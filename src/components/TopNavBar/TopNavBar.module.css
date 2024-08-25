@@ -1,0 +1,122 @@
+/* TopNavBar.module.css */
+
+.topNavbar {
+	position: relative; /* Ensure relative positioning for absolute children */
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 60px; /* Adjust height as needed */
+	background-color: #ffffff; /* Set background color */
+	box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1); /* Add shadow for better visibility */
+	z-index: 100; /* Ensure it's above other elements */
+	display: flex;
+	justify-content: flex-end;
+	align-items: center;
+	padding: 0 20px; /* Add padding as needed */
+}
+
+.rightSection {
+	display: flex;
+	align-items: center;
+}
+
+.notificationIconContainer {
+	position: relative; /* Ensure relative positioning for absolute children */
+	cursor: pointer; /* Add pointer cursor */
+	margin-right: 20px; /* Add margin between icon and profile */
+}
+
+.notificationIcon {
+	font-size: 20px;
+	color: #333; /* Set color for bell icon */
+	font-weight: 300;
+}
+
+.notificationDropdown {
+	position: absolute; /* Position the dropdown */
+	top: calc(100% + 5px); /* Place it below the bell icon */
+	right: 0; /* Align it to the right */
+	background-color: white; /* Set background color */
+	border: 1px solid #ccc; /* Add border */
+	border-radius: 4px; /* Add border radius */
+	padding: 8px; /* Add padding */
+	display: none; /* Hide by default */
+}
+
+.notificationIconContainer:hover .notificationDropdown {
+	display: block; /* Show on hover */
+}
+
+.profileContainer {
+	display: flex;
+	align-items: center;
+}
+
+.profileImage {
+	width: 40px; /* Set image width */
+	height: 40px; /* Set image height */
+	border-radius: 50%; /* Make it circular */
+	margin-right: 10px; /* Add margin between image and user info */
+}
+
+.userInfo {
+	display: flex;
+	flex-direction: column;
+}
+
+.userName {
+	font-weight: bold;
+	color: #000000; /* Set color to black */
+}
+
+.userRole {
+	color: #6c757d; /* Set color to a lighter shade */
+	font-size: 14px; /* Adjust font size as needed */
+}
+
+.signOutPopup {
+	position: absolute; /* Position the popup */
+	top: calc(100% + 5px); /* Position it below the profile image */
+	right: 0; /* Align it to the right */
+	background-color: white; /* Set background color */
+	border: 1px solid #ccc; /* Add border */
+	border-radius: 10px; /* Add border radius */
+	padding: 8px; /* Add padding */
+	z-index: 1000; /* Ensure it's above other elements */
+	box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1); /* Add shadow for better visibility */
+	display: flex;
+	flex-direction: column;
+}
+
+.signOutText {
+	color: #333; /* Set text color */
+	margin-bottom: 8px; /* Add margin below the text */
+}
+
+.signOutButton {
+	position: fixed;
+	top: 70px;
+	background-color: #f00; /* Set background color for sign-out button */
+	color: #fff; /* Set text color */
+	border: none; /* Remove border */
+	border-radius: 4px; /* Add border radius */
+	padding: 8px 16px; /* Add padding */
+	cursor: pointer; /* Add pointer cursor */
+	margin-right: 8px; /* Add margin between buttons */
+}
+
+.confirmButton {
+	background-color: #f00; /* Set background color for confirm button */
+	margin: 10px;
+}
+
+.cancelButton {
+	background-color: #ccc; /* Set background color for cancel button */
+	margin: 10px;
+}
+
+.signOutButton:hover,
+.confirmButton:hover,
+.cancelButton:hover {
+	filter: brightness(90%); /* Reduce brightness on hover */
+}

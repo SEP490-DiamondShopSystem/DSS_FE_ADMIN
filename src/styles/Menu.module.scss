@@ -1,0 +1,25 @@
+.custom-menu {
+	min-width: 460px;
+	box-shadow: none;
+	box-sizing: content-box;
+	font-weight: bold;
+
+	a {
+		text-decoration: none;
+	}
+}
+
+.ant-menu {
+	background-color: #ffffff; /* Ví dụ: thay đổi màu nền của menu */
+	border: none; /* Bỏ viền của menu */
+}
+
+.ant-menu-item {
+	padding: 0 20px; /* Tùy chỉnh khoảng cách padding của các mục menu */
+	font-size: 16px; /* Tùy chỉnh kích thước chữ của các mục menu */
+	box-sizing: content-box;
+}
+
+.ant-menu-item:hover {
+	background-color: #f0f0f0; /* Tùy chỉnh màu nền khi di chuột qua */
+}
