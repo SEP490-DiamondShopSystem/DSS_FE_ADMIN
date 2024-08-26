@@ -1,15 +1,12 @@
-// TopNavbar.jsx
-
-import React, {useState, useRef, useEffect} from 'react';
-import styles from './TopNavBar.module.css'; // Import CSS module file for styling
 import {BellOutlined} from '@ant-design/icons'; // Import icon for notification bell
-import profileImage from './profileImage.jpg'; // Import a sample profile image for illustration
+import React, {useEffect, useRef, useState} from 'react';
 import {useDispatch} from 'react-redux';
-import {message} from 'antd';
 import {useNavigate} from 'react-router-dom';
 import {userLoginSlice} from '../../redux/slices/userLoginSlice';
 import {getLocalStorage, removeLocalStorage} from '../../utils/localstorage';
 import {notifySuccess} from '../../utils/toast';
+import profileImage from './profileImage.jpg'; // Import a sample profile image for illustration
+import styles from './TopNavBar.module.css'; // Import CSS module file for styling
 
 const TopNavbar = () => {
 	const userLocal = getLocalStorage('user');

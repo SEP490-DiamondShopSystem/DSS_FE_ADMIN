@@ -90,8 +90,7 @@ export const DefaultLayout = ({children}) => {
 
 				{showHeaderFooter && (
 					<Footer style={{textAlign: 'center'}}>
-						SportLinker Admin Page ©{new Date().getFullYear()} Created by SportLinker
-						Team
+						Diamond Admin Page ©{new Date().getFullYear()} Created by Diamond Shop Team
 					</Footer>
 				)}
 			</Layout>
