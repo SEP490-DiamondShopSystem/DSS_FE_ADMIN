@@ -1,12 +1,15 @@
-import {DashboardOutlined, UserOutlined} from '@ant-design/icons';
+import {DashboardOutlined, UserOutlined, SettingOutlined} from '@ant-design/icons';
 import {Layout, Menu} from 'antd';
 import React, {useState} from 'react';
 import {Link, useLocation, useNavigate} from 'react-router-dom';
 import {imageExporter} from '../assets/images';
 import TopNavbar from '../components/TopNavBar/TopNavBar'; // Import the TopNavbar component
-const {Footer, Sider, Content} = Layout;
+import '../styles/menuStyle.css';
 
-const getItem = (label, key, icon) => ({key, icon, label});
+const {Footer, Sider, Content} = Layout;
+const {SubMenu} = Menu; // Import SubMenu
+
+const getItem = (label, key, icon, children) => ({key, icon, label, children});
 
 export const DefaultLayout = ({children}) => {
 	const navigate = useNavigate();
@@ -18,7 +21,16 @@ export const DefaultLayout = ({children}) => {
 
 	const items = [
 		getItem('Dashboard', '/dashboard', <DashboardOutlined />),
-		getItem('Manage User', '/users', <UserOutlined />),
+		getItem(
+			'Manage User',
+			'/users',
+			<UserOutlined />
+			// [
+			// getItem('User List', '/users/list'),
+			// getItem('User Settings', '/users/settings', <SettingOutlined />),
+			// getItem('User Profile', '/users/profile'),
+			// ]
+		),
 	];
 
 	const handleClickMenuItem = (e) => {
@@ -38,6 +50,7 @@ export const DefaultLayout = ({children}) => {
 		<Layout style={{minHeight: '100vh'}}>
 			<Sider
 				collapsed={collapsed}
+				className="shadow-sm"
 				collapsible
 				theme="light"
 				onCollapse={toggleCollapsed}
@@ -48,7 +61,7 @@ export const DefaultLayout = ({children}) => {
 						src={collapsed ? imageExporter.tinylogo : imageExporter.logo}
 						alt="logo"
 						style={{
-							width: collapsed ? '60%' : '100%',
+							width: collapsed ? '100%' : '40%',
 							height: 'auto',
 							display: 'block',
 							margin: '10px auto',
@@ -62,11 +75,25 @@ export const DefaultLayout = ({children}) => {
 					selectedKeys={[selectMenu]}
 					mode="inline"
 				>
-					{items.map((item) => (
-						<Menu.Item key={item.key} icon={item.icon}>
-							<Link to={item.key}>{item.label}</Link>
-						</Menu.Item>
-					))}
+					{items.map((item) =>
+						item.children ? (
+							<SubMenu key={item.key} icon={item.icon} title={item.label}>
+								{item.children.map((child) => (
+									<Menu.Item key={child.key}>
+										<Link to={child.key} style={{fontWeight: 'bold'}}>
+											{child.label}
+										</Link>
+									</Menu.Item>
+								))}
+							</SubMenu>
+						) : (
+							<Menu.Item key={item.key} icon={item.icon}>
+								<Link to={item.key} style={{fontWeight: 'bold'}}>
+									{item.label}
+								</Link>
+							</Menu.Item>
+						)
+					)}
 				</Menu>
 			</Sider>
 			<Layout style={{backgroundColor: '#eaeaea', minHeight: '100vh'}}>
@@ -89,7 +116,7 @@ export const DefaultLayout = ({children}) => {
 				</Content>
 
 				{showHeaderFooter && (
-					<Footer style={{textAlign: 'center'}}>
+					<Footer className="text-center font-bold">
 						Diamond Admin Page ©{new Date().getFullYear()} Created by Diamond Shop Team
 					</Footer>
 				)}

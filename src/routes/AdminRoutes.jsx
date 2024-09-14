@@ -2,7 +2,7 @@ import React from 'react';
 import {Navigate, Route, Routes} from 'react-router-dom';
 import {DefaultLayout} from '../layouts/DefaultLayout';
 import UserPage from '../pages/Admin/UserPage';
-import DashboardPage from '../pages/Admin/DashboardPage';
+import DashboardPage from '../pages/Admin/DashboardPage/DashboardPage';
 
 export const AdminRouters = () => {
 	return (
