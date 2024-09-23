@@ -1,10 +1,16 @@
-import {DashboardOutlined, UserOutlined, SettingOutlined} from '@ant-design/icons';
-import {Layout, Menu} from 'antd';
+import {
+	DashboardOutlined,
+	UserOutlined,
+	SettingOutlined,
+	ProductOutlined,
+	RightOutlined,
+} from '@ant-design/icons';
+import {Layout, Menu, Breadcrumb} from 'antd';
 import React, {useState} from 'react';
 import {Link, useLocation, useNavigate} from 'react-router-dom';
 import {imageExporter} from '../assets/images';
 import TopNavbar from '../components/TopNavBar/TopNavBar'; // Import the TopNavbar component
-import '../styles/menuStyle.css';
+import {DiamondOutlined} from '@mui/icons-material';
 
 const {Footer, Sider, Content} = Layout;
 const {SubMenu} = Menu; // Import SubMenu
@@ -17,20 +23,18 @@ export const DefaultLayout = ({children}) => {
 	const location = useLocation();
 	const [selectMenu, setSelectMenu] = useState(location.pathname);
 
+	// Thêm defaultOpenKeys để giữ SubMenu mở
+	const [openKeys, setOpenKeys] = useState([]);
+
 	const pageLocation = ['/dashboard', '/users'];
 
 	const items = [
 		getItem('Dashboard', '/dashboard', <DashboardOutlined />),
-		getItem(
-			'Manage User',
-			'/users',
-			<UserOutlined />
-			// [
-			// getItem('User List', '/users/list'),
-			// getItem('User Settings', '/users/settings', <SettingOutlined />),
-			// getItem('User Profile', '/users/profile'),
-			// ]
-		),
+		getItem('Manage User', '/users', <UserOutlined />),
+		getItem('Manage Product', '/products', <ProductOutlined />, [
+			getItem('Jewelry List', '/products/jewelry-list', <RightOutlined />),
+			getItem('Diamond List', '/products/diamond-list', <DiamondOutlined />),
+		]),
 	];
 
 	const handleClickMenuItem = (e) => {
@@ -42,9 +46,24 @@ export const DefaultLayout = ({children}) => {
 		setCollapsed(!collapsed);
 	};
 
+	// Xử lý mở SubMenu
+	const onOpenChange = (keys) => {
+		setOpenKeys(keys);
+	};
+
 	const isLoginPage = location.pathname === '/login';
 	const isSignUpPage = location.pathname === '/signup';
 	const showHeaderFooter = !(isLoginPage || isSignUpPage);
+
+	// Tạo mảng các item cho Breadcrumb dựa trên pathname
+	const breadcrumbItems = location.pathname
+		.split('/')
+		.filter((path) => path)
+		.map((path, index) => (
+			<Breadcrumb.Item key={index}>
+				<Link to={`/${path}`}>{path.charAt(0).toUpperCase() + path.slice(1)}</Link>
+			</Breadcrumb.Item>
+		));
 
 	return (
 		<Layout style={{minHeight: '100vh'}}>
@@ -54,7 +73,6 @@ export const DefaultLayout = ({children}) => {
 				collapsible
 				theme="light"
 				onCollapse={toggleCollapsed}
-				style={{display: pageLocation.includes(location.pathname) ? 'block' : 'none'}}
 			>
 				<Link to="/dashboard" style={{display: 'block', height: '100px'}}>
 					<img
@@ -74,6 +92,8 @@ export const DefaultLayout = ({children}) => {
 					theme="light"
 					selectedKeys={[selectMenu]}
 					mode="inline"
+					openKeys={openKeys} // Thêm openKeys để giữ SubMenu mở
+					onOpenChange={onOpenChange} // Xử lý khi SubMenu mở
 				>
 					{items.map((item) =>
 						item.children ? (
@@ -98,23 +118,26 @@ export const DefaultLayout = ({children}) => {
 			</Sider>
 			<Layout style={{backgroundColor: '#eaeaea', minHeight: '100vh'}}>
 				{showHeaderFooter && <TopNavbar />}
-				<Content
-					style={{
-						overflow: 'auto',
-						backgroundColor: '#FBFCFB',
-					}}
-				>
+				<Content style={{padding: '0 16px'}}>
+					{/* Thêm Breadcrumb ở đây */}
+					<Breadcrumb style={{margin: '16px 0'}}>
+						<Breadcrumb.Item>
+							<Link to="/dashboard">Home</Link>
+						</Breadcrumb.Item>
+						{breadcrumbItems}
+					</Breadcrumb>
 					<div
 						style={{
 							minHeight: 360,
 							height: 790,
-							backgroundColor: '#ffffff', // Optional: set a background color if needed
+							backgroundColor: '#ffffff',
+							padding: '16px',
+							borderRadius: '8px', // Optional: add some rounding for better appearance
 						}}
 					>
 						{children}
 					</div>
 				</Content>
-
 				{showHeaderFooter && (
 					<Footer className="text-center font-bold">
 						Diamond Admin Page ©{new Date().getFullYear()} Created by Diamond Shop Team
