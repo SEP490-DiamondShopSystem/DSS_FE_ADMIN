@@ -1,0 +1,53 @@
+.custom-table-header .ant-table-thead > tr > th {
+	background-color: #dec986 !important;
+	/* color: white; */
+	font-weight: bold; /* Chữ đậm */
+}
+
+.ant-steps-vertical {
+	display: flex;
+	flex-direction: column-reverse;
+}
+
+.ant-steps-item-process .ant-steps-icon-dot {
+	background-color: #dec986 !important; /* Màu nền cho trạng thái 'process' */
+	border-color: #dec986 !important; /* Màu viền cho trạng thái 'process' */
+}
+
+.ant-steps-item-finish .ant-steps-item-icon {
+	background-color: #1890ff !important; /* Màu nền cho trạng thái 'finish' */
+	border-color: #1890ff !important; /* Màu viền cho trạng thái 'finish' */
+}
+
+/* Tùy chọn: Nếu muốn thay đổi màu của icon bên trong dot */
+.ant-steps-item-icon > .ant-steps-icon {
+	color: #fff; /* Màu sắc của icon bên trong dot */
+}
+
+.ant-steps-item-finish:not(:last-of-type) .ant-steps-item-icon {
+	background-color: #1890ff !important; /* Màu nền cho các dot 'finish' không phải cuối cùng */
+	border-color: #1890ff !important; /* Màu viền cho các dot 'finish' không phải cuối cùng */
+}
+
+.ant-steps-item-finish:last-of-type .ant-steps-item-icon {
+	background-color: #dec986 !important; /* Màu nền cho dot 'finish' cuối cùng */
+	border-color: #dec986 !important; /* Màu viền cho dot 'finish' cuối cùng */
+}
+
+.ant-steps-item-finish:not(:first-of-type) .ant-steps-icon-dot {
+	background-color: #1890ff !important; /* Màu nền cho các dot 'finish' không phải cuối cùng */
+	border-color: #1890ff !important; /* Màu viền cho các dot 'finish' không phải cuối cùng */
+}
+
+.ant-steps-item-finish:first-of-type .ant-steps-icon-dot {
+	background-color: #dec986 !important; /* Màu nền cho dot 'finish' cuối cùng */
+	border-color: #dec986 !important; /* Màu viền cho dot 'finish' cuối cùng */
+}
+
+.ant-steps-icon {
+	color: black !important; /* Ẩn icon */
+}
+
+/* .ant-steps-item-title {
+	font-weight: 700 !important;
+} */
