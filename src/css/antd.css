@@ -51,3 +51,29 @@
 /* .ant-steps-item-title {
 	font-weight: 700 !important;
 } */
+
+/* Áp dụng cho mục menu khi active */
+.ant-menu-item-selected,
+.ant-menu-submenu-selected {
+	color: #dec986 !important;
+}
+
+/* Đối với submenu title */
+.ant-menu-submenu-open {
+	color: #dec986 !important;
+}
+
+/* Khi hover vào mục đã chọn */
+.ant-menu-item:hover,
+.ant-menu-submenu:hover {
+	color: #dec986 !important;
+}
+
+/* Điều chỉnh border-bottom nếu muốn */
+.ant-menu-item::after {
+	border-bottom: 2px solid #dec986 !important;
+}
+
+.ant-menu-title-content {
+	font-weight: 500 !important;
+}
