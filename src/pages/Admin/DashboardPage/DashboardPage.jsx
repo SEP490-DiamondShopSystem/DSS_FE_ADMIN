@@ -1,22 +1,12 @@
-import {
-	Box,
-	Card,
-	CardContent,
-	CardHeader,
-	Container,
-	Divider,
-	FormControl,
-	Grid,
-	MenuItem,
-	Select,
-	Stack,
-	Typography,
-} from '@mui/material';
 import {useState} from 'react';
 import {Helmet} from 'react-helmet';
 import ReactLoading from 'react-loading';
+import {Layout, Card, Row, Col, Select, Form, Typography, Divider} from 'antd';
 import {OverviewBookKpi, OverviewKpi} from './overview/OverviewKpi';
 import {OverviewSummary} from './overview/OverviewSummary';
+
+const {Content} = Layout;
+const {Option} = Select;
 
 const DashboardPage = () => {
 	const currentDate = new Date();
@@ -61,12 +51,12 @@ const DashboardPage = () => {
 		},
 	};
 
-	const handleMonthChange = (event) => {
-		setMonth(event.target.value);
+	const handleMonthChange = (value) => {
+		setMonth(value);
 	};
 
-	const handleYearChange = (event) => {
-		setYear(event.target.value);
+	const handleYearChange = (value) => {
+		setYear(value);
 	};
 
 	return (
@@ -74,215 +64,130 @@ const DashboardPage = () => {
 			<Helmet>
 				<title>Dashboard</title>
 			</Helmet>
-			<Box sx={{flexGrow: 1, py: 8, bgcolor: '#f4f6f8'}}>
-				<Container maxWidth="xl">
+			<Layout style={{padding: '24px'}}>
+				<Content>
 					{loading ? (
-						<Box
-							display="flex"
-							justifyContent="center"
-							alignItems="center"
-							height="100vh"
+						<div
+							style={{
+								display: 'flex',
+								justifyContent: 'center',
+								alignItems: 'center',
+								height: '100vh',
+							}}
 						>
 							<ReactLoading type="spinningBubbles" color="#4878db" />
-						</Box>
+						</div>
 					) : (
-						<Stack spacing={1}>
-							<Typography
-								variant="h4"
-								sx={{fontWeight: 'bold', color: 'primary.main'}}
+						<div>
+							<div
+								style={{
+									display: 'flex',
+									justifyContent: 'flex-end',
+									marginBottom: 16,
+								}}
 							>
-								Dashboard Reports
-							</Typography>
-
-							<div style={{display: 'flex', justifyContent: 'flex-end'}}>
-								<FormControl sx={{minWidth: 120, mr: 2}}>
-									<Select
-										labelId="select-month-label"
-										id="select-month"
-										value={month}
-										onChange={handleMonthChange}
-									>
-										{Array.from({length: 12}, (_, i) => (
-											<MenuItem key={i + 1} value={i + 1}>
-												{new Date(0, i).toLocaleString('default', {
-													month: 'long',
-												})}
-											</MenuItem>
-										))}
-									</Select>
-								</FormControl>
-								<FormControl sx={{minWidth: 120}}>
-									<Select
-										labelId="select-year-label"
-										id="select-year"
-										value={year}
-										onChange={handleYearChange}
-									>
-										{[2022, 2023, 2024, 2025].map((y) => (
-											<MenuItem key={y} value={y}>
-												{y}
-											</MenuItem>
-										))}
-									</Select>
-								</FormControl>
+								<Form layout="inline">
+									<Form.Item>
+										<Select
+											value={month}
+											onChange={handleMonthChange}
+											style={{width: 120}}
+											placeholder="Select month"
+										>
+											{Array.from({length: 12}, (_, i) => (
+												<Option key={i + 1} value={i + 1}>
+													{new Date(0, i).toLocaleString('default', {
+														month: 'long',
+													})}
+												</Option>
+											))}
+										</Select>
+									</Form.Item>
+									<Form.Item>
+										<Select
+											value={year}
+											onChange={handleYearChange}
+											style={{width: 120}}
+											placeholder="Select year"
+										>
+											{[2022, 2023, 2024, 2025].map((y) => (
+												<Option key={y} value={y}>
+													{y}
+												</Option>
+											))}
+										</Select>
+									</Form.Item>
+								</Form>
 							</div>
-							<Grid container spacing={1}>
-								<Grid item xs={3}>
+							<Row gutter={[16, 16]} className="mb-5">
+								<Col span={6}>
 									<OverviewSummary
 										label="TOTAL REVENUE"
 										value={fakeData.users.players.total_player.toLocaleString(
 											'vi-VN'
 										)}
 									/>
-								</Grid>
-								<Grid item xs={3}>
+								</Col>
+								<Col span={6}>
 									<OverviewSummary
 										label="TOTAL ORDER"
 										value={fakeData.users.stadiums.total_stadium_account.toLocaleString(
 											'vi-VN'
 										)}
 									/>
-								</Grid>
-								<Grid item xs={3}>
+								</Col>
+								<Col span={6}>
 									<OverviewSummary
 										label="TOTAL CUSTOM ORDER"
 										value={fakeData.blogs.total_blog.toLocaleString('vi-VN')}
 									/>
-								</Grid>
-								<Grid item xs={3}>
+								</Col>
+								<Col span={6}>
 									<OverviewSummary
 										label="TOTAL CUSTOMER"
 										value={`${fakeData.premiums.total_premium}`}
 									/>
-								</Grid>
-							</Grid>
-							<Grid container spacing={1}>
-								<Grid item xs={12}>
-									<Box>
-										<Card sx={{boxShadow: 3}}>
-											<CardHeader title="Match Summary" />
-											<Divider />
-											<CardContent>
-												<Stack
-													direction="row"
-													justifyContent="center"
-													spacing={3}
-												>
-													<Grid item xs={6}>
-														<OverviewSummary
-															label="Total Matches"
-															value={fakeData.matches.total_match.toLocaleString(
-																'vi-VN'
-															)}
-														/>
-													</Grid>
-													<Grid item xs={6}>
-														<OverviewSummary
-															label="Change from last month"
-															value={`${fakeData.matches.compare_last_month}%`}
-														/>
-													</Grid>
-												</Stack>
-												<OverviewKpi
-													chartSeries={[
-														{
-															name: 'Total Matches',
-															data: fakeData.matches.match_by_time.map(
-																(item) => ({
-																	x: item.time,
-																	y: item.total_match,
-																})
-															),
-														},
-													]}
+								</Col>
+							</Row>
+							<Row gutter={[16, 16]}>
+								<Col span={24}>
+									<Card title="Match Summary" bordered={false}>
+										<Row gutter={[16, 16]}>
+											<Col span={12}>
+												<OverviewSummary
+													label="Total Matches"
+													value={fakeData.matches.total_match.toLocaleString(
+														'vi-VN'
+													)}
 												/>
-											</CardContent>
-										</Card>
-									</Box>
-								</Grid>
-							</Grid>
-							<Grid container spacing={1}>
-								<Grid item xs={12}>
-									<Box mb={3}>
-										<Card sx={{boxShadow: 3, width: '100%'}}>
-											<div style={{display: 'flex'}}>
-												<CardHeader title="Booking Summary" />
-											</div>
-											<Divider />
-											<CardContent>
-												<Stack
-													direction="row"
-													justifyContent="center"
-													spacing={3}
-												>
-													<Grid item xs={3}>
-														<OverviewSummary
-															label="Total Bookings"
-															value={fakeData.bookings.bookings.total_booking.toLocaleString(
-																'vi-VN'
-															)}
-														/>
-													</Grid>
-													<Grid item xs={3}>
-														<OverviewSummary
-															label="Total Income"
-															value={fakeData.revenues.income.total_income.toLocaleString(
-																'vi-VN'
-															)}
-														/>
-													</Grid>
-													<Grid item xs={3}>
-														<OverviewSummary
-															label="Total Revenue"
-															value={`${fakeData.revenues.revenue.total_revenue.toLocaleString(
-																'vi-VN'
-															)} VNĐ`}
-														/>
-													</Grid>
-													<Grid item xs={3}>
-														<OverviewSummary
-															label="Booking Revenue (30%)"
-															value={`${(
-																fakeData.revenues.revenue
-																	.total_revenue * 0.3
-															).toLocaleString('vi-VN')} VNĐ`}
-														/>
-													</Grid>
-												</Stack>
-												<OverviewBookKpi
-													chartSeries={[
-														{
-															name:
-																selectedTable
-																	.charAt(0)
-																	.toUpperCase() +
-																selectedTable.slice(1),
-															data: fakeData.bookings.bookings.booking_by_day_of_week.map(
-																(item) => ({
-																	x: [
-																		'Mon',
-																		'Tue',
-																		'Wed',
-																		'Thu',
-																		'Fri',
-																		'Sat',
-																		'Sun',
-																	][item.day],
-																	y: item.total,
-																})
-															),
-														},
-													]}
+											</Col>
+											<Col span={12}>
+												<OverviewSummary
+													label="Change from last month"
+													value={`${fakeData.matches.compare_last_month}%`}
 												/>
-											</CardContent>
-										</Card>
-									</Box>
-								</Grid>
-							</Grid>
-						</Stack>
+											</Col>
+										</Row>
+										<OverviewKpi
+											chartSeries={[
+												{
+													name: 'Total Matches',
+													data: fakeData.matches.match_by_time.map(
+														(item) => ({
+															x: item.time,
+															y: item.total_match,
+														})
+													),
+												},
+											]}
+										/>
+									</Card>
+								</Col>
+							</Row>
+						</div>
 					)}
-				</Container>
-			</Box>
+				</Content>
+			</Layout>
 		</>
 	);
 };

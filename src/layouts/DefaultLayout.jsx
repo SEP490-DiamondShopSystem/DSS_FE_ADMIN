@@ -1,19 +1,21 @@
+import React, {useState} from 'react';
+
 import {
 	DashboardOutlined,
-	UserOutlined,
-	SettingOutlined,
+	OrderedListOutlined,
 	ProductOutlined,
 	RightOutlined,
+	UserOutlined,
 } from '@ant-design/icons';
-import {Layout, Menu, Breadcrumb} from 'antd';
-import React, {useState} from 'react';
+import {DiamondOutlined} from '@mui/icons-material';
+import {Breadcrumb, Layout, Menu} from 'antd';
 import {Link, useLocation, useNavigate} from 'react-router-dom';
 import {imageExporter} from '../assets/images';
-import TopNavbar from '../components/TopNavBar/TopNavBar'; // Import the TopNavbar component
-import {DiamondOutlined} from '@mui/icons-material';
+import TopNavbar from '../components/TopNavBar/TopNavBar';
+import '../css/antd.css';
 
 const {Footer, Sider, Content} = Layout;
-const {SubMenu} = Menu; // Import SubMenu
+const {SubMenu} = Menu;
 
 const getItem = (label, key, icon, children) => ({key, icon, label, children});
 
@@ -35,6 +37,7 @@ export const DefaultLayout = ({children}) => {
 			getItem('Jewelry List', '/products/jewelry-list', <RightOutlined />),
 			getItem('Diamond List', '/products/diamond-list', <DiamondOutlined />),
 		]),
+		getItem('Manage Order', '/orders', <OrderedListOutlined />),
 	];
 
 	const handleClickMenuItem = (e) => {
@@ -61,7 +64,7 @@ export const DefaultLayout = ({children}) => {
 		.filter((path) => path)
 		.map((path, index) => (
 			<Breadcrumb.Item key={index}>
-				<Link to={`/${path}`}>{path.charAt(0).toUpperCase() + path.slice(1)}</Link>
+				<p to={`/${path}`}>{path.charAt(0).toUpperCase() + path.slice(1)}</p>
 			</Breadcrumb.Item>
 		));
 
@@ -92,8 +95,8 @@ export const DefaultLayout = ({children}) => {
 					theme="light"
 					selectedKeys={[selectMenu]}
 					mode="inline"
-					openKeys={openKeys} // Thêm openKeys để giữ SubMenu mở
-					onOpenChange={onOpenChange} // Xử lý khi SubMenu mở
+					openKeys={openKeys}
+					onOpenChange={onOpenChange}
 				>
 					{items.map((item) =>
 						item.children ? (
@@ -119,7 +122,6 @@ export const DefaultLayout = ({children}) => {
 			<Layout style={{backgroundColor: '#eaeaea', minHeight: '100vh'}}>
 				{showHeaderFooter && <TopNavbar />}
 				<Content style={{padding: '0 16px'}}>
-					{/* Thêm Breadcrumb ở đây */}
 					<Breadcrumb style={{margin: '16px 0'}}>
 						<Breadcrumb.Item>
 							<Link to="/dashboard">Home</Link>
@@ -128,8 +130,7 @@ export const DefaultLayout = ({children}) => {
 					</Breadcrumb>
 					<div
 						style={{
-							minHeight: 360,
-							height: 790,
+							minHeight: 790,
 							backgroundColor: '#ffffff',
 							padding: '16px',
 							borderRadius: '8px', // Optional: add some rounding for better appearance

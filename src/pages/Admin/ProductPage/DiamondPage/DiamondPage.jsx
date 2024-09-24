@@ -155,6 +155,7 @@ const DiamondPage = () => {
 						<Space wrap className="ml-8">
 							<Select
 								defaultValue=""
+								placeholder="Shape"
 								style={{width: 120}}
 								allowClear
 								onChange={handleShapeChange}
