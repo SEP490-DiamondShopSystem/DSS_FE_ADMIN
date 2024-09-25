@@ -2219,3 +2219,15 @@ video {
 .m-32 {
 	margin: 8rem /* 128px */;
 }
+
+.shrink {
+	flex-shrink: 1;
+}
+
+.flex-none {
+	flex: none;
+}
+
+.mr-1 {
+	margin-right: 0.25rem /* 4px */;
+}
