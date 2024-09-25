@@ -51,31 +51,31 @@ const OrderPage = () => {
 
 	const columns = [
 		{
-			title: 'Order ID',
+			title: 'ID Đơn Hàng',
 			dataIndex: 'id',
 			key: 'id',
 			align: 'center',
 		},
 		{
-			title: 'Order Time',
+			title: 'Thời Gian Đặt Hàng',
 			dataIndex: 'orderTime',
 			key: 'orderTime',
 			align: 'center',
 		},
 		{
-			title: 'Total Amount',
+			title: 'Giá',
 			key: 'totalAmount',
 			dataIndex: 'totalAmount',
 			align: 'center',
 		},
 		{
-			title: 'Payment Method',
+			title: 'PT Thanh Toán',
 			key: 'paymentMethod',
 			dataIndex: 'paymentMethod',
 			align: 'center',
 		},
 		{
-			title: 'Customer',
+			title: 'Khách Hàng',
 			key: 'customer',
 			dataIndex: 'customer',
 			align: 'center',
@@ -87,7 +87,7 @@ const OrderPage = () => {
 			align: 'center',
 		},
 		{
-			title: 'Status',
+			title: 'Trạng Thái',
 			key: 'status',
 			dataIndex: 'status',
 			align: 'center',
@@ -116,7 +116,7 @@ const OrderPage = () => {
 			},
 		},
 		{
-			title: 'Action',
+			title: '',
 			key: 'action',
 			align: 'center',
 			render: (_, record) => (

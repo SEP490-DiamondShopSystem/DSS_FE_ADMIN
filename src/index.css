@@ -1,5 +1,5 @@
 :root {
 	font-family: 'Open Sans', system-ui, Avenir, Helvetica, Arial, sans-serif;
 	background-color: #f3f3f3;
-	overflow-y: none;
+	overflow: none;
 }
