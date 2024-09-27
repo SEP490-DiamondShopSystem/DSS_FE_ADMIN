@@ -5,6 +5,7 @@ import {
 	OrderedListOutlined,
 	ProductOutlined,
 	RightOutlined,
+	SafetyOutlined,
 	UserOutlined,
 } from '@ant-design/icons';
 import {DiamondOutlined} from '@mui/icons-material';
@@ -38,6 +39,7 @@ export const DefaultLayout = ({children}) => {
 			getItem('Diamond List', '/products/diamond-list', <DiamondOutlined />),
 		]),
 		getItem('Manage Order', '/orders', <OrderedListOutlined />),
+		getItem('Manage Warranty', '/warranties', <SafetyOutlined />),
 	];
 
 	const handleClickMenuItem = (e) => {
