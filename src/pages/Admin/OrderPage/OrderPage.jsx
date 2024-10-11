@@ -9,14 +9,14 @@ const {RangePicker} = DatePicker;
 
 const statusList = [
 	{name: 'Tất cả', value: 'all'},
-	{name: 'Chờ TToán', value: 'pendingPayment'},
-	{name: 'Chờ XN', value: 'pendingConfirmation'},
-	{name: 'Đã xác nhận', value: 'confirmed'},
-	{name: 'Đã hủy', value: 'canceled'},
-	{name: 'Từ chối', value: 'rejected'},
-	{name: 'Đang VC', value: 'shipping'},
-	{name: 'Đã VChuyển', value: 'shipped'},
-	{name: 'VC Thất bại', value: 'shipFailed'},
+	{name: 'Pending', value: 'pending'},
+	{name: 'Confirmed', value: 'confirmed'},
+	{name: 'Accepted', value: 'accepted'},
+	{name: 'Processing', value: 'processing'},
+	{name: 'Finished', value: 'finished'},
+	{name: 'Shipping', value: 'shipping'},
+	{name: 'Received', value: 'received'},
+	{name: 'Rejected', value: 'rejected'},
 ];
 
 // Sample data with email field
@@ -25,21 +25,20 @@ const dataSource = [
 		id: '001',
 		orderTime: '24/09/2024',
 		totalAmount: '$120.00',
-		paymentMethod: 'Credit Card',
+		paymentMethod: 'Pay All',
 		customer: 'John Doe',
 		email: 'john.doe@example.com',
-		status: 'confirmed',
+		status: 'accepted',
 	},
 	{
 		id: '002',
 		orderTime: '23/09/2024',
 		totalAmount: '$85.00',
-		paymentMethod: 'PayPal',
+		paymentMethod: 'Online',
 		customer: 'Jane Smith',
 		email: 'jane.smith@example.com',
-		status: 'pendingPayment',
+		status: 'pending',
 	},
-	// Add other data entries as needed
 ];
 
 const OrderPage = () => {
@@ -100,12 +99,14 @@ const OrderPage = () => {
 					color = 'volcano';
 				} else if (status === 'shipping') {
 					color = 'blue';
-				} else if (status === 'pendingPayment' || status === 'pendingConfirmation') {
+				} else if (status === 'pending' || status === 'confirmed') {
 					color = 'geekblue';
-				} else if (status === 'shipped') {
+				} else if (status === 'processing') {
 					color = 'purple';
 				} else if (status === 'confirmed') {
 					color = 'gold';
+				} else if (status === 'received') {
+					color = 'green';
 				}
 
 				return (

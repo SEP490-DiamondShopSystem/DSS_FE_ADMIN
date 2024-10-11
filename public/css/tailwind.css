@@ -2231,3 +2231,11 @@ video {
 .mr-1 {
 	margin-right: 0.25rem /* 4px */;
 }
+
+.border-lightGray1 {
+	border-color: e4e4e4;
+}
+
+.text-lightGray1 {
+	color: e4e4e4;
+}

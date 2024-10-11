@@ -1,9 +1,8 @@
 import React, {useState} from 'react';
-import {Image, Input, Table, Tag} from 'antd';
+import {Image, Input, Select, Space, Table, Tag} from 'antd';
 import {Filter} from '../../../components/Filter';
 
 const {Search} = Input;
-
 const dataSource = [
 	{
 		id: '1',
@@ -14,6 +13,7 @@ const dataSource = [
 		sku: 'SKU001',
 		owner: 'Nguyễn Văn A',
 		status: 'Active',
+		type: 'jewelry',
 	},
 	{
 		id: '2',
@@ -24,6 +24,7 @@ const dataSource = [
 		sku: 'SKU002',
 		owner: 'Trần Thị B',
 		status: 'Expired',
+		type: 'diamond',
 	},
 	{
 		id: '3',
@@ -34,6 +35,7 @@ const dataSource = [
 		sku: 'SKU003',
 		owner: 'Lê Văn C',
 		status: 'Expired',
+		type: 'jewelry',
 	},
 	{
 		id: '4',
@@ -44,6 +46,7 @@ const dataSource = [
 		sku: 'SKU004',
 		owner: 'Phạm Thị D',
 		status: 'Active',
+		type: 'diamond',
 	},
 	{
 		id: '5',
@@ -54,6 +57,7 @@ const dataSource = [
 		sku: 'SKU005',
 		owner: 'Hoàng Văn E',
 		status: 'Active',
+		type: 'jewelry',
 	},
 	{
 		id: '6',
@@ -64,6 +68,7 @@ const dataSource = [
 		sku: 'SKU006',
 		owner: 'Đặng Thị F',
 		status: 'Active',
+		type: 'diamond',
 	},
 	{
 		id: '7',
@@ -74,6 +79,7 @@ const dataSource = [
 		sku: 'SKU007',
 		owner: 'Nguyễn Văn G',
 		status: 'Expired',
+		type: 'jewelry',
 	},
 	{
 		id: '8',
@@ -84,6 +90,7 @@ const dataSource = [
 		sku: 'SKU008',
 		owner: 'Trần Thị H',
 		status: 'Expired',
+		type: 'diamond',
 	},
 	{
 		id: '9',
@@ -94,6 +101,7 @@ const dataSource = [
 		sku: 'SKU009',
 		owner: 'Lê Văn I',
 		status: 'Expired',
+		type: 'jewelry',
 	},
 	{
 		id: '10',
@@ -104,6 +112,117 @@ const dataSource = [
 		sku: 'SKU010',
 		owner: 'Phạm Thị K',
 		status: 'Expired',
+		type: 'diamond',
+	},
+	{
+		id: '11',
+		image: 'https://via.placeholder.com/50',
+		productName: 'Sản Phẩm 11',
+		shipDate: '2022-11-20',
+		expireDate: '2023-11-20',
+		sku: 'SKU011',
+		owner: 'Nguyễn Văn L',
+		status: 'Active',
+		type: 'jewelry',
+	},
+	{
+		id: '12',
+		image: 'https://via.placeholder.com/50',
+		productName: 'Sản Phẩm 12',
+		shipDate: '2022-10-15',
+		expireDate: '2023-10-15',
+		sku: 'SKU012',
+		owner: 'Trần Thị M',
+		status: 'Expired',
+		type: 'diamond',
+	},
+	{
+		id: '13',
+		image: 'https://via.placeholder.com/50',
+		productName: 'Sản Phẩm 13',
+		shipDate: '2022-09-10',
+		expireDate: '2023-09-10',
+		sku: 'SKU013',
+		owner: 'Lê Văn N',
+		status: 'Expired',
+		type: 'jewelry',
+	},
+	{
+		id: '14',
+		image: 'https://via.placeholder.com/50',
+		productName: 'Sản Phẩm 14',
+		shipDate: '2022-08-05',
+		expireDate: '2023-08-05',
+		sku: 'SKU014',
+		owner: 'Phạm Thị O',
+		status: 'Active',
+		type: 'diamond',
+	},
+	{
+		id: '15',
+		image: 'https://via.placeholder.com/50',
+		productName: 'Sản Phẩm 15',
+		shipDate: '2022-07-20',
+		expireDate: '2023-07-20',
+		sku: 'SKU015',
+		owner: 'Hoàng Văn P',
+		status: 'Expired',
+		type: 'jewelry',
+	},
+	{
+		id: '16',
+		image: 'https://via.placeholder.com/50',
+		productName: 'Sản Phẩm 16',
+		shipDate: '2022-06-10',
+		expireDate: '2023-06-10',
+		sku: 'SKU016',
+		owner: 'Đặng Thị Q',
+		status: 'Active',
+		type: 'diamond',
+	},
+	{
+		id: '17',
+		image: 'https://via.placeholder.com/50',
+		productName: 'Sản Phẩm 17',
+		shipDate: '2022-05-05',
+		expireDate: '2023-05-05',
+		sku: 'SKU017',
+		owner: 'Nguyễn Văn R',
+		status: 'Expired',
+		type: 'jewelry',
+	},
+	{
+		id: '18',
+		image: 'https://via.placeholder.com/50',
+		productName: 'Sản Phẩm 18',
+		shipDate: '2022-04-01',
+		expireDate: '2023-04-01',
+		sku: 'SKU018',
+		owner: 'Trần Thị S',
+		status: 'Expired',
+		type: 'diamond',
+	},
+	{
+		id: '19',
+		image: 'https://via.placeholder.com/50',
+		productName: 'Sản Phẩm 19',
+		shipDate: '2022-03-10',
+		expireDate: '2023-03-10',
+		sku: 'SKU019',
+		owner: 'Lê Văn T',
+		status: 'Active',
+		type: 'jewelry',
+	},
+	{
+		id: '20',
+		image: 'https://via.placeholder.com/50',
+		productName: 'Sản Phẩm 20',
+		shipDate: '2022-02-15',
+		expireDate: '2023-02-15',
+		sku: 'SKU020',
+		owner: 'Phạm Thị U',
+		status: 'Active',
+		type: 'diamond',
 	},
 ];
 
@@ -161,11 +280,18 @@ const columns = [
 			return <Tag color={color}>{status.toUpperCase()}</Tag>;
 		},
 	},
+	{
+		title: 'Loại',
+		key: 'type',
+		dataIndex: 'type',
+		align: 'center',
+	},
 ];
 
 const WarrantyPage = () => {
 	const [active, setActive] = useState('all');
 	const [searchText, setSearchText] = useState('');
+	const [type, setType] = useState('');
 
 	const filter = [
 		{name: 'All', value: 'all'},
@@ -180,11 +306,15 @@ const WarrantyPage = () => {
 	const onSearch = (value) => {
 		setSearchText(value);
 	};
+	const handleTypeChange = (value) => {
+		setType(value);
+	};
 
 	const filteredData = dataSource.filter((item) => {
 		const matchesStatus = active === 'all' || item.status === active;
 		const matchesSearch = item.sku.toLowerCase().includes(searchText.toLowerCase());
-		return matchesStatus && matchesSearch;
+		const matchesType = type === '' || item.type === type;
+		return matchesStatus && matchesSearch && matchesType;
 	});
 
 	return (
@@ -198,6 +328,18 @@ const WarrantyPage = () => {
 					allowClear
 					onSearch={onSearch}
 				/>
+				<Space wrap className="ml-8">
+					<Select
+						defaultValue=""
+						style={{width: 120}}
+						allowClear
+						onChange={handleTypeChange}
+						options={[
+							{value: 'jewelry', label: 'Jewelry'},
+							{value: 'diamond', label: 'Diamond'},
+						]}
+					/>
+				</Space>
 			</div>
 			<Table dataSource={filteredData} columns={columns} pagination={{pageSize: 5}} />
 		</div>
