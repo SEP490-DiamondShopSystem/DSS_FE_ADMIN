@@ -1,5 +1,6 @@
-import {BellOutlined} from '@ant-design/icons'; // Import icon for notification bell
 import React, {useEffect, useRef, useState} from 'react';
+
+import {BellOutlined} from '@ant-design/icons'; // Import icon for notification bell
 import {useDispatch} from 'react-redux';
 import {useNavigate} from 'react-router-dom';
 import {userLoginSlice} from '../../redux/slices/userLoginSlice';
@@ -7,6 +8,7 @@ import {getLocalStorage, removeLocalStorage} from '../../utils/localstorage';
 import {notifySuccess} from '../../utils/toast';
 import profileImage from './profileImage.jpg'; // Import a sample profile image for illustration
 import styles from './TopNavBar.module.css'; // Import CSS module file for styling
+import {Button} from 'antd';
 
 const TopNavbar = () => {
 	const userLocal = getLocalStorage('user');
@@ -104,32 +106,31 @@ const TopNavbar = () => {
 						<span className={styles.userRole}>{user?.role}</span>
 					</div>
 					{showSignOutButton && (
-						<button
+						<Button
 							ref={signOutRef}
+							type="text"
 							className={styles.signOutButton}
 							onClick={handleSignOut}
 						>
 							Sign Out
-						</button>
+						</Button>
 					)}
 					{showSignOutPopup && (
 						<div className={styles.signOutPopup}>
 							<span className={styles.signOutText}>
 								Are you sure you want to sign out?
 							</span>
-							<div>
-								<button
-									className={styles.confirmButton}
-									onClick={handleConfirmSignOut}
-								>
+							<div className="flex items-center justify-around my-2">
+								<Button danger className="" onClick={handleConfirmSignOut}>
 									Yes
-								</button>
-								<button
-									className={styles.cancelButton}
+								</Button>
+								<Button
+									type="text"
+									className="text-lightGray1 border border-lightGray1"
 									onClick={handleCancelSignOut}
 								>
 									Cancel
-								</button>
+								</Button>
 							</div>
 						</div>
 					)}
