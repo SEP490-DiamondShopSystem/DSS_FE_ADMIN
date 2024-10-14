@@ -6,33 +6,33 @@ const {Title, Text} = Typography;
 const TimeLineOrder = () => {
 	const [confirmStatus, setConfirmStatus] = useState(false);
 	const [currentStep, setCurrentStep] = useState(0);
-	const [orderStatus, setOrderStatus] = useState('Đã vận chuyển');
+	const [orderStatus, setOrderStatus] = useState('Chờ Xác Nhận');
 
 	useEffect(() => {
 		switch (orderStatus) {
 			case 'Chờ Xác Nhận':
 				setCurrentStep(0);
 				break;
-			case 'Chờ Thanh Toán':
+			// case 'Chờ Thanh Toán':
+			// 	setCurrentStep(1);
+			// 	break;
+			case 'Đang Chuẩn Bị':
 				setCurrentStep(1);
 				break;
-			case 'Thanh Toán Hoàn Tất':
+			case 'Hoàn Tất Chuẩn Bị Hàng':
 				setCurrentStep(2);
 				break;
-			case 'Hoàn Tất Chuẩn Bị Hàng':
+			case 'Chuyển giao shipper thành công':
 				setCurrentStep(3);
 				break;
-			case 'Chuyển giao shipper thành công':
+			case 'Đang vận chuyển':
 				setCurrentStep(4);
 				break;
-			case 'Đang vận chuyển':
+			case 'Đã vận chuyển':
 				setCurrentStep(5);
 				break;
-			case 'Đã vận chuyển':
-				setCurrentStep(6);
-				break;
 			case 'Bị báo cáo':
-				setCurrentStep(7);
+				setCurrentStep(6);
 				break;
 			default:
 				setCurrentStep(0);
@@ -43,37 +43,37 @@ const TimeLineOrder = () => {
 		{
 			title: 'Chờ Xác Nhận',
 			subTitle: '00:01:02',
-			status: 'finish',
+			status: `${'finish'}`,
 		},
-		{
-			title: 'Chờ Thanh Toán',
-			subTitle: '00:01:02',
-			status: 'finish',
-		},
+		// {
+		// 	title: 'Chờ Thanh Toán',
+		// 	subTitle: '00:01:02',
+		// 	status: 'process',
+		// },
 		{
 			title: 'Thanh Toán Hoàn Tất',
 			subTitle: '00:01:02',
-			status: 'finish',
+			status: 'process',
 		},
 		{
 			title: 'Hoàn Tất Chuẩn Bị Hàng',
 			subTitle: '00:01:02',
-			status: 'finish',
+			status: 'waiting',
 		},
 		{
 			title: 'Chuyển giao shipper thành công',
 			subTitle: '00:01:02',
-			status: 'finish',
+			status: 'waiting',
 		},
 		{
 			title: 'Đang vận chuyển',
 			subTitle: '00:01:02',
-			status: 'finish',
+			status: 'waiting',
 		},
 		{
 			title: 'Đã vận chuyển',
 			subTitle: '00:01:02',
-			status: 'process',
+			status: 'waiting',
 		},
 		{
 			title: 'Bị báo cáo',
@@ -108,7 +108,11 @@ const TimeLineOrder = () => {
 						<Button type="text" className="bg-red font-semibold w-32 rounded-full">
 							Hủy bỏ
 						</Button>
-						<Button type="text" className="bg-green font-semibold w-32 rounded-full">
+						<Button
+							type="text"
+							className="bg-green font-semibold w-32 rounded-full"
+							onClick={() => setCurrentStep(1)}
+						>
 							Xác nhận
 						</Button>
 					</div>
@@ -118,9 +122,18 @@ const TimeLineOrder = () => {
 			{/* Chờ Thanh Toán */}
 			{currentStep === 1 && (
 				<div className="border rounded-lg border-primary bg-tintWhite p-5 mb-5">
-					<div className="flex items-center" style={{fontSize: 16}}>
+					<div className="flex items-center mb-5" style={{fontSize: 16}}>
 						<p className="font-semibold">Trạng thái đơn hàng:</p>
-						<p className="ml-5">Chờ Thanh Toán</p>
+						<p className="ml-5">Đơn Hàng Đã Xác Nhận</p>
+					</div>
+					<div className="flex justify-around">
+						<Button
+							type="text"
+							className="bg-green font-semibold w-full rounded-full"
+							onClick={() => setCurrentStep(2)}
+						>
+							Chuẩn bị hàng
+						</Button>
 					</div>
 				</div>
 			)}
@@ -130,11 +143,15 @@ const TimeLineOrder = () => {
 				<div className="border rounded-lg border-primary bg-tintWhite p-5 mb-5">
 					<div className="flex items-center mb-5" style={{fontSize: 16}}>
 						<p className="font-semibold">Trạng thái đơn hàng:</p>
-						<p className="ml-5">Thanh Toán Hoàn Tất</p>
+						<p className="ml-5">Đang Chuẩn Bị Đơn Hàng</p>
 					</div>
 					<div className="flex justify-around">
-						<Button type="text" className="bg-green font-semibold w-full rounded-full">
-							Chuẩn bị hàng
+						<Button
+							type="text"
+							className="bg-green font-semibold w-full rounded-full"
+							onClick={() => setCurrentStep(3)}
+						>
+							Hoàn Tất
 						</Button>
 					</div>
 				</div>
@@ -167,7 +184,11 @@ const TimeLineOrder = () => {
 						/>
 					</div>
 					<div className="flex justify-around">
-						<Button type="text" className="bg-green font-semibold rounded-full w-full">
+						<Button
+							type="text"
+							className="bg-green font-semibold rounded-full w-full"
+							onClick={() => setCurrentStep(4)}
+						>
 							Chuyển Giao
 						</Button>
 					</div>
@@ -177,9 +198,18 @@ const TimeLineOrder = () => {
 			{/* Chuyển giao shipper thành công */}
 			{currentStep === 4 && (
 				<div className="border rounded-lg border-primary bg-tintWhite p-5 mb-5">
-					<div className="flex items-center" style={{fontSize: 16}}>
+					<div className="flex items-center mb-5" style={{fontSize: 16}}>
 						<p className="font-semibold">Trạng thái đơn hàng:</p>
 						<p className="ml-5">Chuyển giao shipper thành công</p>
+					</div>
+					<div className="flex justify-around">
+						<Button
+							type="text"
+							className="bg-green font-semibold w-full rounded-full"
+							onClick={() => setCurrentStep(5)}
+						>
+							Tiếp tục
+						</Button>
 					</div>
 				</div>
 			)}
@@ -187,9 +217,18 @@ const TimeLineOrder = () => {
 			{/* Đang giao hàng */}
 			{currentStep === 5 && (
 				<div className="border rounded-lg border-primary bg-tintWhite p-5 mb-5">
-					<div className="flex items-center" style={{fontSize: 16}}>
+					<div className="flex items-center mb-5" style={{fontSize: 16}}>
 						<p className="font-semibold">Trạng thái đơn hàng:</p>
 						<p className="ml-5">Đang giao hàng</p>
+					</div>
+					<div className="flex justify-around">
+						<Button
+							type="text"
+							className="bg-green font-semibold w-full rounded-full"
+							onClick={() => setCurrentStep(6)}
+						>
+							Tiếp tục
+						</Button>
 					</div>
 				</div>
 			)}
@@ -197,9 +236,18 @@ const TimeLineOrder = () => {
 			{/* Đã giao */}
 			{currentStep === 6 && (
 				<div className="border rounded-lg border-primary bg-tintWhite p-5 mb-5">
-					<div className="flex items-center" style={{fontSize: 16}}>
+					<div className="flex items-center mb-5" style={{fontSize: 16}}>
 						<p className="font-semibold">Trạng thái đơn hàng:</p>
 						<p className="ml-5">Đã giao</p>
+					</div>
+					<div className="flex justify-around">
+						<Button
+							type="text"
+							className="bg-green font-semibold w-full rounded-full"
+							onClick={() => setCurrentStep(7)}
+						>
+							Tiếp tục
+						</Button>
 					</div>
 				</div>
 			)}
@@ -207,9 +255,18 @@ const TimeLineOrder = () => {
 			{/* Bị báo cáo */}
 			{currentStep === 7 && (
 				<div className="border rounded-lg border-primary bg-tintWhite p-5 mb-5">
-					<div className="flex items-center" style={{fontSize: 16}}>
+					<div className="flex items-center mb-5" style={{fontSize: 16}}>
 						<p className="font-semibold">Trạng thái đơn hàng:</p>
 						<p className="ml-5 text-red">Bị báo cáo</p>
+					</div>
+					<div className="flex justify-around">
+						<Button
+							type="text"
+							className="bg-green font-semibold w-full rounded-full"
+							onClick={() => setCurrentStep(0)}
+						>
+							Tiếp tục
+						</Button>
 					</div>
 				</div>
 			)}
