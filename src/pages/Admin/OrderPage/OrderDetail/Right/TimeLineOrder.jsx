@@ -7,43 +7,98 @@ const TimeLineOrder = () => {
 	const [confirmStatus, setConfirmStatus] = useState(false);
 	const [currentStep, setCurrentStep] = useState(0);
 	const [orderStatus, setOrderStatus] = useState('Chờ Xác Nhận');
+	const [status, setStatus] = useState({
+		pending: 'process',
+		processing: 'waiting',
+		prepared: 'waiting',
+		delivering: 'waiting',
+		success: 'waiting',
+		error: 'waiting',
+	});
 
-	useEffect(() => {
-		switch (orderStatus) {
-			case 'Chờ Xác Nhận':
-				setCurrentStep(0);
-				break;
-			// case 'Chờ Thanh Toán':
-			// 	setCurrentStep(1);
-			// 	break;
-			case 'Đang Chuẩn Bị':
-				setCurrentStep(1);
-				break;
-			case 'Hoàn Tất Chuẩn Bị Hàng':
-				setCurrentStep(2);
-				break;
-			case 'Chuyển giao shipper thành công':
-				setCurrentStep(3);
-				break;
-			case 'Đang vận chuyển':
-				setCurrentStep(4);
-				break;
-			case 'Đã vận chuyển':
-				setCurrentStep(5);
-				break;
-			case 'Bị báo cáo':
-				setCurrentStep(6);
-				break;
-			default:
-				setCurrentStep(0);
-		}
-	}, [orderStatus]);
+	const handleProcessStatus = () => {
+		setCurrentStep(1);
+		setStatus({
+			pending: 'finish',
+			processing: 'process',
+			prepared: 'waiting',
+			delivering: 'waiting',
+			success: 'waiting',
+			error: 'waiting',
+		});
+	};
+	const handlePreparedStatus = () => {
+		setCurrentStep(2);
+		setStatus({
+			pending: 'finish',
+			processing: 'finish',
+			prepared: 'process',
+			delivering: 'waiting',
+			success: 'waiting',
+			error: 'waiting',
+		});
+	};
+	const handleTransferStatus = () => {
+		setCurrentStep(3);
+		setStatus({
+			pending: 'finish',
+			processing: 'finish',
+			prepared: 'finish',
+			delivering: 'process',
+			success: 'waiting',
+			error: 'waiting',
+		});
+	};
+	const handleDeliveringStatus = () => {
+		setCurrentStep(4);
+		setStatus({
+			pending: 'finish',
+			processing: 'finish',
+			prepared: 'finish',
+			delivering: 'process',
+			success: 'waiting',
+			error: 'waiting',
+		});
+	};
+	const handleDeliveredStatus = () => {
+		setCurrentStep(5);
+		setStatus({
+			pending: 'finish',
+			processing: 'finish',
+			prepared: 'finish',
+			delivering: 'finish',
+			success: 'process',
+			error: 'waiting',
+		});
+	};
+	const handleSuccessStatus = () => {
+		setCurrentStep(6);
+		setStatus({
+			pending: 'finish',
+			processing: 'finish',
+			prepared: 'finish',
+			delivering: 'finish',
+			success: 'finish',
+			error: 'waiting',
+		});
+	};
+	const handleErrorStatus = () => {
+		setCurrentStep(7);
+		setStatus({
+			pending: 'finish',
+			processing: 'finish',
+			prepared: 'finish',
+			delivering: 'finish',
+			success: 'finish',
+			error: 'error',
+		});
+	};
 
 	const allSteps = [
 		{
 			title: 'Chờ Xác Nhận',
 			subTitle: '00:01:02',
-			status: `${'finish'}`,
+			status: `${status.pending}`,
 		},
 		// {
 		// 	title: 'Chờ Thanh Toán',
@@ -51,41 +106,46 @@ const TimeLineOrder = () => {
 		// 	status: 'process',
 		// },
 		{
-			title: 'Thanh Toán Hoàn Tất',
+			title: 'Xác Nhận Thành Công',
 			subTitle: '00:01:02',
-			status: 'process',
+			status: `${status.processing}`,
 		},
 		{
-			title: 'Hoàn Tất Chuẩn Bị Hàng',
+			title: `${
+				status.prepared === 'process'
+					? 'Đang Chuẩn Bị Đơn Hàng'
+					: 'Chuẩn Bị Đơn Hàng Hoàn Tất'
+			}`,
 			subTitle: '00:01:02',
-			status: 'waiting',
+			status: `${status.prepared}`,
 		},
 		{
-			title: 'Chuyển giao shipper thành công',
+			title: `${status.delivering === 'process' ? 'Chuyển Giao Shipper' : 'Đang Vận Chuyển'}`,
 			subTitle: '00:01:02',
-			status: 'waiting',
+			status: `${status.delivering}`,
 		},
+		// {
+		// 	title: 'Đang vận chuyển',
+		// 	subTitle: '00:01:02',
+		// 	status: `${status.delivering}`,
+		// },
 		{
-			title: 'Đang vận chuyển',
+			title: 'Đã Giao',
 			subTitle: '00:01:02',
-			status: 'waiting',
-		},
-		{
-			title: 'Đã vận chuyển',
-			subTitle: '00:01:02',
-			status: 'waiting',
+			status: `${status.success}`,
 		},
 		{
 			title: 'Bị báo cáo',
 			subTitle: '00:01:02',
-			status: 'waiting',
+			status: `${status.error}`,
 		},
 	];
 
 	const getReverseSteps = () => {
 		// Filter out steps with status 'waiting' or 'error'
 		const filteredSteps = allSteps.filter(
-			(step) => step.status === 'finish' || step.status === 'process'
+			(step) =>
+				step.status === 'finish' || step.status === 'process' || step.status === 'error'
 		);
 		// Reverse the filtered steps
 		return filteredSteps.reverse();
@@ -111,7 +171,7 @@ const TimeLineOrder = () => {
 						<Button
 							type="text"
 							className="bg-green font-semibold w-32 rounded-full"
-							onClick={() => setCurrentStep(1)}
+							onClick={handleProcessStatus}
 						>
 							Xác nhận
 						</Button>
@@ -130,7 +190,7 @@ const TimeLineOrder = () => {
 						<Button
 							type="text"
 							className="bg-green font-semibold w-full rounded-full"
-							onClick={() => setCurrentStep(2)}
+							onClick={handlePreparedStatus}
 						>
 							Chuẩn bị hàng
 						</Button>
@@ -149,7 +209,7 @@ const TimeLineOrder = () => {
 						<Button
 							type="text"
 							className="bg-green font-semibold w-full rounded-full"
-							onClick={() => setCurrentStep(3)}
+							onClick={handleTransferStatus}
 						>
 							Hoàn Tất
 						</Button>
@@ -187,7 +247,7 @@ const TimeLineOrder = () => {
 						<Button
 							type="text"
 							className="bg-green font-semibold rounded-full w-full"
-							onClick={() => setCurrentStep(4)}
+							onClick={handleDeliveringStatus}
 						>
 							Chuyển Giao
 						</Button>
@@ -206,7 +266,7 @@ const TimeLineOrder = () => {
 						<Button
 							type="text"
 							className="bg-green font-semibold w-full rounded-full"
-							onClick={() => setCurrentStep(5)}
+							onClick={handleDeliveredStatus}
 						>
 							Tiếp tục
 						</Button>
@@ -225,7 +285,7 @@ const TimeLineOrder = () => {
 						<Button
 							type="text"
 							className="bg-green font-semibold w-full rounded-full"
-							onClick={() => setCurrentStep(6)}
+							onClick={handleSuccessStatus}
 						>
 							Tiếp tục
 						</Button>
@@ -244,7 +304,7 @@ const TimeLineOrder = () => {
 						<Button
 							type="text"
 							className="bg-green font-semibold w-full rounded-full"
-							onClick={() => setCurrentStep(7)}
+							onClick={handleErrorStatus}
 						>
 							Tiếp tục
 						</Button>
