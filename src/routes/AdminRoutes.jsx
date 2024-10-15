@@ -9,6 +9,8 @@ import UserPage from '../pages/Admin/UserPage';
 import OrderPage from '../pages/Admin/OrderPage/OrderPage';
 import OrderDetail from '../pages/Admin/OrderPage/OrderDetail/OrderDetail';
 import WarrantyPage from '../pages/Admin/WarrantyPage';
+import PromotionPage from '../pages/Admin/PromotionPage';
+
 
 export const AdminRouters = () => {
 	return (
@@ -22,6 +24,8 @@ export const AdminRouters = () => {
 				<Route path="/products/jewelry-list" element={<JewelryPage />} />
 				<Route path="/products/diamond-list" element={<DiamondPage />} />
 				<Route path="/warranties" element={<WarrantyPage />} />
+				<Route path="/promotion" element={<PromotionPage />} />
+
 
 				{/* <Route path="/permission-denied" element={<PermissionDeniedPage />} />
 				<Route path="*" element={<NotFoundPage />} /> */}
