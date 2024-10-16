@@ -10,12 +10,10 @@ const {RangePicker} = DatePicker;
 const statusList = [
 	{name: 'Tất cả', value: 'all'},
 	{name: 'Pending', value: 'pending'},
-	{name: 'Confirmed', value: 'confirmed'},
-	{name: 'Accepted', value: 'accepted'},
 	{name: 'Processing', value: 'processing'},
-	{name: 'Finished', value: 'finished'},
-	{name: 'Shipping', value: 'shipping'},
-	{name: 'Received', value: 'received'},
+	{name: 'Prepared', value: 'prepared'},
+	{name: 'Delivering', value: 'delivering'},
+	{name: 'Success', value: 'success'},
 	{name: 'Rejected', value: 'rejected'},
 ];
 
