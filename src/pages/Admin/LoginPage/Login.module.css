@@ -1,0 +1,105 @@
+.loginPageContainer {
+	display: flex;
+	height: 100vh;
+}
+
+.leftSide {
+	flex: 1;
+	background-color: #f2f2f2;
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+}
+
+.rightSide {
+	flex: 1;
+}
+
+.loginHeader h1 {
+	margin-bottom: 20px;
+}
+
+.loginForm {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+}
+
+.formItem {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	margin-bottom: 10px;
+}
+
+.inputField1 {
+	margin-left: 20px;
+}
+
+.inputField {
+	width: 450px;
+	height: 40px;
+	margin-bottom: 10px;
+	border: 1px solid #3498db;
+	border-radius: 5px;
+	padding: 0 10px;
+}
+
+.checkboxForgot {
+	display: flex;
+	align-items: center;
+
+	width: 450px;
+	margin-bottom: 10px;
+}
+
+.checkboxForgot label {
+	margin-left: 5px;
+}
+
+.formItemsContainer {
+	display: flex;
+	flex-direction: row;
+	justify-content: space-between;
+	align-items: center;
+}
+
+.forgotPassword {
+	color: #3498db;
+}
+
+.loginButton {
+	min-width: 450px;
+	height: 40px;
+	background-color: #125394;
+	color: white;
+	border: none;
+	border-radius: 5px;
+	cursor: pointer;
+	transition: background-color 0.3s;
+	font-weight: bold;
+	font-size: larger;
+	text-align: center;
+	margin: 0 auto;
+}
+
+.loginButton:hover,
+.loginButton:focus {
+	background-color: #40a9ff;
+	border-color: #40a9ff;
+}
+
+.loginInput {
+	display: flex;
+	flex-direction: column;
+}
+
+.formActions {
+	display: flex;
+	justify-content: space-between;
+}
+.centerButton {
+	display: flex;
+	justify-content: center;
+}

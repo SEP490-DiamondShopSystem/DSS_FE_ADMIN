@@ -7,7 +7,7 @@ import {
 	RightOutlined,
 	SafetyOutlined,
 	UserOutlined,
-	TagOutlined 
+	TagOutlined,
 } from '@ant-design/icons';
 import {DiamondOutlined} from '@mui/icons-material';
 import {Breadcrumb, Layout, Menu} from 'antd';
@@ -30,7 +30,7 @@ export const DefaultLayout = ({children}) => {
 	// Thêm defaultOpenKeys để giữ SubMenu mở
 	const [openKeys, setOpenKeys] = useState([]);
 
-	const pageLocation = ['/dashboard', '/users'];
+	const pageLocation = ['/dashboard', '/users', '/products', '/orders', '/promotion'];
 
 	const items = [
 		getItem('Dashboard', '/dashboard', <DashboardOutlined />),
@@ -41,7 +41,7 @@ export const DefaultLayout = ({children}) => {
 		]),
 		getItem('Manage Order', '/orders', <OrderedListOutlined />),
 		getItem('Manage Warranty', '/warranties', <SafetyOutlined />),
-		getItem('Manage Promotion', '/promotion', <TagOutlined  />),
+		getItem('Manage Promotion', '/promotion', <TagOutlined />),
 	];
 
 	const handleClickMenuItem = (e) => {
