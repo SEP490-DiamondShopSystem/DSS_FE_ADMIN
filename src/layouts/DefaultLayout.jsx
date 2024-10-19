@@ -1,5 +1,4 @@
 import React, {useState} from 'react';
-
 import {
 	DashboardOutlined,
 	OrderedListOutlined,
@@ -11,7 +10,7 @@ import {
 } from '@ant-design/icons';
 import {DiamondOutlined} from '@mui/icons-material';
 import {Breadcrumb, Layout, Menu} from 'antd';
-import {Link, useLocation, useNavigate} from 'react-router-dom';
+import {Link, Outlet, useLocation, useNavigate} from 'react-router-dom'; // Add Outlet here
 import {imageExporter} from '../assets/images';
 import TopNavbar from '../components/TopNavBar/TopNavBar';
 import '../css/antd.css';
@@ -21,7 +20,7 @@ const {SubMenu} = Menu;
 
 const getItem = (label, key, icon, children) => ({key, icon, label, children});
 
-export const DefaultLayout = ({children}) => {
+const DefaultLayout = () => {
 	const navigate = useNavigate();
 	const [collapsed, setCollapsed] = useState(false);
 	const location = useLocation();
@@ -29,8 +28,6 @@ export const DefaultLayout = ({children}) => {
 
 	// Thêm defaultOpenKeys để giữ SubMenu mở
 	const [openKeys, setOpenKeys] = useState([]);
-
-	const pageLocation = ['/dashboard', '/users', '/products', '/orders', '/promotion'];
 
 	const items = [
 		getItem('Dashboard', '/dashboard', <DashboardOutlined />),
@@ -140,7 +137,8 @@ export const DefaultLayout = ({children}) => {
 							borderRadius: '8px', // Optional: add some rounding for better appearance
 						}}
 					>
-						{children}
+						{/* Render các Route con */}
+						<Outlet />
 					</div>
 				</Content>
 				{showHeaderFooter && (
@@ -152,3 +150,5 @@ export const DefaultLayout = ({children}) => {
 		</Layout>
 	);
 };
+
+export default DefaultLayout;
