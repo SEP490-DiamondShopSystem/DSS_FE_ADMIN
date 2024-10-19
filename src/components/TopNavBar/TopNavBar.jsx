@@ -1,18 +1,27 @@
 import React, {useEffect, useRef, useState} from 'react';
 
 import {BellOutlined} from '@ant-design/icons'; // Import icon for notification bell
-import {useDispatch} from 'react-redux';
+import {useDispatch, useSelector} from 'react-redux';
 import {useNavigate} from 'react-router-dom';
-import {userLoginSlice} from '../../redux/slices/userLoginSlice';
+import {getUserDetail, logout, userLoginSlice} from '../../redux/slices/userLoginSlice';
 import {getLocalStorage, removeLocalStorage} from '../../utils/localstorage';
 import {notifySuccess} from '../../utils/toast';
 import profileImage from './profileImage.jpg'; // Import a sample profile image for illustration
 import styles from './TopNavBar.module.css'; // Import CSS module file for styling
-import {Button} from 'antd';
+import {Button, message} from 'antd';
+import {GetUserDetailSelector} from '../../redux/selectors';
+import {getUserId} from '../GetUserId';
 
 const TopNavbar = () => {
+	function getLocalStorage(key) {
+		return localStorage.getItem(key);
+	}
+
 	const userLocal = getLocalStorage('user');
-	const user = userLocal?.user;
+	const user = userLocal ? JSON.parse(userLocal) : null;
+	const userId = getUserId();
+
+	const userDetail = useSelector(GetUserDetailSelector);
 
 	const dispatch = useDispatch();
 	const navigate = useNavigate();
@@ -21,6 +30,10 @@ const TopNavbar = () => {
 	const [showSignOutPopup, setShowSignOutPopup] = useState(false);
 	const [showSignOutButton, setShowSignOutButton] = useState(false);
 	const signOutRef = useRef(null);
+
+	useEffect(() => {
+		dispatch(getUserDetail(userId));
+	}, []);
 
 	useEffect(() => {
 		// Function to handle clicks outside the sign-out button
@@ -59,28 +72,14 @@ const TopNavbar = () => {
 	};
 
 	const handleConfirmSignOut = () => {
-		removeLocalStorage('user');
-		dispatch(
-			userLoginSlice.actions.logout({
-				userId: '',
-				userPhone: '',
-				name: '',
-				email: '',
-				password: '',
-				bio: '',
-				avatar_url: '',
-				gender: '',
-				date_of_birth: '',
-				role: '',
-				accessToken: '',
-				refreshToken: '',
-				last_active_time: null,
-				status: '',
-			})
-		);
-		notifySuccess('Logout successful!');
-		navigate('/');
+		dispatch(logout());
+		message.success('Đăng xuất thành công!');
+		navigate('/login');
 	};
+
+	const roles = userDetail?.Roles?.map((role) => role.RoleName);
+
+	console.log(roles);
 
 	return (
 		<div className={styles.topNavbar}>
@@ -102,8 +101,13 @@ const TopNavbar = () => {
 						onClick={handleProfileClick}
 					/>
 					<div className={styles.userInfo}>
-						<span className={styles.userName}>{user?.name}</span>
-						<span className={styles.userRole}>{user?.role}</span>
+						<span className={styles.userName}>{user?.Name}</span>
+						{roles &&
+							roles?.map((role, i) => (
+								<span key={i} className={styles.userRole}>
+									{role}
+								</span>
+							))}
 					</div>
 					{showSignOutButton && (
 						<Button
@@ -112,24 +116,24 @@ const TopNavbar = () => {
 							className={styles.signOutButton}
 							onClick={handleSignOut}
 						>
-							Sign Out
+							Đăng Xuất
 						</Button>
 					)}
 					{showSignOutPopup && (
 						<div className={styles.signOutPopup}>
 							<span className={styles.signOutText}>
-								Are you sure you want to sign out?
+								Bạn có chắc chắn muốn đăng xuất không?
 							</span>
 							<div className="flex items-center justify-around my-2">
 								<Button danger className="" onClick={handleConfirmSignOut}>
-									Yes
+									Đăng xuất
 								</Button>
 								<Button
 									type="text"
 									className="text-lightGray1 border border-lightGray1"
 									onClick={handleCancelSignOut}
 								>
-									Cancel
+									Hủy bỏ
 								</Button>
 							</div>
 						</div>

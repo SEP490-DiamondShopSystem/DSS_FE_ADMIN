@@ -1,11 +1,14 @@
 import React, {useState, useEffect} from 'react';
+
 import {Form, Input, Button, Checkbox, message} from 'antd';
 import {imageExporter} from '../../../assets/images';
 import styles from './Login.module.css';
 import {Helmet} from 'react-helmet';
 import {useDispatch} from 'react-redux';
-import {handleLogin} from '../../../redux/slices/userLoginSlice';
-import {useNavigate} from 'react-router-dom';
+import {handleLogin, handleLoginStaff, setUser} from '../../../redux/slices/userLoginSlice';
+import {Link, useNavigate} from 'react-router-dom';
+import {jwtDecode} from 'jwt-decode';
+import {setLocalStorage} from '../../../utils/localstorage';
 
 const LoginPage = () => {
 	const [isLoading, setIsLoading] = useState(false);
@@ -13,60 +16,82 @@ const LoginPage = () => {
 	const dispatch = useDispatch();
 	const navigate = useNavigate();
 
-	useEffect(() => {
-		// Load saved credentials from local storage, if they exist
-		const savedCredentials = localStorage.getItem('rememberedCredentials');
-		if (savedCredentials) {
-			const {phone, password} = JSON.parse(savedCredentials);
-			form.setFieldsValue({phone, password, remember: true});
-		}
-	}, [form]);
-
+	// const decodedData = jwtDecode(
+	// 	'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJSb2xlcyI6IjEiLCJFbWFpbCI6InRhaUBnbWFpbC5jb20iLCJOYW1lIjoiVGFpIERvcmxheiIsIklkZW50aXR5SWQiOiIzOTcwY2Q2Ni0yMGI0LTQ1MGEtOTM0Yy1mYzgyYWQ2ZjBlMzMiLCJVc2VySWQiOiIzZjBjNWU1NC0wMzk0LTRkNTQtOTJmMy1mZDFiNzllYzdiMzIiLCJleHAiOjE3MjkzMDY4OTIsImlzcyI6Imh0dHA6Ly93aGVyZXlvdWhhdmV0b2tlbmdlbmVyYXRlZCJ9.ncMoCNrgwVV4Y3vXINmlZl7Kuxh4O3FwXNhQpMdBqKk'
+	// );
+	// console.log(decodedData);
 	const onFinish = (values) => {
 		console.log('Received values:', values);
-		setIsLoading(true);
+		const {email, password, role} = values;
 
-		dispatch(handleLogin(values))
-			.then((response) => {
-				const user = response.payload.metadata.user;
-				if (user?.role === 'admin') {
-					if (values.remember) {
-						// Save credentials to local storage if "Remember password?" is checked
-						localStorage.setItem(
-							'rememberedCredentials',
-							JSON.stringify({
-								phone: values.phone,
-								password: values.password,
-							})
-						);
+		const data = {
+			email,
+			password,
+			isExternalLogin: true,
+			isStaffLogin: role ? true : false,
+		};
+		if (role) {
+			dispatch(handleLoginStaff(data))
+				.then((res) => {
+					console.log(res.payload);
+
+					if (res.payload) {
+						const decodedData = jwtDecode(res.payload.accessToken);
+						console.log(decodedData);
+						setLocalStorage('user', JSON.stringify(decodedData));
+						setLocalStorage('userId', decodedData.UserId);
+						dispatch(setUser(decodedData));
+						message.success('Đăng nhập thành công!');
+						form.resetFields();
+
+						navigate('/');
 					} else {
-						// Remove saved credentials if "Remember password?" is not checked
-						localStorage.removeItem('rememberedCredentials');
+						message.error(
+							'Đăng nhập không thành công. Vui lòng kiểm tra thông tin đăng nhập của bạn!'
+						);
 					}
+				})
+				.catch((error) => {
 					setIsLoading(false);
-					navigate('/');
-					message.success('Login successful!');
-				} else {
+					console.log(error);
+					message.error('Email hoặc mật khẩu không đúng!');
+				});
+		} else {
+			dispatch(handleLogin(data))
+				.then((res) => {
+					if (res.payload) {
+						const decodedData = jwtDecode(res.payload.accessToken);
+						console.log(decodedData);
+						setLocalStorage('user', JSON.stringify(decodedData));
+						setLocalStorage('userId', decodedData.UserId);
+						dispatch(setUser(decodedData));
+						message.success('Đăng nhập thành công!');
+						form.resetFields();
+
+						navigate('/');
+					} else {
+						message.error(
+							'Đăng nhập không thành công. Vui lòng kiểm tra thông tin đăng nhập của bạn!'
+						);
+					}
+				})
+				.catch((error) => {
 					setIsLoading(false);
-					message.error('You do not have permission to access this page!');
-				}
-			})
-			.catch((error) => {
-				setIsLoading(false);
-				console.log(error);
-				message.error('Incorrect phone or password!');
-			});
+					console.log(error);
+					message.error('Email hoặc mật khẩu không đúng!');
+				});
+		}
 	};
 
 	return (
 		<>
 			<Helmet>
-				<title>Sign In - SportLinker</title>
+				<title>Đăng Nhập | Diamond Shop Admin</title>
 			</Helmet>
 			<div className={styles.loginPageContainer}>
 				<div className={styles.leftSide}>
 					<div className={styles.loginHeader}>
-						<h1>Sign In</h1>
+						<h1>Đăng Nhập</h1>
 					</div>
 					<div className={styles.loginForm}>
 						<Form
@@ -78,18 +103,17 @@ const LoginPage = () => {
 						>
 							<Form.Item
 								className={styles.formItem}
-								label="Phone"
-								name="phone"
+								label="Email"
+								name="email"
 								rules={[
-									{required: true, message: 'Please input your phone!'},
 									{
-										pattern: /^0\d{9}$/,
-										message:
-											'Phone number must start with 0 and be exactly 10 digits!',
+										required: true,
+										message: 'Hãy nhập email của bạn!',
+										type: 'email',
 									},
 								]}
 							>
-								<Input className={styles.inputField} type="tel" maxLength={10} />
+								<Input className={styles.inputField} />
 							</Form.Item>
 
 							<Form.Item
@@ -102,24 +126,25 @@ const LoginPage = () => {
 							</Form.Item>
 
 							<div className={styles.formItemsContainer}>
-								<Form.Item name="remember" valuePropName="checked">
-									<Checkbox className={styles.rememberCheckbox}>
-										Remember password?
-									</Checkbox>
+								<Form.Item name="role" valuePropName="checked" initialValue={false}>
+									<Checkbox value={true}>Bạn là Staff</Checkbox>
 								</Form.Item>
 							</div>
 
 							<Form.Item className={styles.centerButton}>
 								<Button
-									loading={isLoading}
+									// loading={isLoading}
 									type="primary"
 									htmlType="submit"
 									className={styles.loginButton}
 								>
-									Sign In
+									Đăng Nhập
 								</Button>
 							</Form.Item>
 						</Form>
+						<p className={styles.signUpLink}>
+							Bạn chưa có tài khoản? <Link to="/register">Đăng Ký</Link>
+						</p>
 					</div>
 				</div>
 				<div className={styles.rightSide}>

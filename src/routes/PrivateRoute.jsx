@@ -4,7 +4,7 @@ import {Navigate} from 'react-router-dom';
 import {toast} from 'react-toastify';
 import {getUserSelector} from '../redux/selectors';
 
-export const PrivateRoute = ({children, roles}) => {
+const PrivateRoute = ({children, roles}) => {
 	const userSelector = useSelector(getUserSelector);
 	const userLocal = localStorage.getItem('user') && JSON.parse(localStorage.getItem('user'));
 
@@ -14,7 +14,7 @@ export const PrivateRoute = ({children, roles}) => {
 		console.log('Private route redirect');
 		console.log('userRef', userRef);
 		toast.error('Please login!');
-		return <Navigate to="/home" />;
+		return <Navigate to="/" />;
 	}
 
 	// Kiểm tra xem người dùng có vai trò phù hợp không
@@ -25,3 +25,5 @@ export const PrivateRoute = ({children, roles}) => {
 
 	return <>{children}</>;
 };
+
+export default PrivateRoute;

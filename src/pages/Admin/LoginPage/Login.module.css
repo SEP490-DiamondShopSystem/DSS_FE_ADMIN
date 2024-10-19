@@ -99,7 +99,22 @@
 	display: flex;
 	justify-content: space-between;
 }
+
 .centerButton {
 	display: flex;
 	justify-content: center;
+}
+
+.signUpLink {
+	margin-top: 10px;
+	text-align: center;
+}
+
+.signUpLink a {
+	color: #1890ff;
+	text-decoration: none;
+}
+
+.signUpLink a:hover {
+	text-decoration: underline;
 }
