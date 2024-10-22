@@ -1,16 +1,17 @@
 import React from 'react';
 
-import {Button, Checkbox, Form, Input, message, Radio} from 'antd';
+import {Button, Checkbox, Form, Input, message} from 'antd';
 import {Helmet} from 'react-helmet';
-import {Link} from 'react-router-dom';
-import {imageExporter} from '../../../assets/images';
-import styles from './SignUp.module.css';
 import {useDispatch} from 'react-redux';
-import {handleAdminRegister, handleStaffRegister} from '../../../redux/slices/userLoginSlice';
+import {Link, useNavigate} from 'react-router-dom';
+import {imageExporter} from '../../../assets/images';
+import {handleStaffRegister} from '../../../redux/slices/userLoginSlice';
+import styles from './SignUp.module.css';
 
 const SignUpPage = () => {
 	const [form] = Form.useForm();
 	const dispatch = useDispatch();
+	const navigate = useNavigate();
 
 	const onFinish = (values) => {
 		const {firstName, lastName, role} = values;
@@ -19,45 +20,24 @@ const SignUpPage = () => {
 			lastName,
 		};
 		try {
-			if (role) {
-				dispatch(handleStaffRegister({...values, fullName, isManager: role}))
-					.then((res) => {
-						if (res.payload) {
-							message.success('Đăng ký thành công!');
-							form.resetFields();
+			dispatch(handleStaffRegister({...values, fullName, isManager: role}))
+				.then((res) => {
+					if (res.payload) {
+						message.success('Đăng ký thành công!');
+						form.resetFields();
 
-							navigate('/login');
-						} else {
-							message.error(
-								'Đăng ký không thành công. Vui lòng kiểm tra thông tin đăng nhập của bạn!'
-							);
-						}
-					})
-					.catch((error) => {
-						setIsLoading(false);
-						console.log(error);
-						message.error('Email hoặc mật khẩu không đúng!');
-					});
-			} else {
-				dispatch(handleAdminRegister({...values, fullName}))
-					.then((res) => {
-						if (res.payload) {
-							message.success('Đăng ký thành công!');
-							form.resetFields();
-
-							navigate('/login');
-						} else {
-							message.error(
-								'Đăng ký không thành công. Vui lòng kiểm tra thông tin đăng nhập của bạn!'
-							);
-						}
-					})
-					.catch((error) => {
-						setIsLoading(false);
-						console.log(error);
-						message.error('Email hoặc mật khẩu không đúng!');
-					});
-			}
+						navigate('/login');
+					} else {
+						message.error(
+							'Đăng ký không thành công. Vui lòng kiểm tra thông tin đăng nhập của bạn!'
+						);
+					}
+				})
+				.catch((error) => {
+					setIsLoading(false);
+					console.log(error);
+					message.error('Email hoặc mật khẩu không đúng!');
+				});
 		} catch (error) {
 			message.error('Vui Lòng Kiểm Tra lại Thông Tin!');
 		}
@@ -142,7 +122,7 @@ const SignUpPage = () => {
 								<Input.Password className={styles.inputForm} />
 							</Form.Item>{' '}
 							<Form.Item name="role" valuePropName="checked" initialValue={false}>
-								<Checkbox value={true}>Staff</Checkbox>
+								<Checkbox value={true}>Manager</Checkbox>
 							</Form.Item>
 							<Form.Item>
 								<Button

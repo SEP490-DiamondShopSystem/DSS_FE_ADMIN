@@ -1,21 +1,46 @@
-import React, {useState} from 'react';
-import {Filter} from '../../../components/Filter';
 import {CalendarOutlined, EditFilled} from '@ant-design/icons';
 import {Button, DatePicker, Input, Space, Table, Tag} from 'antd';
+import React, {useEffect, useState} from 'react';
+import {useDispatch, useSelector} from 'react-redux';
 import {useNavigate} from 'react-router-dom';
+import {Filter} from '../../../components/Filter';
+import {getAllOrderSelector, LoadingOrderSelector} from '../../../redux/selectors';
+import {getAllOrder} from '../../../redux/slices/orderSlice';
+import {convertToVietnamDate, formatPrice} from '../../../utils';
+import {enums} from '../../../utils/constant';
 
 const {Search} = Input;
 const {RangePicker} = DatePicker;
 
 const statusList = [
 	{name: 'Tất cả', value: 'all'},
-	{name: 'Pending', value: 'pending'},
-	{name: 'Processing', value: 'processing'},
-	{name: 'Prepared', value: 'prepared'},
-	{name: 'Delivering', value: 'delivering'},
-	{name: 'Success', value: 'success'},
-	{name: 'Rejected', value: 'rejected'},
+	{name: 'Pending', value: 'Pending'},
+	{name: 'Paid All', value: 'PaidAll'},
+	{name: 'Deposited', value: 'Deposited'},
+	{name: 'Refunding', value: 'Refunding'},
+	{name: 'Refunded', value: 'Refunded'},
+	// {name: 'Rejected', value: 'rejected'},
 ];
+
+const getEnumKey = (enumObj, value) => {
+	return enumObj
+		? Object.keys(enumObj)
+				.find((key) => enumObj[key] === value)
+				?.replace('_', ' ')
+		: '';
+};
+
+const mapAttributes = (data, attributes) => {
+	return {
+		id: data?.Id,
+		orderTime: convertToVietnamDate(data?.CreatedDate),
+		status: getEnumKey(attributes?.PaymentStatus, data?.PaymentStatus),
+		email: null,
+		totalAmount: formatPrice(data?.TotalPrice),
+		customer: null,
+		paymentMethod: null,
+	};
+};
 
 // Sample data with email field
 const dataSource = [
@@ -41,10 +66,31 @@ const dataSource = [
 
 const OrderPage = () => {
 	const navigate = useNavigate();
+	const dispatch = useDispatch();
+
+	const loading = useSelector(LoadingOrderSelector);
+	const orderList = useSelector(getAllOrderSelector);
+
 	const [startDate, setStartDate] = useState(null);
 	const [endDate, setEndDate] = useState(null);
 	const [activeStatus, setActiveStatus] = useState('all');
 	const [searchText, setSearchText] = useState('');
+	const [orders, setOrders] = useState([]);
+
+	useEffect(() => {
+		dispatch(getAllOrder());
+	}, []);
+
+	console.log('orderList', orderList);
+	console.log('orders', orders);
+
+	useEffect(() => {
+		if (orderList && enums) {
+			// Map diamond attributes to more readable values
+			const mappedData = orderList.map((order) => mapAttributes(order, enums));
+			setOrders(mappedData);
+		}
+	}, [orderList, enums]);
 
 	const columns = [
 		{
@@ -95,15 +141,15 @@ const OrderPage = () => {
 
 				if (status === 'canceled' || status === 'rejected' || status === 'shipFailed') {
 					color = 'volcano';
-				} else if (status === 'shipping') {
+				} else if (status === 'refunded') {
 					color = 'blue';
-				} else if (status === 'pending' || status === 'confirmed') {
+				} else if (status === 'deposited') {
 					color = 'geekblue';
-				} else if (status === 'processing') {
+				} else if (status === 'paidAll') {
 					color = 'purple';
-				} else if (status === 'confirmed') {
+				} else if (status === 'pending') {
 					color = 'gold';
-				} else if (status === 'received') {
+				} else if (status === 'refunding') {
 					color = 'green';
 				}
 
@@ -120,7 +166,7 @@ const OrderPage = () => {
 			align: 'center',
 			render: (_, record) => (
 				<Space size="middle">
-					<Button type="primary" ghost onClick={() => navigate('/orders/1')}>
+					<Button type="primary" ghost onClick={() => navigate(`/orders/${record.id}`)}>
 						<EditFilled />
 					</Button>
 				</Space>
@@ -141,16 +187,16 @@ const OrderPage = () => {
 		setSearchText(value);
 	};
 
-	const filteredDataSource = dataSource
-		.filter((item) => activeStatus === 'all' || item.status === activeStatus)
+	const filteredDataSource = orders
+		?.filter((item) => activeStatus === 'all' || item.status === activeStatus)
 		.filter((item) => {
 			const itemDate = new Date(item.orderTime.split('/').reverse().join('-'));
 			const start = startDate ? new Date(startDate.split('/').reverse().join('-')) : null;
 			const end = endDate ? new Date(endDate.split('/').reverse().join('-')) : null;
 			return (!start || itemDate >= start) && (!end || itemDate <= end);
 		})
-		.filter((item) => item.email.toLowerCase().includes(searchText.toLowerCase()));
-
+		.filter((item) => item.email?.toLowerCase().includes(searchText.toLowerCase()));
+	console.log('filteredDataSource', filteredDataSource);
 	return (
 		<div className="mx-20 my-10">
 			<Filter
@@ -194,10 +240,11 @@ const OrderPage = () => {
 			</div>
 			<div>
 				<Table
-					dataSource={filteredDataSource}
+					dataSource={orders}
 					columns={columns}
 					className="custom-table-header"
 					pagination={{pageSize: 5}}
+					loading={loading}
 				/>
 			</div>
 		</div>

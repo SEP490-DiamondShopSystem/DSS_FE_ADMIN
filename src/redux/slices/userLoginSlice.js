@@ -130,7 +130,7 @@ export const userLoginSlice = createSlice({
 			.addCase(handleLoginStaff.fulfilled, (state, action) => {
 				state.loading = false;
 				state.userInfo = action.payload;
-				setLocalStorage('refreshToken', action.payload.refreshToken);
+				setLocalStorage('accessToken', action.payload.accessToken);
 				setLocalStorage('refreshToken', action.payload.refreshToken);
 			})
 			.addCase(handleLoginStaff.rejected, (state, action) => {

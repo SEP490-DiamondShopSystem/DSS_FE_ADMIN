@@ -7,6 +7,7 @@ import {
 	SafetyOutlined,
 	UserOutlined,
 	TagOutlined,
+	DeliveredProcedureOutlined,
 } from '@ant-design/icons';
 import {DiamondOutlined} from '@mui/icons-material';
 import {Breadcrumb, Layout, Menu} from 'antd';
@@ -14,6 +15,7 @@ import {Link, Outlet, useLocation, useNavigate} from 'react-router-dom'; // Add 
 import {imageExporter} from '../assets/images';
 import TopNavbar from '../components/TopNavBar/TopNavBar';
 import '../css/antd.css';
+import DeliveryPage from '../pages/Admin/DeliveryPage/DeliveryPage';
 
 const {Footer, Sider, Content} = Layout;
 const {SubMenu} = Menu;
@@ -31,11 +33,12 @@ const DefaultLayout = () => {
 
 	const items = [
 		getItem('Dashboard', '/dashboard', <DashboardOutlined />),
-		getItem('Manage User', '/users', <UserOutlined />),
+		getItem('Manage Account', '/accounts', <UserOutlined />),
 		getItem('Manage Product', '/products', <ProductOutlined />, [
 			getItem('Jewelry List', '/products/jewelry-list', <RightOutlined />),
 			getItem('Diamond List', '/products/diamond-list', <DiamondOutlined />),
 		]),
+		getItem('Manage Delivery', '/deliveries', <DeliveredProcedureOutlined />),
 		getItem('Manage Order', '/orders', <OrderedListOutlined />),
 		getItem('Manage Warranty', '/warranties', <SafetyOutlined />),
 		getItem('Manage Promotion', '/promotion', <TagOutlined />),
