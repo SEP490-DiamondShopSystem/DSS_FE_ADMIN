@@ -16,10 +16,6 @@ const LoginPage = () => {
 	const dispatch = useDispatch();
 	const navigate = useNavigate();
 
-	// const decodedData = jwtDecode(
-	// 	'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJSb2xlcyI6IjEiLCJFbWFpbCI6InRhaUBnbWFpbC5jb20iLCJOYW1lIjoiVGFpIERvcmxheiIsIklkZW50aXR5SWQiOiIzOTcwY2Q2Ni0yMGI0LTQ1MGEtOTM0Yy1mYzgyYWQ2ZjBlMzMiLCJVc2VySWQiOiIzZjBjNWU1NC0wMzk0LTRkNTQtOTJmMy1mZDFiNzllYzdiMzIiLCJleHAiOjE3MjkzMDY4OTIsImlzcyI6Imh0dHA6Ly93aGVyZXlvdWhhdmV0b2tlbmdlbmVyYXRlZCJ9.ncMoCNrgwVV4Y3vXINmlZl7Kuxh4O3FwXNhQpMdBqKk'
-	// );
-	// console.log(decodedData);
 	const onFinish = (values) => {
 		console.log('Received values:', values);
 		const {email, password, role} = values;

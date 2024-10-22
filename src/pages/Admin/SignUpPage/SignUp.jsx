@@ -19,45 +19,24 @@ const SignUpPage = () => {
 			lastName,
 		};
 		try {
-			if (role) {
-				dispatch(handleStaffRegister({...values, fullName, isManager: role}))
-					.then((res) => {
-						if (res.payload) {
-							message.success('Đăng ký thành công!');
-							form.resetFields();
+			dispatch(handleStaffRegister({...values, fullName, isManager: role}))
+				.then((res) => {
+					if (res.payload) {
+						message.success('Đăng ký thành công!');
+						form.resetFields();
 
-							navigate('/login');
-						} else {
-							message.error(
-								'Đăng ký không thành công. Vui lòng kiểm tra thông tin đăng nhập của bạn!'
-							);
-						}
-					})
-					.catch((error) => {
-						setIsLoading(false);
-						console.log(error);
-						message.error('Email hoặc mật khẩu không đúng!');
-					});
-			} else {
-				dispatch(handleAdminRegister({...values, fullName}))
-					.then((res) => {
-						if (res.payload) {
-							message.success('Đăng ký thành công!');
-							form.resetFields();
-
-							navigate('/login');
-						} else {
-							message.error(
-								'Đăng ký không thành công. Vui lòng kiểm tra thông tin đăng nhập của bạn!'
-							);
-						}
-					})
-					.catch((error) => {
-						setIsLoading(false);
-						console.log(error);
-						message.error('Email hoặc mật khẩu không đúng!');
-					});
-			}
+						navigate('/login');
+					} else {
+						message.error(
+							'Đăng ký không thành công. Vui lòng kiểm tra thông tin đăng nhập của bạn!'
+						);
+					}
+				})
+				.catch((error) => {
+					setIsLoading(false);
+					console.log(error);
+					message.error('Email hoặc mật khẩu không đúng!');
+				});
 		} catch (error) {
 			message.error('Vui Lòng Kiểm Tra lại Thông Tin!');
 		}
@@ -142,7 +121,7 @@ const SignUpPage = () => {
 								<Input.Password className={styles.inputForm} />
 							</Form.Item>{' '}
 							<Form.Item name="role" valuePropName="checked" initialValue={false}>
-								<Checkbox value={true}>Staff</Checkbox>
+								<Checkbox value={true}>Manager</Checkbox>
 							</Form.Item>
 							<Form.Item>
 								<Button

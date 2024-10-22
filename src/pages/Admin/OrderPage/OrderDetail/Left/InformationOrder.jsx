@@ -1,7 +1,10 @@
 import {ArrowLeftOutlined} from '@ant-design/icons';
 import {Button, Col, Divider, Row, Typography} from 'antd';
-import React from 'react';
+import React, {useEffect} from 'react';
 import {useNavigate} from 'react-router-dom';
+import {formatPrice} from '../../../../../utils';
+import {useDispatch} from 'react-redux';
+import {getUserDetail} from '../../../../../redux/slices/userLoginSlice';
 
 const {Title, Text} = Typography;
 
@@ -63,8 +66,10 @@ const detailGroups = {
 	],
 };
 
-const InformationOrder = () => {
+const InformationOrder = ({orders}) => {
 	const navigate = useNavigate();
+	const dispatch = useDispatch();
+
 	return (
 		<div>
 			<div className="mb-4">
@@ -166,45 +171,43 @@ const InformationOrder = () => {
 					</p>
 				</div>
 			</div>
-			<div className="w-full ">
-				{detailGroups.groups?.map((gr, i) => (
-					<div key={i} className="border mb-5 p-5 rounded">
-						{gr.items?.map((item, j) => (
-							<div key={j}>
-								<div className="w-full flex items-center text-lg">
-									<p style={{width: '10%'}} className="flex justify-center">
-										{item.id}
-									</p>
-									<p style={{width: '40%'}} className="flex my-2">
-										{item.name}
-									</p>
+			{/* <div className="w-full ">
+				{orders &&
+					orders?.map((order, i) => (
+						<div key={i} className="border mb-5 p-5 rounded">
+							<div className="w-full flex items-center text-lg">
+								<p style={{width: '10%'}} className="flex justify-center">
+									{order.Id}
+								</p>
+								<p style={{width: '40%'}} className="flex my-2">
+									{order.name}
+								</p>
 
-									<p style={{width: '20%'}} className="flex justify-center my-2">
-										{item.unitPrice.toLocaleString()} ₫
-									</p>
-									<p style={{width: '10%'}} className="flex justify-center my-2">
-										{item.quantity}
-									</p>
-									<p style={{width: '20%'}} className="flex justify-center">
-										{item.total.toLocaleString()}
-									</p>
-								</div>
-								<Divider />
+								<p style={{width: '20%'}} className="flex justify-center my-2">
+									{order.unitPrice.toLocaleString()} ₫
+								</p>
+								<p style={{width: '10%'}} className="flex justify-center my-2">
+									{order.quantity}
+								</p>
+								<p style={{width: '20%'}} className="flex justify-center">
+									{order.total.toLocaleString()}
+								</p>
 							</div>
-						))}
-						<p className="flex justify-end items-center text-lg font-semibold">
-							Jewelry Price:{' '}
-							<p className="ml-10">{gr.jewelry_price.toLocaleString()} ₫</p>
-						</p>
-					</div>
-				))}
+							<Divider />
+
+							<p className="flex justify-end items-center text-lg font-semibold">
+								Jewelry Price:{' '}
+								<p className="ml-10">{formatPrice(order?.Items?.PurchasedPrice)}</p>
+							</p>
+						</div>
+					))}
 				<div className="w-full bg-primary p-5 border rounded">
 					<p className="flex justify-end items-center text-lg font-semibold">
 						Total Price:{' '}
 						<p className="ml-10">{detailGroups.total_price.toLocaleString()} ₫</p>
 					</p>
 				</div>
-			</div>
+			</div> */}
 		</div>
 	);
 };

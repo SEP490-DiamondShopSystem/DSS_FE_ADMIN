@@ -12,6 +12,8 @@ import WarrantyPage from '../pages/Admin/WarrantyPage';
 import PromotionPage from '../pages/Admin/PromotionPage';
 import LoginPage from '../pages/Admin/LoginPage/LoginPage';
 import SignUpPage from '../pages/Admin/SignUpPage/SignUp';
+import PrivateRoute from './PrivateRoute';
+import DeliveryPage from '../pages/Admin/DeliveryPage/DeliveryPage';
 
 export const AdminRouters = () => {
 	return (
@@ -23,14 +25,78 @@ export const AdminRouters = () => {
 			{/* Các route cần bao quanh bởi DefaultLayout */}
 			<Route element={<DefaultLayout />}>
 				<Route path="/" element={<Navigate to="/dashboard" />} />
-				<Route path="/dashboard" element={<DashboardPage />} />
-				<Route path="/users" element={<UserPage />} />
-				<Route path="/orders" element={<OrderPage />} />
-				<Route path="/orders/:id" element={<OrderDetail />} />
-				<Route path="/products/jewelry-list" element={<JewelryPage />} />
-				<Route path="/products/diamond-list" element={<DiamondPage />} />
-				<Route path="/warranties" element={<WarrantyPage />} />
-				<Route path="/promotion" element={<PromotionPage />} />
+				<Route
+					path="/dashboard"
+					element={
+						<PrivateRoute roles={['staff', 'admin', 'manager']}>
+							<DashboardPage />
+						</PrivateRoute>
+					}
+				/>
+				<Route
+					path="/users"
+					element={
+						<PrivateRoute roles={['staff', 'admin', 'manager']}>
+							<UserPage />
+						</PrivateRoute>
+					}
+				/>
+				<Route
+					path="/orders"
+					element={
+						<PrivateRoute roles={['staff', 'admin', 'manager']}>
+							<OrderPage />
+						</PrivateRoute>
+					}
+				/>
+				<Route
+					path="/orders/:id"
+					element={
+						<PrivateRoute roles={['staff', 'admin', 'manager']}>
+							<OrderDetail />
+						</PrivateRoute>
+					}
+				/>
+				<Route
+					path="/products/jewelry-list"
+					element={
+						<PrivateRoute roles={['staff', 'admin', 'manager']}>
+							<JewelryPage />
+						</PrivateRoute>
+					}
+				/>
+				<Route
+					path="/products/diamond-list"
+					element={
+						<PrivateRoute roles={['staff', 'admin', 'manager']}>
+							<DiamondPage />
+						</PrivateRoute>
+					}
+				/>
+				<Route
+					path="/warranties"
+					element={
+						<PrivateRoute roles={['staff', 'admin', 'manager']}>
+							<WarrantyPage />
+						</PrivateRoute>
+					}
+				/>
+				<Route
+					path="/promotion"
+					element={
+						<PrivateRoute roles={['staff', 'admin', 'manager']}>
+							<PromotionPage />
+						</PrivateRoute>
+					}
+				/>
+				<Route
+					path="/deliveries"
+					element={
+						<PrivateRoute roles={['staff', 'admin', 'manager']}>
+							<DeliveryPage />
+						</PrivateRoute>
+					}
+				/>
 			</Route>
 		</Routes>
 	);

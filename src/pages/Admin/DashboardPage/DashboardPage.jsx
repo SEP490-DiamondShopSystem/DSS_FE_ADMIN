@@ -1,8 +1,9 @@
 import {useState} from 'react';
+
+import {Card, Col, Form, Layout, Row, Select} from 'antd';
 import {Helmet} from 'react-helmet';
 import ReactLoading from 'react-loading';
-import {Layout, Card, Row, Col, Select, Form, Typography, Divider} from 'antd';
-import {OverviewBookKpi, OverviewKpi} from './overview/OverviewKpi';
+import {OverviewKpi} from './overview/OverviewKpi';
 import {OverviewSummary} from './overview/OverviewSummary';
 
 const {Content} = Layout;
