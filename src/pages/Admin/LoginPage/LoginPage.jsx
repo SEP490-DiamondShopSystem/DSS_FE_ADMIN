@@ -26,57 +26,58 @@ const LoginPage = () => {
 			isExternalLogin: true,
 			isStaffLogin: role ? true : false,
 		};
-		if (role) {
-			dispatch(handleLoginStaff(data))
-				.then((res) => {
-					console.log(res.payload);
+		// if (role) {
+		// 	dispatch(handleLoginStaff(data))
+		// 		.then((res) => {
+		// 			console.log(res.payload);
 
-					if (res.payload) {
-						const decodedData = jwtDecode(res.payload.accessToken);
-						console.log(decodedData);
-						setLocalStorage('user', JSON.stringify(decodedData));
-						setLocalStorage('userId', decodedData.UserId);
-						dispatch(setUser(decodedData));
-						message.success('Đăng nhập thành công!');
-						form.resetFields();
+		// 			if (res.payload) {
+		// 				const decodedData = jwtDecode(res.payload.accessToken);
+		// 				console.log(decodedData);
+		// 				setLocalStorage('user', JSON.stringify(decodedData));
+		// 				setLocalStorage('userId', decodedData.UserId);
+		// 				dispatch(setUser(decodedData));
+		// 				message.success('Đăng nhập thành công!');
+		// 				form.resetFields();
 
-						navigate('/');
-					} else {
-						message.error(
-							'Đăng nhập không thành công. Vui lòng kiểm tra thông tin đăng nhập của bạn!'
-						);
-					}
-				})
-				.catch((error) => {
-					setIsLoading(false);
-					console.log(error);
-					message.error('Email hoặc mật khẩu không đúng!');
-				});
-		} else {
-			dispatch(handleLogin(data))
-				.then((res) => {
-					if (res.payload) {
-						const decodedData = jwtDecode(res.payload.accessToken);
-						console.log(decodedData);
-						setLocalStorage('user', JSON.stringify(decodedData));
-						setLocalStorage('userId', decodedData.UserId);
-						dispatch(setUser(decodedData));
-						message.success('Đăng nhập thành công!');
-						form.resetFields();
+		// 				navigate('/');
+		// 			} else {
+		// 				message.error(
+		// 					'Đăng nhập không thành công. Vui lòng kiểm tra thông tin đăng nhập của bạn!'
+		// 				);
+		// 			}
+		// 		})
+		// 		.catch((error) => {
+		// 			setIsLoading(false);
+		// 			console.log(error);
+		// 			message.error('Email hoặc mật khẩu không đúng!');
+		// 		});
+		// } else {
 
-						navigate('/');
-					} else {
-						message.error(
-							'Đăng nhập không thành công. Vui lòng kiểm tra thông tin đăng nhập của bạn!'
-						);
-					}
-				})
-				.catch((error) => {
-					setIsLoading(false);
-					console.log(error);
-					message.error('Email hoặc mật khẩu không đúng!');
-				});
-		}
+		// }
+		dispatch(handleLogin(data))
+			.then((res) => {
+				if (res.payload) {
+					const decodedData = jwtDecode(res.payload.accessToken);
+					console.log(decodedData);
+					setLocalStorage('user', JSON.stringify(decodedData));
+					setLocalStorage('userId', decodedData.UserId);
+					dispatch(setUser(decodedData));
+					message.success('Đăng nhập thành công!');
+					form.resetFields();
+
+					navigate('/');
+				} else {
+					message.error(
+						'Đăng nhập không thành công. Vui lòng kiểm tra thông tin đăng nhập của bạn!'
+					);
+				}
+			})
+			.catch((error) => {
+				setIsLoading(false);
+				console.log(error);
+				message.error('Email hoặc mật khẩu không đúng!');
+			});
 	};
 
 	return (
@@ -121,11 +122,11 @@ const LoginPage = () => {
 								<Input.Password className={styles.inputField} />
 							</Form.Item>
 
-							<div className={styles.formItemsContainer}>
+							{/* <div className={styles.formItemsContainer}>
 								<Form.Item name="role" valuePropName="checked" initialValue={false}>
 									<Checkbox value={true}>Bạn là Staff</Checkbox>
 								</Form.Item>
-							</div>
+							</div> */}
 
 							<Form.Item className={styles.centerButton}>
 								<Button

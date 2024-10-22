@@ -2,18 +2,18 @@ import React from 'react';
 import {Navigate, Route, Routes} from 'react-router-dom';
 import DefaultLayout from '../layouts/DefaultLayout';
 
+import AccountPage from '../pages/Admin/AccountPage/AccountPage';
 import DashboardPage from '../pages/Admin/DashboardPage/DashboardPage';
+import DeliveryPage from '../pages/Admin/DeliveryPage/DeliveryPage';
+import LoginPage from '../pages/Admin/LoginPage/LoginPage';
+import OrderDetail from '../pages/Admin/OrderPage/OrderDetail/OrderDetail';
+import OrderPage from '../pages/Admin/OrderPage/OrderPage';
 import DiamondPage from '../pages/Admin/ProductPage/DiamondPage/DiamondPage';
 import JewelryPage from '../pages/Admin/ProductPage/JewelryPage/JewelryPage';
-import UserPage from '../pages/Admin/UserPage';
-import OrderPage from '../pages/Admin/OrderPage/OrderPage';
-import OrderDetail from '../pages/Admin/OrderPage/OrderDetail/OrderDetail';
-import WarrantyPage from '../pages/Admin/WarrantyPage';
 import PromotionPage from '../pages/Admin/PromotionPage';
-import LoginPage from '../pages/Admin/LoginPage/LoginPage';
 import SignUpPage from '../pages/Admin/SignUpPage/SignUp';
+import WarrantyPage from '../pages/Admin/WarrantyPage';
 import PrivateRoute from './PrivateRoute';
-import DeliveryPage from '../pages/Admin/DeliveryPage/DeliveryPage';
 
 export const AdminRouters = () => {
 	return (
@@ -28,23 +28,23 @@ export const AdminRouters = () => {
 				<Route
 					path="/dashboard"
 					element={
-						<PrivateRoute roles={['staff', 'admin', 'manager']}>
+						<PrivateRoute roles={['deliverer', 'staff', 'admin', 'manager']}>
 							<DashboardPage />
 						</PrivateRoute>
 					}
 				/>
 				<Route
-					path="/users"
+					path="/accounts"
 					element={
-						<PrivateRoute roles={['staff', 'admin', 'manager']}>
-							<UserPage />
+						<PrivateRoute roles={['deliverer', 'staff', 'admin', 'manager']}>
+							<AccountPage />
 						</PrivateRoute>
 					}
 				/>
 				<Route
 					path="/orders"
 					element={
-						<PrivateRoute roles={['staff', 'admin', 'manager']}>
+						<PrivateRoute roles={['deliverer', 'staff', 'admin', 'manager']}>
 							<OrderPage />
 						</PrivateRoute>
 					}
@@ -52,7 +52,7 @@ export const AdminRouters = () => {
 				<Route
 					path="/orders/:id"
 					element={
-						<PrivateRoute roles={['staff', 'admin', 'manager']}>
+						<PrivateRoute roles={['deliverer', 'staff', 'admin', 'manager']}>
 							<OrderDetail />
 						</PrivateRoute>
 					}
@@ -60,7 +60,7 @@ export const AdminRouters = () => {
 				<Route
 					path="/products/jewelry-list"
 					element={
-						<PrivateRoute roles={['staff', 'admin', 'manager']}>
+						<PrivateRoute roles={['deliverer', 'staff', 'admin', 'manager']}>
 							<JewelryPage />
 						</PrivateRoute>
 					}
@@ -68,7 +68,7 @@ export const AdminRouters = () => {
 				<Route
 					path="/products/diamond-list"
 					element={
-						<PrivateRoute roles={['staff', 'admin', 'manager']}>
+						<PrivateRoute roles={['deliverer', 'staff', 'admin', 'manager']}>
 							<DiamondPage />
 						</PrivateRoute>
 					}
@@ -76,7 +76,7 @@ export const AdminRouters = () => {
 				<Route
 					path="/warranties"
 					element={
-						<PrivateRoute roles={['staff', 'admin', 'manager']}>
+						<PrivateRoute roles={['deliverer', 'staff', 'admin', 'manager']}>
 							<WarrantyPage />
 						</PrivateRoute>
 					}
@@ -84,7 +84,7 @@ export const AdminRouters = () => {
 				<Route
 					path="/promotion"
 					element={
-						<PrivateRoute roles={['staff', 'admin', 'manager']}>
+						<PrivateRoute roles={['deliverer', 'staff', 'admin', 'manager']}>
 							<PromotionPage />
 						</PrivateRoute>
 					}
@@ -92,7 +92,7 @@ export const AdminRouters = () => {
 				<Route
 					path="/deliveries"
 					element={
-						<PrivateRoute roles={['staff', 'admin', 'manager']}>
+						<PrivateRoute roles={['deliverer', 'staff', 'admin', 'manager']}>
 							<DeliveryPage />
 						</PrivateRoute>
 					}

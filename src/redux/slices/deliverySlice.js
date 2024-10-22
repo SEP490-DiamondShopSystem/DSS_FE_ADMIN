@@ -16,10 +16,23 @@ export const getAllDelivery = createAsyncThunk(
 
 export const handleCreateDelivery = createAsyncThunk(
 	'deliverySlice/handleCreateDelivery',
+	async (data, {rejectWithValue}) => {
+		try {
+			const res = await api.post(`/Delivery/Create`, data);
+			return res;
+		} catch (error) {
+			console.error(error);
+			return rejectWithValue(error);
+		}
+	}
+);
+
+export const handleBeginDelivery = createAsyncThunk(
+	'deliverySlice/handleBeginDelivery',
 	async (_, {rejectWithValue}) => {
 		try {
-			const data = await api.post(`/Delivery/Create`);
-			return data;
+			const res = await api.put(`/Delivery/Begin`);
+			return res;
 		} catch (error) {
 			console.error(error);
 			return rejectWithValue(error);
@@ -55,6 +68,16 @@ export const deliverySlice = createSlice({
 				state.loading = false;
 			})
 			.addCase(handleCreateDelivery.rejected, (state, action) => {
+				state.loading = false;
+				state.error = action.payload;
+			})
+			.addCase(handleBeginDelivery.pending, (state) => {
+				state.loading = true;
+			})
+			.addCase(handleBeginDelivery.fulfilled, (state, action) => {
+				state.loading = false;
+			})
+			.addCase(handleBeginDelivery.rejected, (state, action) => {
 				state.loading = false;
 				state.error = action.payload;
 			});

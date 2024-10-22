@@ -1,13 +1,13 @@
-import React, {useEffect, useState} from 'react';
-import {Filter} from '../../../components/Filter';
 import {CalendarOutlined, EditFilled} from '@ant-design/icons';
 import {Button, DatePicker, Input, Space, Table, Tag} from 'antd';
-import {useNavigate} from 'react-router-dom';
+import React, {useEffect, useState} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
-import {getAllOrderSelector, loadingOrderSelector} from '../../../redux/selectors';
+import {useNavigate} from 'react-router-dom';
+import {Filter} from '../../../components/Filter';
+import {getAllOrderSelector, LoadingOrderSelector} from '../../../redux/selectors';
 import {getAllOrder} from '../../../redux/slices/orderSlice';
-import {enums} from '../../../utils/constant';
 import {convertToVietnamDate, formatPrice} from '../../../utils';
+import {enums} from '../../../utils/constant';
 
 const {Search} = Input;
 const {RangePicker} = DatePicker;
@@ -68,8 +68,8 @@ const OrderPage = () => {
 	const navigate = useNavigate();
 	const dispatch = useDispatch();
 
+	const loading = useSelector(LoadingOrderSelector);
 	const orderList = useSelector(getAllOrderSelector);
-	const loading = useSelector(loadingOrderSelector);
 
 	const [startDate, setStartDate] = useState(null);
 	const [endDate, setEndDate] = useState(null);

@@ -1,113 +1,48 @@
 import React, {useEffect, useState} from 'react';
-import {DeleteFilled, EditFilled, PlusOutlined} from '@ant-design/icons';
-import {Button, DatePicker, Form, Image, Input, Modal, Select, Space, Table, Tag} from 'antd';
+import {CarryOutOutlined, DeleteFilled, EditFilled, PlusOutlined} from '@ant-design/icons';
+import {
+	Button,
+	DatePicker,
+	Form,
+	Image,
+	Input,
+	message,
+	Modal,
+	Select,
+	Space,
+	Table,
+	Tag,
+	Tooltip,
+} from 'antd';
 import {Filter} from '../../../components/Filter';
 import '../../../css/antd.css';
 import {useDispatch, useSelector} from 'react-redux';
-import {getAllDeliverySelector, getAllOrderSelector} from '../../../redux/selectors';
-import {getAllDelivery, handleCreateDelivery} from '../../../redux/slices/deliverySlice';
+import {
+	getAllDeliverySelector,
+	getAllOrderSelector,
+	getAllUserSelector,
+	GetUserDetailSelector,
+	LoadingDeliverySelector,
+} from '../../../redux/selectors';
+import {
+	getAllDelivery,
+	handleBeginDelivery,
+	handleCreateDelivery,
+} from '../../../redux/slices/deliverySlice';
 import {getAllOrder} from '../../../redux/slices/orderSlice';
 import moment from 'moment/moment';
+import {getAllUser} from '../../../redux/slices/userSlice';
+import {convertToVietnamDate} from '../../../utils';
 
 const {Search} = Input;
-
-const dataSource = [
-	{
-		key: '1',
-		id: 'P001',
-		image: 'https://example.com/image1.jpg',
-		productName: 'Diamond Ring',
-		type: 'ring',
-		sku: 'SKU001',
-		status: 'Activated',
-		price: '$5000',
-		name: 'Mike',
-	},
-	{
-		key: '2',
-		id: 'P002',
-		image: 'https://example.com/image2.jpg',
-		productName: 'Gold Necklace',
-		type: 'bracelets',
-		sku: 'SKU002',
-		status: 'Expired',
-		price: '$3000',
-		name: 'John',
-	},
-];
-
-const columns = [
-	{
-		title: 'ID',
-		dataIndex: 'id',
-		key: 'id',
-		align: 'center',
-	},
-	{
-		title: 'Image',
-		dataIndex: 'image',
-		key: 'image',
-		align: 'center',
-		render: (text) => <Image src={text} alt="product" style={{width: 50, height: 50}} />,
-	},
-	{
-		title: 'Product Name',
-		dataIndex: 'productName',
-		key: 'productName',
-		align: 'center',
-	},
-	{
-		title: 'Type',
-		key: 'type',
-		dataIndex: 'type',
-		align: 'center',
-	},
-	{
-		title: 'SKU',
-		key: 'sku',
-		dataIndex: 'sku',
-		align: 'center',
-	},
-	{
-		title: 'Status',
-		key: 'status',
-		dataIndex: 'status',
-		align: 'center',
-		render: (status) => {
-			let color = status.length > 5 ? 'geekblue' : 'green';
-			if (status === 'Expired') {
-				color = 'volcano';
-			}
-			return <Tag color={color}>{status.toUpperCase()}</Tag>;
-		},
-	},
-	{
-		title: 'Price',
-		key: 'price',
-		dataIndex: 'price',
-		align: 'center',
-	},
-	{
-		title: 'Action',
-		key: 'action',
-		align: 'center',
-		render: (_, record) => (
-			<Space size="middle">
-				<Button type="primary" ghost>
-					<EditFilled />
-				</Button>
-				<Button danger>
-					<DeleteFilled />
-				</Button>
-			</Space>
-		),
-	},
-];
 
 const DeliveryPage = () => {
 	const dispatch = useDispatch();
 	const deliveryList = useSelector(getAllDeliverySelector);
 	const orderList = useSelector(getAllOrderSelector);
+	const userList = useSelector(getAllUserSelector);
+	const userDetail = useSelector(GetUserDetailSelector);
+	const loading = useSelector(LoadingDeliverySelector);
 
 	const [active, setActive] = useState('all');
 	const [type, setType] = useState('');
@@ -115,31 +50,109 @@ const DeliveryPage = () => {
 	const [searchText, setSearchText] = useState('');
 	const [orders, setOrders] = useState([]);
 	const [deliveries, setDeliveries] = useState([]);
+	const [users, setUsers] = useState([]);
+	const [userRoleManager, setUserRoleManager] = useState([]);
+	const [userRoleDeliverer, setUserRoleDeliverer] = useState([]);
 	const [isModalVisible, setIsModalVisible] = useState(false);
+
+	const columns = [
+		{
+			title: 'ID',
+			dataIndex: 'Id',
+			key: 'Id',
+			align: 'center',
+		},
+		{
+			title: 'Ngày giao hàng',
+			key: 'DeliveryDate',
+			dataIndex: 'DeliveryDate',
+			align: 'center',
+		},
+		{
+			title: 'Người giao hàng',
+			key: 'Deliverer',
+			dataIndex: 'Deliverer',
+			align: 'center',
+		},
+		{
+			title: 'Phương thức giao hàng',
+			key: 'DeliveryMethod',
+			dataIndex: 'DeliveryMethod',
+			align: 'center',
+		},
+		// Conditionally render the "Action" column if userRoleDeliverer is true
+		...(userRoleDeliverer
+			? [
+					{
+						title: 'Action',
+						key: 'action',
+						align: 'center',
+						render: (_, record) => (
+							<Tooltip title="Giao Sớm">
+								<Button
+									type="text"
+									className="bg-primary"
+									onClick={handleBeginDeliveryBtn}
+								>
+									<CarryOutOutlined />
+								</Button>
+							</Tooltip>
+						),
+					},
+			  ]
+			: []),
+	];
 
 	useEffect(() => {
 		dispatch(getAllDelivery());
 	}, []);
 
 	useEffect(() => {
-		if (deliveryList) {
-			setDeliveries(deliveryList);
-		}
-	}, [deliveryList]);
-
-	useEffect(() => {
 		dispatch(getAllOrder());
 	}, []);
 
 	useEffect(() => {
+		dispatch(getAllUser());
+	}, []);
+
+	useEffect(() => {
+		if (deliveryList) {
+			setDeliveries(
+				deliveryList?.map((delivery) => ({
+					Id: delivery.Id,
+					DeliveryDate: convertToVietnamDate(delivery.DeliveryDate),
+					DelivererId: delivery.DelivererId,
+					DeliveryMethod: delivery.DeliveryMethod,
+				}))
+			);
+		}
+	}, [deliveryList]);
+
+	useEffect(() => {
 		if (orderList) {
-			setOrders(orderList);
+			const mappedOrder = orderList?.filter((order) => order?.Status === 5);
+			setOrders(mappedOrder);
 		}
 	}, [orderList]);
 
-	console.log('deliveries', deliveries);
-	console.log('orders', orders);
-	console.log('isModalVisible', isModalVisible);
+	useEffect(() => {
+		if (userDetail?.Roles) {
+			const isManager = userDetail.Roles.some((role) => role?.RoleName === 'manager');
+			const isDeliverer = userDetail.Roles.some((role) => role?.RoleName === 'deliverer');
+
+			setUserRoleManager(isManager);
+			setUserRoleDeliverer(isDeliverer);
+		}
+	}, [userDetail]);
+
+	// useEffect(() => {
+	// 	if (userList) {
+	// 		const mappedOrder = userList?.Values?.filter((user) => user?.Status === 2);
+	// 		setOrders(mappedOrder);
+	// 	}
+	// }, [userList]);
+
+	console.log('userDetail', userDetail);
 
 	const filter = [
 		{name: 'All', value: 'all'},
@@ -161,10 +174,24 @@ const DeliveryPage = () => {
 
 	const onFinish = (values) => {
 		console.log('Form Values:', values);
+
+		dispatch(handleCreateDelivery(values)).then((res) => {
+			if (res.payload) {
+				message.success('Tạo gói hàng thành công!');
+				setIsModalVisible(false);
+			}
+		});
 	};
 
-	const handleStatusBtn = (status) => {
-		setActive(status);
+	const handleBeginDeliveryBtn = () => {
+		dispatch(handleBeginDelivery()).then((res) => {
+			if (res.payload) {
+				message.success('Giao hàng sớm');
+				window.location.reload();
+			} else {
+				message.error('Lỗi hệ thống!');
+			}
+		});
 	};
 
 	const onSearch = (value) => {
@@ -179,26 +206,11 @@ const DeliveryPage = () => {
 		setMetal(value);
 	};
 
-	const filteredData = dataSource.filter((item) => {
-		const matchesType = type ? item.type === type : true;
-		const matchesMetal = metal ? item.metal === metal : true;
-		const matchesSearch = item.productName.toLowerCase().includes(searchText.toLowerCase());
-		const matchesStatus =
-			active === 'all' ? true : item.status.toLowerCase() === active.toLowerCase();
-
-		// console.log('matchesType', matchesType);
-		// console.log('matchesMetal', matchesMetal);
-		// console.log('matchesSearch', matchesSearch);
-		// console.log('matchesStatus', matchesStatus);
-
-		return matchesType && matchesMetal && matchesSearch && matchesStatus;
-	});
-
 	// console.log(filteredData);
 
 	return (
 		<div className="mx-20 my-10">
-			<Filter filter={filter} handleStatusBtn={handleStatusBtn} active={active} />
+			{/* <Filter filter={filter} handleStatusBtn={handleStatusBtn} active={active} /> */}
 			<div>
 				<div className="flex items-center justify-between">
 					<div className="flex items-center my-5">
@@ -251,23 +263,21 @@ const DeliveryPage = () => {
 							/>
 						</Space>
 					</div>
-					<div>
-						<Button
-							type="text"
-							className="bg-primary"
-							icon={<PlusOutlined />}
-							onClick={showModal}
-						>
-							Thêm
-						</Button>
-					</div>
+					{userRoleManager && (
+						<div>
+							<Button
+								type="text"
+								className="bg-primary"
+								icon={<PlusOutlined />}
+								onClick={showModal}
+							>
+								Thêm
+							</Button>
+						</div>
+					)}
 				</div>
 				<div>
-					<Table
-						dataSource={deliveries}
-						columns={columns}
-						className="custom-table-header"
-					/>
+					<Table dataSource={deliveries} columns={columns} loading={loading} />
 				</div>
 			</div>
 			<Modal
@@ -281,38 +291,47 @@ const DeliveryPage = () => {
 					{/* Select Order IDs */}
 					<Form.Item
 						name="orderIds"
-						label="Order IDs"
+						label="Id Đơn Hàng"
 						rules={[{required: true, message: 'Please select order IDs'}]}
 					>
 						{orders &&
 							orders?.map((order) => (
-								<Select mode="multiple" placeholder="Select Order IDs">
-									<Option value={order.Id}>{order}</Option>
+								<Select mode="multiple" placeholder="Chọn Order IDs">
+									<Option value={order.Id}>{order.Id}</Option>
 								</Select>
 							))}
 					</Form.Item>
-
-					{/* Select Deliverer ID */}
 					<Form.Item
 						name="delivererId"
-						label="Deliverer ID"
-						rules={[{required: true, message: 'Please select a deliverer'}]}
+						label="Người Giao Hàng"
+						rules={[{required: true, message: 'Chọn người giao hàng'}]}
 					>
-						<Select placeholder="Select Deliverer">
-							<Option value="D1">Deliverer 1</Option>
-							<Option value="D2">Deliverer 2</Option>
+						{/* {orders &&
+							orders?.map((order) => (
+								<Select mode="multiple" placeholder="Select Order IDs">
+									<Option value={order.Id}>{order.Id}</Option>
+								</Select>
+							))} */}
+
+						<Select placeholder="Chọn người giao hàng">
+							<Option value="be289669-d5aa-4558-8e5b-bb24a89d41b5">
+								be289669-d5aa-4558-8e5b-bb24a89d41b5
+							</Option>
 						</Select>
 					</Form.Item>
-
 					{/* Select Delivery Date */}
+
 					<Form.Item
 						name="deliveryDate"
 						label="Delivery Date"
 						rules={[{required: true, message: 'Please choose a delivery date'}]}
 					>
-						<DatePicker showTime format="YYYY-MM-DD HH:mm:ss" defaultValue={moment()} />
+						<DatePicker
+							format="DD-MM-YYYY"
+							placeholder="Select delivery date"
+							style={{width: '100%'}}
+						/>
 					</Form.Item>
-
 					{/* Select Method */}
 					<Form.Item
 						name="method"
@@ -320,11 +339,10 @@ const DeliveryPage = () => {
 						rules={[{required: true, message: 'Please select a method'}]}
 					>
 						<Select placeholder="Select Method">
-							<Option value="COD">Cash on Delivery</Option>
-							<Option value="Online Payment">Online Payment</Option>
+							<Option value="car">Car</Option>
+							{/* <Option value="Online Payment">Online Payment</Option> */}
 						</Select>
 					</Form.Item>
-
 					{/* Submit Button */}
 					<Form.Item>
 						<Button type="primary" htmlType="submit">

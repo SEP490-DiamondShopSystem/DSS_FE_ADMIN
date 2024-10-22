@@ -33,7 +33,7 @@ const DefaultLayout = () => {
 
 	const items = [
 		getItem('Dashboard', '/dashboard', <DashboardOutlined />),
-		getItem('Manage User', '/users', <UserOutlined />),
+		getItem('Manage Account', '/accounts', <UserOutlined />),
 		getItem('Manage Product', '/products', <ProductOutlined />, [
 			getItem('Jewelry List', '/products/jewelry-list', <RightOutlined />),
 			getItem('Diamond List', '/products/diamond-list', <DiamondOutlined />),

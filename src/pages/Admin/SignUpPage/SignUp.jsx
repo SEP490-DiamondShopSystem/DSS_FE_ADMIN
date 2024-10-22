@@ -1,16 +1,17 @@
 import React from 'react';
 
-import {Button, Checkbox, Form, Input, message, Radio} from 'antd';
+import {Button, Checkbox, Form, Input, message} from 'antd';
 import {Helmet} from 'react-helmet';
-import {Link} from 'react-router-dom';
-import {imageExporter} from '../../../assets/images';
-import styles from './SignUp.module.css';
 import {useDispatch} from 'react-redux';
-import {handleAdminRegister, handleStaffRegister} from '../../../redux/slices/userLoginSlice';
+import {Link, useNavigate} from 'react-router-dom';
+import {imageExporter} from '../../../assets/images';
+import {handleStaffRegister} from '../../../redux/slices/userLoginSlice';
+import styles from './SignUp.module.css';
 
 const SignUpPage = () => {
 	const [form] = Form.useForm();
 	const dispatch = useDispatch();
+	const navigate = useNavigate();
 
 	const onFinish = (values) => {
 		const {firstName, lastName, role} = values;
