@@ -1,12 +1,13 @@
 import axios from 'axios';
 
 const API_URL = import.meta.env.VITE_API_URL;
+const API_DEV = import.meta.env.VITE_API_DEV;
 
-console.log(API_URL);
+console.log(API_DEV);
 
 // Khởi tạo axios instance
 export const api = axios.create({
-	baseURL: API_URL,
+	baseURL: API_DEV,
 	headers: {
 		'Content-Type': 'application/json',
 	},

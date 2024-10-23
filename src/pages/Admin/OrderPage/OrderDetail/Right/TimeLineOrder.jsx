@@ -93,7 +93,6 @@ const TimeLineOrder = ({orders, loading}) => {
 		const res = await dispatch(handleOrderReject(orders.Id));
 		if (res.payload) {
 			message.success('Từ chối thành công!');
-			window.location.reload();
 		} else {
 			message.error('Lỗi khi từ chối đơn hàng.');
 		}
@@ -103,7 +102,6 @@ const TimeLineOrder = ({orders, loading}) => {
 		const res = await dispatch(handleOrderAccept(orders.Id));
 		if (res.payload) {
 			message.success('Xác nhận thành công!');
-			window.location.reload();
 		} else {
 			message.error('Lỗi khi xác nhận đơn hàng.');
 		}
@@ -113,7 +111,6 @@ const TimeLineOrder = ({orders, loading}) => {
 		const res = await dispatch(handleOrderPreparing(orders.Id));
 		if (res.payload) {
 			message.success('Chuẩn bị hàng hoàn tất!');
-			window.location.reload();
 		} else {
 			message.error('Lỗi khi chuẩn bị hàng.');
 		}
@@ -122,42 +119,17 @@ const TimeLineOrder = ({orders, loading}) => {
 		const res = await dispatch(handleOrderPreparing(orders.Id));
 		if (res.payload) {
 			message.success('Chuẩn bị hàng hoàn tất!');
-			window.location.reload();
 		} else {
 			message.error('Lỗi khi chuẩn bị hàng.');
 		}
 	};
-	const handleDeliveringStatus = () => {};
 	const handleDeliveredStatus = async () => {
 		const res = await dispatch(handleOrderComplete(orders.Id));
 		if (res.payload) {
 			message.success('Giao hàng thành công!');
-			window.location.reload();
 		} else {
 			message.error('Lỗi khi giao hàng.');
 		}
-	};
-	const handleSuccessStatus = () => {
-		setCurrentStep(6);
-		setStatus({
-			pending: 'finish',
-			processing: 'finish',
-			prepared: 'finish',
-			delivering: 'finish',
-			success: 'finish',
-			error: 'waiting',
-		});
-	};
-	const handleErrorStatus = () => {
-		setCurrentStep(7);
-		setStatus({
-			pending: 'finish',
-			processing: 'finish',
-			prepared: 'finish',
-			delivering: 'finish',
-			success: 'finish',
-			error: 'error',
-		});
 	};
 
 	const allSteps = [
@@ -415,7 +387,9 @@ const TimeLineOrder = ({orders, loading}) => {
 						<div className="border rounded-lg border-primary bg-tintWhite p-5 mb-5">
 							<div className="flex items-center " style={{fontSize: 16}}>
 								<p className="font-semibold">Trạng thái đơn hàng:</p>
-								<p className="ml-5 text-darkGreen font-semibold text-lg">Đã giao</p>
+								<p className="ml-5 text-darkGreen font-semibold text-lg">
+									Đã Giao Hàng
+								</p>
 							</div>
 							{/* <div className="flex justify-around">
 						<Button

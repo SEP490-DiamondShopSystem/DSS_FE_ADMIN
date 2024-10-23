@@ -99,6 +99,7 @@ export const orderSlice = createSlice({
 	initialState: {
 		orders: null,
 		orderDetail: null,
+		orderStatusDetail: null,
 		loading: false,
 		error: null,
 	},
@@ -122,6 +123,7 @@ export const orderSlice = createSlice({
 			.addCase(getOrderDetail.fulfilled, (state, action) => {
 				state.loading = false;
 				state.orderDetail = action.payload;
+				state.orderStatusDetail = action.payload.Status;
 			})
 			.addCase(getOrderDetail.rejected, (state, action) => {
 				state.loading = false;
@@ -132,6 +134,7 @@ export const orderSlice = createSlice({
 			})
 			.addCase(handleOrderAccept.fulfilled, (state, action) => {
 				state.loading = false;
+				state.orderDetail = action.payload;
 			})
 			.addCase(handleOrderAccept.rejected, (state, action) => {
 				state.loading = false;
@@ -142,6 +145,7 @@ export const orderSlice = createSlice({
 			})
 			.addCase(handleOrderReject.fulfilled, (state, action) => {
 				state.loading = false;
+				state.orderDetail = action.payload;
 			})
 			.addCase(handleOrderReject.rejected, (state, action) => {
 				state.loading = false;
@@ -152,6 +156,7 @@ export const orderSlice = createSlice({
 			})
 			.addCase(handleOrderPreparing.fulfilled, (state, action) => {
 				state.loading = false;
+				state.orderDetail = action.payload;
 			})
 			.addCase(handleOrderPreparing.rejected, (state, action) => {
 				state.loading = false;
@@ -162,6 +167,7 @@ export const orderSlice = createSlice({
 			})
 			.addCase(handleOrderAddToDelivery.fulfilled, (state, action) => {
 				state.loading = false;
+				state.orderDetail = action.payload;
 			})
 			.addCase(handleOrderAddToDelivery.rejected, (state, action) => {
 				state.loading = false;
@@ -172,6 +178,7 @@ export const orderSlice = createSlice({
 			})
 			.addCase(handleOrderComplete.fulfilled, (state, action) => {
 				state.loading = false;
+				state.orderDetail = action.payload;
 			})
 			.addCase(handleOrderComplete.rejected, (state, action) => {
 				state.loading = false;

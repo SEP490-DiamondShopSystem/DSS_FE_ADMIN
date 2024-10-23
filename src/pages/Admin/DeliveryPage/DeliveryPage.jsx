@@ -55,6 +55,7 @@ const DeliveryPage = () => {
 	const [userRoleDeliverer, setUserRoleDeliverer] = useState([]);
 	const [isModalVisible, setIsModalVisible] = useState(false);
 
+	console.log('userId', userDetail?.Id);
 	const columns = [
 		{
 			title: 'ID',
@@ -80,24 +81,25 @@ const DeliveryPage = () => {
 			dataIndex: 'DeliveryMethod',
 			align: 'center',
 		},
-		// Conditionally render the "Action" column if userRoleDeliverer is true
-		...(userRoleDeliverer
+		// Conditionally render the "Action" column only if the user is the deliverer
+		...(userRoleDeliverer && deliveries?.some((d) => d.DelivererId === userDetail?.Id)
 			? [
 					{
 						title: 'Action',
 						key: 'action',
 						align: 'center',
-						render: (_, record) => (
-							<Tooltip title="Giao Sớm">
-								<Button
-									type="text"
-									className="bg-primary"
-									onClick={handleBeginDeliveryBtn}
-								>
-									<CarryOutOutlined />
-								</Button>
-							</Tooltip>
-						),
+						render: (_, record) =>
+							record.DelivererId === userDetail?.Id && (
+								<Tooltip title="Giao Sớm">
+									<Button
+										type="text"
+										className="bg-primary"
+										onClick={() => handleBeginDeliveryBtn(record.Id)} // Pass record.Id to handleBeginDeliveryBtn
+									>
+										<CarryOutOutlined />
+									</Button>
+								</Tooltip>
+							),
 					},
 			  ]
 			: []),
@@ -153,6 +155,7 @@ const DeliveryPage = () => {
 	// }, [userList]);
 
 	console.log('userDetail', userDetail);
+	console.log('deliveries', deliveries);
 
 	const filter = [
 		{name: 'All', value: 'all'},
@@ -177,7 +180,7 @@ const DeliveryPage = () => {
 
 		dispatch(handleCreateDelivery(values)).then((res) => {
 			if (res.payload) {
-				message.success('Tạo gói hàng thành công!');
+				message.success('Chuyển giao shipper thành công!');
 				setIsModalVisible(false);
 			}
 		});
@@ -187,7 +190,7 @@ const DeliveryPage = () => {
 		dispatch(handleBeginDelivery()).then((res) => {
 			if (res.payload) {
 				message.success('Giao hàng sớm');
-				window.location.reload();
+				// window.location.reload();
 			} else {
 				message.error('Lỗi hệ thống!');
 			}
@@ -281,7 +284,7 @@ const DeliveryPage = () => {
 				</div>
 			</div>
 			<Modal
-				title="Add Delivery"
+				title="Chuyển giao shipper"
 				visible={isModalVisible}
 				onOk={handleOk}
 				onCancel={handleCancel}
@@ -313,17 +316,21 @@ const DeliveryPage = () => {
 								</Select>
 							))} */}
 
-						<Select placeholder="Chọn người giao hàng">
-							<Option value="be289669-d5aa-4558-8e5b-bb24a89d41b5">
+						{/* <Select placeholder="Chọn người giao hàng">
+							<Option value="999aa08c-d2fd-420e-b8f8-977bda81f7fd">
+								999aa08c-d2fd-420e-b8f8-977bda81f7fd
+							</Option>
+							<Option value="b9de84a0-886a-441e-9940-ead4986e5e9d">
 								be289669-d5aa-4558-8e5b-bb24a89d41b5
 							</Option>
-						</Select>
+						</Select> */}
+						<Input placeholder="Id" />
 					</Form.Item>
 					{/* Select Delivery Date */}
 
 					<Form.Item
 						name="deliveryDate"
-						label="Delivery Date"
+						label="Ngày Bắt Đầu Giao Hàng"
 						rules={[{required: true, message: 'Please choose a delivery date'}]}
 					>
 						<DatePicker
@@ -335,7 +342,7 @@ const DeliveryPage = () => {
 					{/* Select Method */}
 					<Form.Item
 						name="method"
-						label="Delivery Method"
+						label="Phương Thức Giao Hàng"
 						rules={[{required: true, message: 'Please select a method'}]}
 					>
 						<Select placeholder="Select Method">
@@ -345,7 +352,7 @@ const DeliveryPage = () => {
 					</Form.Item>
 					{/* Submit Button */}
 					<Form.Item>
-						<Button type="primary" htmlType="submit">
+						<Button type="text" className="bg-primary" htmlType="submit">
 							Thêm
 						</Button>
 					</Form.Item>

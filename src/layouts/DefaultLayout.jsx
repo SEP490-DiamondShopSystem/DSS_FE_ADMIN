@@ -33,15 +33,15 @@ const DefaultLayout = () => {
 
 	const items = [
 		getItem('Dashboard', '/dashboard', <DashboardOutlined />),
-		getItem('Manage Account', '/accounts', <UserOutlined />),
-		getItem('Manage Product', '/products', <ProductOutlined />, [
-			getItem('Jewelry List', '/products/jewelry-list', <RightOutlined />),
-			getItem('Diamond List', '/products/diamond-list', <DiamondOutlined />),
+		getItem('Quản Lí Tài Khoản', '/accounts', <UserOutlined />),
+		getItem('Quản Lý Sản Phẩm', '/products', <ProductOutlined />, [
+			getItem('Danh Sách Trang Sức', '/products/jewelry-list', <RightOutlined />),
+			getItem('Danh Sách Kim Cương', '/products/diamond-list', <DiamondOutlined />),
 		]),
-		getItem('Manage Delivery', '/deliveries', <DeliveredProcedureOutlined />),
-		getItem('Manage Order', '/orders', <OrderedListOutlined />),
-		getItem('Manage Warranty', '/warranties', <SafetyOutlined />),
-		getItem('Manage Promotion', '/promotion', <TagOutlined />),
+		getItem('Quản Lí Vận Chuyển', '/deliveries', <DeliveredProcedureOutlined />),
+		getItem('Quản Lí Đặt Hàng', '/orders', <OrderedListOutlined />),
+		// getItem('Manage Warranty', '/warranties', <SafetyOutlined />),
+		// getItem('Manage Promotion', '/promotion', <TagOutlined />),
 	];
 
 	const handleClickMenuItem = (e) => {
@@ -86,7 +86,7 @@ const DefaultLayout = () => {
 						src={collapsed ? imageExporter.tinylogo : imageExporter.logo}
 						alt="logo"
 						style={{
-							width: collapsed ? '100%' : '40%',
+							width: collapsed ? '80%' : '40%',
 							height: 'auto',
 							display: 'block',
 							margin: '10px auto',
@@ -98,7 +98,7 @@ const DefaultLayout = () => {
 					onClick={handleClickMenuItem}
 					theme="light"
 					selectedKeys={[selectMenu]}
-					mode="inline"
+					mode="vertical"
 					openKeys={openKeys}
 					onOpenChange={onOpenChange}
 				>
