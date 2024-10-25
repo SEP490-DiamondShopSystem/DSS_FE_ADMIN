@@ -72,7 +72,6 @@
 .loginButton {
 	min-width: 450px;
 	height: 40px;
-	background-color: #125394;
 	color: white;
 	border: none;
 	border-radius: 5px;
@@ -82,12 +81,6 @@
 	font-size: larger;
 	text-align: center;
 	margin: 0 auto;
-}
-
-.loginButton:hover,
-.loginButton:focus {
-	background-color: #40a9ff;
-	border-color: #40a9ff;
 }
 
 .loginInput {

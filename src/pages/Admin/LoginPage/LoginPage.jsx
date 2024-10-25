@@ -4,17 +4,20 @@ import {Form, Input, Button, Checkbox, message} from 'antd';
 import {imageExporter} from '../../../assets/images';
 import styles from './Login.module.css';
 import {Helmet} from 'react-helmet';
-import {useDispatch} from 'react-redux';
+import {useDispatch, useSelector} from 'react-redux';
 import {handleLogin, handleLoginStaff, setUser} from '../../../redux/slices/userLoginSlice';
 import {Link, useNavigate} from 'react-router-dom';
 import {jwtDecode} from 'jwt-decode';
 import {setLocalStorage} from '../../../utils/localstorage';
+import {LoadingUserSelector} from '../../../redux/selectors';
 
 const LoginPage = () => {
 	const [isLoading, setIsLoading] = useState(false);
 	const [form] = Form.useForm();
 	const dispatch = useDispatch();
 	const navigate = useNavigate();
+
+	const loading = useSelector(LoadingUserSelector);
 
 	const onFinish = (values) => {
 		console.log('Received values:', values);
@@ -74,7 +77,6 @@ const LoginPage = () => {
 				}
 			})
 			.catch((error) => {
-				setIsLoading(false);
 				console.log(error);
 				message.error('Email hoặc mật khẩu không đúng!');
 			});
@@ -88,7 +90,7 @@ const LoginPage = () => {
 			<div className={styles.loginPageContainer}>
 				<div className={styles.leftSide}>
 					<div className={styles.loginHeader}>
-						<h1>Đăng Nhập</h1>
+						<h1 className="text-primary text-2xl font-semibold">Đăng Nhập</h1>
 					</div>
 					<div className={styles.loginForm}>
 						<Form
@@ -115,7 +117,7 @@ const LoginPage = () => {
 
 							<Form.Item
 								className={styles.formItem}
-								label="Password"
+								label="Mật Khẩu"
 								name="password"
 								rules={[{required: true, message: 'Please input your password!'}]}
 							>
@@ -131,9 +133,10 @@ const LoginPage = () => {
 							<Form.Item className={styles.centerButton}>
 								<Button
 									// loading={isLoading}
-									type="primary"
+									type="text"
 									htmlType="submit"
-									className={styles.loginButton}
+									className={`bg-primary ${styles.loginButton}`}
+									loading={loading}
 								>
 									Đăng Nhập
 								</Button>
