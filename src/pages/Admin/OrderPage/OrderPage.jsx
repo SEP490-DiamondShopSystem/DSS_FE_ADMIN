@@ -13,13 +13,16 @@ const {Search} = Input;
 const {RangePicker} = DatePicker;
 
 const statusList = [
-	{name: 'Tất cả', value: 'all'},
-	{name: 'Pending', value: 'Pending'},
-	{name: 'Paid All', value: 'PaidAll'},
-	{name: 'Deposited', value: 'Deposited'},
-	{name: 'Refunding', value: 'Refunding'},
-	{name: 'Refunded', value: 'Refunded'},
-	// {name: 'Rejected', value: 'rejected'},
+	{name: 'All', value: ''},
+	{name: 'Pending', value: '1'},
+	{name: 'Processing', value: '2'},
+	{name: 'Rejected', value: '3'},
+	{name: 'Cancelled', value: '4'},
+	{name: 'Prepared', value: '5'},
+	{name: 'Delivering', value: '6'},
+	{name: 'Failed', value: '7'},
+	{name: 'Success', value: '8'},
+	{name: 'Refused', value: '9'},
 ];
 
 const getEnumKey = (enumObj, value) => {
@@ -34,35 +37,13 @@ const mapAttributes = (data, attributes) => {
 	return {
 		id: data?.Id,
 		orderTime: convertToVietnamDate(data?.CreatedDate),
-		status: getEnumKey(attributes?.PaymentStatus, data?.PaymentStatus),
+		status: getEnumKey(attributes?.OrderStatus, data?.Status),
 		email: null,
 		totalAmount: formatPrice(data?.TotalPrice),
 		customer: null,
 		paymentMethod: null,
 	};
 };
-
-// Sample data with email field
-const dataSource = [
-	{
-		id: '001',
-		orderTime: '24/09/2024',
-		totalAmount: '$120.00',
-		paymentMethod: 'Pay All',
-		customer: 'John Doe',
-		email: 'john.doe@example.com',
-		status: 'accepted',
-	},
-	{
-		id: '002',
-		orderTime: '23/09/2024',
-		totalAmount: '$85.00',
-		paymentMethod: 'Online',
-		customer: 'Jane Smith',
-		email: 'jane.smith@example.com',
-		status: 'pending',
-	},
-];
 
 const OrderPage = () => {
 	const navigate = useNavigate();
@@ -73,13 +54,25 @@ const OrderPage = () => {
 
 	const [startDate, setStartDate] = useState(null);
 	const [endDate, setEndDate] = useState(null);
-	const [activeStatus, setActiveStatus] = useState('all');
+	const [activeStatus, setActiveStatus] = useState('');
 	const [searchText, setSearchText] = useState('');
 	const [orders, setOrders] = useState([]);
+	const [pageSize, setPageSize] = useState(100);
+	const [current, setCurrent] = useState(1);
 
 	useEffect(() => {
-		dispatch(getAllOrder());
-	}, []);
+		dispatch(
+			getAllOrder({
+				pageSize: pageSize,
+				start: current,
+				Status: activeStatus,
+				CreatedDate: startDate,
+				ExpectedDate: endDate,
+				Email: searchText,
+			})
+		);
+		// dispatch(getAllOrder());
+	}, [pageSize, current, activeStatus, startDate, endDate, searchText]);
 
 	console.log('orderList', orderList);
 	console.log('orders', orders);
@@ -87,7 +80,7 @@ const OrderPage = () => {
 	useEffect(() => {
 		if (orderList && enums) {
 			// Map diamond attributes to more readable values
-			const mappedData = orderList.map((order) => mapAttributes(order, enums));
+			const mappedData = orderList?.Values?.map((order) => mapAttributes(order, enums));
 			setOrders(mappedData);
 		}
 	}, [orderList, enums]);
@@ -174,17 +167,18 @@ const OrderPage = () => {
 		},
 	];
 	const handleDateChange = (dates, dateStrings) => {
-		setStartDate(dateStrings[0]);
-		setEndDate(dateStrings[1]);
+		setStartDate(dates[0]);
+		setEndDate(dates[1]);
+		console.log();
 	};
 
 	const handleStatusChange = (value) => {
 		setActiveStatus(value);
-		console.log(value);
 	};
 
 	const onSearch = (value) => {
 		setSearchText(value);
+		console.log(value);
 	};
 
 	const filteredDataSource = orders

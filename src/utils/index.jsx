@@ -40,3 +40,28 @@ export function convertToVietnamDate(utcDateString) {
 	// Format to DD/MM/YYYY
 	return `${day}/${month}/${year}`;
 }
+
+export const getOrderStatus = (status) => {
+	switch (status) {
+		case 1:
+			return 'Pending';
+		case 2:
+			return 'Processing';
+		case 3:
+			return 'Rejected';
+		case 4:
+			return 'Cancelled';
+		case 5:
+			return 'Prepared';
+		case 6:
+			return 'Delivering';
+		case 7:
+			return 'Delivery_Failed';
+		case 8:
+			return 'Success';
+		case 9:
+			return 'Refused';
+		default:
+			return 'Unknown';
+	}
+};

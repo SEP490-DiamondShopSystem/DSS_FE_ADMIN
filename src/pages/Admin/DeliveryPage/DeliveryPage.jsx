@@ -132,7 +132,7 @@ const DeliveryPage = () => {
 
 	useEffect(() => {
 		if (orderList) {
-			const mappedOrder = orderList?.filter((order) => order?.Status === 5);
+			const mappedOrder = orderList?.Values?.filter((order) => order?.Status === 5);
 			setOrders(mappedOrder);
 		}
 	}, [orderList]);
