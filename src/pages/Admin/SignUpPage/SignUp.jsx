@@ -31,9 +31,7 @@ const SignUpPage = () => {
 
 						navigate('/login');
 					} else {
-						message.error(
-							'Đăng ký không thành công. Vui lòng kiểm tra thông tin đăng nhập của bạn!'
-						);
+						message.error(`Đăng ký không thành công!`);
 					}
 				})
 				.catch((error) => {

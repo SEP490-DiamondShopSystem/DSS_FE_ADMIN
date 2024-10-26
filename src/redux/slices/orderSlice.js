@@ -2,10 +2,32 @@ import {createAsyncThunk, createSlice} from '@reduxjs/toolkit';
 import {api} from '../../services/api';
 
 export const getAllOrder = createAsyncThunk(
-	'userLoginSlice/getAllOrder',
-	async (_, {rejectWithValue}) => {
+	'orderSlice/getAllOrder',
+	async (params, {rejectWithValue}) => {
 		try {
-			const data = await api.get(`/Order/All`);
+			// Lấy ra các tham số từ `params`
+			const {pageSize, start, Status, CreatedDate, ExpectedDate, Email} = params;
+
+			// Khởi tạo URL cơ bản
+			let url = '/Order/All';
+
+			// Tạo các tham số truy vấn động
+			const queryParams = new URLSearchParams();
+
+			if (pageSize) queryParams.append('pageSize', pageSize);
+			if (start) queryParams.append('start', start);
+			if (Status) queryParams.append('Status', Status);
+			if (CreatedDate) queryParams.append('CreatedDate', CreatedDate);
+			if (ExpectedDate) queryParams.append('ExpectedDate', ExpectedDate);
+			if (Email) queryParams.append('Email', Email);
+
+			// Kiểm tra nếu có queryParams thì thêm vào URL
+			if (queryParams.toString()) {
+				url += `?${queryParams.toString()}`;
+			}
+
+			// Thực hiện request với URL đã hoàn chỉnh
+			const data = await api.get(url);
 			return data;
 		} catch (error) {
 			console.error(error);
@@ -15,7 +37,7 @@ export const getAllOrder = createAsyncThunk(
 );
 
 export const getOrderDetail = createAsyncThunk(
-	'userLoginSlice/getOrderDetail',
+	'orderSlice/getOrderDetail',
 	async (id, {rejectWithValue}) => {
 		try {
 			const data = await api.get(`/Order/${id}`);
@@ -27,11 +49,11 @@ export const getOrderDetail = createAsyncThunk(
 	}
 );
 
-export const handleOrderAccept = createAsyncThunk(
-	'userLoginSlice/handleOrderAccept',
+export const handleOrder = createAsyncThunk(
+	'orderSlice/handleOrder',
 	async (id, {rejectWithValue}) => {
 		try {
-			const data = await api.put(`/Order/Accept?orderId=${id}`);
+			const data = await api.put(`/Order/Proceed?orderId=${id}`);
 			return data;
 		} catch (error) {
 			console.error(error);
@@ -41,7 +63,7 @@ export const handleOrderAccept = createAsyncThunk(
 );
 
 export const handleOrderReject = createAsyncThunk(
-	'userLoginSlice/handleOrderReject',
+	'orderSlice/handleOrderReject',
 	async (id, {rejectWithValue}) => {
 		try {
 			const data = await api.put(`/Order/Reject?orderId=${id}`);
@@ -53,25 +75,25 @@ export const handleOrderReject = createAsyncThunk(
 	}
 );
 
-export const handleOrderPreparing = createAsyncThunk(
-	'userLoginSlice/handleOrderPreparing',
-	async (id, {rejectWithValue}) => {
-		try {
-			const data = await api.put(`/Order/Preparing?orderId=${id}`);
-			return data;
-		} catch (error) {
-			console.error(error);
-			return rejectWithValue(error);
-		}
-	}
-);
+// export const handleOrderPreparing = createAsyncThunk(
+// 	'orderSlice/handleOrderPreparing',
+// 	async (id, {rejectWithValue}) => {
+// 		try {
+// 			const data = await api.put(`/Order/Preparing?orderId=${id}`);
+// 			return data;
+// 		} catch (error) {
+// 			console.error(error);
+// 			return rejectWithValue(error);
+// 		}
+// 	}
+// );
 
-export const handleOrderAddToDelivery = createAsyncThunk(
-	'userLoginSlice/handleOrderAddToDelivery',
-	async ({orderId, deliveryId}, {rejectWithValue}) => {
+export const handleOrderAssignDeliverer = createAsyncThunk(
+	'orderSlice/handleOrderAssignDeliverer',
+	async ({orderId, delivererId}, {rejectWithValue}) => {
 		try {
 			const data = await api.put(
-				`/Order/AddToDelivery?orderId=${orderId}&deliveryId=${deliveryId}`
+				`/Order/AssignDeliverer?orderId=${orderId}&delivererId=${delivererId}`
 			);
 			return data;
 		} catch (error) {
@@ -81,18 +103,18 @@ export const handleOrderAddToDelivery = createAsyncThunk(
 	}
 );
 
-export const handleOrderComplete = createAsyncThunk(
-	'userLoginSlice/handleOrderComplete',
-	async (id, {rejectWithValue}) => {
-		try {
-			const data = await api.put(`/Order/Complete?orderId=${id}`);
-			return data;
-		} catch (error) {
-			console.error(error);
-			return rejectWithValue(error);
-		}
-	}
-);
+// export const handleOrderComplete = createAsyncThunk(
+// 	'orderSlice/handleOrderComplete',
+// 	async (id, {rejectWithValue}) => {
+// 		try {
+// 			const data = await api.put(`/Order/Complete?orderId=${id}`);
+// 			return data;
+// 		} catch (error) {
+// 			console.error(error);
+// 			return rejectWithValue(error);
+// 		}
+// 	}
+// );
 
 export const orderSlice = createSlice({
 	name: 'orderSlice',
@@ -129,14 +151,14 @@ export const orderSlice = createSlice({
 				state.loading = false;
 				state.error = action.payload;
 			})
-			.addCase(handleOrderAccept.pending, (state) => {
+			.addCase(handleOrder.pending, (state) => {
 				state.loading = true;
 			})
-			.addCase(handleOrderAccept.fulfilled, (state, action) => {
+			.addCase(handleOrder.fulfilled, (state, action) => {
 				state.loading = false;
 				state.orderDetail = action.payload;
 			})
-			.addCase(handleOrderAccept.rejected, (state, action) => {
+			.addCase(handleOrder.rejected, (state, action) => {
 				state.loading = false;
 				state.error = action.payload;
 			})
@@ -151,38 +173,38 @@ export const orderSlice = createSlice({
 				state.loading = false;
 				state.error = action.payload;
 			})
-			.addCase(handleOrderPreparing.pending, (state) => {
+			// .addCase(handleOrderPreparing.pending, (state) => {
+			// 	state.loading = true;
+			// })
+			// .addCase(handleOrderPreparing.fulfilled, (state, action) => {
+			// 	state.loading = false;
+			// 	state.orderDetail = action.payload;
+			// })
+			// .addCase(handleOrderPreparing.rejected, (state, action) => {
+			// 	state.loading = false;
+			// 	state.error = action.payload;
+			// })
+			.addCase(handleOrderAssignDeliverer.pending, (state) => {
 				state.loading = true;
 			})
-			.addCase(handleOrderPreparing.fulfilled, (state, action) => {
+			.addCase(handleOrderAssignDeliverer.fulfilled, (state, action) => {
 				state.loading = false;
 				state.orderDetail = action.payload;
 			})
-			.addCase(handleOrderPreparing.rejected, (state, action) => {
-				state.loading = false;
-				state.error = action.payload;
-			})
-			.addCase(handleOrderAddToDelivery.pending, (state) => {
-				state.loading = true;
-			})
-			.addCase(handleOrderAddToDelivery.fulfilled, (state, action) => {
-				state.loading = false;
-				state.orderDetail = action.payload;
-			})
-			.addCase(handleOrderAddToDelivery.rejected, (state, action) => {
-				state.loading = false;
-				state.error = action.payload;
-			})
-			.addCase(handleOrderComplete.pending, (state) => {
-				state.loading = true;
-			})
-			.addCase(handleOrderComplete.fulfilled, (state, action) => {
-				state.loading = false;
-				state.orderDetail = action.payload;
-			})
-			.addCase(handleOrderComplete.rejected, (state, action) => {
+			.addCase(handleOrderAssignDeliverer.rejected, (state, action) => {
 				state.loading = false;
 				state.error = action.payload;
 			});
+		// .addCase(handleOrderComplete.pending, (state) => {
+		// 	state.loading = true;
+		// })
+		// .addCase(handleOrderComplete.fulfilled, (state, action) => {
+		// 	state.loading = false;
+		// 	state.orderDetail = action.payload;
+		// })
+		// .addCase(handleOrderComplete.rejected, (state, action) => {
+		// 	state.loading = false;
+		// 	state.error = action.payload;
+		// });
 	},
 });
