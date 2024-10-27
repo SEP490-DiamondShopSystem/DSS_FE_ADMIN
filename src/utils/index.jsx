@@ -65,3 +65,24 @@ export const getOrderStatus = (status) => {
 			return 'Unknown';
 	}
 };
+
+export const getStepFromStatus = (status) => {
+	switch (status) {
+		case 'Pending':
+			return 0;
+		case 'Processing':
+			return 1;
+		case 'Prepared':
+			return 2;
+		case 'Delivering':
+			return 3;
+		case 'Delivery_Failed':
+			return 4;
+		case 'Success':
+			return 5;
+		case 'Refused':
+			return 6;
+		default:
+			return 0;
+	}
+};
