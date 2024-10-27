@@ -8,9 +8,19 @@ import {
 	handleOrderAssignDeliverer,
 	handleOrderReject,
 } from '../../../../../redux/slices/orderSlice';
-import {convertToVietnamDate, getOrderStatus} from '../../../../../utils';
+import {convertToVietnamDate, getOrderStatus, getStepFromStatus} from '../../../../../utils';
 
 const {Title, Text} = Typography;
+
+const OrderStatus = {
+	Pending: 1,
+	Processing: 2,
+	Prepared: 3,
+	Delivering: 4,
+	Delivery_Failed: 5,
+	Success: 6,
+	Refused: 7,
+};
 
 const TimeLineOrder = ({orders, loading}) => {
 	const dispatch = useDispatch();
@@ -66,7 +76,7 @@ const TimeLineOrder = ({orders, loading}) => {
 			const newStatus = getOrderStatus(orders.Status);
 			setStatus(newStatus);
 			// Update the current step based on status
-			// setCurrentStep(getStepFromStatus(newStatus));
+			setCurrentStep(getStepFromStatus(newStatus));
 		}
 	}, [orders?.Status]);
 
@@ -128,71 +138,83 @@ const TimeLineOrder = ({orders, loading}) => {
 		{
 			title: 'Chờ Xác Nhận',
 			subTitle: '00:01:02',
-			status: `${status === 'Pending' ? 'process' : 'finish'}`,
+			status: `${
+				OrderStatus.Pending < OrderStatus[status]
+					? 'finish'
+					: OrderStatus.Pending === OrderStatus[status]
+					? 'process'
+					: 'wait'
+			}`,
 		},
-		// {
-		// 	title: 'Chờ Thanh Toán',
-		// 	subTitle: '00:01:02',
-		// 	status: 'process',
-		// },
-		// {
-		// 	title: 'Xác Nhận Thành Công',
-		// 	subTitle: '00:01:02',
-		// 	status: `${(status = 'Processing' ? 'process' : '')}`,
-		// },
-		// {
-		// 	title: `${
-		// 		status.prepared === 'Processing'
-		// 			? 'Đang Chuẩn Bị Đơn Hàng'
-		// 			: 'Chuẩn Bị Đơn Hàng Hoàn Tất'
-		// 	}`,
-		// 	subTitle: '00:01:02',
-		// 	status: `${status === 'Pending' ? 'process' : 'finish'}`,
-		// },
-		// {
-		// 	title: `${status === 'Processing' ? 'Chuyển Giao Shipper' : 'Đang Vận Chuyển'}`,
-		// 	subTitle: '00:01:02',
-		// 	status: `${status === 'Processing' ? 'process' : 'finish'}`,
-		// },
-		// // {
-		// // 	title: 'Đang vận chuyển',
-		// // 	subTitle: '00:01:02',
-		// // 	status: `${status.delivering}`,
-		// // },
-		// {
-		// 	title: 'Đã Giao',
-		// 	subTitle: '00:01:02',
-		// 	status: `${status === 'Processing' ? 'process' : 'finish'}`,
-		// },
-		// {
-		// 	title: 'Bị báo cáo',
-		// 	subTitle: '00:01:02',
-		// 	status: `${status === 'Processing' ? 'process' : 'finish'}`,
-		// },
-	];
-
-	const steps = [
-		{title: 'Chờ Xác Nhận', status: status === 'Pending' ? 'process' : 'finish'},
-		{title: 'Đang Xử Lý', status: status === 'Processing' ? 'process' : 'finish'},
-		{title: 'Chuẩn Bị Hàng', status: status === 'Prepared' ? 'process' : 'finish'},
-		{title: 'Đang Giao', status: status === 'Delivering' ? 'process' : 'finish'},
-		{title: 'Hoàn Tất', status: status === 'Success' ? 'finish' : 'wait'},
 		{
-			title: 'Bị Hủy',
-			status: ['Rejected', 'Cancelled', 'Delivery_Failed'].includes(status)
-				? 'error'
-				: 'wait',
+			title: 'Đang Xử Lý',
+			subTitle: '00:01:02',
+			status: `${
+				OrderStatus.Processing < OrderStatus[status]
+					? 'finish'
+					: OrderStatus.Processing === OrderStatus[status]
+					? 'process'
+					: 'wait'
+			}`,
+		},
+		{
+			title: 'Chuẩn Bị Đơn Hàng',
+			subTitle: '00:01:02',
+			status: `${
+				OrderStatus.Prepared < OrderStatus[status]
+					? 'finish'
+					: OrderStatus.Prepared === OrderStatus[status]
+					? 'process'
+					: 'wait'
+			}`,
+		},
+		{
+			title: 'Đang Vận Chuyển',
+			subTitle: '00:01:02',
+			status: `${
+				OrderStatus.Delivering < OrderStatus[status]
+					? 'finish'
+					: OrderStatus.Delivering === OrderStatus[status]
+					? 'process'
+					: 'wait'
+			}`,
+		},
+		{
+			title: 'Giao Hàng Thất Bại',
+			subTitle: '00:01:02',
+			status: `${
+				OrderStatus.Delivery_Failed < OrderStatus[status]
+					? 'finish'
+					: OrderStatus.Delivery_Failed === OrderStatus[status]
+					? 'process'
+					: 'wait'
+			}`,
+		},
+		{
+			title: 'Giao Hàng Thành Công',
+			subTitle: '00:01:02',
+			status: `${OrderStatus.Success === OrderStatus[status] ? 'finish' : 'wait'}`,
+		},
+		{
+			title: 'Đã Từ Chối',
+			subTitle: '00:01:02',
+			status: `${
+				OrderStatus.Refused < OrderStatus[status]
+					? 'finish'
+					: OrderStatus.Refused === OrderStatus[status]
+					? 'process'
+					: 'wait'
+			}`,
 		},
 	];
 
 	const getReverseSteps = () => {
-		// Filter out steps with status 'waiting' or 'error'
-		const filteredSteps = allSteps.filter(
-			(step) =>
-				step.status === 'finish' || step.status === 'process' || step.status === 'error'
-		);
-		// Reverse the filtered steps
-		return filteredSteps.reverse();
+		return allSteps
+			.filter(
+				(step) =>
+					step.status === 'finish' || step.status === 'process' || step.status === 'error'
+			)
+			.reverse();
 	};
 
 	const handleChange = (value) => {
@@ -280,8 +302,8 @@ const TimeLineOrder = ({orders, loading}) => {
 									onChange={handleChange}
 									options={[
 										{
-											value: '14e546cc-dfdd-4382-a160-56c1b2951029',
-											label: '14e546cc-dfdd-4382-a160-56c1b2951029',
+											value: '66313c7b-53f3-4c9a-a777-64211afdbf4f',
+											label: '66313c7b-53f3-4c9a-a777-64211afdbf4f',
 										},
 										// Additional options can be uncommented as needed
 										// { value: 'thai', label: 'Thái' },

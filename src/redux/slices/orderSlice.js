@@ -5,13 +5,10 @@ export const getAllOrder = createAsyncThunk(
 	'orderSlice/getAllOrder',
 	async (params, {rejectWithValue}) => {
 		try {
-			// Lấy ra các tham số từ `params`
 			const {pageSize, start, Status, CreatedDate, ExpectedDate, Email} = params;
 
-			// Khởi tạo URL cơ bản
 			let url = '/Order/All';
 
-			// Tạo các tham số truy vấn động
 			const queryParams = new URLSearchParams();
 
 			if (pageSize) queryParams.append('pageSize', pageSize);
@@ -21,12 +18,10 @@ export const getAllOrder = createAsyncThunk(
 			if (ExpectedDate) queryParams.append('ExpectedDate', ExpectedDate);
 			if (Email) queryParams.append('Email', Email);
 
-			// Kiểm tra nếu có queryParams thì thêm vào URL
 			if (queryParams.toString()) {
 				url += `?${queryParams.toString()}`;
 			}
 
-			// Thực hiện request với URL đã hoàn chỉnh
 			const data = await api.get(url);
 			return data;
 		} catch (error) {
