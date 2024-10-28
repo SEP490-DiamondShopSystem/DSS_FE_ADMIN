@@ -128,21 +128,31 @@ const OrderPage = () => {
 			dataIndex: 'status',
 			align: 'center',
 			render: (status) => {
-				// Find status item from statusList
-				const foundStatus = statusList.find((item) => item.value === status);
+				console.log('status', status);
+
+				const foundStatus = statusList.find((item) => item.name === status);
+				console.log('foundStatus', foundStatus);
+
 				let color = 'green';
 
-				if (status === 'canceled' || status === 'rejected' || status === 'shipFailed') {
+				// Determine color based on status
+				if (status === 'Cancelled' || status === 'Failed' || status === 'Refused') {
+					// 'canceled', 'rejected', 'shipFailed'
 					color = 'volcano';
-				} else if (status === 'refunded') {
+				} else if (status === 'Pending') {
+					// 'refunded'
 					color = 'blue';
-				} else if (status === 'deposited') {
+				} else if (status === 'Processing') {
+					// 'deposited'
 					color = 'geekblue';
-				} else if (status === 'paidAll') {
+				} else if (status === 'Delivering') {
+					// 'paidAll'
 					color = 'purple';
-				} else if (status === 'pending') {
+				} else if (status === 'Prepared') {
+					// 'pending'
 					color = 'gold';
-				} else if (status === 'refunding') {
+				} else if (status === 'Success') {
+					// 'refunding'
 					color = 'green';
 				}
 
@@ -181,16 +191,6 @@ const OrderPage = () => {
 		console.log(value);
 	};
 
-	const filteredDataSource = orders
-		?.filter((item) => activeStatus === 'all' || item.status === activeStatus)
-		.filter((item) => {
-			const itemDate = new Date(item.orderTime.split('/').reverse().join('-'));
-			const start = startDate ? new Date(startDate.split('/').reverse().join('-')) : null;
-			const end = endDate ? new Date(endDate.split('/').reverse().join('-')) : null;
-			return (!start || itemDate >= start) && (!end || itemDate <= end);
-		})
-		.filter((item) => item.email?.toLowerCase().includes(searchText.toLowerCase()));
-	console.log('filteredDataSource', filteredDataSource);
 	return (
 		<div className="mx-20 my-10">
 			<Filter

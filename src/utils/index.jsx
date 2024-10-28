@@ -66,6 +66,31 @@ export const getOrderStatus = (status) => {
 	}
 };
 
+export const getOrderStatusTag = (status) => {
+	switch (status) {
+		case 1:
+			return {name: 'Pending', color: 'gold'};
+		case 2:
+			return {name: 'Processing', color: 'blue'}; // Adjust color as needed
+		case 3:
+			return {name: 'Rejected', color: 'volcano'};
+		case 4:
+			return {name: 'Cancelled', color: 'volcano'};
+		case 5:
+			return {name: 'Prepared', color: 'green'}; // Adjust color as needed
+		case 6:
+			return {name: 'Delivering', color: 'orange'}; // Adjust color as needed
+		case 7:
+			return {name: 'Delivery_Failed', color: 'red'};
+		case 8:
+			return {name: 'Success', color: 'green'};
+		case 9:
+			return {name: 'Refused', color: 'purple'}; // Adjust color as needed
+		default:
+			return {name: 'Unknown', color: 'grey'};
+	}
+};
+
 export const getStepFromStatus = (status) => {
 	switch (status) {
 		case 'Pending':
