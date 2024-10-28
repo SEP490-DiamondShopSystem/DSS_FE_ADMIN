@@ -1,74 +1,23 @@
 import {ArrowLeftOutlined} from '@ant-design/icons';
-import {Button, Col, Divider, Row, Typography} from 'antd';
+import {Button, Col, Divider, Row, Tag, Typography} from 'antd';
 import React, {useEffect} from 'react';
 import {useNavigate} from 'react-router-dom';
-import {convertToVietnamDate, formatPrice, getOrderStatus} from '../../../../../utils';
+import {
+	convertToVietnamDate,
+	formatPrice,
+	getOrderStatus,
+	getOrderStatusTag,
+} from '../../../../../utils';
 import {useDispatch} from 'react-redux';
 import {getUserDetail} from '../../../../../redux/slices/userLoginSlice';
 
 const {Title, Text} = Typography;
 
-const detailGroups = {
-	total_price: 20138000,
-	groups: [
-		{
-			jewelry_price: 10069000,
-			items: [
-				{
-					id: 86,
-					name: 'Round Diamond 3.5 Carat IF',
-					unitPrice: 3357000,
-					quantity: 1,
-					total: 3357000,
-				},
-				{
-					id: 86,
-					name: 'Round Diamond 3.5 Carat VVS1',
-					unitPrice: 4467000,
-					quantity: 1,
-					total: 4467000,
-				},
-				{
-					id: 86,
-					name: 'Petite Solitaire Engagement Ring In 14k White Gold',
-					unitPrice: 2245000,
-					quantity: 1,
-					total: 2245000,
-				},
-			],
-		},
-		{
-			jewelry_price: 10069000,
-			items: [
-				{
-					id: 86,
-					name: 'Round Diamond 3.5 Carat IF',
-					unitPrice: 3357000,
-					quantity: 1,
-					total: 3357000,
-				},
-				{
-					id: 86,
-					name: 'Round Diamond 3.5 Carat VVS1',
-					unitPrice: 4467000,
-					quantity: 1,
-					total: 4467000,
-				},
-				{
-					id: 86,
-					name: 'Petite Solitaire Engagement Ring In 14k White Gold',
-					unitPrice: 2245000,
-					quantity: 1,
-					total: 2245000,
-				},
-			],
-		},
-	],
-};
-
 const InformationOrder = ({orders}) => {
 	const navigate = useNavigate();
 	const dispatch = useDispatch();
+
+	const orderStatus = getOrderStatusTag(orders?.Status);
 
 	return (
 		<div>
@@ -150,7 +99,7 @@ const InformationOrder = ({orders}) => {
 						Trạng Thái Thanh Toán
 					</Text>
 					<br />
-					<Text>{getOrderStatus(orders?.Status)}</Text>
+					<Tag color={orderStatus.color}>{orderStatus.name.toUpperCase()}</Tag>
 				</Col>
 			</Row>
 			<Divider style={{borderColor: '#d9d9d9'}} />

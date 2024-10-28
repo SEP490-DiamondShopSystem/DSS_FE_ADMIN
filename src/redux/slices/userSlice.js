@@ -29,10 +29,53 @@ export const handleAddRole = createAsyncThunk(
 	}
 );
 
+export const handleRemoveRole = createAsyncThunk(
+	'userSlice/handleRemoveRole',
+	async ({accId, roleId}) => {
+		try {
+			const data = await api.put(`/Account/RemoveRole`, {
+				accId,
+				roleId,
+			});
+			console.log(data);
+
+			return data;
+		} catch (error) {
+			console.error(error);
+		}
+	}
+);
+
+export const handleBanAccount = createAsyncThunk('userSlice/handleBanAccount', async (id) => {
+	try {
+		const data = await api.put(`/Account/Ban?identityId=${id}`);
+		console.log(data);
+
+		return data;
+	} catch (error) {
+		console.error(error);
+	}
+});
+
+export const getUserAccountDetail = createAsyncThunk(
+	'userSlice/getUserAccountDetail',
+	async (id, {rejectWithValue}) => {
+		try {
+			const data = await api.get(`/Account/${id}`);
+
+			return data;
+		} catch (error) {
+			console.error(error);
+			return rejectWithValue(error);
+		}
+	}
+);
+
 export const userSlice = createSlice({
 	name: 'userSlice',
 	initialState: {
 		users: null,
+		userAccount: null,
 		loading: false,
 		error: null,
 	},
@@ -57,6 +100,37 @@ export const userSlice = createSlice({
 				state.loading = false;
 			})
 			.addCase(handleAddRole.rejected, (state, action) => {
+				state.loading = false;
+				state.error = action.payload;
+			})
+			.addCase(handleRemoveRole.pending, (state) => {
+				state.loading = true;
+			})
+			.addCase(handleRemoveRole.fulfilled, (state, action) => {
+				state.loading = false;
+			})
+			.addCase(handleRemoveRole.rejected, (state, action) => {
+				state.loading = false;
+				state.error = action.payload;
+			})
+			.addCase(getUserAccountDetail.pending, (state) => {
+				state.loading = true;
+			})
+			.addCase(getUserAccountDetail.fulfilled, (state, action) => {
+				state.loading = false;
+				state.userAccount = action.payload;
+			})
+			.addCase(getUserAccountDetail.rejected, (state, action) => {
+				state.loading = false;
+				state.error = action.payload;
+			})
+			.addCase(handleBanAccount.pending, (state) => {
+				state.loading = true;
+			})
+			.addCase(handleBanAccount.fulfilled, (state, action) => {
+				state.loading = false;
+			})
+			.addCase(handleBanAccount.rejected, (state, action) => {
 				state.loading = false;
 				state.error = action.payload;
 			});

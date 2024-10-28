@@ -1,4 +1,4 @@
-import {Button, message, Select, Steps, Typography} from 'antd';
+import {Button, message, Select, Steps, Timeline, Typography} from 'antd';
 import React, {useEffect, useState} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
 import Loading from '../../../../../components/Loading';
@@ -9,17 +9,20 @@ import {
 	handleOrderReject,
 } from '../../../../../redux/slices/orderSlice';
 import {convertToVietnamDate, getOrderStatus, getStepFromStatus} from '../../../../../utils';
+import {ClockCircleOutlined} from '@ant-design/icons';
+import {TimeLine} from './TimeLine';
 
 const {Title, Text} = Typography;
 
-const OrderStatus = {
-	Pending: 1,
-	Processing: 2,
-	Prepared: 3,
-	Delivering: 4,
-	Delivery_Failed: 5,
-	Success: 6,
-	Refused: 7,
+const ORDER_STATUS_TEXTS = {
+	Pending: 'Chờ Xác Nhận',
+	Processing: 'Đang Xử Lý',
+	Prepared: 'Chuẩn Bị Đơn Hàng',
+	Prepared_1: 'Đơn Hàng Được Chuyển Giao',
+	Delivering: 'Đang Vận Chuyển',
+	Delivery_Failed: 'Giao Hàng Thất Bại',
+	Success: 'Giao Hàng Thành Công',
+	Refused: 'Đã Từ Chối',
 };
 
 const TimeLineOrder = ({orders, loading}) => {
@@ -34,6 +37,7 @@ const TimeLineOrder = ({orders, loading}) => {
 	const [status, setStatus] = useState();
 	const [userRoleManager, setUserRoleManager] = useState(false);
 	const [deliveries, setDeliveries] = useState([]);
+	const [userRoleStaff, setUserRoleStaff] = useState(false);
 	const [userRoleDeliverer, setUserRoleDeliverer] = useState(false);
 	const [selectedShipper, setSelectedShipper] = useState();
 	const [isAssigned, setIsAssigned] = useState(false);
@@ -49,9 +53,11 @@ const TimeLineOrder = ({orders, loading}) => {
 	useEffect(() => {
 		if (userDetail?.Roles) {
 			const isManager = userDetail?.Roles?.some((role) => role?.RoleName === 'manager');
+			const isStaff = userDetail?.Roles?.some((role) => role?.RoleName === 'staff');
 			const isDeliverer = userDetail?.Roles?.some((role) => role?.RoleName === 'deliverer');
 
 			setUserRoleManager(isManager);
+			setUserRoleStaff(isStaff);
 			setUserRoleDeliverer(isDeliverer);
 		}
 	}, [userDetail]);
@@ -75,8 +81,6 @@ const TimeLineOrder = ({orders, loading}) => {
 		if (orders?.Status !== undefined) {
 			const newStatus = getOrderStatus(orders.Status);
 			setStatus(newStatus);
-			// Update the current step based on status
-			setCurrentStep(getStepFromStatus(newStatus));
 		}
 	}, [orders?.Status]);
 
@@ -134,89 +138,6 @@ const TimeLineOrder = ({orders, loading}) => {
 		}
 	};
 
-	const allSteps = [
-		{
-			title: 'Chờ Xác Nhận',
-			subTitle: '00:01:02',
-			status: `${
-				OrderStatus.Pending < OrderStatus[status]
-					? 'finish'
-					: OrderStatus.Pending === OrderStatus[status]
-					? 'process'
-					: 'wait'
-			}`,
-		},
-		{
-			title: 'Đang Xử Lý',
-			subTitle: '00:01:02',
-			status: `${
-				OrderStatus.Processing < OrderStatus[status]
-					? 'finish'
-					: OrderStatus.Processing === OrderStatus[status]
-					? 'process'
-					: 'wait'
-			}`,
-		},
-		{
-			title: 'Chuẩn Bị Đơn Hàng',
-			subTitle: '00:01:02',
-			status: `${
-				OrderStatus.Prepared < OrderStatus[status]
-					? 'finish'
-					: OrderStatus.Prepared === OrderStatus[status]
-					? 'process'
-					: 'wait'
-			}`,
-		},
-		{
-			title: 'Đang Vận Chuyển',
-			subTitle: '00:01:02',
-			status: `${
-				OrderStatus.Delivering < OrderStatus[status]
-					? 'finish'
-					: OrderStatus.Delivering === OrderStatus[status]
-					? 'process'
-					: 'wait'
-			}`,
-		},
-		{
-			title: 'Giao Hàng Thất Bại',
-			subTitle: '00:01:02',
-			status: `${
-				OrderStatus.Delivery_Failed < OrderStatus[status]
-					? 'finish'
-					: OrderStatus.Delivery_Failed === OrderStatus[status]
-					? 'process'
-					: 'wait'
-			}`,
-		},
-		{
-			title: 'Giao Hàng Thành Công',
-			subTitle: '00:01:02',
-			status: `${OrderStatus.Success === OrderStatus[status] ? 'finish' : 'wait'}`,
-		},
-		{
-			title: 'Đã Từ Chối',
-			subTitle: '00:01:02',
-			status: `${
-				OrderStatus.Refused < OrderStatus[status]
-					? 'finish'
-					: OrderStatus.Refused === OrderStatus[status]
-					? 'process'
-					: 'wait'
-			}`,
-		},
-	];
-
-	const getReverseSteps = () => {
-		return allSteps
-			.filter(
-				(step) =>
-					step.status === 'finish' || step.status === 'process' || step.status === 'error'
-			)
-			.reverse();
-	};
-
 	const handleChange = (value) => {
 		setSelectedShipper(value);
 	};
@@ -234,7 +155,7 @@ const TimeLineOrder = ({orders, loading}) => {
 						<div className="border rounded-lg border-primary bg-tintWhite p-5 mb-5">
 							<div className="flex items-center mb-5" style={{fontSize: 16}}>
 								<p className="font-semibold">Trạng thái đơn hàng:</p>
-								<p className="ml-5">Chờ Xác Nhận</p>
+								<p className="ml-5">{ORDER_STATUS_TEXTS.Pending}</p>
 							</div>
 							{userRoleManager ? (
 								<div className="flex justify-around">
@@ -268,7 +189,7 @@ const TimeLineOrder = ({orders, loading}) => {
 						<div className="border rounded-lg border-primary bg-tintWhite p-5 mb-5">
 							<div className="flex items-center mb-5" style={{fontSize: 16}}>
 								<p className="font-semibold">Trạng thái đơn hàng:</p>
-								<p className="ml-5">Đơn Hàng Đã Xác Nhận</p>
+								<p className="ml-5">{ORDER_STATUS_TEXTS.Processing}</p>
 							</div>
 							<div className="flex justify-around">
 								<Button
@@ -283,57 +204,68 @@ const TimeLineOrder = ({orders, loading}) => {
 						</div>
 					)}
 
-					{/* Thanh Toán Hoàn Tất */}
-					{status === 'Prepared' && userRoleManager && !isAssigned && (
+					{status === 'Prepared' && !isAssigned && (
 						<div className="border rounded-lg border-primary bg-tintWhite p-5 mb-5">
 							<div className="flex items-center" style={{fontSize: 16}}>
 								<p className="font-semibold">Trạng thái đơn hàng:</p>
-								<p className="ml-5">Hoàn Tất Chuẩn Bị Hàng</p>
+								<p className="ml-5">{ORDER_STATUS_TEXTS.Prepared}</p>
 							</div>
 
-							<>
-								<div className="flex mt-2">
-									<p className="text-red mr-1">*</p>
-									<p>Chọn giao hàng</p>
-								</div>
-								<Select
-									defaultValue=""
-									className="w-full mb-5"
-									onChange={handleChange}
-									options={[
-										{
-											value: '66313c7b-53f3-4c9a-a777-64211afdbf4f',
-											label: '66313c7b-53f3-4c9a-a777-64211afdbf4f',
-										},
-										// Additional options can be uncommented as needed
-										// { value: 'thai', label: 'Thái' },
-										// { value: 'minh', label: 'Minh' },
-										// { value: 'tai', label: 'Tai', disabled: true },
-									]}
-								/>
-								<div className="flex justify-around">
-									<Button
-										type="text"
-										className="bg-primary font-semibold rounded-full w-full"
-										onClick={handleAssignDeliverer}
-									>
-										Chuyển Giao
-									</Button>
-								</div>
-							</>
+							{userRoleManager && (
+								<>
+									<div className="flex mt-2">
+										<p className="text-red mr-1">*</p>
+										<p>Chọn giao hàng</p>
+									</div>
+									<Select
+										defaultValue=""
+										className="w-full mb-5"
+										onChange={handleChange}
+										options={[
+											{
+												value: 'c8266c11-4400-43b1-8cc0-e05f2c48911f',
+												label: 'Shipper 1',
+											},
+											// Uncomment for more options
+											// { value: 'thai', label: 'Thái' },
+											// { value: 'minh', label: 'Minh' },
+											// { value: 'tai', label: 'Tai', disabled: true },
+										]}
+									/>
+									<div className="flex justify-around">
+										<Button
+											type="text"
+											className="bg-primary font-semibold rounded-full w-full"
+											onClick={handleAssignDeliverer}
+										>
+											Chuyển Giao
+										</Button>
+									</div>
+								</>
+							)}
+
+							{userRoleDeliverer ||
+								userRoleStaff ||
+								(!userRoleManager && (
+									<p className="mt-3 text-center">Chờ Manager Chọn Giao Hàng</p>
+								))}
+
+							{userRoleDeliverer ||
+								userRoleStaff ||
+								(!userRoleManager && (
+									<p className="mt-3 text-center">Chờ Manager Chọn Giao Hàng</p>
+								))}
 						</div>
 					)}
 
-					{status === 'Prepared' &&
-						userRoleDeliverer &&
-						!userRoleManager &&
-						isAssigned && (
-							<div className="border rounded-lg border-primary bg-tintWhite p-5 mb-5">
-								<div className="flex items-center mb-5" style={{fontSize: 16}}>
-									<p className="font-semibold">Trạng thái đơn hàng:</p>
-									<p className="ml-5">Chuyển Giao Thành Công</p>
-								</div>
+					{status === 'Prepared' && isAssigned && (
+						<div className="border rounded-lg border-primary bg-tintWhite p-5 mb-5">
+							<div className="flex items-center mb-5" style={{fontSize: 16}}>
+								<p className="font-semibold">Trạng thái đơn hàng:</p>
+								<p className="ml-5">{ORDER_STATUS_TEXTS.Prepared}</p>
+							</div>
 
+							{userRoleDeliverer ? (
 								<div className="flex justify-around">
 									<Button
 										type="text"
@@ -343,25 +275,41 @@ const TimeLineOrder = ({orders, loading}) => {
 										Bắt Đầu Giao Hàng
 									</Button>
 								</div>
-							</div>
-						)}
+							) : (
+								<div>
+									<p className="mt-3 text-center font-semibold text-primary">
+										Chờ Deliverer Giao Hàng
+									</p>
+								</div>
+							)}
+						</div>
+					)}
 
 					{/* Chuyển giao shipper thành công */}
 					{status === 'Delivering' && (
 						<div className="border rounded-lg border-primary bg-tintWhite p-5 mb-5">
 							<div className="flex items-center mb-5" style={{fontSize: 16}}>
 								<p className="font-semibold">Trạng thái đơn hàng:</p>
-								<p className="ml-5">Đơn Hàng Đang Được Giao</p>
+								<p className="ml-5">{ORDER_STATUS_TEXTS.Delivering}</p>
 							</div>
 							<div className="flex justify-around">
 								{userRoleDeliverer ? (
-									<Button
-										type="text"
-										className="bg-primary font-semibold w-full rounded-full"
-										onClick={handleDeliveredStatus}
-									>
-										Giao Hàng Thành Công
-									</Button>
+									<div className="flex items-center">
+										<Button
+											type="text"
+											className="bg-primary font-semibold w-full rounded-full mr-5"
+											onClick={handleDeliveredStatus}
+										>
+											Giao Hàng Thành Công
+										</Button>
+										<Button
+											danger
+											className="bg-primary font-semibold w-full rounded-full"
+											onClick={handleDeliveredStatus}
+										>
+											Giao Hàng Thất Bại
+										</Button>
+									</div>
 								) : (
 									<p className="font-bold text-primary">Đang Giao Hàng Bởi ???</p>
 								)}
@@ -429,13 +377,8 @@ const TimeLineOrder = ({orders, loading}) => {
 				</>
 			)}
 
-			<Title level={3}>Order Timeline</Title>
-			<Steps
-				progressDot
-				current={currentStep}
-				direction="vertical"
-				items={getReverseSteps()}
-			/>
+			<Title level={3}>Trạng Thái Đơn Hàng</Title>
+			<TimeLine status={status} />
 		</div>
 	);
 };

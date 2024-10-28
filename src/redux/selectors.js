@@ -5,6 +5,7 @@ export const GetUserDetailSelector = (state) => state.userLoginSlice.userDetail;
 
 //USER
 export const getAllUserSelector = (state) => state.userSlice.users;
+export const getDetailUserSelector = (state) => state.userSlice.userAccount;
 export const getLoadingUserSelector = (state) => state.userSlice.loading;
 
 //ORDER

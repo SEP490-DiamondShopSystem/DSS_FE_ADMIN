@@ -16,10 +16,12 @@ import {
 	handleRegisterDeliverer,
 	handleStaffRegister,
 } from '../../../redux/slices/userLoginSlice';
+import {useNavigate} from 'react-router-dom';
 
 const AccountPage = () => {
 	const [form] = Form.useForm();
 	const dispatch = useDispatch();
+	const navigate = useNavigate();
 	const userList = useSelector(getAllUserSelector);
 	const loading = useSelector(getLoadingUserSelector);
 	const userDetail = useSelector(GetUserDetailSelector);
@@ -27,11 +29,8 @@ const AccountPage = () => {
 	const [pageSize, setPageSize] = useState(100);
 	const [current, setCurrent] = useState(0);
 	const [users, setUsers] = useState();
-	const [userId, setUserId] = useState('');
-	const [isModalVisible, setIsModalVisible] = useState(false);
 	const [isModalAddVisible, setIsModalAddVisible] = useState(false);
 	const [active, setActive] = useState('all');
-	const [selectedOption, setSelectedOption] = useState(null);
 
 	const columns = [
 		{
@@ -41,13 +40,13 @@ const AccountPage = () => {
 			align: 'center',
 		},
 		{
-			title: 'FirstName',
+			title: 'Họ',
 			dataIndex: 'FirstName',
 			key: 'FirstName',
 			align: 'center',
 		},
 		{
-			title: 'LastName',
+			title: 'Tên',
 			key: 'LastName',
 			dataIndex: 'LastName',
 			align: 'center',
@@ -86,19 +85,21 @@ const AccountPage = () => {
 		// 	align: 'center',
 		// },
 		{
-			title: 'Action',
+			title: '',
 			key: 'action',
 			align: 'center',
 			render: (_, record) => (
 				<Space size="middle">
-					<Tooltip title={'Thêm vai trò'}>
-						<Button type="primary" ghost onClick={() => showModal(record.Id)}>
-							<UpCircleFilled />
+					<Tooltip title={'Xem Chi Tiết'}>
+						<Button
+							type="text"
+							className="bg-primary"
+							// ghost
+							onClick={() => navigate(record.Id)}
+						>
+							<EditFilled />
 						</Button>
 					</Tooltip>
-					<Button danger>
-						<DeleteFilled />
-					</Button>
 				</Space>
 			),
 		},
@@ -114,32 +115,8 @@ const AccountPage = () => {
 		}
 	}, [userList]);
 
-	const showModal = (id) => {
-		setIsModalVisible(true);
-		setUserId(id);
-	};
-
 	const openForm = () => {
 		setIsModalAddVisible(true);
-	};
-
-	const handleOk = () => {
-		const accId = {
-			value: userId,
-		};
-
-		const roleId = {
-			value: selectedOption,
-		};
-
-		dispatch(handleAddRole({accId, roleId})).then((res) => {
-			if (res.payload) {
-				message.success('Thêm vai trò thành công!');
-			} else {
-				message.error(res.payload.title);
-			}
-		});
-		setIsModalVisible(false);
 	};
 
 	const onFinish = (value) => {
@@ -186,16 +163,13 @@ const AccountPage = () => {
 		setIsModalAddVisible(false);
 	};
 
-	const handleCancel = () => {
-		setIsModalVisible(false);
-	};
-	const handleCloseAdd = () => {
-		form.resetFields();
-		handleCancel();
+	const handleAddCancel = () => {
+		setIsModalAddVisible(false);
 	};
 
-	const handleChange = (value) => {
-		setSelectedOption(value);
+	const handleCloseAdd = () => {
+		form.resetFields();
+		handleAddCancel();
 	};
 
 	const handleStatusBtn = (status) => {
@@ -211,10 +185,6 @@ const AccountPage = () => {
 		{name: 'Activated', value: 'activated'},
 		{name: 'Expired', value: 'expired'},
 	];
-
-	console.log('selectedOption', selectedOption);
-	console.log('users', users);
-	console.log('userId', userId);
 
 	return (
 		<div className="mx-20 my-10">
@@ -291,26 +261,9 @@ const AccountPage = () => {
 						loading={loading}
 					/>
 				</div>
+
 				<Modal
-					title="Select an Option"
-					visible={isModalVisible}
-					onOk={handleOk}
-					onCancel={handleCancel}
-				>
-					<Select
-						placeholder="Select an option"
-						style={{width: '100%'}}
-						onChange={handleChange}
-					>
-						<Option value={44}>Deliverer</Option>
-						<Option value={1}>Customer</Option>
-						<Option value={11}>Staff</Option>
-						<Option value={22}>Manager</Option>
-						<Option value={33}>Admin</Option>
-					</Select>
-				</Modal>
-				<Modal
-					title="Add Account"
+					title="Thêm Tài Khoản"
 					visible={isModalAddVisible}
 					onOk={() => form.submit()}
 					onCancel={handleCloseAdd}
