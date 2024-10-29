@@ -13,6 +13,7 @@ export const getAllOrderSelector = (state) => state.orderSlice.orders;
 export const LoadingOrderSelector = (state) => state.orderSlice.loading;
 export const getOrderDetailSelector = (state) => state.orderSlice.orderDetail;
 export const getOrderStatusDetailSelector = (state) => state.orderSlice.orderStatusDetail;
+export const getPaymentStatusDetailSelector = (state) => state.orderSlice.orderPaymentStatusDetail;
 
 //DELIVERY
 export const LoadingDeliverySelector = (state) => state.deliverySlice.loading;

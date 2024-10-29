@@ -38,8 +38,9 @@ const DefaultLayout = () => {
 			getItem('Danh Sách Trang Sức', '/products/jewelry-list', <RightOutlined />),
 			getItem('Danh Sách Kim Cương', '/products/diamond-list', <DiamondOutlined />),
 		]),
-		getItem('Quản Lí Vận Chuyển', '/deliveries', <DeliveredProcedureOutlined />),
 		getItem('Quản Lí Đặt Hàng', '/orders', <OrderedListOutlined />),
+		getItem('Quản Lí Vận Chuyển', '/deliveries', <DeliveredProcedureOutlined />),
+
 		// getItem('Manage Warranty', '/warranties', <SafetyOutlined />),
 		// getItem('Manage Promotion', '/promotion', <TagOutlined />),
 	];

@@ -25,6 +25,14 @@ const statusList = [
 	{name: 'Refused', value: '9'},
 ];
 
+const paymentStatusList = [
+	{name: 'PaidAll', value: '1'},
+	{name: 'Deposited', value: '2'},
+	{name: 'Refunding', value: '3'},
+	{name: 'Refunded', value: '4'},
+	{name: 'Pending', value: '5'},
+];
+
 const getEnumKey = (enumObj, value) => {
 	return enumObj
 		? Object.keys(enumObj)
@@ -41,7 +49,7 @@ const mapAttributes = (data, attributes) => {
 		email: null,
 		totalAmount: formatPrice(data?.TotalPrice),
 		customer: null,
-		paymentMethod: null,
+		paymentMethod: getEnumKey(attributes?.PaymentStatus, data?.PaymentStatus),
 	};
 };
 
@@ -105,52 +113,75 @@ const OrderPage = () => {
 			align: 'center',
 		},
 		{
-			title: 'PT Thanh Toán',
-			key: 'paymentMethod',
-			dataIndex: 'paymentMethod',
-			align: 'center',
-		},
-		{
-			title: 'Khách Hàng',
-			key: 'customer',
-			dataIndex: 'customer',
-			align: 'center',
-		},
-		{
 			title: 'Email',
 			key: 'email',
 			dataIndex: 'email',
 			align: 'center',
 		},
 		{
+			title: 'PT Thanh Toán',
+			key: 'paymentMethod',
+			dataIndex: 'paymentMethod',
+			align: 'center',
+			render: (status) => {
+				const foundStatus = paymentStatusList.find((item) => item.name === status);
+
+				let color = 'green';
+
+				// Determine color based on status
+				if (status === 'Refunding' || status === 'Refunded') {
+					// 'canceled', 'rejected', 'shipFailed'
+					color = 'red';
+				} else if (status === 'Pending') {
+					// 'refunded'
+					color = 'orange';
+				} else if (status === 'Deposited') {
+					// 'deposited'
+					color = 'blue';
+				} else if (status === 'PaidAll') {
+					// 'paidAll'
+					color = 'cyan';
+				}
+
+				return (
+					<Tag color={color}>
+						{foundStatus ? foundStatus.name.toUpperCase() : status.toUpperCase()}
+					</Tag>
+				);
+			},
+		},
+
+		{
 			title: 'Trạng Thái',
 			key: 'status',
 			dataIndex: 'status',
 			align: 'center',
 			render: (status) => {
-				console.log('status', status);
-
 				const foundStatus = statusList.find((item) => item.name === status);
-				console.log('foundStatus', foundStatus);
 
 				let color = 'green';
 
 				// Determine color based on status
-				if (status === 'Cancelled' || status === 'Failed' || status === 'Refused') {
+				if (
+					status === 'Cancelled' ||
+					status === 'Delivery Failed' ||
+					status === 'Refused' ||
+					status === 'Rejected'
+				) {
 					// 'canceled', 'rejected', 'shipFailed'
-					color = 'volcano';
+					color = 'red';
 				} else if (status === 'Pending') {
 					// 'refunded'
-					color = 'blue';
+					color = 'orange';
 				} else if (status === 'Processing') {
 					// 'deposited'
-					color = 'geekblue';
+					color = 'blue';
 				} else if (status === 'Delivering') {
 					// 'paidAll'
-					color = 'purple';
+					color = 'cyan';
 				} else if (status === 'Prepared') {
 					// 'pending'
-					color = 'gold';
+					color = 'purple';
 				} else if (status === 'Success') {
 					// 'refunding'
 					color = 'green';
