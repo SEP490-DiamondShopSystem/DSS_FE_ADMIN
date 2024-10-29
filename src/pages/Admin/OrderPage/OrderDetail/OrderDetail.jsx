@@ -2,7 +2,12 @@ import React, {useEffect, useState} from 'react';
 import InformationOrder from './Left/InformationOrder';
 import TimeLineOrder from './Right/TimeLineOrder';
 import {useDispatch, useSelector} from 'react-redux';
-import {getOrderDetailSelector, LoadingOrderSelector} from '../../../../redux/selectors';
+import {
+	getOrderDetailSelector,
+	getOrderStatusDetailSelector,
+	getPaymentStatusDetailSelector,
+	LoadingOrderSelector,
+} from '../../../../redux/selectors';
 import {getOrderDetail} from '../../../../redux/slices/orderSlice';
 import {useParams} from 'react-router-dom';
 import Loading from 'react-loading';
@@ -12,6 +17,8 @@ const OrderDetail = () => {
 	const dispatch = useDispatch();
 	const orderDetail = useSelector(getOrderDetailSelector);
 	const loading = useSelector(LoadingOrderSelector);
+	const statusOrder = useSelector(getOrderStatusDetailSelector);
+	const paymentStatusOrder = useSelector(getPaymentStatusDetailSelector);
 
 	const [orders, setOrders] = useState();
 
@@ -32,10 +39,18 @@ const OrderDetail = () => {
 			) : (
 				<div className="w-full flex">
 					<div className="" style={{width: '70%'}}>
-						<InformationOrder orders={orders} />
+						<InformationOrder
+							orders={orders}
+							statusOrder={statusOrder}
+							paymentStatusOrder={paymentStatusOrder}
+						/>
 					</div>
 					<div className="pl-10" style={{width: '30%'}}>
-						<TimeLineOrder orders={orders} />
+						<TimeLineOrder
+							orders={orders}
+							statusOrder={statusOrder}
+							paymentStatusOrder={paymentStatusOrder}
+						/>
 					</div>
 				</div>
 			)}

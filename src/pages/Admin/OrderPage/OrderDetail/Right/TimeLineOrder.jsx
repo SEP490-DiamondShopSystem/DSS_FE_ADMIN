@@ -1,15 +1,21 @@
-import {Button, message, Select, Steps, Timeline, Typography} from 'antd';
+import {Button, Form, Input, message, Modal, Select, Steps, Timeline, Typography} from 'antd';
 import React, {useEffect, useState} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
 import Loading from '../../../../../components/Loading';
-import {getAllDeliverySelector, GetUserDetailSelector} from '../../../../../redux/selectors';
 import {
+	getAllDeliverySelector,
+	getOrderStatusDetailSelector,
+	GetUserDetailSelector,
+} from '../../../../../redux/selectors';
+import {
+	handleDeliveryFailed,
 	handleOrder,
 	handleOrderAssignDeliverer,
 	handleOrderReject,
+	handleRefundOrder,
 } from '../../../../../redux/slices/orderSlice';
 import {convertToVietnamDate, getOrderStatus, getStepFromStatus} from '../../../../../utils';
-import {ClockCircleOutlined} from '@ant-design/icons';
+import {CheckCircleOutlined, ClockCircleOutlined, CloseCircleOutlined} from '@ant-design/icons';
 import {TimeLine} from './TimeLine';
 
 const {Title, Text} = Typography;
@@ -17,6 +23,7 @@ const {Title, Text} = Typography;
 const ORDER_STATUS_TEXTS = {
 	Pending: 'Chờ Xác Nhận',
 	Processing: 'Đang Xử Lý',
+	Rejected: 'Đã Từ Chối',
 	Prepared: 'Chuẩn Bị Đơn Hàng',
 	Prepared_1: 'Đơn Hàng Được Chuyển Giao',
 	Delivering: 'Đang Vận Chuyển',
@@ -25,7 +32,7 @@ const ORDER_STATUS_TEXTS = {
 	Refused: 'Đã Từ Chối',
 };
 
-const TimeLineOrder = ({orders, loading}) => {
+const TimeLineOrder = ({orders, loading, statusOrder, paymentStatusOrder}) => {
 	const dispatch = useDispatch();
 
 	const userDetail = useSelector(GetUserDetailSelector);
@@ -37,6 +44,7 @@ const TimeLineOrder = ({orders, loading}) => {
 	const [status, setStatus] = useState();
 	const [userRoleManager, setUserRoleManager] = useState(false);
 	const [deliveries, setDeliveries] = useState([]);
+	const [isCancelModalVisible, setIsCancelModalVisible] = useState(false);
 	const [userRoleStaff, setUserRoleStaff] = useState(false);
 	const [userRoleDeliverer, setUserRoleDeliverer] = useState(false);
 	const [selectedShipper, setSelectedShipper] = useState();
@@ -78,35 +86,26 @@ const TimeLineOrder = ({orders, loading}) => {
 	console.log(deliveries);
 
 	useEffect(() => {
-		if (orders?.Status !== undefined) {
-			const newStatus = getOrderStatus(orders.Status);
+		if (statusOrder !== undefined) {
+			const newStatus = getOrderStatus(statusOrder);
 			setStatus(newStatus);
 		}
-	}, [orders?.Status]);
-
-	const handleRejectStatus = async () => {
-		const res = await dispatch(handleOrderReject(orders.Id));
-		if (res.payload) {
-			message.success('Từ chối thành công!');
-		} else {
-			message.error('Lỗi khi từ chối đơn hàng.');
-		}
-	};
+	}, [statusOrder]);
 
 	const handleAcceptStatus = async () => {
 		const res = await dispatch(handleOrder(orders.Id));
-		if (res.payload) {
+		if (res.payload !== undefined) {
 			message.success('Xác nhận thành công!');
-		} else {
+		} else if (res.payload.status === 400) {
 			message.error('Lỗi khi xác nhận đơn hàng.');
 		}
 	};
 
 	const handlePreparedStatus = async () => {
 		const res = await dispatch(handleOrder(orders.Id));
-		if (res.payload) {
+		if (res.payload !== undefined) {
 			message.success('Chuẩn bị hàng hoàn tất!');
-		} else {
+		} else if (res.payload.status === 400) {
 			message.error('Lỗi khi chuẩn bị hàng.');
 		}
 	};
@@ -114,26 +113,45 @@ const TimeLineOrder = ({orders, loading}) => {
 		const res = await dispatch(
 			handleOrderAssignDeliverer({orderId: orders.Id, delivererId: selectedShipper})
 		);
-		if (res.payload) {
+
+		if (res.payload !== undefined) {
 			message.success('Đã chuyển giao cho shipper!');
 			localStorage.setItem(`isAssigned_${orders.Id}`, JSON.stringify(true));
-		} else {
+		} else if (res.payload.status === 400) {
 			message.error('Lỗi khi chuyển giao cho shipper.');
 		}
 	};
 	const handleDeliveringStatus = async () => {
 		const res = await dispatch(handleOrder(orders.Id));
-		if (res.payload) {
+		if (res.payload !== undefined) {
 			message.success('Xác nhận giao hàng!');
-		} else {
+		} else if (res.payload.status === 400) {
 			message.error('Lỗi khi giao hàng.');
 		}
 	};
 	const handleDeliveredStatus = async () => {
 		const res = await dispatch(handleOrder(orders.Id));
-		if (res.payload) {
+		if (res.payload !== undefined) {
 			message.success('Hoàn tất giao hàng!');
-		} else {
+		} else if (res.payload.status === 400) {
+			message.error('Lỗi khi giao hàng.');
+		}
+	};
+
+	const handleFailedDeliveredStatus = async () => {
+		const res = await dispatch(handleDeliveryFailed(orders.Id));
+		if (res.payload !== undefined) {
+			message.warning('Hủy giao hàng!');
+		} else if (res.payload.status === 400) {
+			message.error('Lỗi khi giao hàng.');
+		}
+	};
+
+	const handleRefund = async () => {
+		const res = await dispatch(handleRefundOrder(orders.Id));
+		if (res.payload !== undefined) {
+			message.warning('Xác nhận hoàn tiền!');
+		} else if (res.payload.status === 400) {
 			message.error('Lỗi khi giao hàng.');
 		}
 	};
@@ -142,8 +160,29 @@ const TimeLineOrder = ({orders, loading}) => {
 		setSelectedShipper(value);
 	};
 
+	const handleCancelOrder = () => {
+		setIsCancelModalVisible(true);
+	};
+
+	const submitCancelOrder = async (values) => {
+		const res = await dispatch(handleOrderReject({orderId: orders.Id, reason: values.reason}));
+		console.log('err', res.payload);
+
+		if (res.payload !== undefined) {
+			message.success('Từ chối thành công!');
+		} else if (res.payload.status === 400) {
+			message.error('Lỗi khi từ chối đơn hàng.');
+		}
+
+		setIsCancelModalVisible(false);
+	};
+
 	console.log('userRoleManager', userRoleManager);
 	console.log('userRoleDeliverer', userRoleDeliverer);
+	console.log('isAssigned', isAssigned);
+	console.log('status', status);
+	console.log('statusOrder', statusOrder);
+	console.log('paymentStatusOrder', paymentStatusOrder);
 
 	return (
 		<div>
@@ -155,18 +194,12 @@ const TimeLineOrder = ({orders, loading}) => {
 						<div className="border rounded-lg border-primary bg-tintWhite p-5 mb-5">
 							<div className="flex items-center mb-5" style={{fontSize: 16}}>
 								<p className="font-semibold">Trạng thái đơn hàng:</p>
-								<p className="ml-5">{ORDER_STATUS_TEXTS.Pending}</p>
+								<p className="ml-5">
+									<ClockCircleOutlined /> {ORDER_STATUS_TEXTS.Pending}
+								</p>
 							</div>
 							{userRoleManager ? (
 								<div className="flex justify-around">
-									<Button
-										type="text"
-										className="bg-red font-semibold w-32 rounded-full"
-										onClick={handleRejectStatus}
-										disabled={loading}
-									>
-										Hủy bỏ
-									</Button>
 									<Button
 										type="text"
 										className="bg-primary font-semibold w-32 rounded-full"
@@ -174,6 +207,14 @@ const TimeLineOrder = ({orders, loading}) => {
 										disabled={loading}
 									>
 										Xác nhận
+									</Button>
+									<Button
+										type="text"
+										className="bg-red font-semibold w-32 rounded-full"
+										onClick={handleCancelOrder}
+										disabled={loading}
+									>
+										Hủy bỏ
 									</Button>
 								</div>
 							) : (
@@ -184,12 +225,43 @@ const TimeLineOrder = ({orders, loading}) => {
 						</div>
 					)}
 
-					{/* Chờ Thanh Toán */}
+					{status === 'Rejected' && paymentStatusOrder === 3 && (
+						<div className="border rounded-lg border-primary bg-tintWhite p-5 mb-5">
+							<div className="flex items-center mb-5" style={{fontSize: 16}}>
+								<p className="font-semibold">Trạng thái đơn hàng:</p>
+								<p className="ml-5 text-red font-semibold">
+									<CloseCircleOutlined /> {ORDER_STATUS_TEXTS.Rejected}
+								</p>
+							</div>
+							<div className="flex justify-around">
+								<Button
+									type="text"
+									className="bg-primary font-semibold w-full rounded-full"
+									onClick={handleRefund}
+									disabled={loading}
+								>
+									Xác nhận hoàn tiền
+								</Button>
+							</div>
+						</div>
+					)}
+					{status === 'Rejected' && paymentStatusOrder === 4 && (
+						<div className="border rounded-lg border-primary bg-tintWhite p-5 mb-5">
+							<div className="flex items-center " style={{fontSize: 16}}>
+								<p className="font-semibold">Trạng thái đơn hàng:</p>
+								<p className="ml-5 text-red font-semibold">
+									<CloseCircleOutlined /> {ORDER_STATUS_TEXTS.Rejected}
+								</p>
+							</div>
+						</div>
+					)}
 					{status === 'Processing' && (
 						<div className="border rounded-lg border-primary bg-tintWhite p-5 mb-5">
 							<div className="flex items-center mb-5" style={{fontSize: 16}}>
 								<p className="font-semibold">Trạng thái đơn hàng:</p>
-								<p className="ml-5">{ORDER_STATUS_TEXTS.Processing}</p>
+								<p className="ml-5">
+									<ClockCircleOutlined /> {ORDER_STATUS_TEXTS.Processing}
+								</p>
 							</div>
 							<div className="flex justify-around">
 								<Button
@@ -208,7 +280,9 @@ const TimeLineOrder = ({orders, loading}) => {
 						<div className="border rounded-lg border-primary bg-tintWhite p-5 mb-5">
 							<div className="flex items-center" style={{fontSize: 16}}>
 								<p className="font-semibold">Trạng thái đơn hàng:</p>
-								<p className="ml-5">{ORDER_STATUS_TEXTS.Prepared}</p>
+								<p className="ml-5">
+									<CheckCircleOutlined /> {ORDER_STATUS_TEXTS.Prepared}
+								</p>
 							</div>
 
 							{userRoleManager && (
@@ -223,7 +297,7 @@ const TimeLineOrder = ({orders, loading}) => {
 										onChange={handleChange}
 										options={[
 											{
-												value: 'c8266c11-4400-43b1-8cc0-e05f2c48911f',
+												value: '4d85fc09-6854-4c61-8e55-a615887e412e',
 												label: 'Shipper 1',
 											},
 											// Uncomment for more options
@@ -247,13 +321,9 @@ const TimeLineOrder = ({orders, loading}) => {
 							{userRoleDeliverer ||
 								userRoleStaff ||
 								(!userRoleManager && (
-									<p className="mt-3 text-center">Chờ Manager Chọn Giao Hàng</p>
-								))}
-
-							{userRoleDeliverer ||
-								userRoleStaff ||
-								(!userRoleManager && (
-									<p className="mt-3 text-center">Chờ Manager Chọn Giao Hàng</p>
+									<p className="mt-3 text-center">
+										Chờ Manager Chọn Chuyển Giao Đơn Hàng
+									</p>
 								))}
 						</div>
 					)}
@@ -262,7 +332,9 @@ const TimeLineOrder = ({orders, loading}) => {
 						<div className="border rounded-lg border-primary bg-tintWhite p-5 mb-5">
 							<div className="flex items-center mb-5" style={{fontSize: 16}}>
 								<p className="font-semibold">Trạng thái đơn hàng:</p>
-								<p className="ml-5">{ORDER_STATUS_TEXTS.Prepared}</p>
+								<p className="ml-5">
+									<CheckCircleOutlined /> {ORDER_STATUS_TEXTS.Prepared}
+								</p>
 							</div>
 
 							{userRoleDeliverer ? (
@@ -290,7 +362,9 @@ const TimeLineOrder = ({orders, loading}) => {
 						<div className="border rounded-lg border-primary bg-tintWhite p-5 mb-5">
 							<div className="flex items-center mb-5" style={{fontSize: 16}}>
 								<p className="font-semibold">Trạng thái đơn hàng:</p>
-								<p className="ml-5">{ORDER_STATUS_TEXTS.Delivering}</p>
+								<p className="ml-5">
+									<ClockCircleOutlined /> {ORDER_STATUS_TEXTS.Delivering}
+								</p>
 							</div>
 							<div className="flex justify-around">
 								{userRoleDeliverer ? (
@@ -300,14 +374,14 @@ const TimeLineOrder = ({orders, loading}) => {
 											className="bg-primary font-semibold w-full rounded-full mr-5"
 											onClick={handleDeliveredStatus}
 										>
-											Giao Hàng Thành Công
+											Đã Giao Hàng
 										</Button>
 										<Button
 											danger
-											className="bg-primary font-semibold w-full rounded-full"
-											onClick={handleDeliveredStatus}
+											className="font-semibold w-full rounded-full"
+											onClick={handleFailedDeliveredStatus}
 										>
-											Giao Hàng Thất Bại
+											Hủy Giao Hàng
 										</Button>
 									</div>
 								) : (
@@ -317,23 +391,25 @@ const TimeLineOrder = ({orders, loading}) => {
 						</div>
 					)}
 
-					{/* {currentStep === 5 && (
-				<div className="border rounded-lg border-primary bg-tintWhite p-5 mb-5">
-					<div className="flex items-center mb-5" style={{fontSize: 16}}>
-						<p className="font-semibold">Trạng thái đơn hàng:</p>
-						<p className="ml-5">Đang giao hàng</p>
-					</div>
-					<div className="flex justify-around">
-						<Button
-							type="text"
-							className="bg-primary font-semibold w-full rounded-full"
-							onClick={handleSuccessStatus}
-						>
-							Tiếp tục
-						</Button>
-					</div>
-				</div>
-			)} */}
+					{status === 'Delivery_Failed' && (
+						<div className="border rounded-lg border-primary bg-tintWhite p-5 mb-5">
+							<div className="flex items-center" style={{fontSize: 16}}>
+								<p className="font-semibold">Trạng thái đơn hàng:</p>
+								<p className="ml-5 font-semibold text-red">
+									<CloseCircleOutlined /> {ORDER_STATUS_TEXTS.Delivery_Failed}
+								</p>
+							</div>
+							{/* <div className="flex justify-around">
+								<Button
+									type="text"
+									className="bg-primary font-semibold w-full rounded-full"
+									// onClick={handleSuccessStatus}
+								>
+									Tiếp tục
+								</Button>
+							</div> */}
+						</div>
+					)}
 
 					{/* Đã giao */}
 					{status === 'Success' && (
@@ -341,7 +417,7 @@ const TimeLineOrder = ({orders, loading}) => {
 							<div className="flex items-center " style={{fontSize: 16}}>
 								<p className="font-semibold">Trạng thái đơn hàng:</p>
 								<p className="ml-5 text-darkGreen font-semibold text-lg">
-									Đã Giao Hàng
+									<CheckCircleOutlined /> Đã Giao Hàng
 								</p>
 							</div>
 							{/* <div className="flex justify-around">
@@ -379,6 +455,28 @@ const TimeLineOrder = ({orders, loading}) => {
 
 			<Title level={3}>Trạng Thái Đơn Hàng</Title>
 			<TimeLine status={status} />
+
+			<Modal
+				title="Hủy Đơn"
+				visible={isCancelModalVisible}
+				onCancel={() => setIsCancelModalVisible(false)}
+				footer={null}
+			>
+				<Form onFinish={submitCancelOrder}>
+					<Form.Item
+						label="Lý do hủy"
+						name="reason"
+						rules={[{required: true, message: 'Vui lòng nhập lý do hủy đơn'}]}
+					>
+						<Input.TextArea />
+					</Form.Item>
+					<div className="flex items-center justify-center">
+						<Button type="text" className="bg-primary" htmlType="submit">
+							Xác nhận hủy
+						</Button>
+					</div>
+				</Form>
+			</Modal>
 		</div>
 	);
 };

@@ -1,4 +1,4 @@
-import {CheckCircleOutlined, ClockCircleOutlined} from '@ant-design/icons';
+import {CheckCircleOutlined, ClockCircleOutlined, CloseCircleOutlined} from '@ant-design/icons';
 import {Timeline} from 'antd';
 import React from 'react';
 
@@ -9,7 +9,7 @@ const OrderStatus = {
 	Delivering: 4,
 	Delivery_Failed: 5,
 	Success: 6,
-	Refused: 7,
+	Rejected: 7,
 };
 
 export const TimeLine = ({status}) => {
@@ -17,13 +17,18 @@ export const TimeLine = ({status}) => {
 		if (stepStatus < OrderStatus[status]) {
 			return {color: 'blue', icon: <CheckCircleOutlined style={{fontSize: '16px'}} />};
 		} else if (stepStatus === OrderStatus[status]) {
-			// Nếu là bước "Giao Hàng Thành Công" và là trạng thái cuối cùng
 			if (status === 'Success' && stepStatus === OrderStatus.Success) {
 				return {color: 'blue', icon: <CheckCircleOutlined style={{fontSize: '16px'}} />};
 			}
+			if (status === 'Delivery_Failed' && stepStatus === OrderStatus.Delivery_Failed) {
+				return {color: 'red', icon: <CloseCircleOutlined style={{fontSize: '16px'}} />};
+			}
+			if (status === 'Rejected' && stepStatus === OrderStatus.Rejected) {
+				return {color: 'red', icon: <CloseCircleOutlined style={{fontSize: '16px'}} />};
+			}
 			return {color: '#dec986', icon: <ClockCircleOutlined style={{fontSize: '16px'}} />};
 		} else {
-			return null; // Các bước chưa đạt tới sẽ bị ẩn
+			return null; // Hide future steps
 		}
 	};
 
@@ -32,6 +37,11 @@ export const TimeLine = ({status}) => {
 			children: 'Chờ Xác Nhận',
 			color: getStepStatus(OrderStatus.Pending)?.color,
 			dot: getStepStatus(OrderStatus.Pending)?.icon,
+		},
+		{
+			children: 'Đã Từ Chối',
+			color: getStepStatus(OrderStatus.Rejected)?.color,
+			dot: getStepStatus(OrderStatus.Rejected)?.icon,
 		},
 		{
 			children: 'Đang Xử Lý',
@@ -58,25 +68,25 @@ export const TimeLine = ({status}) => {
 			color: getStepStatus(OrderStatus.Success)?.color,
 			dot: getStepStatus(OrderStatus.Success)?.icon,
 		},
-		{
-			children: 'Đã Từ Chối',
-			color: getStepStatus(OrderStatus.Refused)?.color,
-			dot: getStepStatus(OrderStatus.Refused)?.icon,
-		},
 	];
 
-	// Loại bỏ "Giao Hàng Thất Bại" nếu đã có "Giao Hàng Thành Công" và ngược lại
-	if (status === 'Success') {
-		allSteps = allSteps.filter((step) => step.children !== 'Giao Hàng Thất Bại');
-	} else if (status === 'Delivery_Failed') {
-		allSteps = allSteps.filter((step) => step.children !== 'Giao Hàng Thành Công');
+	// If status is Reject, only display steps up to "Đã Từ Chối" and hide subsequent steps
+	if (status === 'Rejected') {
+		allSteps = allSteps.filter(
+			(step) =>
+				step.children !== 'Đang Xử Lý' &&
+				step.children !== 'Chuẩn Bị Đơn Hàng' &&
+				step.children !== 'Đang Vận Chuyển' &&
+				step.children !== 'Giao Hàng Thất Bại' &&
+				step.children !== 'Giao Hàng Thành Công'
+		);
 	}
 
-	// Lọc các bước có màu để hiển thị
+	// Filter steps with a defined color to display
 	allSteps = allSteps.filter((step) => step.color);
 
 	return (
-		<div>
+		<div className="mt-10">
 			<Timeline reverse={true} items={allSteps} />
 		</div>
 	);

@@ -1,23 +1,18 @@
+import React from 'react';
+
 import {ArrowLeftOutlined} from '@ant-design/icons';
 import {Button, Col, Divider, Row, Tag, Typography} from 'antd';
-import React, {useEffect} from 'react';
-import {useNavigate} from 'react-router-dom';
-import {
-	convertToVietnamDate,
-	formatPrice,
-	getOrderStatus,
-	getOrderStatusTag,
-} from '../../../../../utils';
 import {useDispatch} from 'react-redux';
-import {getUserDetail} from '../../../../../redux/slices/userLoginSlice';
+import {useNavigate} from 'react-router-dom';
+import {convertToVietnamDate, formatPrice, getOrderStatusTag} from '../../../../../utils';
 
 const {Title, Text} = Typography;
 
-const InformationOrder = ({orders}) => {
+const InformationOrder = ({orders, statusOrder, paymentStatusOrder}) => {
 	const navigate = useNavigate();
 	const dispatch = useDispatch();
 
-	const orderStatus = getOrderStatusTag(orders?.Status);
+	const orderStatus = getOrderStatusTag(paymentStatusOrder);
 
 	return (
 		<div>
@@ -48,7 +43,7 @@ const InformationOrder = ({orders}) => {
 						Loại Đơn Hàng
 					</Text>
 					<br />
-					<Text>Đơn hàng custom</Text>
+					<Text>Đơn hàng</Text>
 				</Col>
 				<Col span={12}>
 					<Text strong style={{fontSize: 18}}>
@@ -95,8 +90,8 @@ const InformationOrder = ({orders}) => {
 			</Row>
 			<Row gutter={[16, 16]} justify="center" align="middle" className="my-3">
 				<Col span={24}>
-					<Text strong style={{fontSize: 18}}>
-						Trạng Thái Thanh Toán
+					<Text strong className="mb-5" style={{fontSize: 18}}>
+						Phương Thức Thanh Toán
 					</Text>
 					<br />
 					<Tag color={orderStatus.color}>{orderStatus.name.toUpperCase()}</Tag>
