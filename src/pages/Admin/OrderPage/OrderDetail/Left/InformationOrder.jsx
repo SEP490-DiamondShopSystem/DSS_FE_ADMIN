@@ -4,7 +4,12 @@ import {ArrowLeftOutlined} from '@ant-design/icons';
 import {Button, Col, Divider, Row, Tag, Typography} from 'antd';
 import {useDispatch} from 'react-redux';
 import {useNavigate} from 'react-router-dom';
-import {convertToVietnamDate, formatPrice, getOrderStatusTag} from '../../../../../utils';
+import {
+	convertToVietnamDate,
+	formatPrice,
+	getOrderStatus,
+	getOrderStatusTag,
+} from '../../../../../utils';
 
 const {Title, Text} = Typography;
 
@@ -13,6 +18,10 @@ const InformationOrder = ({orders, statusOrder, paymentStatusOrder}) => {
 	const dispatch = useDispatch();
 
 	const orderStatus = getOrderStatusTag(paymentStatusOrder);
+	const status = getOrderStatus(statusOrder);
+
+	console.log('orders', orders);
+	console.log('statusOrder', statusOrder);
 
 	return (
 		<div>
@@ -31,6 +40,53 @@ const InformationOrder = ({orders, statusOrder, paymentStatusOrder}) => {
 					<Title level={3}>Chi Tiết Đơn Hàng</Title>
 				</Col>
 			</Row>
+			{orders && orders?.CancelledReason !== null && (
+				<>
+					<Divider style={{borderColor: '#d9d9d9'}} />
+					<Row>
+						<Col span={24}>
+							<Title level={4}>Đơn Hàng Bị Hủy</Title>
+						</Col>
+					</Row>
+					<Row gutter={[16, 16]} justify="center" align="middle" className="my-3">
+						<Col span={12}>
+							<Text strong style={{fontSize: 18}}>
+								Tiêu Đề
+							</Text>
+							<br />
+							<Text>
+								{status === 'Cancelled'
+									? 'Người Đặt Hủy Đặt Hàng'
+									: 'Shop Từ Chối Đặt Hàng'}
+							</Text>
+						</Col>
+						<Col span={12}>
+							<Text strong style={{fontSize: 18}}>
+								Lý Do
+							</Text>
+							<br />
+							<Text>{orders?.CancelledReason}</Text>
+						</Col>
+					</Row>
+					<Row gutter={[16, 16]} justify="center" align="middle" className="my-3">
+						<Col span={12}>
+							<Text strong style={{fontSize: 18}}>
+								{status === 'Cancelled' ? 'Ngày Hủy' : 'Ngày Từ Chối'}
+							</Text>
+							<br />
+							<Text>{convertToVietnamDate(orders?.CancelledDate)}</Text>
+						</Col>
+						<Col span={12}>
+							<Text strong className="mb-5" style={{fontSize: 18}}>
+								Trạng Thái
+							</Text>
+							<br />
+							<Tag color={orderStatus.color}>{orderStatus.name.toUpperCase()}</Tag>
+						</Col>
+					</Row>
+				</>
+			)}
+
 			<Divider style={{borderColor: '#d9d9d9'}} />
 			<Row>
 				<Col span={24}>
@@ -80,23 +136,20 @@ const InformationOrder = ({orders, statusOrder, paymentStatusOrder}) => {
 					<br />
 					<Text>{convertToVietnamDate(orders?.CreatedDate)}</Text>
 				</Col>
+
 				<Col span={12}>
-					{/* <Text strong style={{fontSize: 18}}>
-						Payment Method
-					</Text>
-					<br />
-					<Text>VNPAY</Text> */}
+					{orders && orders?.CancelledReason === null && (
+						<>
+							<Text strong className="mb-5" style={{fontSize: 18}}>
+								Phương Thức Thanh Toán
+							</Text>
+							<br />
+							<Tag color={orderStatus.color}>{orderStatus.name.toUpperCase()}</Tag>
+						</>
+					)}
 				</Col>
 			</Row>
-			<Row gutter={[16, 16]} justify="center" align="middle" className="my-3">
-				<Col span={24}>
-					<Text strong className="mb-5" style={{fontSize: 18}}>
-						Phương Thức Thanh Toán
-					</Text>
-					<br />
-					<Tag color={orderStatus.color}>{orderStatus.name.toUpperCase()}</Tag>
-				</Col>
-			</Row>
+
 			<Divider style={{borderColor: '#d9d9d9'}} />
 			<div className="w-full bg-primary p-5 border rounded">
 				<div className="w-full flex items-center font-semibold text-lg">

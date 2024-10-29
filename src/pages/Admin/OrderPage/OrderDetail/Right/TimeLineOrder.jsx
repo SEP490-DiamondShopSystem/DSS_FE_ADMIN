@@ -24,6 +24,7 @@ const ORDER_STATUS_TEXTS = {
 	Pending: 'Chờ Xác Nhận',
 	Processing: 'Đang Xử Lý',
 	Rejected: 'Đã Từ Chối',
+	Cancelled: 'Đã Hủy Đơn',
 	Prepared: 'Chuẩn Bị Đơn Hàng',
 	Prepared_1: 'Đơn Hàng Được Chuyển Giao',
 	Delivering: 'Đang Vận Chuyển',
@@ -251,6 +252,36 @@ const TimeLineOrder = ({orders, loading, statusOrder, paymentStatusOrder}) => {
 								<p className="font-semibold">Trạng thái đơn hàng:</p>
 								<p className="ml-5 text-red font-semibold">
 									<CloseCircleOutlined /> {ORDER_STATUS_TEXTS.Rejected}
+								</p>
+							</div>
+						</div>
+					)}
+					{status === 'Cancelled' && paymentStatusOrder === 3 && (
+						<div className="border rounded-lg border-primary bg-tintWhite p-5 mb-5">
+							<div className="flex items-center mb-5" style={{fontSize: 16}}>
+								<p className="font-semibold">Trạng thái đơn hàng:</p>
+								<p className="ml-5 text-red font-semibold">
+									<CloseCircleOutlined /> {ORDER_STATUS_TEXTS.Cancelled}
+								</p>
+							</div>
+							<div className="flex justify-around">
+								<Button
+									type="text"
+									className="bg-primary font-semibold w-full rounded-full"
+									onClick={handleRefund}
+									disabled={loading}
+								>
+									Xác nhận hoàn tiền
+								</Button>
+							</div>
+						</div>
+					)}
+					{status === 'Cancelled' && paymentStatusOrder === 4 && (
+						<div className="border rounded-lg border-primary bg-tintWhite p-5 mb-5">
+							<div className="flex items-center " style={{fontSize: 16}}>
+								<p className="font-semibold">Trạng thái đơn hàng:</p>
+								<p className="ml-5 text-red font-semibold">
+									<CloseCircleOutlined /> {ORDER_STATUS_TEXTS.Cancelled}
 								</p>
 							</div>
 						</div>
