@@ -38,8 +38,8 @@ export const enums = {
 	Status: {
 		Scheduled: 1,
 		Active: 2,
-		Expired: 3,
-		Paused: 4,
+		Paused: 3,
+		Expired: 4,
 		Cancelled: 5,
 	},
 	TargetType: {
@@ -52,27 +52,23 @@ export const enums = {
 		Fix_Price: 2,
 		Free_Gift: 3,
 	},
-	DeliveryPackageStatus: {
-		Preparing: 1,
-		Delivering: 2,
-		Complete: 3,
-		Cancelled: 4,
-	},
 	OrderItemStatus: {
-		Preparing: 0,
-		Done: 1,
-		Removed: 2,
+		Pending: 0,
+		Prepared: 1,
+		Done: 2,
+		Removed: 3,
+		Replaced: 4,
 	},
 	OrderStatus: {
-		Pending: 0,
-		Processing: 1,
-		Rejected: 2,
-		Cancelled: 3,
-		Prepared: 4,
-		Delivering: 5,
-		Delivery_Failed: 6,
-		Success: 7,
-		Refused: 8,
+		Pending: 1,
+		Processing: 2,
+		Rejected: 3,
+		Cancelled: 4,
+		Prepared: 5,
+		Delivering: 6,
+		Delivery_Failed: 7,
+		Success: 8,
+		Refused: 9,
 	},
 	PaymentStatus: {
 		PaidAll: 1,
@@ -156,8 +152,7 @@ export const enums = {
 	Cut: {
 		Good: 1,
 		Very_Good: 2,
-		Ideal: 3,
-		Astor_Ideal: 4,
+		Excellent: 3,
 	},
 	Fluorescence: {
 		None: 1,
@@ -204,5 +199,10 @@ export const enums = {
 		Customer: 0,
 		Staff: 1,
 		None: -1,
+	},
+	ProductStatus: {
+		Active: 1,
+		Sold: 2,
+		Locked: 3,
 	},
 };

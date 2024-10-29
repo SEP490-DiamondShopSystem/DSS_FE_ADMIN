@@ -75,6 +75,23 @@ export const handleAdminRegister = createAsyncThunk(
 	}
 );
 
+export const handleRegisterDeliverer = createAsyncThunk(
+	'userSlice/handleRegisterDeliverer',
+	async ({email, password, fullName}) => {
+		try {
+			const data = await api.post(`/Account/RegisterDeliverer`, {
+				email,
+				password,
+				fullName,
+			});
+
+			return data;
+		} catch (error) {
+			console.error(error);
+		}
+	}
+);
+
 export const getUserDetail = createAsyncThunk(
 	'userLoginSlice/getUserDetail',
 	async (id, {rejectWithValue}) => {
@@ -154,6 +171,15 @@ export const userLoginSlice = createSlice({
 				state.userInfo = action.payload;
 			})
 			.addCase(handleAdminRegister.rejected, (state, action) => {
+				state.loading = false;
+			})
+			.addCase(handleRegisterDeliverer.pending, (state, action) => {
+				state.loading = true;
+			})
+			.addCase(handleRegisterDeliverer.fulfilled, (state, action) => {
+				state.loading = false;
+			})
+			.addCase(handleRegisterDeliverer.rejected, (state, action) => {
 				state.loading = false;
 			})
 			.addCase(getUserDetail.pending, (state) => {

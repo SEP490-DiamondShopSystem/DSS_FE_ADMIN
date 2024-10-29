@@ -13,13 +13,24 @@ const {Search} = Input;
 const {RangePicker} = DatePicker;
 
 const statusList = [
-	{name: 'Tất cả', value: 'all'},
-	{name: 'Pending', value: 'Pending'},
-	{name: 'Paid All', value: 'PaidAll'},
-	{name: 'Deposited', value: 'Deposited'},
-	{name: 'Refunding', value: 'Refunding'},
-	{name: 'Refunded', value: 'Refunded'},
-	// {name: 'Rejected', value: 'rejected'},
+	{name: 'All', value: ''},
+	{name: 'Pending', value: '1'},
+	{name: 'Processing', value: '2'},
+	{name: 'Rejected', value: '3'},
+	{name: 'Cancelled', value: '4'},
+	{name: 'Prepared', value: '5'},
+	{name: 'Delivering', value: '6'},
+	{name: 'Failed', value: '7'},
+	{name: 'Success', value: '8'},
+	{name: 'Refused', value: '9'},
+];
+
+const paymentStatusList = [
+	{name: 'PaidAll', value: '1'},
+	{name: 'Deposited', value: '2'},
+	{name: 'Refunding', value: '3'},
+	{name: 'Refunded', value: '4'},
+	{name: 'Pending', value: '5'},
 ];
 
 const getEnumKey = (enumObj, value) => {
@@ -34,35 +45,13 @@ const mapAttributes = (data, attributes) => {
 	return {
 		id: data?.Id,
 		orderTime: convertToVietnamDate(data?.CreatedDate),
-		status: getEnumKey(attributes?.PaymentStatus, data?.PaymentStatus),
+		status: getEnumKey(attributes?.OrderStatus, data?.Status),
 		email: null,
 		totalAmount: formatPrice(data?.TotalPrice),
 		customer: null,
-		paymentMethod: null,
+		paymentMethod: getEnumKey(attributes?.PaymentStatus, data?.PaymentStatus),
 	};
 };
-
-// Sample data with email field
-const dataSource = [
-	{
-		id: '001',
-		orderTime: '24/09/2024',
-		totalAmount: '$120.00',
-		paymentMethod: 'Pay All',
-		customer: 'John Doe',
-		email: 'john.doe@example.com',
-		status: 'accepted',
-	},
-	{
-		id: '002',
-		orderTime: '23/09/2024',
-		totalAmount: '$85.00',
-		paymentMethod: 'Online',
-		customer: 'Jane Smith',
-		email: 'jane.smith@example.com',
-		status: 'pending',
-	},
-];
 
 const OrderPage = () => {
 	const navigate = useNavigate();
@@ -73,13 +62,25 @@ const OrderPage = () => {
 
 	const [startDate, setStartDate] = useState(null);
 	const [endDate, setEndDate] = useState(null);
-	const [activeStatus, setActiveStatus] = useState('all');
+	const [activeStatus, setActiveStatus] = useState('');
 	const [searchText, setSearchText] = useState('');
 	const [orders, setOrders] = useState([]);
+	const [pageSize, setPageSize] = useState(100);
+	const [current, setCurrent] = useState(1);
 
 	useEffect(() => {
-		dispatch(getAllOrder());
-	}, []);
+		dispatch(
+			getAllOrder({
+				pageSize: pageSize,
+				start: current,
+				Status: activeStatus,
+				CreatedDate: startDate,
+				ExpectedDate: endDate,
+				Email: searchText,
+			})
+		);
+		// dispatch(getAllOrder());
+	}, [pageSize, current, activeStatus, startDate, endDate, searchText]);
 
 	console.log('orderList', orderList);
 	console.log('orders', orders);
@@ -87,7 +88,7 @@ const OrderPage = () => {
 	useEffect(() => {
 		if (orderList && enums) {
 			// Map diamond attributes to more readable values
-			const mappedData = orderList.map((order) => mapAttributes(order, enums));
+			const mappedData = orderList?.Values?.map((order) => mapAttributes(order, enums));
 			setOrders(mappedData);
 		}
 	}, [orderList, enums]);
@@ -112,44 +113,77 @@ const OrderPage = () => {
 			align: 'center',
 		},
 		{
-			title: 'PT Thanh Toán',
-			key: 'paymentMethod',
-			dataIndex: 'paymentMethod',
-			align: 'center',
-		},
-		{
-			title: 'Khách Hàng',
-			key: 'customer',
-			dataIndex: 'customer',
-			align: 'center',
-		},
-		{
 			title: 'Email',
 			key: 'email',
 			dataIndex: 'email',
 			align: 'center',
 		},
 		{
+			title: 'PT Thanh Toán',
+			key: 'paymentMethod',
+			dataIndex: 'paymentMethod',
+			align: 'center',
+			render: (status) => {
+				const foundStatus = paymentStatusList.find((item) => item.name === status);
+
+				let color = 'green';
+
+				// Determine color based on status
+				if (status === 'Refunding' || status === 'Refunded') {
+					// 'canceled', 'rejected', 'shipFailed'
+					color = 'red';
+				} else if (status === 'Pending') {
+					// 'refunded'
+					color = 'orange';
+				} else if (status === 'Deposited') {
+					// 'deposited'
+					color = 'blue';
+				} else if (status === 'PaidAll') {
+					// 'paidAll'
+					color = 'cyan';
+				}
+
+				return (
+					<Tag color={color}>
+						{foundStatus ? foundStatus.name.toUpperCase() : status.toUpperCase()}
+					</Tag>
+				);
+			},
+		},
+
+		{
 			title: 'Trạng Thái',
 			key: 'status',
 			dataIndex: 'status',
 			align: 'center',
 			render: (status) => {
-				// Find status item from statusList
-				const foundStatus = statusList.find((item) => item.value === status);
+				const foundStatus = statusList.find((item) => item.name === status);
+
 				let color = 'green';
 
-				if (status === 'canceled' || status === 'rejected' || status === 'shipFailed') {
-					color = 'volcano';
-				} else if (status === 'refunded') {
+				// Determine color based on status
+				if (
+					status === 'Cancelled' ||
+					status === 'Delivery Failed' ||
+					status === 'Refused' ||
+					status === 'Rejected'
+				) {
+					// 'canceled', 'rejected', 'shipFailed'
+					color = 'red';
+				} else if (status === 'Pending') {
+					// 'refunded'
+					color = 'orange';
+				} else if (status === 'Processing') {
+					// 'deposited'
 					color = 'blue';
-				} else if (status === 'deposited') {
-					color = 'geekblue';
-				} else if (status === 'paidAll') {
+				} else if (status === 'Delivering') {
+					// 'paidAll'
+					color = 'cyan';
+				} else if (status === 'Prepared') {
+					// 'pending'
 					color = 'purple';
-				} else if (status === 'pending') {
-					color = 'gold';
-				} else if (status === 'refunding') {
+				} else if (status === 'Success') {
+					// 'refunding'
 					color = 'green';
 				}
 
@@ -174,29 +208,20 @@ const OrderPage = () => {
 		},
 	];
 	const handleDateChange = (dates, dateStrings) => {
-		setStartDate(dateStrings[0]);
-		setEndDate(dateStrings[1]);
+		setStartDate(dates[0]);
+		setEndDate(dates[1]);
+		console.log();
 	};
 
 	const handleStatusChange = (value) => {
 		setActiveStatus(value);
-		console.log(value);
 	};
 
 	const onSearch = (value) => {
 		setSearchText(value);
+		console.log(value);
 	};
 
-	const filteredDataSource = orders
-		?.filter((item) => activeStatus === 'all' || item.status === activeStatus)
-		.filter((item) => {
-			const itemDate = new Date(item.orderTime.split('/').reverse().join('-'));
-			const start = startDate ? new Date(startDate.split('/').reverse().join('-')) : null;
-			const end = endDate ? new Date(endDate.split('/').reverse().join('-')) : null;
-			return (!start || itemDate >= start) && (!end || itemDate <= end);
-		})
-		.filter((item) => item.email?.toLowerCase().includes(searchText.toLowerCase()));
-	console.log('filteredDataSource', filteredDataSource);
 	return (
 		<div className="mx-20 my-10">
 			<Filter

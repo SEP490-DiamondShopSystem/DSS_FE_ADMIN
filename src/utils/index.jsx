@@ -40,3 +40,68 @@ export function convertToVietnamDate(utcDateString) {
 	// Format to DD/MM/YYYY
 	return `${day}/${month}/${year}`;
 }
+
+export const getOrderStatus = (status) => {
+	switch (status) {
+		case 1:
+			return 'Pending';
+		case 2:
+			return 'Processing';
+		case 3:
+			return 'Rejected';
+		case 4:
+			return 'Cancelled';
+		case 5:
+			return 'Prepared';
+		case 6:
+			return 'Delivering';
+		case 7:
+			return 'Delivery_Failed';
+		case 8:
+			return 'Success';
+		case 9:
+			return 'Refused';
+		default:
+			return 'Unknown';
+	}
+};
+
+export const getOrderStatusTag = (status) => {
+	switch (status) {
+		case 1:
+			return {name: 'Paid All', color: 'cyan'};
+		case 2:
+			return {name: 'Deposited', color: 'blue'};
+		case 3:
+			return {name: 'Refunding', color: 'red'};
+		case 4:
+			return {name: 'Refunded', color: 'red'};
+		case 5:
+			return {name: 'Pending', color: 'orange'};
+		case 6:
+
+		default:
+			return {name: 'Unknown', color: 'grey'};
+	}
+};
+
+export const getStepFromStatus = (status) => {
+	switch (status) {
+		case 'Pending':
+			return 0;
+		case 'Processing':
+			return 1;
+		case 'Prepared':
+			return 2;
+		case 'Delivering':
+			return 3;
+		case 'Delivery_Failed':
+			return 4;
+		case 'Success':
+			return 5;
+		case 'Refused':
+			return 6;
+		default:
+			return 0;
+	}
+};

@@ -1,74 +1,27 @@
+import React from 'react';
+
 import {ArrowLeftOutlined} from '@ant-design/icons';
-import {Button, Col, Divider, Row, Typography} from 'antd';
-import React, {useEffect} from 'react';
-import {useNavigate} from 'react-router-dom';
-import {formatPrice} from '../../../../../utils';
+import {Button, Col, Divider, Row, Tag, Typography} from 'antd';
 import {useDispatch} from 'react-redux';
-import {getUserDetail} from '../../../../../redux/slices/userLoginSlice';
+import {useNavigate} from 'react-router-dom';
+import {
+	convertToVietnamDate,
+	formatPrice,
+	getOrderStatus,
+	getOrderStatusTag,
+} from '../../../../../utils';
 
 const {Title, Text} = Typography;
 
-const detailGroups = {
-	total_price: 20138000,
-	groups: [
-		{
-			jewelry_price: 10069000,
-			items: [
-				{
-					id: 86,
-					name: 'Round Diamond 3.5 Carat IF',
-					unitPrice: 3357000,
-					quantity: 1,
-					total: 3357000,
-				},
-				{
-					id: 86,
-					name: 'Round Diamond 3.5 Carat VVS1',
-					unitPrice: 4467000,
-					quantity: 1,
-					total: 4467000,
-				},
-				{
-					id: 86,
-					name: 'Petite Solitaire Engagement Ring In 14k White Gold',
-					unitPrice: 2245000,
-					quantity: 1,
-					total: 2245000,
-				},
-			],
-		},
-		{
-			jewelry_price: 10069000,
-			items: [
-				{
-					id: 86,
-					name: 'Round Diamond 3.5 Carat IF',
-					unitPrice: 3357000,
-					quantity: 1,
-					total: 3357000,
-				},
-				{
-					id: 86,
-					name: 'Round Diamond 3.5 Carat VVS1',
-					unitPrice: 4467000,
-					quantity: 1,
-					total: 4467000,
-				},
-				{
-					id: 86,
-					name: 'Petite Solitaire Engagement Ring In 14k White Gold',
-					unitPrice: 2245000,
-					quantity: 1,
-					total: 2245000,
-				},
-			],
-		},
-	],
-};
-
-const InformationOrder = ({orders}) => {
+const InformationOrder = ({orders, statusOrder, paymentStatusOrder}) => {
 	const navigate = useNavigate();
 	const dispatch = useDispatch();
+
+	const orderStatus = getOrderStatusTag(paymentStatusOrder);
+	const status = getOrderStatus(statusOrder);
+
+	console.log('orders', orders);
+	console.log('statusOrder', statusOrder);
 
 	return (
 		<div>
@@ -87,6 +40,53 @@ const InformationOrder = ({orders}) => {
 					<Title level={3}>Chi Tiết Đơn Hàng</Title>
 				</Col>
 			</Row>
+			{orders && orders?.CancelledReason !== null && (
+				<>
+					<Divider style={{borderColor: '#d9d9d9'}} />
+					<Row>
+						<Col span={24}>
+							<Title level={4}>Đơn Hàng Bị Hủy</Title>
+						</Col>
+					</Row>
+					<Row gutter={[16, 16]} justify="center" align="middle" className="my-3">
+						<Col span={12}>
+							<Text strong style={{fontSize: 18}}>
+								Tiêu Đề
+							</Text>
+							<br />
+							<Text>
+								{status === 'Cancelled'
+									? 'Người Đặt Hủy Đặt Hàng'
+									: 'Shop Từ Chối Đặt Hàng'}
+							</Text>
+						</Col>
+						<Col span={12}>
+							<Text strong style={{fontSize: 18}}>
+								Lý Do
+							</Text>
+							<br />
+							<Text>{orders?.CancelledReason}</Text>
+						</Col>
+					</Row>
+					<Row gutter={[16, 16]} justify="center" align="middle" className="my-3">
+						<Col span={12}>
+							<Text strong style={{fontSize: 18}}>
+								{status === 'Cancelled' ? 'Ngày Hủy' : 'Ngày Từ Chối'}
+							</Text>
+							<br />
+							<Text>{convertToVietnamDate(orders?.CancelledDate)}</Text>
+						</Col>
+						<Col span={12}>
+							<Text strong className="mb-5" style={{fontSize: 18}}>
+								Trạng Thái
+							</Text>
+							<br />
+							<Tag color={orderStatus.color}>{orderStatus.name.toUpperCase()}</Tag>
+						</Col>
+					</Row>
+				</>
+			)}
+
 			<Divider style={{borderColor: '#d9d9d9'}} />
 			<Row>
 				<Col span={24}>
@@ -99,30 +99,32 @@ const InformationOrder = ({orders}) => {
 						Loại Đơn Hàng
 					</Text>
 					<br />
-					<Text>Đơn hàng custom</Text>
+					<Text>Đơn hàng</Text>
 				</Col>
 				<Col span={12}>
 					<Text strong style={{fontSize: 18}}>
 						Khách hàng
 					</Text>
 					<br />
-					<Text>NGUYỄN VĂN A</Text>
+					<Text>
+						{orders?.Account?.FirstName} {orders?.Account?.LastName}
+					</Text>
 				</Col>
 			</Row>
 			<Row gutter={[16, 16]} justify="center" align="middle" className="my-3">
 				<Col span={12}>
 					<Text strong style={{fontSize: 18}}>
-						Số Điện Thoại
+						Email
 					</Text>
 					<br />
-					<Text>083456789</Text>
+					<Text>{orders?.Account?.Email}</Text>
 				</Col>
 				<Col span={12}>
 					<Text strong style={{fontSize: 18}}>
 						Địa Chỉ
 					</Text>
 					<br />
-					<Text>Thủ Đức, TP.HCM</Text>
+					<Text>{orders?.ShippingAddress}</Text>
 				</Col>
 			</Row>
 
@@ -132,82 +134,62 @@ const InformationOrder = ({orders}) => {
 						Ngày Đặt Hàng
 					</Text>
 					<br />
-					<Text>24/09/2024</Text>
+					<Text>{convertToVietnamDate(orders?.CreatedDate)}</Text>
 				</Col>
+
 				<Col span={12}>
-					<Text strong style={{fontSize: 18}}>
-						Payment Method
-					</Text>
-					<br />
-					<Text>VNPAY</Text>
+					{orders && orders?.CancelledReason === null && (
+						<>
+							<Text strong className="mb-5" style={{fontSize: 18}}>
+								Phương Thức Thanh Toán
+							</Text>
+							<br />
+							<Tag color={orderStatus.color}>{orderStatus.name.toUpperCase()}</Tag>
+						</>
+					)}
 				</Col>
 			</Row>
-			<Row gutter={[16, 16]} justify="center" align="middle" className="my-3">
-				<Col span={24}>
-					<Text strong style={{fontSize: 18}}>
-						Trạng Thái Thanh Toán
-					</Text>
-					<br />
-					<Text>Đang xử lí</Text>
-				</Col>
-			</Row>
+
 			<Divider style={{borderColor: '#d9d9d9'}} />
 			<div className="w-full bg-primary p-5 border rounded">
 				<div className="w-full flex items-center font-semibold text-lg">
-					<p style={{width: '10%'}} className="flex justify-center">
+					<p style={{width: '33%'}} className="flex justify-center">
 						Id
 					</p>
-					<p style={{width: '40%'}} className="flex justify-center">
+					<p style={{width: '33%'}} className="flex justify-center">
 						Tên Sản Phẩm
 					</p>
-					<p style={{width: '20%'}} className="flex justify-center">
-						Đơn Giá
-					</p>
-					<p style={{width: '10%'}} className="flex justify-center">
-						Số Lượng
-					</p>
-					<p style={{width: '20%'}} className="flex justify-center">
-						Tổng giá
+					<p style={{width: '33%'}} className="flex justify-center">
+						Giá
 					</p>
 				</div>
 			</div>
-			{/* <div className="w-full ">
+			<div className="w-full border">
 				{orders &&
-					orders?.map((order, i) => (
-						<div key={i} className="border mb-5 p-5 rounded">
+					orders.Items?.map((order, i) => (
+						<div key={order.Id} className=" mb-5 p-5 rounded">
 							<div className="w-full flex items-center text-lg">
-								<p style={{width: '10%'}} className="flex justify-center">
-									{order.Id}
+								<p style={{width: '33%'}} className="flex justify-center">
+									{i + 1}
 								</p>
-								<p style={{width: '40%'}} className="flex my-2">
-									{order.name}
+								<p style={{width: '33%'}} className="flex my-2">
+									{/* {order?.Jewelry?.Name || orders} */}
 								</p>
-
-								<p style={{width: '20%'}} className="flex justify-center my-2">
-									{order.unitPrice.toLocaleString()} ₫
-								</p>
-								<p style={{width: '10%'}} className="flex justify-center my-2">
-									{order.quantity}
-								</p>
-								<p style={{width: '20%'}} className="flex justify-center">
-									{order.total.toLocaleString()}
+								<p style={{width: '33%'}} className="flex my-2">
+									{formatPrice(
+										order?.Jewelry?.TotalPrice || order.PurchasedPrice
+									) || 'N/A'}
 								</p>
 							</div>
-							<Divider />
-
-							<p className="flex justify-end items-center text-lg font-semibold">
-								Jewelry Price:{' '}
-								<p className="ml-10">{formatPrice(order?.Items?.PurchasedPrice)}</p>
-							</p>
 						</div>
 					))}
+
 				<div className="w-full bg-primary p-5 border rounded">
 					<p className="flex justify-end items-center text-lg font-semibold">
-						Total Price:{' '}
-						<p className="ml-10">{detailGroups.total_price.toLocaleString()} ₫</p>
+						Tổng Giá: <p className="ml-10">{formatPrice(orders?.TotalPrice)}</p>
 					</p>
 				</div>
-			</div> */}
+			</div>
 		</div>
 	);
 };

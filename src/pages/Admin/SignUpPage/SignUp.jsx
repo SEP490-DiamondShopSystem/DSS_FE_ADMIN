@@ -2,16 +2,19 @@ import React from 'react';
 
 import {Button, Checkbox, Form, Input, message} from 'antd';
 import {Helmet} from 'react-helmet';
-import {useDispatch} from 'react-redux';
+import {useDispatch, useSelector} from 'react-redux';
 import {Link, useNavigate} from 'react-router-dom';
 import {imageExporter} from '../../../assets/images';
 import {handleStaffRegister} from '../../../redux/slices/userLoginSlice';
 import styles from './SignUp.module.css';
+import {LoadingUserSelector} from '../../../redux/selectors';
 
 const SignUpPage = () => {
 	const [form] = Form.useForm();
 	const dispatch = useDispatch();
 	const navigate = useNavigate();
+
+	const loading = useSelector(LoadingUserSelector);
 
 	const onFinish = (values) => {
 		const {firstName, lastName, role} = values;
@@ -28,9 +31,7 @@ const SignUpPage = () => {
 
 						navigate('/login');
 					} else {
-						message.error(
-							'Đăng ký không thành công. Vui lòng kiểm tra thông tin đăng nhập của bạn!'
-						);
+						message.error(`Đăng ký không thành công!`);
 					}
 				})
 				.catch((error) => {
@@ -63,7 +64,7 @@ const SignUpPage = () => {
 				</div>
 				<div className={styles.rightSide}>
 					<div className={styles.signUpHeader}>
-						<h1>Đăng Ký</h1>
+						<h1 className="text-primary font-semibold text-2xl">Đăng Ký</h1>
 					</div>
 					<div className={styles.signUpForm}>
 						<Form form={form} layout="vertical" name="basic" onFinish={onFinish}>
@@ -126,9 +127,10 @@ const SignUpPage = () => {
 							</Form.Item>
 							<Form.Item>
 								<Button
-									type="primary"
+									type="text"
 									htmlType="submit"
-									className={styles.signUpButton}
+									loading={loading}
+									className={`bg-primary font-semibold ${styles.signUpButton}`}
 								>
 									Đăng Ký
 								</Button>

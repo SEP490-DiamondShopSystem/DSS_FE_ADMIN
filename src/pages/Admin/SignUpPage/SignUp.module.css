@@ -26,12 +26,6 @@
 	margin-bottom: 20px;
 }
 
-.signUpHeader h1 {
-	color: #1890ff;
-	font-size: 36px;
-	margin: 0;
-}
-
 .signUpForm {
 	width: 100%;
 	max-width: 400px;
@@ -47,14 +41,6 @@
 
 .signUpButton {
 	width: 100%;
-	background-color: #1890ff;
-	border-color: #1890ff;
-}
-
-.signUpButton:hover,
-.signUpButton:focus {
-	background-color: #40a9ff;
-	border-color: #40a9ff;
 }
 
 .signInLink {
