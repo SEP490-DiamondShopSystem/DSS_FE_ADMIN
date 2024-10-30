@@ -1,8 +1,8 @@
-import React from 'react';
+import React, {useState} from 'react';
 
 import {ArrowLeftOutlined} from '@ant-design/icons';
-import {Button, Col, Divider, Row, Tag, Typography} from 'antd';
-import {useDispatch} from 'react-redux';
+import {Button, Col, Divider, Row, Table, Tag, Typography} from 'antd';
+import {useDispatch, useSelector} from 'react-redux';
 import {useNavigate} from 'react-router-dom';
 import {
 	convertToVietnamDate,
@@ -10,6 +10,7 @@ import {
 	getOrderStatus,
 	getOrderStatusTag,
 } from '../../../../../utils';
+import {LoadingOrderSelector} from '../../../../../redux/selectors';
 
 const {Title, Text} = Typography;
 
@@ -17,11 +18,122 @@ const InformationOrder = ({orders, statusOrder, paymentStatusOrder}) => {
 	const navigate = useNavigate();
 	const dispatch = useDispatch();
 
+	const loading = useSelector(LoadingOrderSelector);
+
 	const orderStatus = getOrderStatusTag(paymentStatusOrder);
 	const status = getOrderStatus(statusOrder);
 
+	const [dataSource, setDataSource] = useState([
+		{
+			orderId: orders?.Id,
+			orderTime: convertToVietnamDate(orders?.CreatedDate),
+			price: formatPrice(orders?.TotalPrice),
+			status: getOrderStatus(orders?.Status),
+			paymentStatus: orders?.PaymentStatus,
+			products: orders?.Items.map((item) => ({
+				productId: item?.Id,
+				productName: item?.Name,
+				productPrice: formatPrice(item?.PurchasedPrice),
+			})), // Mỗi sản phẩm trong đơn hàng
+		},
+	]);
+
 	console.log('orders', orders);
 	console.log('statusOrder', statusOrder);
+
+	const columns = [
+		{
+			title: 'ID',
+			dataIndex: 'orderId',
+			align: 'center',
+		},
+		{
+			title: 'Thời gian đặt hàng',
+			dataIndex: 'orderTime',
+			align: 'center',
+		},
+
+		{
+			title: 'Tổng Giá',
+			dataIndex: 'price',
+			align: 'center',
+		},
+		{
+			title: 'Trạng thái',
+			dataIndex: 'status',
+			render: (status) => {
+				let color = 'red';
+				switch (status) {
+					case 'Success':
+						color = 'green';
+						break;
+					case 'Pending':
+						color = 'orange';
+						break;
+					case 'Processing':
+						color = 'blue';
+						break;
+					case 'Delivering':
+						color = 'cyan';
+						break;
+					case 'Prepared':
+						color = 'purple';
+						break;
+					case 'Cancelled':
+					case 'Rejected':
+					case 'Refused':
+						color = 'red';
+						break;
+					case 'Delivery_Failed':
+						color = 'volcano';
+						break;
+					default:
+						color = 'gray';
+						break;
+				}
+				return (
+					<div className="text-center">
+						<Tag className="text-center" color={color}>
+							{status.toUpperCase()}
+						</Tag>
+					</div>
+				);
+			},
+			align: 'center',
+		},
+	];
+
+	const expandedColumns = [
+		{
+			title: 'ID',
+			dataIndex: 'productId',
+			key: 'productId',
+			align: 'center',
+		},
+		{
+			title: 'Sản phẩm',
+			dataIndex: 'productName',
+			key: 'productName',
+			align: 'center',
+		},
+		{
+			title: 'Giá',
+			dataIndex: 'productPrice',
+			key: 'productPrice',
+			align: 'center',
+		},
+	];
+
+	const expandedRowRender = (record) => {
+		return (
+			<Table
+				columns={expandedColumns}
+				dataSource={record.products}
+				pagination={false}
+				rowKey="productId"
+			/>
+		);
+	};
 
 	return (
 		<div>
@@ -45,7 +157,9 @@ const InformationOrder = ({orders, statusOrder, paymentStatusOrder}) => {
 					<Divider style={{borderColor: '#d9d9d9'}} />
 					<Row>
 						<Col span={24}>
-							<Title level={4}>Đơn Hàng Bị Hủy</Title>
+							<Title level={4}>
+								{status === 'Cancelled' ? 'Đơn Hàng Bị Hủy' : 'Đơn Hàng Bị Từ Chối'}
+							</Title>
 						</Col>
 					</Row>
 					<Row gutter={[16, 16]} justify="center" align="middle" className="my-3">
@@ -151,44 +265,21 @@ const InformationOrder = ({orders, statusOrder, paymentStatusOrder}) => {
 			</Row>
 
 			<Divider style={{borderColor: '#d9d9d9'}} />
-			<div className="w-full bg-primary p-5 border rounded">
-				<div className="w-full flex items-center font-semibold text-lg">
-					<p style={{width: '33%'}} className="flex justify-center">
-						Id
-					</p>
-					<p style={{width: '33%'}} className="flex justify-center">
-						Tên Sản Phẩm
-					</p>
-					<p style={{width: '33%'}} className="flex justify-center">
-						Giá
-					</p>
-				</div>
-			</div>
-			<div className="w-full border">
-				{orders &&
-					orders.Items?.map((order, i) => (
-						<div key={order.Id} className=" mb-5 p-5 rounded">
-							<div className="w-full flex items-center text-lg">
-								<p style={{width: '33%'}} className="flex justify-center">
-									{i + 1}
-								</p>
-								<p style={{width: '33%'}} className="flex my-2">
-									{/* {order?.Jewelry?.Name || orders} */}
-								</p>
-								<p style={{width: '33%'}} className="flex my-2">
-									{formatPrice(
-										order?.Jewelry?.TotalPrice || order.PurchasedPrice
-									) || 'N/A'}
-								</p>
-							</div>
-						</div>
-					))}
-
-				<div className="w-full bg-primary p-5 border rounded">
-					<p className="flex justify-end items-center text-lg font-semibold">
-						Tổng Giá: <p className="ml-10">{formatPrice(orders?.TotalPrice)}</p>
-					</p>
-				</div>
+			<Row>
+				<Col span={24}>
+					<Title level={4}>Chi Tiết Sản Phẩm</Title>
+				</Col>
+			</Row>
+			<div className="font-semibold w-full  py-10 bg-white rounded-lg">
+				<Table
+					dataSource={dataSource}
+					columns={columns}
+					pagination={{pageSize: 5}}
+					className="custom-table-header"
+					rowKey="orderId"
+					expandedRowRender={expandedRowRender}
+					loading={loading}
+				/>
 			</div>
 		</div>
 	);
