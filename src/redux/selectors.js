@@ -16,3 +16,9 @@ export const getOrderStatusDetailSelector = (state) => state.orderSlice.orderSta
 //DELIVERY
 export const LoadingDeliverySelector = (state) => state.deliverySlice.loading;
 export const getAllDeliverySelector = (state) => state.deliverySlice.deliveryList;
+
+//PROMOTION
+export const getAllPromotionSelector = (state) => state.promotionSlice.promotions;
+export const LoadingPromotionSelector = (state) => state.promotionSlice.loading;
+export const getPromotionDetailSelector = (state) => state.promotionSlice.promotionDetail;
+
