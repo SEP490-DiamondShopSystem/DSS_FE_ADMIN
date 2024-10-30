@@ -66,6 +66,25 @@ export const getOrderStatus = (status) => {
 	}
 };
 
+export const getOrderStatusTag = (status) => {
+	switch (status) {
+		case 1:
+			return {name: 'Paid All', color: 'cyan'};
+		case 2:
+			return {name: 'Deposited', color: 'blue'};
+		case 3:
+			return {name: 'Refunding', color: 'red'};
+		case 4:
+			return {name: 'Refunded', color: 'red'};
+		case 5:
+			return {name: 'Pending', color: 'orange'};
+		case 6:
+
+		default:
+			return {name: 'Unknown', color: 'grey'};
+	}
+};
+
 export const getStepFromStatus = (status) => {
 	switch (status) {
 		case 'Pending':

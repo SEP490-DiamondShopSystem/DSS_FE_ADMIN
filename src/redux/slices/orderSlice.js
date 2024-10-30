@@ -57,11 +57,39 @@ export const handleOrder = createAsyncThunk(
 	}
 );
 
-export const handleOrderReject = createAsyncThunk(
-	'orderSlice/handleOrderReject',
+export const handleDeliveryFailed = createAsyncThunk(
+	'orderSlice/handleDeliveryFailed',
 	async (id, {rejectWithValue}) => {
 		try {
-			const data = await api.put(`/Order/Reject?orderId=${id}`);
+			const data = await api.put(`/Order/DeliverFail?orderId=${id}`);
+			return data;
+		} catch (error) {
+			console.error(error);
+			return rejectWithValue(error);
+		}
+	}
+);
+
+export const handleRefundOrder = createAsyncThunk(
+	'orderSlice/handleRefundOrder',
+	async (id, {rejectWithValue}) => {
+		try {
+			const data = await api.put(`/Order/CompleteRefund?orderId=${id}`);
+			console.log(data);
+
+			return data;
+		} catch (error) {
+			console.error(error);
+			return rejectWithValue(error);
+		}
+	}
+);
+
+export const handleOrderReject = createAsyncThunk(
+	'orderSlice/handleOrderReject',
+	async ({orderId, reason}, {rejectWithValue}) => {
+		try {
+			const data = await api.put(`/Order/Reject?orderId=${orderId}&reason=${reason}`);
 			return data;
 		} catch (error) {
 			console.error(error);
@@ -117,6 +145,7 @@ export const orderSlice = createSlice({
 		orders: null,
 		orderDetail: null,
 		orderStatusDetail: null,
+		orderPaymentStatusDetail: null,
 		loading: false,
 		error: null,
 	},
@@ -141,6 +170,7 @@ export const orderSlice = createSlice({
 				state.loading = false;
 				state.orderDetail = action.payload;
 				state.orderStatusDetail = action.payload.Status;
+				state.orderPaymentStatusDetail = action.payload.PaymentStatus;
 			})
 			.addCase(getOrderDetail.rejected, (state, action) => {
 				state.loading = false;
@@ -151,7 +181,7 @@ export const orderSlice = createSlice({
 			})
 			.addCase(handleOrder.fulfilled, (state, action) => {
 				state.loading = false;
-				state.orderDetail = action.payload;
+				state.orderStatusDetail = action.payload.Status;
 			})
 			.addCase(handleOrder.rejected, (state, action) => {
 				state.loading = false;
@@ -162,9 +192,21 @@ export const orderSlice = createSlice({
 			})
 			.addCase(handleOrderReject.fulfilled, (state, action) => {
 				state.loading = false;
-				state.orderDetail = action.payload;
+				state.orderStatusDetail = action.payload.Status;
+				state.orderPaymentStatusDetail = action.payload.PaymentStatus;
 			})
 			.addCase(handleOrderReject.rejected, (state, action) => {
+				state.loading = false;
+				state.error = action.payload;
+			})
+			.addCase(handleDeliveryFailed.pending, (state) => {
+				state.loading = true;
+			})
+			.addCase(handleDeliveryFailed.fulfilled, (state, action) => {
+				state.loading = false;
+				state.orderStatusDetail = action.payload.Status;
+			})
+			.addCase(handleDeliveryFailed.rejected, (state, action) => {
 				state.loading = false;
 				state.error = action.payload;
 			})
@@ -173,7 +215,8 @@ export const orderSlice = createSlice({
 			// })
 			// .addCase(handleOrderPreparing.fulfilled, (state, action) => {
 			// 	state.loading = false;
-			// 	state.orderDetail = action.payload;
+			// 				state.orderStatusDetail = action.payload.Status;
+
 			// })
 			// .addCase(handleOrderPreparing.rejected, (state, action) => {
 			// 	state.loading = false;
@@ -185,21 +228,24 @@ export const orderSlice = createSlice({
 			.addCase(handleOrderAssignDeliverer.fulfilled, (state, action) => {
 				state.loading = false;
 				state.orderDetail = action.payload;
+				state.orderStatusDetail = action.payload.Status;
 			})
 			.addCase(handleOrderAssignDeliverer.rejected, (state, action) => {
 				state.loading = false;
 				state.error = action.payload;
+			})
+			.addCase(handleRefundOrder.pending, (state) => {
+				state.loading = true;
+			})
+			.addCase(handleRefundOrder.fulfilled, (state, action) => {
+				state.loading = false;
+				// state.orderDetail = action.payload;
+				state.orderStatusDetail = action.payload.Status;
+				state.orderPaymentStatusDetail = action.payload.PaymentStatus;
+			})
+			.addCase(handleRefundOrder.rejected, (state, action) => {
+				state.loading = false;
+				state.error = action.payload;
 			});
-		// .addCase(handleOrderComplete.pending, (state) => {
-		// 	state.loading = true;
-		// })
-		// .addCase(handleOrderComplete.fulfilled, (state, action) => {
-		// 	state.loading = false;
-		// 	state.orderDetail = action.payload;
-		// })
-		// .addCase(handleOrderComplete.rejected, (state, action) => {
-		// 	state.loading = false;
-		// 	state.error = action.payload;
-		// });
 	},
 });
