@@ -18,3 +18,6 @@ export const getPaymentStatusDetailSelector = (state) => state.orderSlice.orderP
 //DELIVERY
 export const LoadingDeliverySelector = (state) => state.deliverySlice.loading;
 export const getAllDeliverySelector = (state) => state.deliverySlice.deliveryList;
+
+//DIAMOND
+export const getAllShapeSelector = (state) => state.diamondSlice.diamondShape;

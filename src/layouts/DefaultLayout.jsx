@@ -1,13 +1,11 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {
 	DashboardOutlined,
+	DeliveredProcedureOutlined,
 	OrderedListOutlined,
 	ProductOutlined,
 	RightOutlined,
-	SafetyOutlined,
 	UserOutlined,
-	TagOutlined,
-	DeliveredProcedureOutlined,
 } from '@ant-design/icons';
 import {DiamondOutlined} from '@mui/icons-material';
 import {Breadcrumb, Layout, Menu} from 'antd';
@@ -15,7 +13,8 @@ import {Link, Outlet, useLocation, useNavigate} from 'react-router-dom'; // Add 
 import {imageExporter} from '../assets/images';
 import TopNavbar from '../components/TopNavBar/TopNavBar';
 import '../css/antd.css';
-import DeliveryPage from '../pages/Admin/DeliveryPage/DeliveryPage';
+import {GetUserDetailSelector} from '../redux/selectors';
+import {useSelector} from 'react-redux';
 
 const {Footer, Sider, Content} = Layout;
 const {SubMenu} = Menu;
@@ -24,25 +23,46 @@ const getItem = (label, key, icon, children) => ({key, icon, label, children});
 
 const DefaultLayout = () => {
 	const navigate = useNavigate();
+	const userDetail = useSelector(GetUserDetailSelector);
+
 	const [collapsed, setCollapsed] = useState(false);
 	const location = useLocation();
+	const [delivererRole, setDelivererRole] = useState(false);
+	const [staffRole, setStaffRole] = useState(false);
+	const [adminRole, setAdminRole] = useState(false);
+	const [managerRole, setManagerRole] = useState(false);
 	const [selectMenu, setSelectMenu] = useState(location.pathname);
-
-	// Thêm defaultOpenKeys để giữ SubMenu mở
 	const [openKeys, setOpenKeys] = useState([]);
 
-	const items = [
-		getItem('Dashboard', '/dashboard', <DashboardOutlined />),
-		getItem('Quản Lí Tài Khoản', '/accounts', <UserOutlined />),
-		getItem('Quản Lý Sản Phẩm', '/products', <ProductOutlined />, [
-			getItem('Danh Sách Trang Sức', '/products/jewelry-list', <RightOutlined />),
-			getItem('Danh Sách Kim Cương', '/products/diamond-list', <DiamondOutlined />),
-		]),
-		getItem('Quản Lí Đặt Hàng', '/orders', <OrderedListOutlined />),
-		getItem('Quản Lí Vận Chuyển', '/deliveries', <DeliveredProcedureOutlined />),
+	useEffect(() => {
+		if (userDetail?.Roles) {
+			const isDeliverer = userDetail.Roles.some((role) => role?.RoleName === 'deliverer');
+			const isManager = userDetail.Roles.some((role) => role?.RoleName === 'manager');
+			const isAdmin = userDetail.Roles.some((role) => role?.RoleName === 'admin');
+			const isStaff = userDetail.Roles.some((role) => role?.RoleName === 'staff');
+			setDelivererRole(isDeliverer);
+			setStaffRole(isStaff);
+			setManagerRole(isManager);
+			setAdminRole(isAdmin);
+		}
+	}, [userDetail]);
 
-		// getItem('Manage Warranty', '/warranties', <SafetyOutlined />),
-		// getItem('Manage Promotion', '/promotion', <TagOutlined />),
+	const items = [
+		// Show only if the user is admin, manager, or staff
+		(adminRole || managerRole || staffRole) &&
+			getItem('Dashboard', '/dashboard', <DashboardOutlined />),
+		(adminRole || managerRole || staffRole) &&
+			getItem('Quản Lí Tài Khoản', '/accounts', <UserOutlined />),
+		(adminRole || managerRole || staffRole) &&
+			getItem('Quản Lý Sản Phẩm', '/products', <ProductOutlined />, [
+				getItem('Danh Sách Trang Sức', '/products/jewelry-list', <RightOutlined />),
+				getItem('Danh Sách Kim Cương', '/products/diamond-list', <DiamondOutlined />),
+			]),
+		// Show 'Quản Lí Đặt Hàng' for deliverer and all other roles
+		getItem('Quản Lí Đặt Hàng', '/orders', <OrderedListOutlined />),
+		// Show 'Quản Lí Vận Chuyển' only for admin, manager, and staff
+		(adminRole || managerRole || staffRole) &&
+			getItem('Quản Lí Vận Chuyển', '/deliveries', <DeliveredProcedureOutlined />),
 	];
 
 	const handleClickMenuItem = (e) => {
@@ -54,7 +74,6 @@ const DefaultLayout = () => {
 		setCollapsed(!collapsed);
 	};
 
-	// Xử lý mở SubMenu
 	const onOpenChange = (keys) => {
 		setOpenKeys(keys);
 	};
@@ -63,7 +82,7 @@ const DefaultLayout = () => {
 	const isSignUpPage = location.pathname === '/signup';
 	const showHeaderFooter = !(isLoginPage || isSignUpPage);
 
-	// Tạo mảng các item cho Breadcrumb dựa trên pathname
+	// Breadcrumb logic
 	const breadcrumbItems = location.pathname
 		.split('/')
 		.filter((path) => path)
@@ -115,11 +134,13 @@ const DefaultLayout = () => {
 								))}
 							</SubMenu>
 						) : (
-							<Menu.Item key={item.key} icon={item.icon}>
-								<Link to={item.key} style={{fontWeight: 'bold'}}>
-									{item.label}
-								</Link>
-							</Menu.Item>
+							item && ( // Ensure item is truthy before rendering
+								<Menu.Item key={item.key} icon={item.icon}>
+									<Link to={item.key} style={{fontWeight: 'bold'}}>
+										{item.label}
+									</Link>
+								</Menu.Item>
+							)
 						)
 					)}
 				</Menu>
@@ -141,7 +162,7 @@ const DefaultLayout = () => {
 							borderRadius: '8px', // Optional: add some rounding for better appearance
 						}}
 					>
-						{/* Render các Route con */}
+						{/* Render child routes */}
 						<Outlet />
 					</div>
 				</Content>

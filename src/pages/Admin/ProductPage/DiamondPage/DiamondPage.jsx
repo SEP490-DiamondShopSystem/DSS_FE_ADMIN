@@ -4,6 +4,7 @@ import {DeleteFilled, EditFilled, PlusOutlined} from '@ant-design/icons';
 import {Button, Image, Input, Select, Space, Table, Tag} from 'antd';
 import {Filter} from '../../../../components/Filter';
 import '../../../../css/antd.css';
+import {AddModalDiamond} from './AddModalDiamond/AddModalDiamond';
 
 const {Search} = Input;
 
@@ -105,6 +106,7 @@ const DiamondPage = () => {
 	const [type, setType] = useState('');
 	const [shape, setShape] = useState('');
 	const [searchText, setSearchText] = useState('');
+	const [showModal, setShowModal] = useState(false);
 
 	const filter = [
 		{name: 'All', value: 'all'},
@@ -137,6 +139,10 @@ const DiamondPage = () => {
 
 		return matchesShape && matchesSearch && matchesStatus;
 	});
+
+	const showModelAdd = () => {
+		setShowModal(true);
+	};
 
 	// console.log(filteredData);
 
@@ -176,8 +182,13 @@ const DiamondPage = () => {
 						</Space>
 					</div>
 					<div>
-						<Button type="text" className="bg-primary" icon={<PlusOutlined />}>
-							Add
+						<Button
+							type="text"
+							className="bg-primary"
+							icon={<PlusOutlined />}
+							onClick={showModelAdd}
+						>
+							Thêm
 						</Button>
 					</div>
 				</div>
@@ -189,6 +200,7 @@ const DiamondPage = () => {
 					/>
 				</div>
 			</div>
+			<AddModalDiamond setShowModal={setShowModal} showModal={showModal} />
 		</div>
 	);
 };

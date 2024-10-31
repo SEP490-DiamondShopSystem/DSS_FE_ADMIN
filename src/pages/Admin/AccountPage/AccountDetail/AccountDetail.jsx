@@ -155,6 +155,14 @@ const AccountDetail = () => {
 					Quay lại
 				</Button>
 				<div className="flex w-full">
+					<div style={{width: '60%'}}>
+						<EditInfo
+							user={user}
+							editing={editing}
+							onChange={onChange}
+							userInfo={userInfo}
+						/>
+					</div>
 					<div style={{width: '40%'}}>
 						<Information
 							user={user}
@@ -164,14 +172,6 @@ const AccountDetail = () => {
 							showModal={showModal}
 							showRemoveModal={showRemoveModal}
 							handleBanAccount={handleBan}
-						/>
-					</div>
-					<div style={{width: '60%'}}>
-						<EditInfo
-							user={user}
-							editing={editing}
-							onChange={onChange}
-							userInfo={userInfo}
 						/>
 					</div>
 				</div>

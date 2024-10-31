@@ -23,6 +23,60 @@ const InformationOrder = ({orders, statusOrder, paymentStatusOrder}) => {
 	console.log('orders', orders);
 	console.log('statusOrder', statusOrder);
 
+<<<<<<< Updated upstream
+=======
+	const columns = [
+		{
+			title: 'ID',
+			dataIndex: 'orderId',
+			align: 'center',
+		},
+		{
+			title: 'Thời gian đặt hàng',
+			dataIndex: 'orderTime',
+			align: 'center',
+		},
+
+		{
+			title: 'Tổng Giá',
+			dataIndex: 'price',
+			align: 'center',
+		},
+	];
+
+	const expandedColumns = [
+		{
+			title: 'ID',
+			dataIndex: 'productId',
+			key: 'productId',
+			align: 'center',
+		},
+		{
+			title: 'Sản phẩm',
+			dataIndex: 'productName',
+			key: 'productName',
+			align: 'center',
+		},
+		{
+			title: 'Giá',
+			dataIndex: 'productPrice',
+			key: 'productPrice',
+			align: 'center',
+		},
+	];
+
+	const expandedRowRender = (record) => {
+		return (
+			<Table
+				columns={expandedColumns}
+				dataSource={record.products}
+				pagination={false}
+				rowKey="productId"
+			/>
+		);
+	};
+
+>>>>>>> Stashed changes
 	return (
 		<div>
 			<div className="mb-4">
