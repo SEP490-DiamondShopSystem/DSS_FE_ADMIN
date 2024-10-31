@@ -117,10 +117,16 @@ const OrderPage = () => {
 	}, [orderList, enums]);
 
 	const columns = [
+		// {
+		// 	title: 'ID Đơn Hàng',
+		// 	dataIndex: 'id',
+		// 	key: 'id',
+		// 	align: 'center',
+		// },
 		{
-			title: 'ID Đơn Hàng',
-			dataIndex: 'id',
-			key: 'id',
+			title: 'Email',
+			key: 'email',
+			dataIndex: 'email',
 			align: 'center',
 		},
 		{
@@ -135,12 +141,7 @@ const OrderPage = () => {
 			dataIndex: 'totalAmount',
 			align: 'center',
 		},
-		{
-			title: 'Email',
-			key: 'email',
-			dataIndex: 'email',
-			align: 'center',
-		},
+
 		{
 			title: 'PT Thanh Toán',
 			key: 'paymentMethod',
@@ -223,13 +224,19 @@ const OrderPage = () => {
 			align: 'center',
 			render: (_, record) => (
 				<Space size="middle">
-					<Button type="primary" ghost onClick={() => navigate(`/orders/${record.id}`)}>
+					<Button
+						type="text"
+						className="bg-primary"
+						ghost
+						onClick={() => navigate(`/orders/${record.id}`)}
+					>
 						<EditFilled />
 					</Button>
 				</Space>
 			),
 		},
 	];
+
 	const handleDateChange = (dates, dateStrings) => {
 		setStartDate(dates[0]);
 		setEndDate(dates[1]);

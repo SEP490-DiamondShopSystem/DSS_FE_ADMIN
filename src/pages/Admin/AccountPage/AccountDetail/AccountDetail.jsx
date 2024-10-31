@@ -28,11 +28,11 @@ const AccountDetail = () => {
 	const [isModalRemoveRoleVisible, setIsModalRemoveRoleVisible] = useState(false);
 	const [userId, setUserId] = useState('');
 	const [userInfo, setUserInfo] = useState({
-		Email: userDetail.Email || '',
-		FirstName: userDetail.FirstName || '',
-		LastName: userDetail.LastName || '',
-		Id: userDetail.Id || '',
-		Addresses: userDetail.Addresses || [],
+		Email: userDetail?.Email || '',
+		FirstName: userDetail?.FirstName || '',
+		LastName: userDetail?.LastName || '',
+		Id: userDetail?.Id || '',
+		Addresses: userDetail?.Addresses || [],
 	});
 
 	const [roleLevel, setRoleLevel] = useState(0);
