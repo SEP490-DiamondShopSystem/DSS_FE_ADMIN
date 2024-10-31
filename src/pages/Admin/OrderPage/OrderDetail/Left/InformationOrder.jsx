@@ -23,8 +23,6 @@ const InformationOrder = ({orders, statusOrder, paymentStatusOrder}) => {
 	console.log('orders', orders);
 	console.log('statusOrder', statusOrder);
 
-<<<<<<< Updated upstream
-=======
 	const columns = [
 		{
 			title: 'ID',
@@ -76,7 +74,6 @@ const InformationOrder = ({orders, statusOrder, paymentStatusOrder}) => {
 		);
 	};
 
->>>>>>> Stashed changes
 	return (
 		<div>
 			<div className="mb-4">

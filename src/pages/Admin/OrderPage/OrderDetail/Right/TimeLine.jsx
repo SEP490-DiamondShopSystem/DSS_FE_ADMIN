@@ -38,8 +38,7 @@ export const TimeLine = ({status}) => {
 			color: getStepStatus(OrderStatus.Pending)?.color,
 			dot: getStepStatus(OrderStatus.Pending)?.icon,
 		},
-<<<<<<< Updated upstream
-=======
+
 		// Chỉ thêm bước "Đã Hủy" nếu trạng thái hiện tại chưa qua "Processing"
 		...(OrderStatus[status] < OrderStatus.Processing
 			? [
@@ -50,7 +49,7 @@ export const TimeLine = ({status}) => {
 					},
 			  ]
 			: []),
->>>>>>> Stashed changes
+
 		{
 			children: 'Đã Từ Chối',
 			color: getStepStatus(OrderStatus.Rejected)?.color,
