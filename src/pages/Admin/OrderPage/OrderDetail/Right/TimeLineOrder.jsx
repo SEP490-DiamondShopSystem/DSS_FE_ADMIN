@@ -1,12 +1,9 @@
-import {Button, Form, Input, message, Modal, Select, Steps, Timeline, Typography} from 'antd';
+import {CheckCircleOutlined, ClockCircleOutlined, CloseCircleOutlined} from '@ant-design/icons';
+import {Button, Form, Input, message, Modal, Select, Typography} from 'antd';
 import React, {useEffect, useState} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
 import Loading from '../../../../../components/Loading';
-import {
-	getAllDeliverySelector,
-	getOrderStatusDetailSelector,
-	GetUserDetailSelector,
-} from '../../../../../redux/selectors';
+import {getAllDeliverySelector, GetUserDetailSelector} from '../../../../../redux/selectors';
 import {
 	handleDeliveryFailed,
 	handleOrder,
@@ -14,8 +11,7 @@ import {
 	handleOrderReject,
 	handleRefundOrder,
 } from '../../../../../redux/slices/orderSlice';
-import {convertToVietnamDate, getOrderStatus, getStepFromStatus} from '../../../../../utils';
-import {CheckCircleOutlined, ClockCircleOutlined, CloseCircleOutlined} from '@ant-design/icons';
+import {convertToVietnamDate, getOrderStatus} from '../../../../../utils';
 import {TimeLine} from './TimeLine';
 
 const {Title, Text} = Typography;
