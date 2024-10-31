@@ -5,7 +5,7 @@ export const getAllDiamond = createAsyncThunk(
 	'diamondSlice/getAllDiamond',
 	async (_, {rejectWithValue}) => {
 		try {
-			const response = await api.get(`/Diamond/All`);
+			const response = await api.get(`/Diamond/All/Admin`);
 			return response;
 		} catch (error) {
 			console.log('Error: ', JSON.stringify(error.response.data));
@@ -55,6 +55,20 @@ export const handleAddDiamond = createAsyncThunk(
 
 		try {
 			const response = await api.post(`/Diamond`, params);
+			console.log(response);
+
+			return response;
+		} catch (error) {
+			console.log('Error: ', JSON.stringify(error.response.data));
+			return rejectWithValue(error.response.data);
+		}
+	}
+);
+export const handleDeleteDiamond = createAsyncThunk(
+	'diamondSlice/handleDeleteDiamond',
+	async (id, {rejectWithValue}) => {
+		try {
+			const response = await api.delete(`/Diamond/${id}`);
 			console.log(response);
 
 			return response;
@@ -121,6 +135,16 @@ export const diamondSlice = createSlice({
 				state.loading = false;
 			})
 			.addCase(handleAddDiamond.rejected, (state, action) => {
+				state.loading = false;
+				state.error = action.payload;
+			})
+			.addCase(handleDeleteDiamond.pending, (state) => {
+				state.loading = true;
+			})
+			.addCase(handleDeleteDiamond.fulfilled, (state, action) => {
+				state.loading = false;
+			})
+			.addCase(handleDeleteDiamond.rejected, (state, action) => {
 				state.loading = false;
 				state.error = action.payload;
 			});

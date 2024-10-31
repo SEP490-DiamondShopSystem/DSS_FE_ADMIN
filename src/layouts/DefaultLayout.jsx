@@ -2,6 +2,7 @@ import React, {useEffect, useState} from 'react';
 import {
 	DashboardOutlined,
 	DeliveredProcedureOutlined,
+	GiftOutlined,
 	OrderedListOutlined,
 	ProductOutlined,
 	RightOutlined,
@@ -44,11 +45,14 @@ const DefaultLayout = () => {
 			setStaffRole(isStaff);
 			setManagerRole(isManager);
 			setAdminRole(isAdmin);
+
+			if (isDeliverer) {
+				navigate('/orders');
+			}
 		}
-	}, [userDetail]);
+	}, [userDetail, navigate]);
 
 	const items = [
-		// Show only if the user is admin, manager, or staff
 		(adminRole || managerRole || staffRole) &&
 			getItem('Dashboard', '/dashboard', <DashboardOutlined />),
 		(adminRole || managerRole || staffRole) &&
@@ -58,9 +62,9 @@ const DefaultLayout = () => {
 				getItem('Danh Sách Trang Sức', '/products/jewelry-list', <RightOutlined />),
 				getItem('Danh Sách Kim Cương', '/products/diamond-list', <DiamondOutlined />),
 			]),
-		// Show 'Quản Lí Đặt Hàng' for deliverer and all other roles
 		getItem('Quản Lí Đặt Hàng', '/orders', <OrderedListOutlined />),
-		// Show 'Quản Lí Vận Chuyển' only for admin, manager, and staff
+		(adminRole || managerRole || staffRole) &&
+			getItem('Quản Lí Khuyến Mãi', '/promotion', <GiftOutlined />),
 		(adminRole || managerRole || staffRole) &&
 			getItem('Quản Lí Vận Chuyển', '/deliveries', <DeliveredProcedureOutlined />),
 	];

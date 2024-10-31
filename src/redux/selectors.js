@@ -26,3 +26,5 @@ export const getPromotionDetailSelector = (state) => state.promotionSlice.promot
 
 //DIAMOND
 export const getAllShapeSelector = (state) => state.diamondSlice.diamondShape;
+export const getAllDiamondSelector = (state) => state.diamondSlice.diamonds;
+export const LoadingDiamondSelector = (state) => state.diamondSlice.loading;
