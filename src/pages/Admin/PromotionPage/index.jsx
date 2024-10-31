@@ -29,6 +29,7 @@ import {
 	updatePromotionRequirements,
 	updatePromotionThumbnail,
 	deletePromotion,
+	cancelPromotion,
 	uploadPromotionThumbnail,
 } from '../../../redux/slices/promotionSlice';
 const {RangePicker} = DatePicker;
@@ -38,14 +39,14 @@ const PromotionPage = ({promotionData}) => {
 	const [form] = Form.useForm();
 	const [setPromotions] = useState([]);
 	const [editingKey, setEditingKey] = useState('');
-	const [editingPromotionId, setEditingPromotionId] = useState(null); // Track the promotion being edited
-	const [isEditing, setIsEditing] = useState(false); // Track if currently editing
-	const [targetTypes, setTargetTypes] = useState({}); // Track targetType per requirement by index
+	const [editingPromotionId, setEditingPromotionId] = useState(null); 
+	const [isEditing, setIsEditing] = useState(false); 
+	const [targetTypes, setTargetTypes] = useState({}); 
 	const [giftType, setGiftType] = useState({});
 
 	const dispatch = useDispatch();
-	const promotions = useSelector((state) => state.promotionSlice.promotions); // Access fetched promotions
-	const loading = useSelector((state) => state.promotionSlice.loading); // Access loading state
+	const promotions = useSelector((state) => state.promotionSlice.promotions); 
+	const loading = useSelector((state) => state.promotionSlice.loading); 
 
 	useEffect(() => {
 		dispatch(fetchPromotions());
@@ -55,7 +56,6 @@ const PromotionPage = ({promotionData}) => {
 		date ? moment(date, 'DD-MM-YYYY HH:mm:ss').format('DD-MM-YYYY HH:mm') : 'N/A';
 
 	useEffect(() => {
-		// Initialize targetTypes and unitTypes based on promotion data
 		if (promotionData) {
 			if (promotionData.require) {
 				const initialTargetTypes = {};
@@ -73,23 +73,22 @@ const PromotionPage = ({promotionData}) => {
 				setGiftType(initialGiftTypes);
 			}
 
-			form.setFieldsValue(promotionData); // Populate form with promotion data
+			form.setFieldsValue(promotionData);
 		}
 	}, [promotionData, form]);
 
 	const handleTargetTypeChange = (index, value) => {
-		setTargetTypes((prev) => ({...prev, [index]: value})); // Update specific targetType by index
+		setTargetTypes((prev) => ({...prev, [index]: value})); 
 	};
-	// Handle form submission to create or update a promotion
 	const handleCreatePromotion = (values) => {
+		const [startDateTime, endDateTime] = values.validDate;
 		const newPromotion = {
 			...values,
 			key: promotions.length,
-			validDate: `${values.validDate[0].format('DD-MM-YYYY')} to ${values.validDate[1].format(
-				'DD-MM-YYYY'
-			)}`,
+			startDateTime: startDateTime.format('DD-MM-YYYY HH:mm:ss'),
+			endDateTime: endDateTime.format('DD-MM-YYYY HH:mm:ss'),
 		};
-		setPromotions([...promotions, newPromotion]);
+		dispatch(createFullPromotion(newPromotion));
 		message.success('Promotion created successfully!');
 		form.resetFields();
 		setIsEditing(false);
@@ -217,7 +216,6 @@ const PromotionPage = ({promotionData}) => {
 		setEditingPromotionId(promotion.Id);
 		setIsEditing(true);
 
-		// Map data to the form fields
 		form.setFieldsValue({
 			name: promotion.Name,
 			description: promotion.Description,
@@ -276,42 +274,64 @@ const PromotionPage = ({promotionData}) => {
 			})),
 		});
 	};
-
+	const handleCancel = async (id) => {
+		try {
+			await dispatch(cancelPromotion(id)); // Use your actual cancelPromotion logic
+			message.success(`Promotion with id: ${id} has been canceled.`);
+		} catch (error) {
+			message.error('Failed to cancel the promotion. Please try again.');
+		}
+	};
 	const handleUpdate = async () => {
 		try {
+			// Validate the form fields
 			const row = await form.validateFields();
+			
+			// Format the valid date range
+			const formattedDateRange = {
+				startDate: row.validDate[0].format('DD-MM-YYYY'),
+				endDate: row.validDate[1].format('DD-MM-YYYY'),
+			};
+	
+			// Create updated promotion data
+			const updatedPromotion = {
+				...row,
+				validDate: `${formattedDateRange.startDate} to ${formattedDateRange.endDate}`,
+			};
+	
+			// Dispatch the update promotion action
+			await dispatch(updatePromotion({ id: editingKey, data: JSON.stringify(updatedPromotion) }));
+	
+			// Update local state with the new data for immediate UI feedback
 			const newData = [...promotions];
 			const index = newData.findIndex((item) => item.key === editingKey);
 			if (index > -1) {
 				const item = newData[index];
-				const updatedPromotion = {
-					...item,
-					...row,
-					validDate: `${row.validDate[0].format(
-						'DD-MM-YYYY'
-					)} to ${row.validDate[1].format('DD-MM-YYYY')}`,
-				};
-				newData.splice(index, 1, updatedPromotion);
+				newData.splice(index, 1, { ...item, ...updatedPromotion });
 				setPromotions(newData);
-				setEditingKey('');
-				setIsEditing(false);
-				form.resetFields();
-				message.success('Promotion updated successfully!');
 			}
+	
+			// Clear editing state and reset form
+			setEditingKey('');
+			setIsEditing(false);
+			form.resetFields();
+			message.success('Promotion updated successfully!');
+			
 		} catch (err) {
+			// Handle errors
 			message.error('Please correct the form errors.');
 		}
 	};
+	
 
 	const handleDelete = (id) => {
-		// Filter out the promotion to be deleted
-		const updatedPromotions = promotions.filter((promotion) => promotion.key !== id);
-
-		// Update the state with the filtered promotions
-		setPromotions(updatedPromotions);
-
-		// Show a success message
-		message.success(`Deleted promotion with id: ${id}`);
+		dispatch(deletePromotion(id))
+			.then(() => {
+				message.success(`Deleted promotion with id: ${id}`);
+			})
+			.catch((error) => {
+				message.error(`Failed to delete promotion: ${error.message}`);
+			});
 	};
 
 	const handleCancelEdit = () => {
@@ -401,15 +421,20 @@ const PromotionPage = ({promotionData}) => {
 			key: 'action',
 			render: (_, record) => (
 				<Space size="middle">
-					<Button type="link" onClick={() => handleEdit(record)}>
-						Edit
-					</Button>
-					<Popconfirm title="Sure to delete?" onConfirm={() => handleDelete(record.Id)}>
-						<Button type="link" danger>
-							Delete
-						</Button>
-					</Popconfirm>
-				</Space>
+			<Button type="link" onClick={() => handleEdit(record)}>
+				Edit
+			</Button>
+			<Popconfirm title="Sure to delete?" onConfirm={() => handleDelete(record.Id)}>
+				<Button type="link" danger>
+					Delete
+				</Button>
+			</Popconfirm>
+			<Popconfirm title="Are you sure you want to cancel this promotion?" onConfirm={() => handleCancel(record.Id)}>
+				<Button type="link" danger>
+					Cancel Promo
+				</Button>
+			</Popconfirm>
+		</Space>
 			),
 		},
 	];

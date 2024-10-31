@@ -87,23 +87,28 @@ export const updatePromotionGifts = createAsyncThunk(
 // Update a specific promotion
 export const updatePromotion = createAsyncThunk(
 	'promotions/updatePromotion',
-	async ({promotionId, promotionData}, {rejectWithValue}) => {
+	async ({ promotionId, promotionData }, { rejectWithValue }) => {
 		try {
-			const response = await api.put(`/Promotion/${promotionId}`, promotionData);
+			const response = await api.put(`/Promotion/${promotionId}`, promotionData, {
+				headers: {
+					'Content-Type': 'application/json' // Ensure JSON content type is set
+				}
+			});
 			return response.data;
 		} catch (error) {
 			if (error.response) {
 				// Handle 400 and 500 status codes
 				if (error.response.status === 400) {
-					return rejectWithValue({status: 400, errors: error.response.data.errors});
+					return rejectWithValue({ status: 400, errors: error.response.data.errors });
 				} else if (error.response.status === 500) {
-					return rejectWithValue({status: 500, detail: error.response.data.detail});
+					return rejectWithValue({ status: 500, detail: error.response.data.detail });
 				}
 			}
-			return rejectWithValue({status: 'unknown', detail: 'An unexpected error occurred.'});
+			return rejectWithValue({ status: 'unknown', detail: 'An unexpected error occurred.' });
 		}
 	}
 );
+
 
 // Delete a promotion
 export const deletePromotion = createAsyncThunk(
@@ -331,6 +336,7 @@ export const promotionSlice = createSlice({
 				state.promotions = state.promotions.filter((promo) => promo.Id !== action.payload);
 			})
 			.addCase(deletePromotion.rejected, (state, action) => {
+				console.error("Delete error:", action.payload);
 				state.loading = false;
 				state.error = action.payload;
 			})
@@ -382,5 +388,6 @@ export const promotionSlice = createSlice({
 				state.loading = false;
 				state.error = action.payload;
 			});
+			
 	},
 });
