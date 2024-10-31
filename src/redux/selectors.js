@@ -24,3 +24,5 @@ export const getAllPromotionSelector = (state) => state.promotionSlice.promotion
 export const LoadingPromotionSelector = (state) => state.promotionSlice.loading;
 export const getPromotionDetailSelector = (state) => state.promotionSlice.promotionDetail;
 
+//DIAMOND
+export const getAllShapeSelector = (state) => state.diamondSlice.diamondShape;

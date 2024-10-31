@@ -19,17 +19,15 @@ import AccountDetail from '../pages/Admin/AccountPage/AccountDetail/AccountDetai
 export const AdminRouters = () => {
 	return (
 		<Routes>
-			{/* Các route không cần DefaultLayout */}
 			<Route path="/login" element={<LoginPage />} />
 			<Route path="/register" element={<SignUpPage />} />
 
-			{/* Các route cần bao quanh bởi DefaultLayout */}
 			<Route element={<DefaultLayout />}>
 				<Route path="/" element={<Navigate to="/dashboard" />} />
 				<Route
 					path="/dashboard"
 					element={
-						<PrivateRoute roles={['deliverer', 'staff', 'admin', 'manager']}>
+						<PrivateRoute roles={['staff', 'admin', 'manager']}>
 							<DashboardPage />
 						</PrivateRoute>
 					}

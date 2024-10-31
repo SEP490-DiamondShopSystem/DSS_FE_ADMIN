@@ -2382,3 +2382,7 @@ video {
 	--tw-text-opacity: 1;
 	color: rgb(112 112 112 / var(--tw-text-opacity)) /* #707070 */;
 }
+
+.w-1\/4 {
+	width: 25%;
+}

@@ -4,12 +4,13 @@ import React from 'react';
 
 const OrderStatus = {
 	Pending: 1,
-	Processing: 2,
-	Prepared: 3,
-	Delivering: 4,
-	Delivery_Failed: 5,
-	Success: 6,
-	Rejected: 7,
+	Cancelled: 2,
+	Processing: 3,
+	Prepared: 4,
+	Delivering: 5,
+	Delivery_Failed: 6,
+	Success: 7,
+	Rejected: 8,
 };
 
 export const TimeLine = ({status}) => {
@@ -26,6 +27,9 @@ export const TimeLine = ({status}) => {
 			if (status === 'Rejected' && stepStatus === OrderStatus.Rejected) {
 				return {color: 'red', icon: <CloseCircleOutlined style={{fontSize: '16px'}} />};
 			}
+			if (status === 'Cancelled' && stepStatus === OrderStatus.Cancelled) {
+				return {color: 'red', icon: <CloseCircleOutlined style={{fontSize: '16px'}} />};
+			}
 			return {color: '#dec986', icon: <ClockCircleOutlined style={{fontSize: '16px'}} />};
 		} else {
 			return null; // Hide future steps
@@ -37,6 +41,11 @@ export const TimeLine = ({status}) => {
 			children: 'Chờ Xác Nhận',
 			color: getStepStatus(OrderStatus.Pending)?.color,
 			dot: getStepStatus(OrderStatus.Pending)?.icon,
+		},
+		{
+			children: 'Đã Hủy',
+			color: getStepStatus(OrderStatus.Cancelled)?.color,
+			dot: getStepStatus(OrderStatus.Cancelled)?.icon,
 		},
 		{
 			children: 'Đã Từ Chối',
@@ -70,19 +79,22 @@ export const TimeLine = ({status}) => {
 		},
 	];
 
-	// If status is Reject, only display steps up to "Đã Từ Chối" and hide subsequent steps
-	if (status === 'Rejected') {
-		allSteps = allSteps.filter(
-			(step) =>
-				step.children !== 'Đang Xử Lý' &&
-				step.children !== 'Chuẩn Bị Đơn Hàng' &&
-				step.children !== 'Đang Vận Chuyển' &&
-				step.children !== 'Giao Hàng Thất Bại' &&
-				step.children !== 'Giao Hàng Thành Công'
-		);
+	// Nếu trạng thái là "Cancelled", chỉ hiển thị bước "Đã Hủy" và ẩn tất cả các bước khác
+	if (status === 'Cancelled') {
+		allSteps = allSteps.filter((step) => step.children === 'Đã Hủy');
 	}
 
-	// Filter steps with a defined color to display
+	// Nếu trạng thái là "Rejected", chỉ hiển thị bước "Đã Từ Chối" và ẩn tất cả các bước khác
+	if (status === 'Rejected') {
+		allSteps = allSteps.filter((step) => step.children === 'Đã Từ Chối');
+	}
+
+	// Nếu trạng thái là "Success", ẩn bước "Giao Hàng Thất Bại"
+	if (status === 'Success') {
+		allSteps = allSteps.filter((step) => step.children !== 'Giao Hàng Thất Bại');
+	}
+
+	// Filter chỉ các bước có màu để hiển thị
 	allSteps = allSteps.filter((step) => step.color);
 
 	return (

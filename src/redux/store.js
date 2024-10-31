@@ -7,6 +7,7 @@ import {userLoginSlice} from './slices/userLoginSlice';
 import {orderSlice} from './slices/orderSlice';
 import {deliverySlice} from './slices/deliverySlice';
 import {promotionSlice} from './slices/promotionSlice';
+import {diamondSlice} from './slices/diamondSlice';
 
 const rootPersistConfig = {
 	key: 'root',
@@ -20,6 +21,7 @@ const rootReducer = combineReducers({
 	orderSlice: orderSlice.reducer,
 	deliverySlice: deliverySlice.reducer,
 	promotionSlice: promotionSlice.reducer,
+	diamondSlice: diamondSlice.reducer,
 });
 
 const persistedReducer = persistReducer(rootPersistConfig, rootReducer);

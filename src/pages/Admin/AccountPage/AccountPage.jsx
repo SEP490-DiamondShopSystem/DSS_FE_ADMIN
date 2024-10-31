@@ -248,7 +248,7 @@ const AccountPage = () => {
 							icon={<PlusOutlined />}
 							onClick={openForm}
 						>
-							Add
+							Thêm
 						</Button>
 					</div>
 				</div>

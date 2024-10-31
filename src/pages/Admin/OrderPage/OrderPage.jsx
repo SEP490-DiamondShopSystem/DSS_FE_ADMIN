@@ -4,7 +4,11 @@ import React, {useEffect, useState} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
 import {useNavigate} from 'react-router-dom';
 import {Filter} from '../../../components/Filter';
-import {getAllOrderSelector, LoadingOrderSelector} from '../../../redux/selectors';
+import {
+	getAllOrderSelector,
+	GetUserDetailSelector,
+	LoadingOrderSelector,
+} from '../../../redux/selectors';
 import {getAllOrder} from '../../../redux/slices/orderSlice';
 import {convertToVietnamDate, formatPrice} from '../../../utils';
 import {enums} from '../../../utils/constant';
@@ -23,6 +27,14 @@ const statusList = [
 	{name: 'Failed', value: '7'},
 	{name: 'Success', value: '8'},
 	{name: 'Refused', value: '9'},
+];
+const delivererStatusList = [
+	{name: 'All', value: ''},
+	{name: 'Prepared', value: '5'},
+	{name: 'Delivering', value: '6'},
+	{name: 'Failed', value: '7'},
+	{name: 'Success', value: '8'},
+	// {name: 'Refused', value: '9'},
 ];
 
 const paymentStatusList = [
@@ -59,6 +71,7 @@ const OrderPage = () => {
 
 	const loading = useSelector(LoadingOrderSelector);
 	const orderList = useSelector(getAllOrderSelector);
+	const userDetail = useSelector(GetUserDetailSelector);
 
 	const [startDate, setStartDate] = useState(null);
 	const [endDate, setEndDate] = useState(null);
@@ -67,6 +80,7 @@ const OrderPage = () => {
 	const [orders, setOrders] = useState([]);
 	const [pageSize, setPageSize] = useState(100);
 	const [current, setCurrent] = useState(1);
+	const [delivererRole, setDelivererRole] = useState(false);
 
 	useEffect(() => {
 		dispatch(
@@ -84,6 +98,15 @@ const OrderPage = () => {
 
 	console.log('orderList', orderList);
 	console.log('orders', orders);
+	console.log('userDetail', userDetail);
+
+	useEffect(() => {
+		if (userDetail?.Roles) {
+			const isDeliverer = userDetail.Roles.some((role) => role?.RoleName === 'deliverer');
+
+			setDelivererRole(isDeliverer);
+		}
+	}, [userDetail]);
 
 	useEffect(() => {
 		if (orderList && enums) {
@@ -225,7 +248,7 @@ const OrderPage = () => {
 	return (
 		<div className="mx-20 my-10">
 			<Filter
-				filter={statusList}
+				filter={delivererRole ? delivererStatusList : statusList}
 				handleStatusBtn={handleStatusChange}
 				active={activeStatus}
 			/>
