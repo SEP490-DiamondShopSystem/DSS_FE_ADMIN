@@ -2386,3 +2386,8 @@ video {
 .w-1\/4 {
 	width: 25%;
 }
+
+.mx-16 {
+	margin-left: 4rem /* 64px */;
+	margin-right: 4rem /* 64px */;
+}
