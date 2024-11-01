@@ -50,8 +50,8 @@ const DiamondPage = () => {
 			dataIndex: 'IsLabDiamond',
 			align: 'center',
 			render: (isLabDiamond) => {
-				const color = isLabDiamond ? 'green' : 'volcano';
-				const label = isLabDiamond ? 'Tự Nhiên' : 'Nhân Tạo';
+				const color = isLabDiamond ? 'volcano' : 'green';
+				const label = isLabDiamond ? 'Nhân Tạo' : 'Tự Nhiên';
 
 				return (
 					<Tag color={color} key={label}>
@@ -167,6 +167,8 @@ const DiamondPage = () => {
 	const handleDelete = () => {
 		console.log('Deleted successfully');
 		dispatch(handleDeleteDiamond(diamondId)).then((res) => {
+			console.log('res', res);
+
 			if (res.payload !== undefined) {
 				message.success('Xóa Kim Cương Thành Công!');
 			} else {
