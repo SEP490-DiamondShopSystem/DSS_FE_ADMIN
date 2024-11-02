@@ -106,12 +106,6 @@ const PromotionPage = ({promotionData}) => {
 			priority: priority,
 		};
 
-		console.log('values', values);
-		console.log('newPromotion', newPromotion);
-		console.log('createPromotionCommand', createPromotionCommand);
-		console.log('requirements', requirements);
-		console.log('gifts', updatedGifts); // Hiển thị gifts đã được cập nhật
-
 		dispatch(
 			createFullPromotion({createPromotionCommand, requirements, gifts: updatedGifts})
 		).then((res) => {
