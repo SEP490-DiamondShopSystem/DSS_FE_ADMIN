@@ -28,3 +28,10 @@ export const getPromotionDetailSelector = (state) => state.promotionSlice.promot
 export const getAllShapeSelector = (state) => state.diamondSlice.diamondShape;
 export const getAllDiamondSelector = (state) => state.diamondSlice.diamonds;
 export const LoadingDiamondSelector = (state) => state.diamondSlice.loading;
+
+// DIAMOND PRICE
+export const getPriceBoardSelector = (state) => state.diamondPriceSlice.priceBoard;
+export const getAllPricesSelector = (state) => state.diamondPriceSlice.prices;
+export const getAllShapesSelector = (state) => state.diamondPriceSlice.shapes;
+export const LoadingDiamondPriceSelector = (state) => state.diamondPriceSlice.loading;
+export const DiamondPriceErrorSelector = (state) => state.diamondPriceSlice.error;

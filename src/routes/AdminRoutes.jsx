@@ -15,6 +15,7 @@ import SignUpPage from '../pages/Admin/SignUpPage/SignUp';
 import WarrantyPage from '../pages/Admin/WarrantyPage';
 import PrivateRoute from './PrivateRoute';
 import AccountDetail from '../pages/Admin/AccountPage/AccountDetail/AccountDetail';
+import DiamondPricePage from '../pages/Admin/DiamondPricePage';
 
 export const AdminRouters = () => {
 	return (
@@ -93,6 +94,14 @@ export const AdminRouters = () => {
 					element={
 						<PrivateRoute roles={['deliverer', 'staff', 'admin', 'manager']}>
 							<PromotionPage />
+						</PrivateRoute>
+					}
+				/>
+				<Route
+					path="/price"
+					element={
+						<PrivateRoute roles={['deliverer', 'staff', 'admin', 'manager']}>
+							<DiamondPricePage />
 						</PrivateRoute>
 					}
 				/>

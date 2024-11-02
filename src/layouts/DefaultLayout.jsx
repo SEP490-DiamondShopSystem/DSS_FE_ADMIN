@@ -62,11 +62,13 @@ const DefaultLayout = () => {
 				getItem('Danh Sách Trang Sức', '/products/jewelry-list', <RightOutlined />),
 				getItem('Danh Sách Kim Cương', '/products/diamond-list', <DiamondOutlined />),
 			]),
-		getItem('Quản Lí Đặt Hàng', '/orders', <OrderedListOutlined />),
+			getItem('Quản Lí Đặt Hàng', '/orders', <OrderedListOutlined />),
 		(adminRole || managerRole || staffRole) &&
 			getItem('Quản Lí Khuyến Mãi', '/promotion', <GiftOutlined />),
 		(adminRole || managerRole || staffRole) &&
 			getItem('Quản Lí Vận Chuyển', '/deliveries', <DeliveredProcedureOutlined />),
+		(adminRole || managerRole || staffRole) &&
+			getItem('Quản Lí Giá Kim Cương', '/price', <DiamondOutlined />),
 	];
 
 	const handleClickMenuItem = (e) => {
@@ -163,11 +165,12 @@ const DefaultLayout = () => {
 							minHeight: 790,
 							backgroundColor: '#ffffff',
 							padding: '16px',
+							overflowy: 'auto',
 							borderRadius: '8px', // Optional: add some rounding for better appearance
 						}}
 					>
 						{/* Render child routes */}
-						<Outlet />
+						<Outlet/>
 					</div>
 				</Content>
 				{showHeaderFooter && (
