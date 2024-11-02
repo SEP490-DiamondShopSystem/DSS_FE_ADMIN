@@ -112,17 +112,54 @@ export const fetchDiamondPriceByShape = createAsyncThunk(
 );
 
 // DELETE /api/Diamond/Price/{shapeId}/{criteriaId}
+
 export const deleteDiamondPrice = createAsyncThunk(
 	'diamondPrice/deleteDiamondPrice',
-	async ({criteriaId}, {rejectWithValue}) => {
+	async (
+		{ deleteList, isFancyShapePrice, isLabDiamond, isSideDiamond },
+		{ rejectWithValue }
+	) => {
 		try {
-			const response = await api.delete(`/Diamond/Price/${criteriaId}`);
-			return response;
+			// Log the data being sent to the API for debugging
+			console.log('Sending delete request with:', {
+				deleteList,
+				isFancyShapePrice,
+				isLabDiamond,
+				isSideDiamond,
+			});
+
+			// Make the DELETE request with the appropriate request body
+			const response = await api.delete('/Diamond/Price', {
+				data: {
+					deleteList,
+					isFancyShapePrice,
+					isLabDiamond,
+					isSideDiamond,
+				},
+			});
+
+			// Log the response from the API for debugging
+			console.log('Response from delete diamond prices:', response);
+
+			// Check if the response is structured as expected and return the data
+			return response.data || response;
 		} catch (error) {
-			return rejectWithValue(error.response);
+			// Log the error response for better debugging
+			console.error('Error deleting diamond prices:', error);
+			// Handle different error response formats
+			if (error.response) {
+				return rejectWithValue(error.response.data); // Use the detailed error information
+			}
+			return rejectWithValue({
+				type: 'Unknown Error',
+				title: 'Error occurred during deletion',
+				status: 500,
+				detail: error.message,
+			}); // Fallback for unknown errors
 		}
 	}
 );
+
 // DELETE /api/Diamond/Price/{shapeId}/{criteriaId}
 export const deleteDiamondPriceShape = createAsyncThunk(
 	'diamondPrice/deleteDiamondPrice',
@@ -248,9 +285,9 @@ export const diamondPriceSlice = createSlice({
 			.addCase(deleteDiamondPrice.fulfilled, (state, action) => {
 				state.loading = false;
 				// Ensure shapeId and criteriaId are present in action.payload or adjust as needed
-				const {shapeId, criteriaId} = action.payload || action.meta.arg;
+				const {criteriaId} = action.payload || action.meta.arg;
 				state.prices = state.prices.filter(
-					(price) => price.shapeId !== shapeId || price.criteriaId !== criteriaId
+					(price) => price.criteriaId !== criteriaId
 				);
 			})
 			.addCase(deleteDiamondPrice.rejected, (state, action) => {
