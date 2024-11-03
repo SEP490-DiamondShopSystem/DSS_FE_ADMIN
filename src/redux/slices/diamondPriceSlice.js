@@ -44,16 +44,32 @@ export const fetchDiamondPrices = createAsyncThunk(
 // POST /api/Diamond/Price
 export const createDiamondPrice = createAsyncThunk(
 	'diamondPrice/createDiamondPrice',
-	async ({diamondCriteriaId, diamondShapeId, price, isLabDiamond}, {rejectWithValue}) => {
+	async ({listPrices, isFancyShapePrice, isSideDiamond, isLabDiamond}, {rejectWithValue}) => {
 		try {
-			const response = await api.post('/Diamond/Price', {
-				diamondCriteriaId: {value: diamondCriteriaId},
-				diamondShapeId: {value: diamondShapeId},
-				price,
+			// Log the data being sent to the API
+			console.log('Sending listPrices to API:', {
+				listPrices,
+				isFancyShapePrice,
 				isLabDiamond,
+				isSideDiamond,
 			});
-			return response;
+
+			// Make the PUT request to update prices
+			const response = await api.post('/Diamond/Price', {
+				listPrices,
+				isFancyShapePrice,
+				isLabDiamond,
+				isSideDiamond,
+			});
+
+			// Log the response received from the API
+			console.log('Response from creating diamond prices:', response);
+
+			// Check if the API response is structured as expected
+			return response.data || response; // Adjust this based on your API's response structure
 		} catch (error) {
+			// Log the error response for better debugging
+			console.error('Error creating diamond prices:', error);
 			return rejectWithValue(error.response);
 		}
 	}
@@ -115,10 +131,7 @@ export const fetchDiamondPriceByShape = createAsyncThunk(
 
 export const deleteDiamondPrice = createAsyncThunk(
 	'diamondPrice/deleteDiamondPrice',
-	async (
-		{ deleteList, isFancyShapePrice, isLabDiamond, isSideDiamond },
-		{ rejectWithValue }
-	) => {
+	async ({deleteList, isFancyShapePrice, isLabDiamond, isSideDiamond}, {rejectWithValue}) => {
 		try {
 			// Log the data being sent to the API for debugging
 			console.log('Sending delete request with:', {
@@ -239,26 +252,29 @@ export const diamondPriceSlice = createSlice({
 			.addCase(updateDiamondPrices.fulfilled, (state, action) => {
 				state.loading = false;
 				const updatedPrices = action.payload.data || action.payload; // Make sure this is correct
-			
+
 				console.log('Response from updating diamond prices:', updatedPrices); // Log the response
-			
+
 				if (Array.isArray(updatedPrices) && updatedPrices.length > 0) {
 					updatedPrices.forEach((updatedPrice) => {
-						const index = state.prices.findIndex(price => price.diamondCriteriaId === updatedPrice.diamondCriteriaId);
+						const index = state.prices.findIndex(
+							(price) => price.diamondCriteriaId === updatedPrice.diamondCriteriaId
+						);
 						if (index !== -1) {
 							// Update existing price
 							state.prices[index] = updatedPrice;
 						} else {
-							console.warn(`Price with diamondCriteriaId ${updatedPrice.diamondCriteriaId} not found.`);
+							console.warn(
+								`Price with diamondCriteriaId ${updatedPrice.diamondCriteriaId} not found.`
+							);
 						}
 					});
 				} else {
 					console.warn('No updated prices returned from the API.');
 				}
-			
+
 				console.log('Updated diamond prices:', state.prices); // Log the updated prices array
 			})
-			
 
 			.addCase(updateDiamondPrices.rejected, (state, action) => {
 				state.loading = false;
@@ -286,9 +302,7 @@ export const diamondPriceSlice = createSlice({
 				state.loading = false;
 				// Ensure shapeId and criteriaId are present in action.payload or adjust as needed
 				const {criteriaId} = action.payload || action.meta.arg;
-				state.prices = state.prices.filter(
-					(price) => price.criteriaId !== criteriaId
-				);
+				state.prices = state.prices.filter((price) => price.criteriaId !== criteriaId);
 			})
 			.addCase(deleteDiamondPrice.rejected, (state, action) => {
 				state.loading = false;

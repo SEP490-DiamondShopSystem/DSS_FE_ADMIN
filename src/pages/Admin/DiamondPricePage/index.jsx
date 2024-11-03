@@ -24,11 +24,11 @@ const DiamondPricePage = () => {
 	const [isLabDiamond, setIsLabDiamond] = useState(false);
 	const [cut, setCut] = useState(1);
 	const [isSideDiamond, setIsSideDiamond] = useState(false);
-	const [editedPrices, setEditedPrices] = useState({});
 	const [editedCells, setEditedCells] = useState([]);
 	const [isEditing, setIsEditing] = useState(false);
 	const [selectedPrices, setSelectedPrices] = useState([]); // Track selected prices
-
+	const [isCreating, setIsCreating] = useState(false); // Add this to toggle Create mode
+	const [listPrices, setListPrices] = useState([]);
 	const [showDeleteConfirm, setShowDeleteConfirm] = useState(false); // State for confirmation popup
 
 	useEffect(() => {
@@ -106,7 +106,48 @@ const DiamondPricePage = () => {
 			}
 		});
 	};
+	const handleAddPriceToggle = () => {
+		setIsCreating(!isCreating);
+		setIsEditing(false);
+	};
+	const handleEditPriceToggle = () => {
+		setIsEditing(!isEditing);
+		setIsCreating(false);
+	};
+	const handleAddPriceCell = (rowIndex, cellIndex, newValue) => {
+		const updatedListPrices = [...listPrices];
+		const diamondCriteriaId =
+			priceBoard.PriceTables[rowIndex].CellMatrix[rowIndex][cellIndex].CriteriaId;
 
+		const priceIndex = updatedListPrices.findIndex(
+			(item) => item.diamondCriteriaId === diamondCriteriaId
+		);
+
+		if (priceIndex >= 0) {
+			updatedListPrices[priceIndex].price = parseInt(newValue, 10);
+		} else {
+			updatedListPrices.push({
+				diamondCriteriaId,
+				price: parseInt(newValue, 10),
+			});
+		}
+
+		setListPrices(updatedListPrices);
+	};
+	const savePrices = () => {
+		const payload = {
+			listPrices,
+			isFancyShapePrice, // set based on your requirements
+			isLabDiamond, // set based on your requirements
+			isSideDiamond, // set based on your requirements
+		};
+
+		// dispatch createDiamondPrice action with the payload
+		dispatch(createDiamondPrice(payload));
+
+		setIsCreating(false); // Exit Create Price mode
+		setListPrices([]); // Clear the price list after saving
+	};
 	const handleSave = () => {
 		const updatedPrices = editedCells.map((cell) => ({
 			diamondCriteriaId: cell.diamondCriteriaId,
@@ -135,9 +176,9 @@ const DiamondPricePage = () => {
 		return <div className="text-center text-lg font-semibold">Loading...</div>;
 	}
 
-	const renderPriceRows = (cellMatrix, colorRange) => {
+	const renderPriceRows = (cellMatrix, colorRange, isCreating) => {
 		return cellMatrix.map((row, rowIndex) => (
-			<tr key={`row-${rowIndex}`} className="hover:bg-gray-100 transition duration-200">
+			<tr key={`row-${rowIndex}`} className=" transition duration-200">
 				<td className="border p-4 text-center bg-primary">{colorRange[rowIndex]}</td>
 				{row.map((cell, cellIndex) => {
 					const editedCell = editedCells.find(
@@ -145,29 +186,59 @@ const DiamondPricePage = () => {
 					);
 					const cellValue = editedCell ? editedCell.price : cell.Price;
 
+					// Determine the class for the cell based on IsPriceKnown and isCreating state
+					const cellClass = isCreating
+						? cell.IsPriceKnown
+							? 'border p-4 text-center bg-gray'
+							: 'border p-4 text-center' // Darken known prices when creating
+						: cell.IsPriceKnown
+						? 'border p-4 text-center'
+						: 'border p-4 text-center bg-gray'; // Darken unknown prices when not creating
+
 					return (
-						<td key={`cell-${cellIndex}`} className="border p-4 text-center">
-							{isEditing && cell.IsPriceKnown ? (
-								<div>
-									<input
-										type="number"
-										value={cellValue}
-										onChange={(e) =>
-											handleEditCell(rowIndex, cellIndex, e.target.value)
-										}
-										min={1000}
-										step={1000}
-										className="w-full text-center border rounded"
-									/>
-									<input
-										type="checkbox"
-										checked={selectedPrices.includes(cell.CriteriaId)}
-										onChange={() => handleCheckboxChange(cell.CriteriaId)}
-										className="mr-2"
-									/>
-								</div>
+						<td key={`cell-${cellIndex}`} className={cellClass}>
+							{isCreating && !cell.IsPriceKnown ? (
+								<input
+									type="number"
+									onChange={(e) =>
+										handleAddPriceCell(rowIndex, cellIndex, e.target.value)
+									}
+									min={1000}
+									step={1000}
+									className="w-full text-center border rounded"
+									placeholder="New Price"
+								/>
 							) : (
-								formatPrice(cell.Price)
+								<div>
+									{isEditing && cell.IsPriceKnown ? (
+										<div>
+											<input
+												type="number"
+												value={cellValue}
+												onChange={(e) =>
+													handleEditCell(
+														rowIndex,
+														cellIndex,
+														e.target.value
+													)
+												}
+												min={1000}
+												step={1000}
+												className="w-full text-center border rounded"
+											/>
+											<input
+												type="checkbox"
+												checked={selectedPrices.includes(cell.CriteriaId)}
+												onChange={() =>
+													handleCheckboxChange(cell.CriteriaId)
+												}
+												className="mr-2"
+											/>
+										</div>
+									) : (
+										formatPrice(cell.Price)
+									)}
+								</div>
 							)}
 						</td>
 					);
@@ -320,19 +391,42 @@ const DiamondPricePage = () => {
 				</div>
 			</div>
 
-			<div className="flex w-full justify-end text-center my-4">
+			<div className="m-4 flex justify-around w-full text-center">
+				{isCreating && (
+					<div className="mt-4 text-center">
+						<button
+							onClick={savePrices}
+							className="border-2 bg-primary text-black px-8 py-3 rounded-lg hover:bg-primaryLight transition duration-200 font-semibold shadow-md hover:scale-105 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
+							aria-label="Save Changes"
+						>
+							Save Changes
+						</button>
+					</div>
+				)}
+				<div className="flex items-center gap-3">
+					<button
+						onClick={handleAddPriceToggle}
+						className={`border-2 rounded-lg px-8 py-3 transition duration-200 ${
+							isCreating
+								? 'border-red bg-red text-white hover:bg-redLight'
+								: 'border-green bg-green text-black hover:bg-greenLight'
+						} font-semibold shadow-md`}
+					>
+						{isCreating ? 'Cancel Create Price' : 'Create Price'}
+					</button>
+				</div>
 				{isEditing && (
 					<div className="m-4 flex justify-around w-full text-center">
 						<button
 							onClick={handleDelete}
-							className="border-2 bg-red text-white px-6 py-2 rounded hover:bg-redLight transition duration-200 font-semibold shadow hover:scale-105"
+							className="border-2 bg-red text-white px-8 py-3 rounded-lg hover:bg-redLight transition duration-200 font-semibold shadow-md hover:scale-105 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
 							aria-label="Delete Selected"
 						>
 							Delete Selected
 						</button>
 						<button
 							onClick={handleSave}
-							className="border-2 bg-primary text-black px-6 py-2 rounded hover:bg-primaryLight transition duration-200 font-semibold shadow hover:scale-105"
+							className="border-2 bg-primary text-black px-8 py-3 rounded-lg hover:bg-primaryLight transition duration-200 font-semibold shadow-md hover:scale-105 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
 							aria-label="Save Changes"
 						>
 							Save Changes
@@ -340,12 +434,12 @@ const DiamondPricePage = () => {
 					</div>
 				)}
 				<button
-					onClick={() => setIsEditing((prev) => !prev)}
-					className={`border-2 border-${isEditing ? 'red' : 'green'} bg-${
-						isEditing ? 'red' : 'green'
-					} text-white px-6 py-2 rounded-xl hover:bg-${
-						isEditing ? 'redLight' : 'greenLight'
-					} transition duration-200 font-semibold shadow-md transform hover:scale-105`}
+					onClick={handleEditPriceToggle}
+					className={`border-2 rounded-lg px-8 py-3 transition duration-200 ${
+						isEditing
+							? 'border-red bg-red text-white hover:bg-redLight'
+							: 'border-green bg-green text-black hover:bg-greenLight'
+					} font-semibold shadow-md`}
 					aria-label={isEditing ? 'Cancel Editing' : 'Edit Prices'}
 				>
 					{isEditing ? 'Cancel' : 'Edit Prices'}
@@ -405,7 +499,11 @@ const DiamondPricePage = () => {
 										{table.CaratFrom} - {table.CaratTo} Carat
 									</td>
 								</tr>
-								{renderPriceRows(table.CellMatrix, Object.keys(table.ColorRange))}
+								{renderPriceRows(
+									table.CellMatrix,
+									Object.keys(table.ColorRange),
+									isCreating
+								)}
 							</React.Fragment>
 						))}
 					</tbody>
@@ -416,6 +514,16 @@ const DiamondPricePage = () => {
 				<div className="mt-4 text-center">
 					<button
 						onClick={handleSave}
+						className="border-2 bg-blue-500 text-black px-6 py-2 rounded hover:bg-blue-600 transition duration-200 font-semibold"
+					>
+						Save Changes
+					</button>
+				</div>
+			)}
+			{isCreating && (
+				<div className="mt-4 text-center">
+					<button
+						onClick={savePrices}
 						className="border-2 bg-blue-500 text-black px-6 py-2 rounded hover:bg-blue-600 transition duration-200 font-semibold"
 					>
 						Save Changes
