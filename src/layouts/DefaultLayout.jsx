@@ -7,6 +7,7 @@ import {
 	ProductOutlined,
 	RightOutlined,
 	UserOutlined,
+	TagOutlined,
 } from '@ant-design/icons';
 import {DiamondOutlined} from '@mui/icons-material';
 import {Breadcrumb, Layout, Menu} from 'antd';
@@ -68,7 +69,7 @@ const DefaultLayout = () => {
 		(adminRole || managerRole || staffRole) &&
 			getItem('Quản Lí Vận Chuyển', '/deliveries', <DeliveredProcedureOutlined />),
 		(adminRole || managerRole || staffRole) &&
-			getItem('Quản Lí Giá Kim Cương', '/price', <DiamondOutlined />),
+			getItem('Quản Lí Giá Kim Cương', '/price', <TagOutlined />),
 	];
 
 	const handleClickMenuItem = (e) => {

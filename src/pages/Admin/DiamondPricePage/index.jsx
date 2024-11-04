@@ -101,10 +101,12 @@ const DiamondPricePage = () => {
 	const handleAddPriceToggle = () => {
 		setIsCreating(!isCreating);
 		setIsEditing(false);
+		setListPrices([]);
 	};
 	const handleEditPriceToggle = () => {
 		setIsEditing(!isEditing);
 		setIsCreating(false);
+		setEditedCells([]);
 	};
 	const handleEditCell = (rowIndex, cellIndex, criteriaId, newValue) => {
 		const numericValue = parseFloat(newValue.replace(/\./g, '').replace(',', '.')) || 0;
@@ -479,7 +481,7 @@ const DiamondPricePage = () => {
 			</div>
 
 			<div className="m-4 flex justify-around w-full text-center">
-				{isCreating && (
+				{isCreating && editedCells.length > 0 && (
 					<div className="mt-4 text-center">
 						<button
 							onClick={savePrices}
@@ -511,13 +513,15 @@ const DiamondPricePage = () => {
 						>
 							Delete Selected
 						</button>
-						<button
-							onClick={handleSave}
-							className="border-2 bg-primary text-black px-8 py-3 rounded-lg hover:bg-primaryLight transition duration-200 font-semibold shadow-md hover:scale-105 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
-							aria-label="Save Changes"
-						>
-							Save Changes
-						</button>
+						{editedCells.length > 0 && (
+							<button
+								onClick={handleSave}
+								className="border-2 bg-primary text-black px-8 py-3 rounded-lg hover:bg-primaryLight transition duration-200 font-semibold shadow-md hover:scale-105 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
+								aria-label="Save Changes"
+							>
+								Save Changes
+							</button>
+						)}
 					</div>
 				)}
 				<button
