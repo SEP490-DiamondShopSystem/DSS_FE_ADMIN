@@ -35,3 +35,12 @@ export const getAllPricesSelector = (state) => state.diamondPriceSlice.prices;
 export const getAllShapesSelector = (state) => state.diamondPriceSlice.shapes;
 export const LoadingDiamondPriceSelector = (state) => state.diamondPriceSlice.loading;
 export const DiamondPriceErrorSelector = (state) => state.diamondPriceSlice.error;
+// METAL
+export const getAllMetalsSelector = (state) => state.metalSlice.metals;
+export const LoadingMetalSelector = (state) => state.metalSlice.loading;
+export const MetalErrorSelector = (state) => state.metalSlice.error;
+
+// JEWELRY MODEL CATEGORY
+export const getAllJewelryModelCategoriesSelector = (state) => state.jewelryModelCategorySlice.categories;
+export const LoadingJewelryModelCategorySelector = (state) => state.jewelryModelCategorySlice.loading;
+export const JewelryModelCategoryErrorSelector = (state) => state.jewelryModelCategorySlice.error;
