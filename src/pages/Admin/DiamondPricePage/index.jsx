@@ -9,16 +9,31 @@ import {
 } from '../../../redux/slices/diamondPriceSlice';
 import {getPriceBoardSelector, LoadingDiamondPriceSelector} from '../../../redux/selectors';
 
-// Helper function to format price with periods as thousands separators
 const formatPrice = (price) => {
-	if (!price) return 'N/A';
+	if (price === null || price === undefined) return 'N/A';
+	if (price < 0) return 'Not Set';
 	return price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.') + ' VND';
 };
 
 const DiamondPricePage = () => {
 	const dispatch = useDispatch();
-	const priceBoard = useSelector(getPriceBoardSelector);
-	const loading = useSelector(LoadingDiamondPriceSelector);
+	const {priceBoard, loading} = useSelector((state) => ({
+		priceBoard: getPriceBoardSelector(state),
+		loading: LoadingDiamondPriceSelector(state),
+	}));
+	const [filters, setFilters] = useState({
+		isFancyShapePrice: false,
+		isLabDiamond: false,
+		cut: 1,
+		isSideDiamond: false,
+	});
+
+	const handleFilterChange = (filterName) => (event) => {
+		setFilters((prev) => ({
+			...prev,
+			[filterName]: event.target.checked || Number(event.target.value),
+		}));
+	};
 
 	const [isFancyShapePrice, setIsFancy] = useState(false);
 	const [isLabDiamond, setIsLabDiamond] = useState(false);
@@ -26,10 +41,10 @@ const DiamondPricePage = () => {
 	const [isSideDiamond, setIsSideDiamond] = useState(false);
 	const [editedCells, setEditedCells] = useState([]);
 	const [isEditing, setIsEditing] = useState(false);
-	const [selectedPrices, setSelectedPrices] = useState([]); // Track selected prices
-	const [isCreating, setIsCreating] = useState(false); // Add this to toggle Create mode
+	const [selectedPrices, setSelectedPrices] = useState([]);
+	const [isCreating, setIsCreating] = useState(false);
 	const [listPrices, setListPrices] = useState([]);
-	const [showDeleteConfirm, setShowDeleteConfirm] = useState(false); // State for confirmation popup
+	const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
 	useEffect(() => {
 		dispatch(fetchPriceBoard({isFancyShapePrice, isLabDiamond, cut, isSideDiamond}));
@@ -63,12 +78,13 @@ const DiamondPricePage = () => {
 		};
 
 		dispatch(deleteDiamondPrice(payload));
-		setSelectedPrices([]); // Clear selection after deletion
-		setShowDeleteConfirm(false); // Hide confirmation popup
+		setSelectedPrices([]);
+		setShowDeleteConfirm(false);
+		dispatch(fetchPriceBoard({isFancyShapePrice, isLabDiamond, cut, isSideDiamond}));
 	};
 
 	const cancelDelete = () => {
-		setShowDeleteConfirm(false); // Hide confirmation popup
+		setShowDeleteConfirm(false);
 	};
 	const handleLabDiamondChange = (event) => {
 		setIsLabDiamond(event.target.checked);
@@ -82,30 +98,6 @@ const DiamondPricePage = () => {
 		setIsSideDiamond(event.target.checked);
 	};
 
-	const handleEditCell = (rowIndex, cellIndex, newValue) => {
-		const diamondCriteriaId =
-			priceBoard.PriceTables[rowIndex].CellMatrix[rowIndex][cellIndex].CriteriaId;
-		const numericValue = parseFloat(newValue.replace(/\./g, '').replace(',', '.')) || 0;
-		setEditedCells((prev) => {
-			const existingCell = prev.find(
-				(cell) => cell.rowIndex === rowIndex && cell.cellIndex === cellIndex
-			);
-
-			if (existingCell) {
-				return prev.map((cell) =>
-					cell === existingCell ? {...existingCell, price: numericValue} : cell
-				);
-			} else {
-				const newEntry = {
-					diamondCriteriaId,
-					price: numericValue,
-					rowIndex,
-					cellIndex,
-				};
-				return [...prev, newEntry];
-			}
-		});
-	};
 	const handleAddPriceToggle = () => {
 		setIsCreating(!isCreating);
 		setIsEditing(false);
@@ -114,40 +106,123 @@ const DiamondPricePage = () => {
 		setIsEditing(!isEditing);
 		setIsCreating(false);
 	};
-	const handleAddPriceCell = (rowIndex, cellIndex, newValue) => {
-		const updatedListPrices = [...listPrices];
-		const diamondCriteriaId =
-			priceBoard.PriceTables[rowIndex].CellMatrix[rowIndex][cellIndex].CriteriaId;
+	const handleEditCell = (rowIndex, cellIndex, criteriaId, newValue) => {
+		const numericValue = parseFloat(newValue.replace(/\./g, '').replace(',', '.')) || 0;
+		console.log(`Received CriteriaId: ${criteriaId}`);
 
-		const priceIndex = updatedListPrices.findIndex(
-			(item) => item.diamondCriteriaId === diamondCriteriaId
-		);
+		setEditedCells((prev) => {
+			const existingCell = prev.find(
+				(cell) => cell.rowIndex === rowIndex && cell.cellIndex === cellIndex
+			);
 
-		if (priceIndex >= 0) {
-			updatedListPrices[priceIndex].price = parseInt(newValue, 10);
-		} else {
-			updatedListPrices.push({
-				diamondCriteriaId,
-				price: parseInt(newValue, 10),
-			});
+			if (existingCell) {
+				if (newValue.trim() === '' || numericValue === 0) {
+					// Remove the existing cell entry if the new value is empty
+					console.log(`Removing entry for CriteriaId: ${criteriaId} due to empty value`);
+					return prev.filter((cell) => cell !== existingCell);
+				} else {
+					// Update the existing entry
+					console.log(
+						`Updating existing entry with CriteriaId: ${criteriaId}, Price: ${numericValue}`
+					);
+					return prev.map((cell) =>
+						cell === existingCell ? {...existingCell, price: numericValue} : cell
+					);
+				}
+			} else {
+				if (numericValue > 0) {
+					// Add new entry only if the value is greater than zero
+					const newEntry = {
+						diamondCriteriaId: criteriaId,
+						price: numericValue,
+						rowIndex,
+						cellIndex,
+					};
+					console.log(
+						`Adding new entry with CriteriaId: ${criteriaId}, Price: ${numericValue}`
+					);
+					return [...prev, newEntry];
+				}
+				// If the numeric value is zero or the new value is empty, do not add a new entry
+				return prev;
+			}
+		});
+	};
+
+	const handleAddPriceCell = (rowIndex, cellIndex, criteriaId, newValue) => {
+		console.log(`Received CriteriaId: ${criteriaId}, New Value: ${newValue}`);
+		const numericValue = parseFloat(newValue.replace(/\./g, '').replace(',', '.')) || 0;
+
+		setEditedCells((prev) => {
+			const existingCell = prev.find(
+				(cell) => cell.rowIndex === rowIndex && cell.cellIndex === cellIndex
+			);
+
+			if (existingCell) {
+				if (newValue.trim() === '' || numericValue === 0) {
+					// Remove the existing cell entry if the new value is empty
+					console.log(`Removing entry for CriteriaId: ${criteriaId} due to empty value`);
+					return prev.filter((cell) => cell !== existingCell);
+				} else {
+					// Update the existing entry
+					console.log(
+						`Updating existing entry with CriteriaId: ${criteriaId}, New Price: ${numericValue}`
+					);
+					return prev.map((cell) =>
+						cell === existingCell ? {...existingCell, price: numericValue} : cell
+					);
+				}
+			} else {
+				if (numericValue > 0) {
+					// Add new entry only if the value is greater than zero
+					const newCell = {
+						diamondCriteriaId: criteriaId,
+						price: numericValue,
+						rowIndex,
+						cellIndex,
+					};
+					console.log(
+						`Adding new entry with CriteriaId: ${criteriaId}, Price: ${numericValue}`
+					);
+					return [...prev, newCell];
+				}
+				// If the numeric value is zero or the new value is empty, do not add a new entry
+				return prev;
+			}
+		});
+	};
+
+	const savePrices = () => {
+		const listPrices = editedCells.map((cell) => ({
+			diamondCriteriaId: cell.diamondCriteriaId,
+			price: Number(cell.price),
+		}));
+
+		console.log('Prepared listPrices for API:', listPrices);
+
+		if (listPrices.length === 0) {
+			console.warn('No prices to save. Check editedCells or handleEditCell function.');
+			return;
 		}
 
-		setListPrices(updatedListPrices);
+		dispatch(
+			createDiamondPrice({
+				listPrices,
+				isFancyShapePrice,
+				isLabDiamond,
+				isSideDiamond,
+			})
+		)
+			.then(() => {
+				setEditedCells([]);
+				setIsCreating(false);
+				dispatch(fetchPriceBoard({isFancyShapePrice, isLabDiamond, cut, isSideDiamond}));
+			})
+			.catch((error) => {
+				console.error('Error creating diamond prices:', error);
+			});
 	};
-	const savePrices = () => {
-		const payload = {
-			listPrices,
-			isFancyShapePrice, // set based on your requirements
-			isLabDiamond, // set based on your requirements
-			isSideDiamond, // set based on your requirements
-		};
 
-		// dispatch createDiamondPrice action with the payload
-		dispatch(createDiamondPrice(payload));
-
-		setIsCreating(false); // Exit Create Price mode
-		setListPrices([]); // Clear the price list after saving
-	};
 	const handleSave = () => {
 		const updatedPrices = editedCells.map((cell) => ({
 			diamondCriteriaId: cell.diamondCriteriaId,
@@ -162,6 +237,8 @@ const DiamondPricePage = () => {
 				isSideDiamond,
 			})
 		);
+		setEditedCells([]);
+		setIsEditing(false);
 		dispatch(fetchPriceBoard({isFancyShapePrice, isLabDiamond, cut, isSideDiamond}));
 	};
 
@@ -178,32 +255,41 @@ const DiamondPricePage = () => {
 
 	const renderPriceRows = (cellMatrix, colorRange, isCreating) => {
 		return cellMatrix.map((row, rowIndex) => (
-			<tr key={`row-${rowIndex}`} className=" transition duration-200">
+			<tr key={`row-${rowIndex}`} className="transition duration-200">
 				<td className="border p-4 text-center bg-primary">{colorRange[rowIndex]}</td>
+
 				{row.map((cell, cellIndex) => {
 					const editedCell = editedCells.find(
 						(edited) => edited.rowIndex === rowIndex && edited.cellIndex === cellIndex
 					);
 					const cellValue = editedCell ? editedCell.price : cell.Price;
 
-					// Determine the class for the cell based on IsPriceKnown and isCreating state
 					const cellClass = isCreating
 						? cell.IsPriceKnown
-							? 'border p-4 text-center bg-gray'
-							: 'border p-4 text-center' // Darken known prices when creating
+							? `border p-4 text-center bg-gray col-${cellIndex}`
+							: `border p-4 text-center col-${cellIndex}`
 						: cell.IsPriceKnown
-						? 'border p-4 text-center'
-						: 'border p-4 text-center bg-gray'; // Darken unknown prices when not creating
+						? `border p-4 text-center col-${cellIndex}`
+						: `border p-4 text-center bg-gray col-${cellIndex}`;
 
 					return (
 						<td key={`cell-${cellIndex}`} className={cellClass}>
 							{isCreating && !cell.IsPriceKnown ? (
 								<input
 									type="number"
-									onChange={(e) =>
-										handleAddPriceCell(rowIndex, cellIndex, e.target.value)
-									}
-									min={1000}
+									onChange={(e) => {
+										console.log(
+											'Creating price for cell with CriteriaId:',
+											cell.CriteriaId
+										);
+										handleAddPriceCell(
+											rowIndex,
+											cellIndex,
+											cell.CriteriaId,
+											e.target.value
+										);
+									}}
+									min={0}
 									step={1000}
 									className="w-full text-center border rounded"
 									placeholder="New Price"
@@ -219,10 +305,11 @@ const DiamondPricePage = () => {
 													handleEditCell(
 														rowIndex,
 														cellIndex,
+														cell.CriteriaId,
 														e.target.value
 													)
 												}
-												min={1000}
+												min={0}
 												step={1000}
 												className="w-full text-center border rounded"
 											/>
@@ -512,22 +599,40 @@ const DiamondPricePage = () => {
 
 			{isEditing && (
 				<div className="mt-4 text-center">
-					<button
-						onClick={handleSave}
-						className="border-2 bg-blue-500 text-black px-6 py-2 rounded hover:bg-blue-600 transition duration-200 font-semibold"
-					>
-						Save Changes
-					</button>
+					{editedCells.length > 0 ? (
+						<button
+							onClick={handleSave}
+							className="border-2 bg-blue-500 text-black px-6 py-2 rounded hover:bg-blue-600 transition duration-200 font-semibold"
+						>
+							Save Changes
+						</button>
+					) : (
+						<button
+							onClick={handleEditPriceToggle} // Replace with your cancel function
+							className="border-2 bg-red text-white px-6 py-2 rounded hover:bg-red-600 transition duration-200 font-semibold"
+						>
+							Cancel
+						</button>
+					)}
 				</div>
 			)}
 			{isCreating && (
 				<div className="mt-4 text-center">
-					<button
-						onClick={savePrices}
-						className="border-2 bg-blue-500 text-black px-6 py-2 rounded hover:bg-blue-600 transition duration-200 font-semibold"
-					>
-						Save Changes
-					</button>
+					{editedCells.length > 0 ? (
+						<button
+							onClick={savePrices}
+							className="border-2 bg-blue text-black px-6 py-2 rounded hover:bg-blue-600 transition duration-200 font-semibold"
+						>
+							Save Changes
+						</button>
+					) : (
+						<button
+							onClick={handleAddPriceToggle} // Replace with your cancel function
+							className="border-2 bg-red text-white px-6 py-2 rounded hover:bg-red-600 transition duration-200 font-semibold"
+						>
+							Cancel
+						</button>
+					)}
 				</div>
 			)}
 		</div>
