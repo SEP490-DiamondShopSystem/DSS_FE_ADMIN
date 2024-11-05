@@ -9,8 +9,11 @@ import {deliverySlice} from './slices/deliverySlice';
 import {promotionSlice} from './slices/promotionSlice';
 import {diamondSlice} from './slices/diamondSlice';
 import {diamondPriceSlice} from './slices/diamondPriceSlice';
-import {metalSlice} from './slices/metalSlice';
-import {jewelryModelCategorySlice} from './slices/jewelryModelCategorySlice';
+import {metalSlice} from './slices/jewelry/metalSlice';
+import {jewelryModelCategorySlice} from './slices/jewelry/jewelryModelCategorySlice';
+import {jewelrySlice} from './slices/jewelry/jewelrySlice';
+import {jewelryModelSlice} from './slices/jewelry/jewelryModelSlice';
+
 
 const rootPersistConfig = {
 	key: 'root',
@@ -28,6 +31,9 @@ const rootReducer = combineReducers({
 	diamondPriceSlice: diamondPriceSlice.reducer,
 	metalSLice: metalSlice.reducer,
 	jewelryModelCategorySlice: jewelryModelCategorySlice.reducer,
+	jewelrySlice: jewelrySlice.reducer,
+	jewelryModelSlice: jewelryModelSlice.reducer,
+
 });
 
 const persistedReducer = persistReducer(rootPersistConfig, rootReducer);

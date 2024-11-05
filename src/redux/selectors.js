@@ -41,6 +41,24 @@ export const LoadingMetalSelector = (state) => state.metalSlice.loading;
 export const MetalErrorSelector = (state) => state.metalSlice.error;
 
 // JEWELRY MODEL CATEGORY
-export const getAllJewelryModelCategoriesSelector = (state) => state.jewelryModelCategorySlice.categories;
-export const LoadingJewelryModelCategorySelector = (state) => state.jewelryModelCategorySlice.loading;
+export const getAllJewelryModelCategoriesSelector = (state) =>
+	state.jewelryModelCategorySlice.categories;
+export const LoadingJewelryModelCategorySelector = (state) =>
+	state.jewelryModelCategorySlice.loading;
 export const JewelryModelCategoryErrorSelector = (state) => state.jewelryModelCategorySlice.error;
+// JEWELRY
+export const getAllJewelrySelector = (state) => state.jewelrySlice.jewelryItems;
+export const getTotalPageSelector = (state) => state.jewelrySlice.totalPage;
+export const getCurrentPageSelector = (state) => state.jewelrySlice.currentPage;
+export const getJewelryStatusSelector = (state) => state.jewelrySlice.status;
+export const getJewelryErrorSelector = (state) => state.jewelrySlice.error;
+export const getJewelryDetailSelector = (state) => state.jewelrySlice.jewelryDetail;
+export const getCreateJewelryStatusSelector = (state) => state.jewelrySlice.createStatus;
+export const getCreateJewelryErrorSelector = (state) => state.jewelrySlice.createError;
+// JEWELRY MODEL
+export const selectJewelryModels = (state) => state.jewelryModel.jewelryModels;
+export const selectJewelryModelDetail = (state) => state.jewelryModel.jewelryModelDetail;
+export const selectTotalPages = (state) => state.jewelryModel.totalPage;
+export const selectCurrentPage = (state) => state.jewelryModel.currentPage;
+export const selectJewelryModelStatus = (state) => state.jewelryModel.status;
+export const selectJewelryModelError = (state) => state.jewelryModel.error;
