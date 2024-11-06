@@ -8,16 +8,11 @@ import {orderSlice} from './slices/orderSlice';
 import {deliverySlice} from './slices/deliverySlice';
 import {promotionSlice} from './slices/promotionSlice';
 import {diamondSlice} from './slices/diamondSlice';
-<<<<<<< Updated upstream
 import {diamondPriceSlice} from './slices/diamondPriceSlice';
 import {metalSlice} from './slices/jewelry/metalSlice';
 import {jewelryModelCategorySlice} from './slices/jewelry/jewelryModelCategorySlice';
 import {jewelrySlice} from './slices/jewelry/jewelrySlice';
 import {jewelryModelSlice} from './slices/jewelry/jewelryModelSlice';
-
-=======
-import {diamondPriceSlice} from './slices/diamondPriceSlice'
->>>>>>> Stashed changes
 
 const rootPersistConfig = {
 	key: 'root',
@@ -33,14 +28,10 @@ const rootReducer = combineReducers({
 	promotionSlice: promotionSlice.reducer,
 	diamondSlice: diamondSlice.reducer,
 	diamondPriceSlice: diamondPriceSlice.reducer,
-<<<<<<< Updated upstream
 	metalSlice: metalSlice.reducer,
 	jewelryModelCategorySlice: jewelryModelCategorySlice.reducer,
 	jewelrySlice: jewelrySlice.reducer,
 	jewelryModelSlice: jewelryModelSlice.reducer,
-
-=======
->>>>>>> Stashed changes
 });
 
 const persistedReducer = persistReducer(rootPersistConfig, rootReducer);

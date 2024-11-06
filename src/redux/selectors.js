@@ -37,7 +37,7 @@ export const getAllPricesSelector = (state) => state.diamondPriceSlice.prices;
 export const getAllShapesSelector = (state) => state.diamondPriceSlice.shapes;
 export const LoadingDiamondPriceSelector = (state) => state.diamondPriceSlice.loading;
 export const DiamondPriceErrorSelector = (state) => state.diamondPriceSlice.error;
-<<<<<<< Updated upstream
+
 // METAL
 export const getAllMetalsSelector = (state) => state.metalSlice.metals;
 export const LoadingMetalSelector = (state) => state.metalSlice.loading;
@@ -65,5 +65,3 @@ export const selectTotalPages = (state) => state.jewelryModel.totalPage;
 export const selectCurrentPage = (state) => state.jewelryModel.currentPage;
 export const selectJewelryModelStatus = (state) => state.jewelryModel.status;
 export const selectJewelryModelError = (state) => state.jewelryModel.error;
-=======
->>>>>>> Stashed changes

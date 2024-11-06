@@ -17,11 +17,8 @@ import WarrantyPage from '../pages/Admin/WarrantyPage';
 import PrivateRoute from './PrivateRoute';
 import AccountDetail from '../pages/Admin/AccountPage/AccountDetail/AccountDetail';
 import DiamondPricePage from '../pages/Admin/DiamondPricePage';
-<<<<<<< Updated upstream
 import MetalPage from '../pages/Admin/ProductPage/JewelryPage/MetalPage';
-=======
 import OrderCustomizePage from '../pages/Admin/OrderCustomize/OrderCustomize';
->>>>>>> Stashed changes
 
 export const AdminRouters = () => {
 	return (

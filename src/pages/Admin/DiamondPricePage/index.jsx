@@ -383,24 +383,17 @@ const DiamondPricePage = () => {
 					</div>
 
 					{/* Side Diamond Checkbox */}
-<<<<<<< Updated upstream
-					{(isCreating || isEditing)  &&(
-=======
->>>>>>> Stashed changes
-					<div className="flex items-center gap-2">
-						<input
-							type="checkbox"
-							checked={isSideDiamond}
-							onChange={handleSideDiamondChange}
-							className="rounded focus:ring-blue-500"
-						/>
-						<label className="text-lg font-semibold">Side Diamond</label>
-					</div>
-<<<<<<< Updated upstream
+					{(isCreating || isEditing) && (
+						<div className="flex items-center gap-2">
+							<input
+								type="checkbox"
+								checked={isSideDiamond}
+								onChange={handleSideDiamondChange}
+								className="rounded focus:ring-blue-500"
+							/>
+							<label className="text-lg font-semibold">Side Diamond</label>
+						</div>
 					)}
-=======
-
->>>>>>> Stashed changes
 					{/* Clear Filters Button */}
 					<div>
 						<button
@@ -465,8 +458,7 @@ const DiamondPricePage = () => {
 				</div>
 
 				{/* Side Diamond Checkbox */}
-<<<<<<< Updated upstream
-				{(isCreating || isEditing)  &&(
+				{(isCreating || isEditing) && (
 					<div className="flex items-center gap-2">
 						<input
 							type="checkbox"
@@ -476,19 +468,7 @@ const DiamondPricePage = () => {
 						/>
 						<label className="text-lg font-semibold">Side Diamond</label>
 					</div>
-					)}
-=======
-				<div className="flex items-center gap-2">
-					<input
-						type="checkbox"
-						checked={isSideDiamond}
-						onChange={handleSideDiamondChange}
-						className="rounded text-blue focus:ring-blue-500 hover:ring-2 transition duration-200"
-						aria-label="Side Diamond"
-					/>
-					<label className="text-lg font-semibold text-gray-800">Side Diamond</label>
-				</div>
->>>>>>> Stashed changes
+				)}
 
 				{/* Clear Filters Button */}
 				<div>
