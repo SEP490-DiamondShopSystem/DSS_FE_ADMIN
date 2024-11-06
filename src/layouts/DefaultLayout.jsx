@@ -74,12 +74,14 @@ const DefaultLayout = () => {
 			getItem('Quản Lý Sản Phẩm', '/products', <ProductOutlined />, [
 				getItem('Danh Sách Trang Sức', '/products/jewelry-list', <RightOutlined />),
 				getItem('Danh Sách Kim Cương', '/products/diamond-list', <DiamondOutlined />),
-				getItem('Danh Sách Loại Trang Sức', '/products/jewelry-model-category-list', <RightOutlined />),
+				getItem(
+					'Danh Sách Loại Trang Sức',
+					'/products/jewelry-model-category-list',
+					<RightOutlined />
+				),
 				getItem('Danh Sách Kim Loại', '/products/metal-list', <DiamondOutlined />),
 			]),
-<<<<<<< Updated upstream
-			getItem('Quản Lí Đặt Hàng', '/orders', <OrderedListOutlined />),
-=======
+
 		// Order Management only for roles with specific permissions
 		(adminRole || managerRole || staffRole || delivererRole) &&
 			getItem('Quản Lý Đặt Hàng', '/orders', <OrderedListOutlined />, [
@@ -90,7 +92,7 @@ const DefaultLayout = () => {
 					<OrderedListOutlined />
 				),
 			]),
->>>>>>> Stashed changes
+
 		(adminRole || managerRole || staffRole) &&
 			getItem('Quản Lí Khuyến Mãi', '/promotion', <GiftOutlined />),
 		(adminRole || managerRole || staffRole) &&
@@ -193,20 +195,13 @@ const DefaultLayout = () => {
 							minHeight: 790,
 							backgroundColor: '#ffffff',
 							padding: '16px',
-<<<<<<< Updated upstream
+
 							overflowy: 'auto',
 							borderRadius: '8px', // Optional: add some rounding for better appearance
 						}}
 					>
 						{/* Render child routes */}
-						<Outlet/>
-=======
-							overflowY: 'auto',
-							borderRadius: '8px',
-						}}
-					>
 						<Outlet />
->>>>>>> Stashed changes
 					</div>
 				</Content>
 				{showHeaderFooter && (
