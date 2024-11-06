@@ -6,7 +6,7 @@ import {
 	getLoadingUserSelector,
 	GetUserDetailSelector,
 } from '../../../redux/selectors';
-import {Button, Form, Input, message, Modal, Select, Space, Table, Tooltip} from 'antd';
+import {Button, Form, Input, message, Modal, Select, Space, Table, Tag, Tooltip} from 'antd';
 import {DeleteFilled, EditFilled, PlusOutlined, UpCircleFilled} from '@ant-design/icons';
 import {Filter} from '../../../components/Filter';
 import {Search} from '@mui/icons-material';
@@ -22,6 +22,7 @@ const AccountPage = () => {
 	const [form] = Form.useForm();
 	const dispatch = useDispatch();
 	const navigate = useNavigate();
+
 	const userList = useSelector(getAllUserSelector);
 	const loading = useSelector(getLoadingUserSelector);
 	const userDetail = useSelector(GetUserDetailSelector);
@@ -31,14 +32,19 @@ const AccountPage = () => {
 	const [users, setUsers] = useState();
 	const [isModalAddVisible, setIsModalAddVisible] = useState(false);
 	const [active, setActive] = useState('all');
+	const [isManager, setIsManager] = useState();
+	const [role, setRole] = useState();
+
+	console.log('userDetail', userDetail);
+	console.log('isManager', isManager);
 
 	const columns = [
-		{
-			title: 'ID',
-			dataIndex: 'Id',
-			key: 'Id',
-			align: 'center',
-		},
+		// {
+		// 	title: 'ID',
+		// 	dataIndex: 'Id',
+		// 	key: 'Id',
+		// 	align: 'center',
+		// },
 		{
 			title: 'Họ',
 			dataIndex: 'FirstName',
@@ -59,55 +65,73 @@ const AccountPage = () => {
 			// render: (text) => <Image src={text} alt="product" style={{width: 50, height: 50}} />,
 		},
 
-		// {
-		// 	title: 'SKU',
-		// 	key: 'sku',
-		// 	dataIndex: 'sku',
-		// 	align: 'center',
-		// },
-		// {
-		// 	title: 'Status',
-		// 	key: 'status',
-		// 	dataIndex: 'status',
-		// 	align: 'center',
-		// 	render: (status) => {
-		// 		let color = status.length > 5 ? 'geekblue' : 'green';
-		// 		if (status === 'Expired') {
-		// 			color = 'volcano';
-		// 		}
-		// 		return <Tag color={color}>{status.toUpperCase()}</Tag>;
-		// 	},
-		// },
-		// {
-		// 	title: 'Price',
-		// 	key: 'price',
-		// 	dataIndex: 'price',
-		// 	align: 'center',
-		// },
+		{
+			title: 'Vai Trò',
+			key: 'Roles',
+			align: 'center',
+			render: (_, record) => (
+				<>
+					{record.Roles.map((role) => {
+						let color;
+						switch (role.RoleName) {
+							case 'customer':
+								color = 'green';
+								break;
+							case 'admin':
+								color = 'red';
+								break;
+							case 'staff':
+								color = 'orange';
+								break;
+							case 'manager':
+								color = 'blue';
+								break;
+							default:
+								color = 'default';
+						}
+						return (
+							<Tag color={color} key={role.Id}>
+								{role.RoleName.toUpperCase()}
+							</Tag>
+						);
+					})}
+				</>
+			),
+		},
+
 		{
 			title: '',
 			key: 'action',
 			align: 'center',
 			render: (_, record) => (
 				<Space size="middle">
-					<Tooltip title={'Xem Chi Tiết'}>
-						<Button
-							type="text"
-							className="bg-primary"
-							// ghost
-							onClick={() => navigate(record.Id)}
-						>
-							<EditFilled />
-						</Button>
-					</Tooltip>
+					{isManager || record.Id === userDetail.Id ? (
+						<Tooltip title={`${isManager ? 'Xem Chi Tiết' : 'Sửa Thông Tin'} `}>
+							<Button
+								type="text"
+								className="bg-primary"
+								onClick={() => navigate(`/Accounts/${record.Id}`)}
+							>
+								<EditFilled />
+							</Button>
+						</Tooltip>
+					) : null}
 				</Space>
 			),
 		},
 	];
 
 	useEffect(() => {
-		dispatch(getAllUser({current, size: pageSize}));
-	}, []);
+		dispatch(getAllUser({current, size: pageSize, roleId: role}));
+	}, [current, pageSize, role]);
+
+	useEffect(() => {
+		if (userDetail) {
+			const isManager = userDetail?.Roles?.some((role) => role?.RoleName === 'manager');
+
+			setIsManager(isManager);
+		}
+	}, [userDetail]);
 
 	useEffect(() => {
 		if (userList) {
@@ -172,47 +196,53 @@ const AccountPage = () => {
 		handleAddCancel();
 	};
 
-	const handleStatusBtn = (status) => {
-		setActive(status);
+	const handleRoleChange = (value) => {
+		setRole(value);
+		console.log('role', value);
 	};
 
 	const onSearch = (value) => {
 		setSearchText(value);
 	};
 
-	const filter = [
-		{name: 'All', value: 'all'},
-		{name: 'Activated', value: 'activated'},
-		{name: 'Expired', value: 'expired'},
-	];
+	// const filter = [
+	// 	{name: 'All', value: 'all'},
+	// 	{name: 'Activated', value: 'activated'},
+	// 	{name: 'Expired', value: 'expired'},
+	// ];
 
 	return (
 		<div className="mx-20 my-10">
-			<Filter filter={filter} handleStatusBtn={handleStatusBtn} active={active} />
+			{/* <Filter filter={filter} handleStatusBtn={handleStatusBtn} active={active} /> */}
 			<div>
 				<div className="flex items-center justify-between">
 					<div className="flex items-center my-5">
-						<p className="mr-3">Tìm kiếm</p>
-						<Search
+						<p className="mr-3 font-semibold">Tìm kiếm</p>
+						{/* <Search
 							className="w-60"
 							placeholder="input search text"
 							allowClear
 							onSearch={onSearch}
-						/>
-						<Space wrap className="ml-8">
+						/> */}
+						<Space wrap className="">
 							<Select
-								defaultValue=""
-								style={{width: 120}}
+								// defaultValue=""
+								style={{width: 160}}
 								allowClear
-								// onChange={handleTypeChange}
+								onChange={handleRoleChange}
 								options={[
-									{value: 'ring', label: 'Ring'},
-									{value: 'pendant', label: 'Pendant'},
-									{value: 'bracelets', label: 'Bracelets'},
-									{value: 'earrings', label: 'Earrings'},
+									{value: '', label: 'CHỌN VAI TRÒ'},
+									{value: '1', label: 'Customer'},
+									{value: '2', label: 'Customer Bronze'},
+									{value: '3', label: 'Customer Silver'},
+									{value: '4', label: 'Customer Gold'},
+									{value: '44', label: 'Deliverer'},
+									{value: '11', label: 'Staff'},
+									{value: '22', label: 'Manager'},
+									{value: '33', label: 'Admin'},
 								]}
 							/>
-							<Select
+							{/* <Select
 								defaultValue=""
 								style={{width: 120}}
 								allowClear
@@ -238,7 +268,7 @@ const AccountPage = () => {
 									{value: 'radiant', label: 'Radiant'},
 									{value: 'marquise', label: 'Marquise'},
 								]}
-							/>
+							/> */}
 						</Space>
 					</div>
 					<div>

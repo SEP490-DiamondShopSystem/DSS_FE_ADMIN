@@ -44,6 +44,45 @@ export const getOrderDetail = createAsyncThunk(
 	}
 );
 
+export const getAllOrderCustomize = createAsyncThunk(
+	'orderSlice/getAllOrderCustomize',
+	async (params, {rejectWithValue}) => {
+		try {
+			const {currentPage, pageSize} = params;
+
+			let url = '/CustomizeRequest/Staff/All';
+
+			const queryParams = new URLSearchParams();
+
+			if (currentPage) queryParams.append('currentPage', currentPage);
+			if (pageSize) queryParams.append('pageSize', pageSize);
+
+			if (queryParams.toString()) {
+				url += `?${queryParams.toString()}`;
+			}
+
+			const data = await api.get(url);
+			return data;
+		} catch (error) {
+			console.error(error);
+			return rejectWithValue(error);
+		}
+	}
+);
+
+export const getOrderDetailCustomize = createAsyncThunk(
+	'orderSlice/getOrderDetailCustomize',
+	async (id, {rejectWithValue}) => {
+		try {
+			const data = await api.get(`/CustomizeRequest/Staff/Detail/${id}`);
+			return data;
+		} catch (error) {
+			console.error(error);
+			return rejectWithValue(error);
+		}
+	}
+);
+
 export const handleOrder = createAsyncThunk(
 	'orderSlice/handleOrder',
 	async (id, {rejectWithValue}) => {
@@ -143,7 +182,9 @@ export const orderSlice = createSlice({
 	name: 'orderSlice',
 	initialState: {
 		orders: null,
+		ordersCustomize: null,
 		orderDetail: null,
+		orderDetailCustomize: null,
 		orderStatusDetail: null,
 		orderPaymentStatusDetail: null,
 		loading: false,
@@ -210,18 +251,28 @@ export const orderSlice = createSlice({
 				state.loading = false;
 				state.error = action.payload;
 			})
-			// .addCase(handleOrderPreparing.pending, (state) => {
-			// 	state.loading = true;
-			// })
-			// .addCase(handleOrderPreparing.fulfilled, (state, action) => {
-			// 	state.loading = false;
-			// 				state.orderStatusDetail = action.payload.Status;
-
-			// })
-			// .addCase(handleOrderPreparing.rejected, (state, action) => {
-			// 	state.loading = false;
-			// 	state.error = action.payload;
-			// })
+			.addCase(getAllOrderCustomize.pending, (state) => {
+				state.loading = true;
+			})
+			.addCase(getAllOrderCustomize.fulfilled, (state, action) => {
+				state.loading = false;
+				state.ordersCustomize = action.payload;
+			})
+			.addCase(getAllOrderCustomize.rejected, (state, action) => {
+				state.loading = false;
+				state.error = action.payload;
+			})
+			.addCase(getOrderDetailCustomize.pending, (state) => {
+				state.loading = true;
+			})
+			.addCase(getOrderDetailCustomize.fulfilled, (state, action) => {
+				state.loading = false;
+				state.orderDetailCustomize = action.payload;
+			})
+			.addCase(getOrderDetailCustomize.rejected, (state, action) => {
+				state.loading = false;
+				state.error = action.payload;
+			})
 			.addCase(handleOrderAssignDeliverer.pending, (state) => {
 				state.loading = true;
 			})

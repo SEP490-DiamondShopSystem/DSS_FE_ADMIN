@@ -14,6 +14,8 @@ export const LoadingOrderSelector = (state) => state.orderSlice.loading;
 export const getOrderDetailSelector = (state) => state.orderSlice.orderDetail;
 export const getOrderStatusDetailSelector = (state) => state.orderSlice.orderStatusDetail;
 export const getPaymentStatusDetailSelector = (state) => state.orderSlice.orderPaymentStatusDetail;
+export const getAllOrderCustomizeSelector = (state) => state.orderSlice.ordersCustomize;
+export const getOrderDetailCustomizeSelector = (state) => state.orderSlice.orderDetailCustomize;
 
 //DELIVERY
 export const LoadingDeliverySelector = (state) => state.deliverySlice.loading;
@@ -35,6 +37,7 @@ export const getAllPricesSelector = (state) => state.diamondPriceSlice.prices;
 export const getAllShapesSelector = (state) => state.diamondPriceSlice.shapes;
 export const LoadingDiamondPriceSelector = (state) => state.diamondPriceSlice.loading;
 export const DiamondPriceErrorSelector = (state) => state.diamondPriceSlice.error;
+
 // METAL
 export const getAllMetalsSelector = (state) => state.metalSlice.metals;
 export const LoadingMetalSelector = (state) => state.metalSlice.loading;

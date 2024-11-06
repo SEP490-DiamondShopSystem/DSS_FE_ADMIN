@@ -99,7 +99,7 @@ const InformationOrder = ({orders, statusOrder, paymentStatusOrder}) => {
 					icon={<ArrowLeftOutlined />}
 					type="text"
 					className="bg-primary"
-					onClick={() => navigate('/orders')}
+					onClick={() => navigate('/orders/preset')}
 				>
 					Quay lại
 				</Button>
@@ -170,7 +170,10 @@ const InformationOrder = ({orders, statusOrder, paymentStatusOrder}) => {
 						Loại Đơn Hàng
 					</Text>
 					<br />
-					<Text>Đơn hàng</Text>
+					<Text className="flex items-center">
+						<p className="mr-1">Đơn hàng</p>{' '}
+						<p className="font-semibold">Trang Sức Có Sẵn</p>
+					</Text>
 				</Col>
 				<Col span={12}>
 					<Text strong style={{fontSize: 18}}>

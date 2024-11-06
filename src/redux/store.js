@@ -14,7 +14,6 @@ import {jewelryModelCategorySlice} from './slices/jewelry/jewelryModelCategorySl
 import {jewelrySlice} from './slices/jewelry/jewelrySlice';
 import {jewelryModelSlice} from './slices/jewelry/jewelryModelSlice';
 
-
 const rootPersistConfig = {
 	key: 'root',
 	storage,
@@ -33,7 +32,6 @@ const rootReducer = combineReducers({
 	jewelryModelCategorySlice: jewelryModelCategorySlice.reducer,
 	jewelrySlice: jewelrySlice.reducer,
 	jewelryModelSlice: jewelryModelSlice.reducer,
-
 });
 
 const persistedReducer = persistReducer(rootPersistConfig, rootReducer);

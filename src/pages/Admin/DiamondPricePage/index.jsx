@@ -383,16 +383,16 @@ const DiamondPricePage = () => {
 					</div>
 
 					{/* Side Diamond Checkbox */}
-					{(isCreating || isEditing)  &&(
-					<div className="flex items-center gap-2">
-						<input
-							type="checkbox"
-							checked={isSideDiamond}
-							onChange={handleSideDiamondChange}
-							className="rounded focus:ring-blue-500"
-						/>
-						<label className="text-lg font-semibold">Side Diamond</label>
-					</div>
+					{(isCreating || isEditing) && (
+						<div className="flex items-center gap-2">
+							<input
+								type="checkbox"
+								checked={isSideDiamond}
+								onChange={handleSideDiamondChange}
+								className="rounded focus:ring-blue-500"
+							/>
+							<label className="text-lg font-semibold">Side Diamond</label>
+						</div>
 					)}
 					{/* Clear Filters Button */}
 					<div>
@@ -458,7 +458,7 @@ const DiamondPricePage = () => {
 				</div>
 
 				{/* Side Diamond Checkbox */}
-				{(isCreating || isEditing)  &&(
+				{(isCreating || isEditing) && (
 					<div className="flex items-center gap-2">
 						<input
 							type="checkbox"
@@ -468,7 +468,7 @@ const DiamondPricePage = () => {
 						/>
 						<label className="text-lg font-semibold">Side Diamond</label>
 					</div>
-					)}
+				)}
 
 				{/* Clear Filters Button */}
 				<div>
