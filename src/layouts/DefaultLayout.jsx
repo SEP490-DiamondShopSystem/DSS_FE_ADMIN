@@ -62,6 +62,8 @@ const DefaultLayout = () => {
 			getItem('Quản Lý Sản Phẩm', '/products', <ProductOutlined />, [
 				getItem('Danh Sách Trang Sức', '/products/jewelry-list', <RightOutlined />),
 				getItem('Danh Sách Kim Cương', '/products/diamond-list', <DiamondOutlined />),
+				getItem('Danh Sách Loại Trang Sức', '/products/jewelry-model-category-list', <RightOutlined />),
+				getItem('Danh Sách Kim Loại', '/products/metal-list', <DiamondOutlined />),
 			]),
 			getItem('Quản Lí Đặt Hàng', '/orders', <OrderedListOutlined />),
 		(adminRole || managerRole || staffRole) &&

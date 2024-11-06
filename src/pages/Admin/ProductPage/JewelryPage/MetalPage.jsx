@@ -30,39 +30,40 @@ const MetalPage = () => {
       .catch((err) => console.error('Failed to update price:', err));
   };
 
-  if (loading) return <p>Loading metals...</p>;
+  if (loading) return <p className="text-xl text-blue-500">Loading metals...</p>;
 
   return (
-    <div className="p-6">
-      <h1 className="text-2xl font-semibold mb-4">Manage Metal Prices</h1>
-      <table className="w-full border-collapse border border-gray-200">
+    <div className="p-6 bg-offWhite min-h-screen">
+      <h1 className="text-3xl font-semibold text-primary mb-6">Manage Metal Prices</h1>
+
+      {/* Metal Prices Table */}
+      <table className="w-full border-collapse bg-white rounded-lg shadow-md border border-lightGray">
         <thead>
           <tr className="bg-gray-100">
-            <th className="border p-2 text-left">Name</th>
-            <th className="border p-2 text-left">Current Price</th>
-            <th className="border p-2 text-left">New Price</th>
-            <th className="border p-2 text-left">Actions</th>
+            <th className="border p-3 text-left text-sm text-gray-700">Name</th>
+            <th className="border p-3 text-left text-sm text-gray-700">Current Price</th>
+            <th className="border p-3 text-left text-sm text-gray-700">New Price</th>
+            <th className="border p-3 text-left text-sm text-gray-700">Actions</th>
           </tr>
         </thead>
         <tbody>
           {metals.map((metal) => (
-            <tr key={metal.Id} className="border">
-              <td className="border p-2">{metal.Name}</td>
-              <td className="border p-2">{metal.Price.toLocaleString()} VND</td>
-              <td className="border p-2">
+            <tr key={metal.Id} className="border-b">
+              <td className="border p-3 text-sm text-gray-700">{metal.Name}</td>
+              <td className="border p-3 text-sm text-gray-700">{metal.Price.toLocaleString()} VND</td>
+              <td className="border p-3">
                 <input
                   type="number"
-				  min={0}
-				  
+                  min={0}
                   value={editPrice[metal.Id] || ''}
                   onChange={(e) => handlePriceChange(metal.Id, e.target.value)}
-                  className="p-1 border rounded w-full"
+                  className="p-2 border border-gray-300 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-primary"
                 />
               </td>
-              <td className="border p-2">
+              <td className="border p-3">
                 <button
                   onClick={() => handleSave(metal)}
-                  className="px-4 py-2 bg-blue-500 text-white rounded disabled:opacity-50"
+                  className="px-6 py-2 bg-primary text-white rounded-md hover:bg-primaryDark disabled:opacity-50 focus:outline-none focus:ring-2 focus:ring-primary"
                   disabled={!editPrice[metal.Id]}
                 >
                   Save
