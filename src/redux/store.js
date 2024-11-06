@@ -29,7 +29,7 @@ const rootReducer = combineReducers({
 	promotionSlice: promotionSlice.reducer,
 	diamondSlice: diamondSlice.reducer,
 	diamondPriceSlice: diamondPriceSlice.reducer,
-	metalSLice: metalSlice.reducer,
+	metalSlice: metalSlice.reducer,
 	jewelryModelCategorySlice: jewelryModelCategorySlice.reducer,
 	jewelrySlice: jewelrySlice.reducer,
 	jewelryModelSlice: jewelryModelSlice.reducer,
