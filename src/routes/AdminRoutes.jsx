@@ -10,11 +10,18 @@ import OrderDetail from '../pages/Admin/OrderPage/OrderDetail/OrderDetail';
 import OrderPage from '../pages/Admin/OrderPage/OrderPage';
 import DiamondPage from '../pages/Admin/ProductPage/DiamondPage/DiamondPage';
 import JewelryPage from '../pages/Admin/ProductPage/JewelryPage/JewelryPage';
+import JewelryModelCategoryPage from '../pages/Admin/ProductPage/JewelryPage/JewelryModelCategoryPage';
 import PromotionPage from '../pages/Admin/PromotionPage';
 import SignUpPage from '../pages/Admin/SignUpPage/SignUp';
 import WarrantyPage from '../pages/Admin/WarrantyPage';
 import PrivateRoute from './PrivateRoute';
 import AccountDetail from '../pages/Admin/AccountPage/AccountDetail/AccountDetail';
+import DiamondPricePage from '../pages/Admin/DiamondPricePage';
+<<<<<<< Updated upstream
+import MetalPage from '../pages/Admin/ProductPage/JewelryPage/MetalPage';
+=======
+import OrderCustomizePage from '../pages/Admin/OrderCustomize/OrderCustomize';
+>>>>>>> Stashed changes
 
 export const AdminRouters = () => {
 	return (
@@ -27,7 +34,7 @@ export const AdminRouters = () => {
 				<Route
 					path="/dashboard"
 					element={
-						<PrivateRoute roles={['staff', 'admin', 'manager']}>
+						<PrivateRoute roles={['deliverer', 'staff', 'admin', 'manager']}>
 							<DashboardPage />
 						</PrivateRoute>
 					}
@@ -35,7 +42,7 @@ export const AdminRouters = () => {
 				<Route
 					path="/accounts"
 					element={
-						<PrivateRoute roles={['deliverer', 'staff', 'admin', 'manager']}>
+						<PrivateRoute roles={['staff', 'admin', 'manager']}>
 							<AccountPage />
 						</PrivateRoute>
 					}
@@ -43,13 +50,13 @@ export const AdminRouters = () => {
 				<Route
 					path="/accounts/:id"
 					element={
-						<PrivateRoute roles={['deliverer', 'staff', 'admin', 'manager']}>
+						<PrivateRoute roles={['staff', 'admin', 'manager']}>
 							<AccountDetail />
 						</PrivateRoute>
 					}
 				/>
 				<Route
-					path="/orders"
+					path="/orders/preset"
 					element={
 						<PrivateRoute roles={['deliverer', 'staff', 'admin', 'manager']}>
 							<OrderPage />
@@ -57,7 +64,23 @@ export const AdminRouters = () => {
 					}
 				/>
 				<Route
-					path="/orders/:id"
+					path="/orders/preset/:id"
+					element={
+						<PrivateRoute roles={['deliverer', 'staff', 'admin', 'manager']}>
+							<OrderDetail />
+						</PrivateRoute>
+					}
+				/>
+				<Route
+					path="/orders/customize"
+					element={
+						<PrivateRoute roles={['deliverer', 'staff', 'admin', 'manager']}>
+							<OrderCustomizePage />
+						</PrivateRoute>
+					}
+				/>
+				<Route
+					path="/orders/customize/:id"
 					element={
 						<PrivateRoute roles={['deliverer', 'staff', 'admin', 'manager']}>
 							<OrderDetail />
@@ -67,23 +90,40 @@ export const AdminRouters = () => {
 				<Route
 					path="/products/jewelry-list"
 					element={
-						<PrivateRoute roles={['deliverer', 'staff', 'admin', 'manager']}>
+						<PrivateRoute roles={['staff', 'admin', 'manager']}>
 							<JewelryPage />
+						</PrivateRoute>
+					}
+				/>
+				<Route
+					path="/products/jewelry-model-category-list"
+					element={
+						<PrivateRoute roles={['deliverer', 'staff', 'admin', 'manager']}>
+							<JewelryModelCategoryPage />
+						</PrivateRoute>
+					}
+				/>
+				<Route
+					path="/products/metal-list"
+					element={
+						<PrivateRoute roles={['deliverer', 'staff', 'admin', 'manager']}>
+							<MetalPage />
 						</PrivateRoute>
 					}
 				/>
 				<Route
 					path="/products/diamond-list"
 					element={
-						<PrivateRoute roles={['deliverer', 'staff', 'admin', 'manager']}>
+						<PrivateRoute roles={['staff', 'admin', 'manager']}>
 							<DiamondPage />
 						</PrivateRoute>
 					}
 				/>
+
 				<Route
 					path="/warranties"
 					element={
-						<PrivateRoute roles={['deliverer', 'staff', 'admin', 'manager']}>
+						<PrivateRoute roles={['staff', 'admin', 'manager']}>
 							<WarrantyPage />
 						</PrivateRoute>
 					}
@@ -91,15 +131,23 @@ export const AdminRouters = () => {
 				<Route
 					path="/promotion"
 					element={
-						<PrivateRoute roles={['deliverer', 'staff', 'admin', 'manager']}>
+						<PrivateRoute roles={['staff', 'admin', 'manager']}>
 							<PromotionPage />
+						</PrivateRoute>
+					}
+				/>
+				<Route
+					path="/price"
+					element={
+						<PrivateRoute roles={['deliverer', 'staff', 'admin', 'manager']}>
+							<DiamondPricePage />
 						</PrivateRoute>
 					}
 				/>
 				<Route
 					path="/deliveries"
 					element={
-						<PrivateRoute roles={['deliverer', 'staff', 'admin', 'manager']}>
+						<PrivateRoute roles={['staff', 'admin', 'manager']}>
 							<DeliveryPage />
 						</PrivateRoute>
 					}
