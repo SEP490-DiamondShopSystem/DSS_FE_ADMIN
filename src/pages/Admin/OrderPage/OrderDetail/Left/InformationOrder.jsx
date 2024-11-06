@@ -58,49 +58,6 @@ const InformationOrder = ({orders, statusOrder, paymentStatusOrder}) => {
 			dataIndex: 'price',
 			align: 'center',
 		},
-		{
-			title: 'Trạng thái',
-			dataIndex: 'status',
-			render: (status) => {
-				let color = 'red';
-				switch (status) {
-					case 'Success':
-						color = 'green';
-						break;
-					case 'Pending':
-						color = 'orange';
-						break;
-					case 'Processing':
-						color = 'blue';
-						break;
-					case 'Delivering':
-						color = 'cyan';
-						break;
-					case 'Prepared':
-						color = 'purple';
-						break;
-					case 'Cancelled':
-					case 'Rejected':
-					case 'Refused':
-						color = 'red';
-						break;
-					case 'Delivery_Failed':
-						color = 'volcano';
-						break;
-					default:
-						color = 'gray';
-						break;
-				}
-				return (
-					<div className="text-center">
-						<Tag className="text-center" color={color}>
-							{status.toUpperCase()}
-						</Tag>
-					</div>
-				);
-			},
-			align: 'center',
-		},
 	];
 
 	const expandedColumns = [
@@ -142,7 +99,7 @@ const InformationOrder = ({orders, statusOrder, paymentStatusOrder}) => {
 					icon={<ArrowLeftOutlined />}
 					type="text"
 					className="bg-primary"
-					onClick={() => navigate('/orders')}
+					onClick={() => navigate('/orders/preset')}
 				>
 					Quay lại
 				</Button>
@@ -213,7 +170,10 @@ const InformationOrder = ({orders, statusOrder, paymentStatusOrder}) => {
 						Loại Đơn Hàng
 					</Text>
 					<br />
-					<Text>Đơn hàng</Text>
+					<Text className="flex items-center">
+						<p className="mr-1">Đơn hàng</p>{' '}
+						<p className="font-semibold">Trang Sức Có Sẵn</p>
+					</Text>
 				</Col>
 				<Col span={12}>
 					<Text strong style={{fontSize: 18}}>

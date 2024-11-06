@@ -1,6 +1,7 @@
 import {
 	CheckCircleFilled,
 	CloseCircleOutlined,
+	CopyFilled,
 	DeleteOutlined,
 	DownCircleFilled,
 	EditFilled,
@@ -36,7 +37,7 @@ export const Information = ({
 					className="border rounded-full"
 				/>
 			</div>
-			<p className="font-semibold text-lg my-2">{user.Email}</p>
+			<p className="font-semibold text-lg my-2">{user?.Email}</p>
 			<p className="font-semibold my-2" style={{color: '#939698'}}>
 				Đăng nhập lần cuối: 1 phút trước
 			</p>
@@ -48,15 +49,15 @@ export const Information = ({
 					<div className="flex items-center justify-around w-full">
 						<p className="font-semibold">User ID:</p>
 						<p className="" style={{color: '#9a9b9d'}}>
-							{user.Id}
+							{user?.Id}
 						</p>
+						<button
+							onClick={copyToClipboard}
+							className="ml-3 py-1 rounded bg-blue-500 font-semibold hover:text-gray"
+						>
+							<CopyFilled />
+						</button>
 					</div>
-					<button
-						onClick={copyToClipboard}
-						className="ml-3 py-1 px-3 rounded bg-blue-500 font-semibold hover:text-gray"
-					>
-						Copy
-					</button>
 				</div>
 			</div>
 			<div className="mt-10 font-semibold">
@@ -75,7 +76,7 @@ export const Information = ({
 						<Button
 							type="primary"
 							className="flex items-center mb-2 mr-3"
-							onClick={() => showModal(user.Id)}
+							onClick={() => showModal(user?.Id)}
 						>
 							<p>
 								<UpCircleFilled />
@@ -138,12 +139,6 @@ export const Information = ({
 							<StopOutlined />
 						</p>
 						<p className="ml-3">Cấm Người Dùng</p>
-					</Button>
-					<Button danger className="flex items-center mb-2">
-						<p>
-							<DeleteOutlined />
-						</p>
-						<p className="ml-3">Xóa Người Dùng</p>
 					</Button>
 				</div>
 			</div>

@@ -1,21 +1,22 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {
 	DashboardOutlined,
+	DeliveredProcedureOutlined,
+	GiftOutlined,
 	OrderedListOutlined,
 	ProductOutlined,
 	RightOutlined,
-	SafetyOutlined,
 	UserOutlined,
 	TagOutlined,
-	DeliveredProcedureOutlined,
 } from '@ant-design/icons';
 import {DiamondOutlined} from '@mui/icons-material';
-import {Breadcrumb, Layout, Menu} from 'antd';
-import {Link, Outlet, useLocation, useNavigate} from 'react-router-dom'; // Add Outlet here
+import {Breadcrumb, Layout, Menu, message} from 'antd';
+import {Link, Outlet, useLocation, useNavigate} from 'react-router-dom';
 import {imageExporter} from '../assets/images';
 import TopNavbar from '../components/TopNavBar/TopNavBar';
 import '../css/antd.css';
-import DeliveryPage from '../pages/Admin/DeliveryPage/DeliveryPage';
+import {GetUserDetailSelector} from '../redux/selectors';
+import {useSelector} from 'react-redux';
 
 const {Footer, Sider, Content} = Layout;
 const {SubMenu} = Menu;
@@ -24,25 +25,80 @@ const getItem = (label, key, icon, children) => ({key, icon, label, children});
 
 const DefaultLayout = () => {
 	const navigate = useNavigate();
+	const userDetail = useSelector(GetUserDetailSelector);
+
 	const [collapsed, setCollapsed] = useState(false);
 	const location = useLocation();
+	const [delivererRole, setDelivererRole] = useState(false);
+	const [staffRole, setStaffRole] = useState(false);
+	const [adminRole, setAdminRole] = useState(false);
+	const [managerRole, setManagerRole] = useState(false);
 	const [selectMenu, setSelectMenu] = useState(location.pathname);
-
-	// Thêm defaultOpenKeys để giữ SubMenu mở
 	const [openKeys, setOpenKeys] = useState([]);
 
-	const items = [
-		getItem('Dashboard', '/dashboard', <DashboardOutlined />),
-		getItem('Quản Lí Tài Khoản', '/accounts', <UserOutlined />),
-		getItem('Quản Lý Sản Phẩm', '/products', <ProductOutlined />, [
-			getItem('Danh Sách Trang Sức', '/products/jewelry-list', <RightOutlined />),
-			getItem('Danh Sách Kim Cương', '/products/diamond-list', <DiamondOutlined />),
-		]),
-		getItem('Quản Lí Đặt Hàng', '/orders', <OrderedListOutlined />),
-		getItem('Quản Lí Vận Chuyển', '/deliveries', <DeliveredProcedureOutlined />),
+	useEffect(() => {
+		if (userDetail?.Roles) {
+			const isDeliverer = userDetail.Roles.some((role) => role?.RoleName === 'deliverer');
+			const isManager = userDetail.Roles.some((role) => role?.RoleName === 'manager');
+			const isAdmin = userDetail.Roles.some((role) => role?.RoleName === 'admin');
+			const isStaff = userDetail.Roles.some((role) => role?.RoleName === 'staff');
+			setDelivererRole(isDeliverer);
+			setStaffRole(isStaff);
+			setManagerRole(isManager);
+			setAdminRole(isAdmin);
 
-		// getItem('Manage Warranty', '/warranties', <SafetyOutlined />),
-		// getItem('Manage Promotion', '/promotion', <TagOutlined />),
+			// // Regular expression to match paths with optional ID parameter for preset orders
+			// const presetOrderPathRegex = /^\/orders\/preset(\/\d+)?$/;
+			// const customizeOrderPathRegex = /^\/orders\/customize(\/\d+)?$/;
+
+			// console.log('isDeliverer', isDeliverer);
+			// console.log('presetOrderPathRegex', presetOrderPathRegex.test(location.pathname));
+			// console.log('customizeOrderPathRegex', customizeOrderPathRegex.test(location.pathname));
+
+			// const redirectTimeout = setTimeout(() => {
+			// 	if (isDeliverer && !presetOrderPathRegex.test(location.pathname)) {
+			// 		navigate('/orders/preset');
+			// 	}
+			// }, 50);
+
+			// return () => clearTimeout(redirectTimeout);
+		}
+	}, [userDetail, navigate, location.pathname]);
+
+	const items = [
+		(adminRole || managerRole || staffRole) &&
+			getItem('Dashboard', '/dashboard', <DashboardOutlined />),
+		(adminRole || managerRole || staffRole) &&
+			getItem('Quản Lí Tài Khoản', '/accounts', <UserOutlined />),
+		(adminRole || managerRole || staffRole) &&
+			getItem('Quản Lý Sản Phẩm', '/products', <ProductOutlined />, [
+				getItem('Danh Sách Trang Sức', '/products/jewelry-list', <RightOutlined />),
+				getItem('Danh Sách Kim Cương', '/products/diamond-list', <DiamondOutlined />),
+				getItem(
+					'Danh Sách Loại Trang Sức',
+					'/products/jewelry-model-category-list',
+					<RightOutlined />
+				),
+				getItem('Danh Sách Kim Loại', '/products/metal-list', <DiamondOutlined />),
+			]),
+
+		// Order Management only for roles with specific permissions
+		(adminRole || managerRole || staffRole || delivererRole) &&
+			getItem('Quản Lý Đặt Hàng', '/orders', <OrderedListOutlined />, [
+				getItem('Danh Sách Đặt Hàng Có Sẵn', '/orders/preset', <OrderedListOutlined />),
+				getItem(
+					'Danh Sách Đặt Hàng Thiết Kế',
+					'/orders/customize',
+					<OrderedListOutlined />
+				),
+			]),
+
+		(adminRole || managerRole || staffRole) &&
+			getItem('Quản Lí Khuyến Mãi', '/promotion', <GiftOutlined />),
+		(adminRole || managerRole || staffRole) &&
+			getItem('Quản Lí Vận Chuyển', '/deliveries', <DeliveredProcedureOutlined />),
+		(adminRole || managerRole || staffRole) &&
+			getItem('Quản Lí Giá Kim Cương', '/price', <TagOutlined />),
 	];
 
 	const handleClickMenuItem = (e) => {
@@ -54,7 +110,6 @@ const DefaultLayout = () => {
 		setCollapsed(!collapsed);
 	};
 
-	// Xử lý mở SubMenu
 	const onOpenChange = (keys) => {
 		setOpenKeys(keys);
 	};
@@ -63,7 +118,7 @@ const DefaultLayout = () => {
 	const isSignUpPage = location.pathname === '/signup';
 	const showHeaderFooter = !(isLoginPage || isSignUpPage);
 
-	// Tạo mảng các item cho Breadcrumb dựa trên pathname
+	// Breadcrumb logic
 	const breadcrumbItems = location.pathname
 		.split('/')
 		.filter((path) => path)
@@ -115,11 +170,13 @@ const DefaultLayout = () => {
 								))}
 							</SubMenu>
 						) : (
-							<Menu.Item key={item.key} icon={item.icon}>
-								<Link to={item.key} style={{fontWeight: 'bold'}}>
-									{item.label}
-								</Link>
-							</Menu.Item>
+							item && (
+								<Menu.Item key={item.key} icon={item.icon}>
+									<Link to={item.key} style={{fontWeight: 'bold'}}>
+										{item.label}
+									</Link>
+								</Menu.Item>
+							)
 						)
 					)}
 				</Menu>
@@ -138,10 +195,12 @@ const DefaultLayout = () => {
 							minHeight: 790,
 							backgroundColor: '#ffffff',
 							padding: '16px',
+
+							overflowy: 'auto',
 							borderRadius: '8px', // Optional: add some rounding for better appearance
 						}}
 					>
-						{/* Render các Route con */}
+						{/* Render child routes */}
 						<Outlet />
 					</div>
 				</Content>

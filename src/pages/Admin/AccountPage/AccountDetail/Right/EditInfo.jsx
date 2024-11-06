@@ -15,7 +15,7 @@ export const EditInfo = ({user, editing, onChange, userInfo}) => {
 							className="font-semibold text-lg"
 							disabled={!editing}
 							name="FirstName"
-							value={userInfo.FirstName}
+							value={userInfo?.FirstName}
 							onChange={onChange}
 						/>
 					</div>
@@ -27,7 +27,7 @@ export const EditInfo = ({user, editing, onChange, userInfo}) => {
 							className="font-semibold text-lg"
 							disabled={!editing}
 							name="LastName"
-							value={userInfo.LastName}
+							value={userInfo?.LastName}
 							onChange={onChange}
 						/>
 					</div>
@@ -40,7 +40,7 @@ export const EditInfo = ({user, editing, onChange, userInfo}) => {
 						<Input
 							className="font-semibold text-lg"
 							disabled={true}
-							value={userInfo.Email}
+							value={userInfo?.Email}
 						/>
 					</div>
 				</div>

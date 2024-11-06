@@ -28,11 +28,11 @@ const AccountDetail = () => {
 	const [isModalRemoveRoleVisible, setIsModalRemoveRoleVisible] = useState(false);
 	const [userId, setUserId] = useState('');
 	const [userInfo, setUserInfo] = useState({
-		Email: userDetail.Email || '',
-		FirstName: userDetail.FirstName || '',
-		LastName: userDetail.LastName || '',
-		Id: userDetail.Id || '',
-		Addresses: userDetail.Addresses || [],
+		Email: userDetail?.Email || '',
+		FirstName: userDetail?.FirstName || '',
+		LastName: userDetail?.LastName || '',
+		Id: userDetail?.Id || '',
+		Addresses: userDetail?.Addresses || [],
 	});
 
 	const [roleLevel, setRoleLevel] = useState(0);
@@ -155,6 +155,14 @@ const AccountDetail = () => {
 					Quay lại
 				</Button>
 				<div className="flex w-full">
+					<div style={{width: '60%'}}>
+						<EditInfo
+							user={user}
+							editing={editing}
+							onChange={onChange}
+							userInfo={userInfo}
+						/>
+					</div>
 					<div style={{width: '40%'}}>
 						<Information
 							user={user}
@@ -164,14 +172,6 @@ const AccountDetail = () => {
 							showModal={showModal}
 							showRemoveModal={showRemoveModal}
 							handleBanAccount={handleBan}
-						/>
-					</div>
-					<div style={{width: '60%'}}>
-						<EditInfo
-							user={user}
-							editing={editing}
-							onChange={onChange}
-							userInfo={userInfo}
 						/>
 					</div>
 				</div>
