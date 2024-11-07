@@ -108,28 +108,30 @@ const DiamondPage = () => {
 
 	useEffect(() => {
 		if (diamondList) {
-			const diamondSetting = diamondList.map((diamond) => ({
-				Id: diamond?.Id,
-				ShapeName: diamond?.DiamondShape?.ShapeName,
-				CriteriaId: diamond?.DiamondPrice?.CriteriaId,
-				Carat: diamond?.Carat,
-				Clarity: diamond?.Clarity,
-				Color: diamond?.Color,
-				Culet: diamond?.Culet,
-				Depth: diamond?.Depth,
-				IsLabDiamond: diamond?.IsLabDiamond,
-				Measurement: diamond?.Measurement,
-				Polish: diamond?.Polish,
-				PriceOffset: diamond?.PriceOffset,
-				Symmetry: diamond?.Symmetry,
-				Table: diamond?.Table,
-				Title: diamond?.Title,
-				TruePrice: formatPrice(diamond?.TruePrice),
-				WidthLengthRatio: diamond?.WidthLengthRatio,
-				Girdle: diamond?.Girdle,
-				Fluorescence: diamond?.Fluorescence,
-				Thumbnail: diamond?.Thumbnail,
-			}));
+			const diamondSetting =
+				diamondList &&
+				diamondList?.map((diamond) => ({
+					Id: diamond?.Id,
+					ShapeName: diamond?.DiamondShape?.ShapeName,
+					CriteriaId: diamond?.DiamondPrice?.CriteriaId,
+					Carat: diamond?.Carat,
+					Clarity: diamond?.Clarity,
+					Color: diamond?.Color,
+					Culet: diamond?.Culet,
+					Depth: diamond?.Depth,
+					IsLabDiamond: diamond?.IsLabDiamond,
+					Measurement: diamond?.Measurement,
+					Polish: diamond?.Polish,
+					PriceOffset: diamond?.PriceOffset,
+					Symmetry: diamond?.Symmetry,
+					Table: diamond?.Table,
+					Title: diamond?.Title,
+					TruePrice: formatPrice(diamond?.TruePrice),
+					WidthLengthRatio: diamond?.WidthLengthRatio,
+					Girdle: diamond?.Girdle,
+					Fluorescence: diamond?.Fluorescence,
+					Thumbnail: diamond?.Thumbnail,
+				}));
 			setDiamonds(diamondSetting);
 		}
 	}, [diamondList]);

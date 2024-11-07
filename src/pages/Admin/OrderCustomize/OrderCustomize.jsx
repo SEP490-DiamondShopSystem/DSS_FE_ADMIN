@@ -5,11 +5,12 @@ import {useDispatch, useSelector} from 'react-redux';
 import {useNavigate} from 'react-router-dom';
 import {Filter} from '../../../components/Filter';
 import {
+	getAllOrderCustomizeSelector,
 	getAllOrderSelector,
 	GetUserDetailSelector,
 	LoadingOrderSelector,
 } from '../../../redux/selectors';
-import {getAllOrder} from '../../../redux/slices/orderSlice';
+import {getAllOrder, getAllOrderCustomize} from '../../../redux/slices/orderSlice';
 import {convertToVietnamDate, formatPrice} from '../../../utils';
 import {enums} from '../../../utils/constant';
 
@@ -19,22 +20,11 @@ const {RangePicker} = DatePicker;
 const statusList = [
 	{name: 'All', value: ''},
 	{name: 'Pending', value: '1'},
-	{name: 'Processing', value: '2'},
-	{name: 'Rejected', value: '3'},
-	{name: 'Cancelled', value: '4'},
-	{name: 'Prepared', value: '5'},
-	{name: 'Delivering', value: '6'},
-	{name: 'Failed', value: '7'},
-	{name: 'Success', value: '8'},
-	{name: 'Refused', value: '9'},
-];
-const delivererStatusList = [
-	{name: 'All', value: ''},
-	{name: 'Prepared', value: '5'},
-	{name: 'Delivering', value: '6'},
-	{name: 'Failed', value: '7'},
-	{name: 'Success', value: '8'},
-	// {name: 'Refused', value: '9'},
+	{name: 'Priced', value: '2'},
+	{name: 'Requesting', value: '3'},
+	{name: 'Accepted', value: '4'},
+	{name: 'Shop Rejected', value: '5'},
+	{name: 'Customer Rejected', value: '6'},
 ];
 
 const paymentStatusList = [
@@ -55,8 +45,11 @@ const getEnumKey = (enumObj, value) => {
 
 const mapAttributes = (data, attributes) => {
 	return {
-		id: data?.Id,
-		orderTime: convertToVietnamDate(data?.CreatedDate),
+		id: data?.JewelryModelId,
+		EngravedFont: data?.EngravedFont,
+		EngravedText: data?.EngravedText,
+		SizeId: data?.SizeId,
+		// orderTime: convertToVietnamDate(data?.CreatedDate),
 		status: getEnumKey(attributes?.OrderStatus, data?.Status),
 		email: data?.Account?.Email,
 		totalAmount: formatPrice(data?.TotalPrice),
@@ -65,12 +58,12 @@ const mapAttributes = (data, attributes) => {
 	};
 };
 
-const OrderPage = () => {
+const OrderCustomizePage = () => {
 	const navigate = useNavigate();
 	const dispatch = useDispatch();
 
 	const loading = useSelector(LoadingOrderSelector);
-	const orderList = useSelector(getAllOrderSelector);
+	const orderList = useSelector(getAllOrderCustomizeSelector);
 	const userDetail = useSelector(GetUserDetailSelector);
 
 	const [startDate, setStartDate] = useState(null);
@@ -84,13 +77,9 @@ const OrderPage = () => {
 
 	useEffect(() => {
 		dispatch(
-			getAllOrder({
+			getAllOrderCustomize({
 				pageSize: pageSize,
-				start: current,
-				Status: activeStatus,
-				CreatedDate: startDate,
-				ExpectedDate: endDate,
-				Email: searchText,
+				currentPage: current,
 			})
 		);
 		// dispatch(getAllOrder());
@@ -136,44 +125,44 @@ const OrderPage = () => {
 			align: 'center',
 		},
 		{
-			title: 'Giá',
+			title: 'Giá Mẫu',
 			key: 'totalAmount',
 			dataIndex: 'totalAmount',
 			align: 'center',
 		},
 
-		{
-			title: 'PT Thanh Toán',
-			key: 'paymentMethod',
-			dataIndex: 'paymentMethod',
-			align: 'center',
-			render: (status) => {
-				const foundStatus = paymentStatusList.find((item) => item.name === status);
+		// {
+		// 	title: 'PT Thanh Toán',
+		// 	key: 'paymentMethod',
+		// 	dataIndex: 'paymentMethod',
+		// 	align: 'center',
+		// 	render: (status) => {
+		// 		const foundStatus = paymentStatusList.find((item) => item.name === status);
 
-				let color = 'green';
+		// 		let color = 'green';
 
-				// Determine color based on status
-				if (status === 'Refunding' || status === 'Refunded') {
-					// 'canceled', 'rejected', 'shipFailed'
-					color = 'red';
-				} else if (status === 'Pending') {
-					// 'refunded'
-					color = 'orange';
-				} else if (status === 'Deposited') {
-					// 'deposited'
-					color = 'blue';
-				} else if (status === 'PaidAll') {
-					// 'paidAll'
-					color = 'cyan';
-				}
+		// 		// Determine color based on status
+		// 		if (status === 'Refunding' || status === 'Refunded') {
+		// 			// 'canceled', 'rejected', 'shipFailed'
+		// 			color = 'red';
+		// 		} else if (status === 'Pending') {
+		// 			// 'refunded'
+		// 			color = 'orange';
+		// 		} else if (status === 'Deposited') {
+		// 			// 'deposited'
+		// 			color = 'blue';
+		// 		} else if (status === 'PaidAll') {
+		// 			// 'paidAll'
+		// 			color = 'cyan';
+		// 		}
 
-				return (
-					<Tag color={color}>
-						{foundStatus ? foundStatus.name.toUpperCase() : status.toUpperCase()}
-					</Tag>
-				);
-			},
-		},
+		// 		return (
+		// 			<Tag color={color}>
+		// 				{foundStatus ? foundStatus.name.toUpperCase() : status.toUpperCase()}
+		// 			</Tag>
+		// 		);
+		// 	},
+		// },
 
 		{
 			title: 'Trạng Thái',
@@ -228,7 +217,7 @@ const OrderPage = () => {
 						type="text"
 						className="bg-primary"
 						ghost
-						onClick={() => navigate(`/orders/preset/${record.id}`)}
+						onClick={() => navigate(`/orders/${record.id}`)}
 					>
 						<EditFilled />
 					</Button>
@@ -255,7 +244,7 @@ const OrderPage = () => {
 	return (
 		<div className="mx-20 my-10">
 			<Filter
-				filter={delivererRole ? delivererStatusList : statusList}
+				filter={statusList}
 				handleStatusBtn={handleStatusChange}
 				active={activeStatus}
 			/>
@@ -306,4 +295,4 @@ const OrderPage = () => {
 	);
 };
 
-export default OrderPage;
+export default OrderCustomizePage;

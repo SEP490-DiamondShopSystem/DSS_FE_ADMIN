@@ -1,9 +1,22 @@
 import {createAsyncThunk, createSlice} from '@reduxjs/toolkit';
 import {api} from '../../services/api';
 
-export const getAllUser = createAsyncThunk('userSlice/getAllUser', async ({current, size}) => {
+export const getAllUser = createAsyncThunk('userSlice/getAllUser', async (params) => {
 	try {
-		const data = await api.get(`/Account/Paging?current=${current}&size=${size}`);
+		const {current, size, roleId} = params;
+		let url = '/Account/Paging';
+
+		const queryParams = new URLSearchParams();
+
+		if (current) queryParams.append('current', current);
+		if (size) queryParams.append('size', size);
+		if (roleId) queryParams.append('roleIds', roleId);
+
+		if (queryParams.toString()) {
+			url += `?${queryParams.toString()}`;
+		}
+
+		const data = await api.get(url);
 		console.log(data);
 
 		return data;

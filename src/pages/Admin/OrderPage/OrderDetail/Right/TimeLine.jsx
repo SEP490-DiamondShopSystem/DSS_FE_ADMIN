@@ -38,7 +38,7 @@ export const TimeLine = ({status}) => {
 
 	let allSteps = [
 		{
-			children: 'Chờ Xác Nhận',
+			children: status === 'Pending' ? 'Chờ Xác Nhận' : 'Đã Được Xác Nhận',
 			color: getStepStatus(OrderStatus.Pending)?.color,
 			dot: getStepStatus(OrderStatus.Pending)?.icon,
 		},
@@ -53,12 +53,12 @@ export const TimeLine = ({status}) => {
 			dot: getStepStatus(OrderStatus.Rejected)?.icon,
 		},
 		{
-			children: 'Đang Xử Lý',
+			children: status === 'Processing' ? 'Đang Xử Lý' : 'Đã Xử Lý',
 			color: getStepStatus(OrderStatus.Processing)?.color,
 			dot: getStepStatus(OrderStatus.Processing)?.icon,
 		},
 		{
-			children: 'Chuẩn Bị Đơn Hàng',
+			children: status === 'Prepared' ? 'Chuẩn Bị Đơn Hàng' : 'Đơn Hàng Đã Được Chuẩn Bị',
 			color: getStepStatus(OrderStatus.Prepared)?.color,
 			dot: getStepStatus(OrderStatus.Prepared)?.icon,
 		},
@@ -87,6 +87,15 @@ export const TimeLine = ({status}) => {
 	// Nếu trạng thái là "Rejected", chỉ hiển thị bước "Đã Từ Chối" và ẩn tất cả các bước khác
 	if (status === 'Rejected') {
 		allSteps = allSteps.filter((step) => step.children === 'Đã Từ Chối');
+	}
+
+	// Nếu trạng thái không phải "Cancelled" hoặc "Rejected", ẩn các bước này
+	if (status !== 'Cancelled') {
+		allSteps = allSteps.filter((step) => step.children !== 'Đã Hủy');
+	}
+
+	if (status !== 'Rejected') {
+		allSteps = allSteps.filter((step) => step.children !== 'Đã Từ Chối');
 	}
 
 	// Nếu trạng thái là "Success", ẩn bước "Giao Hàng Thất Bại"

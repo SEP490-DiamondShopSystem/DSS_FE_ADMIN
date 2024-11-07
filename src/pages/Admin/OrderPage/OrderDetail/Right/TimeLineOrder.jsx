@@ -3,7 +3,11 @@ import {Button, Form, Input, message, Modal, Select, Typography} from 'antd';
 import React, {useEffect, useState} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
 import Loading from '../../../../../components/Loading';
-import {getAllDeliverySelector, GetUserDetailSelector} from '../../../../../redux/selectors';
+import {
+	getAllDeliverySelector,
+	getAllUserSelector,
+	GetUserDetailSelector,
+} from '../../../../../redux/selectors';
 import {
 	handleDeliveryFailed,
 	handleOrder,
@@ -13,8 +17,10 @@ import {
 } from '../../../../../redux/slices/orderSlice';
 import {convertToVietnamDate, getOrderStatus} from '../../../../../utils';
 import {TimeLine} from './TimeLine';
+import {getAllUser} from '../../../../../redux/slices/userSlice';
 
 const {Title, Text} = Typography;
+const {Option} = Select;
 
 const ORDER_STATUS_TEXTS = {
 	Pending: 'Chờ Xác Nhận',
@@ -34,10 +40,9 @@ const TimeLineOrder = ({orders, loading, statusOrder, paymentStatusOrder}) => {
 
 	const userDetail = useSelector(GetUserDetailSelector);
 	const deliveryList = useSelector(getAllDeliverySelector);
+	const userDeliverer = useSelector(getAllUserSelector);
 
-	const [confirmStatus, setConfirmStatus] = useState(false);
 	const [currentStep, setCurrentStep] = useState(0);
-	const [orderStatus, setOrderStatus] = useState('Chờ Xác Nhận');
 	const [status, setStatus] = useState();
 	const [userRoleManager, setUserRoleManager] = useState(false);
 	const [deliveries, setDeliveries] = useState([]);
@@ -46,6 +51,7 @@ const TimeLineOrder = ({orders, loading, statusOrder, paymentStatusOrder}) => {
 	const [userRoleDeliverer, setUserRoleDeliverer] = useState(false);
 	const [selectedShipper, setSelectedShipper] = useState();
 	const [isAssigned, setIsAssigned] = useState(false);
+	const [deliverer, setDeliverer] = useState([]);
 
 	useEffect(() => {
 		if (orders?.Id) {
@@ -80,7 +86,15 @@ const TimeLineOrder = ({orders, loading, statusOrder, paymentStatusOrder}) => {
 		}
 	}, [deliveryList]);
 
-	console.log(deliveries);
+	useEffect(() => {
+		dispatch(getAllUser({roleId: '44'}));
+	}, []);
+
+	useEffect(() => {
+		if (userDeliverer) {
+			setDeliverer(userDeliverer?.Values);
+		}
+	}, [userDeliverer]);
 
 	useEffect(() => {
 		if (statusOrder !== undefined) {
@@ -180,6 +194,7 @@ const TimeLineOrder = ({orders, loading, statusOrder, paymentStatusOrder}) => {
 	console.log('status', status);
 	console.log('statusOrder', statusOrder);
 	console.log('paymentStatusOrder', paymentStatusOrder);
+	console.log('selectedShipper', selectedShipper);
 
 	return (
 		<div>
@@ -322,17 +337,12 @@ const TimeLineOrder = ({orders, loading, statusOrder, paymentStatusOrder}) => {
 										defaultValue=""
 										className="w-full mb-5"
 										onChange={handleChange}
-										options={[
-											{
-												value: '4d85fc09-6854-4c61-8e55-a615887e412e',
-												label: 'Shipper 1',
-											},
-											// Uncomment for more options
-											// { value: 'thai', label: 'Thái' },
-											// { value: 'minh', label: 'Minh' },
-											// { value: 'tai', label: 'Tai', disabled: true },
-										]}
-									/>
+									>
+										{deliverer &&
+											deliverer?.map((user) => (
+												<Option key={user?.Id}>{user?.Email}</Option>
+											))}
+									</Select>
 									<div className="flex justify-around">
 										<Button
 											type="text"
@@ -389,7 +399,7 @@ const TimeLineOrder = ({orders, loading, statusOrder, paymentStatusOrder}) => {
 						<div className="border rounded-lg border-primary bg-tintWhite p-5 mb-5">
 							<div className="flex items-center mb-5" style={{fontSize: 16}}>
 								<p className="font-semibold">Trạng thái đơn hàng:</p>
-								<p className="ml-5">
+								<p className="ml-5 ">
 									<ClockCircleOutlined /> {ORDER_STATUS_TEXTS.Delivering}
 								</p>
 							</div>

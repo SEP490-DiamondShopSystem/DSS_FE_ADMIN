@@ -10,8 +10,8 @@ import {
 	TagOutlined,
 } from '@ant-design/icons';
 import {DiamondOutlined} from '@mui/icons-material';
-import {Breadcrumb, Layout, Menu} from 'antd';
-import {Link, Outlet, useLocation, useNavigate} from 'react-router-dom'; // Add Outlet here
+import {Breadcrumb, Layout, Menu, message} from 'antd';
+import {Link, Outlet, useLocation, useNavigate} from 'react-router-dom';
 import {imageExporter} from '../assets/images';
 import TopNavbar from '../components/TopNavBar/TopNavBar';
 import '../css/antd.css';
@@ -47,11 +47,23 @@ const DefaultLayout = () => {
 			setManagerRole(isManager);
 			setAdminRole(isAdmin);
 
-			if (isDeliverer) {
-				navigate('/orders');
-			}
+			// // Regular expression to match paths with optional ID parameter for preset orders
+			// const presetOrderPathRegex = /^\/orders\/preset(\/\d+)?$/;
+			// const customizeOrderPathRegex = /^\/orders\/customize(\/\d+)?$/;
+
+			// console.log('isDeliverer', isDeliverer);
+			// console.log('presetOrderPathRegex', presetOrderPathRegex.test(location.pathname));
+			// console.log('customizeOrderPathRegex', customizeOrderPathRegex.test(location.pathname));
+
+			// const redirectTimeout = setTimeout(() => {
+			// 	if (isDeliverer && !presetOrderPathRegex.test(location.pathname)) {
+			// 		navigate('/orders/preset');
+			// 	}
+			// }, 50);
+
+			// return () => clearTimeout(redirectTimeout);
 		}
-	}, [userDetail, navigate]);
+	}, [userDetail, navigate, location.pathname]);
 
 	const items = [
 		(adminRole || managerRole || staffRole) &&
@@ -66,7 +78,18 @@ const DefaultLayout = () => {
 				getItem('Danh Sách Mẫu Trang Sức', '/products/jewelry-model-list', <RightOutlined />),
 				getItem('Danh Sách Kim Loại', '/products/metal-list', <DiamondOutlined />),
 			]),
-			getItem('Quản Lí Đặt Hàng', '/orders', <OrderedListOutlined />),
+
+		// Order Management only for roles with specific permissions
+		(adminRole || managerRole || staffRole || delivererRole) &&
+			getItem('Quản Lý Đặt Hàng', '/orders', <OrderedListOutlined />, [
+				getItem('Danh Sách Đặt Hàng Có Sẵn', '/orders/preset', <OrderedListOutlined />),
+				getItem(
+					'Danh Sách Đặt Hàng Thiết Kế',
+					'/orders/customize',
+					<OrderedListOutlined />
+				),
+			]),
+
 		(adminRole || managerRole || staffRole) &&
 			getItem('Quản Lí Khuyến Mãi', '/promotion', <GiftOutlined />),
 		(adminRole || managerRole || staffRole) &&
@@ -144,7 +167,7 @@ const DefaultLayout = () => {
 								))}
 							</SubMenu>
 						) : (
-							item && ( // Ensure item is truthy before rendering
+							item && (
 								<Menu.Item key={item.key} icon={item.icon}>
 									<Link to={item.key} style={{fontWeight: 'bold'}}>
 										{item.label}
@@ -169,12 +192,13 @@ const DefaultLayout = () => {
 							minHeight: 790,
 							backgroundColor: '#ffffff',
 							padding: '16px',
+
 							overflowy: 'auto',
 							borderRadius: '8px', // Optional: add some rounding for better appearance
 						}}
 					>
 						{/* Render child routes */}
-						<Outlet/>
+						<Outlet />
 					</div>
 				</Content>
 				{showHeaderFooter && (
