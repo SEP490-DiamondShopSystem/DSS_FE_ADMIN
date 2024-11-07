@@ -56,9 +56,13 @@ export const getJewelryDetailSelector = (state) => state.jewelrySlice.jewelryDet
 export const getCreateJewelryStatusSelector = (state) => state.jewelrySlice.createStatus;
 export const getCreateJewelryErrorSelector = (state) => state.jewelrySlice.createError;
 // JEWELRY MODEL
-export const selectJewelryModels = (state) => state.jewelryModel.jewelryModels;
-export const selectJewelryModelDetail = (state) => state.jewelryModel.jewelryModelDetail;
-export const selectTotalPages = (state) => state.jewelryModel.totalPage;
-export const selectCurrentPage = (state) => state.jewelryModel.currentPage;
-export const selectJewelryModelStatus = (state) => state.jewelryModel.status;
-export const selectJewelryModelError = (state) => state.jewelryModel.error;
+export const getAllJewelryModelsSelector = (state) => state.jewelryModelSlice.models;
+export const getJewelryModelDetailSelector = (state) => state.jewelryModelSlice.modelDetail;
+export const LoadingJewelryModelSelector = (state) => state.jewelryModelSlice.loading;
+export const JewelryModelErrorSelector = (state) => state.jewelryModelSlice.error;
+//SIZE 
+export const getAllSizesSelector = (state) => state.sizeSlice.sizes;
+//ENUM
+export const getAllEnumsSelector = (state) => state.enumSlice.enums;
+//SHAPE
+export const getAllDiamondShapesSelector = (state) => state.shapeSlice.shapes;

@@ -13,6 +13,9 @@ import {metalSlice} from './slices/jewelry/metalSlice';
 import {jewelryModelCategorySlice} from './slices/jewelry/jewelryModelCategorySlice';
 import {jewelrySlice} from './slices/jewelry/jewelrySlice';
 import {jewelryModelSlice} from './slices/jewelry/jewelryModelSlice';
+import {sizeSlice} from './slices/jewelry/sizeSlice';
+import {enumSlice} from './slices/jewelry/enumSlice';
+import {shapeSlice} from './slices/shapeSlice';
 
 
 const rootPersistConfig = {
@@ -33,7 +36,9 @@ const rootReducer = combineReducers({
 	jewelryModelCategorySlice: jewelryModelCategorySlice.reducer,
 	jewelrySlice: jewelrySlice.reducer,
 	jewelryModelSlice: jewelryModelSlice.reducer,
-
+	sizeSlice: sizeSlice.reducer,
+	enumSlice: enumSlice.reducer,
+	shapeSlice: shapeSlice.reducer,
 });
 
 const persistedReducer = persistReducer(rootPersistConfig, rootReducer);

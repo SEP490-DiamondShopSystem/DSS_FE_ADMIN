@@ -11,6 +11,7 @@ import OrderPage from '../pages/Admin/OrderPage/OrderPage';
 import DiamondPage from '../pages/Admin/ProductPage/DiamondPage/DiamondPage';
 import JewelryPage from '../pages/Admin/ProductPage/JewelryPage/JewelryPage';
 import JewelryModelCategoryPage from '../pages/Admin/ProductPage/JewelryPage/JewelryModelCategoryPage';
+import JewelryModelPage from '../pages/Admin/ProductPage/JewelryPage/JewelryModelPage';
 import PromotionPage from '../pages/Admin/PromotionPage';
 import SignUpPage from '../pages/Admin/SignUpPage/SignUp';
 import WarrantyPage from '../pages/Admin/WarrantyPage';
@@ -80,6 +81,14 @@ export const AdminRouters = () => {
 					element={
 						<PrivateRoute roles={['deliverer', 'staff', 'admin', 'manager']}>
 							<JewelryModelCategoryPage />
+						</PrivateRoute>
+					}
+				/>
+				<Route
+					path="/products/jewelry-model-list"
+					element={
+						<PrivateRoute roles={['deliverer', 'staff', 'admin', 'manager']}>
+							<JewelryModelPage />
 						</PrivateRoute>
 					}
 				/>
