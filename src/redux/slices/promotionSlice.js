@@ -4,14 +4,13 @@ import {api} from '../../services/api';
 // Fetch all promotions
 export const fetchPromotions = createAsyncThunk(
 	'promotions/fetchPromotions',
-	async (_, { rejectWithValue }) => {
-		console.log("Fetching promotions...");
+	async (_, {rejectWithValue}) => {
+		console.log('Fetching promotions...');
 		try {
 			const response = await api.get('/Promotion');
-			console.log("Fetched promotions:", response);
 			return response;
 		} catch (error) {
-			console.error("Failed to fetch promotions:", error.response?.data || error.message);
+			console.error('Failed to fetch promotions:', error.response?.data || error.message);
 			return rejectWithValue(error.response?.data || 'Failed to fetch promotions');
 		}
 	}
@@ -22,6 +21,7 @@ export const createPromotion = createAsyncThunk(
 	async (newPromotion, {rejectWithValue}) => {
 		try {
 			const response = await api.post('/Promotion', newPromotion);
+
 			return response;
 		} catch (error) {
 			return rejectWithValue(error.response.data || 'Failed to create promotion');
@@ -35,6 +35,7 @@ export const createFullPromotion = createAsyncThunk(
 	async (fullPromotion, {rejectWithValue}) => {
 		try {
 			const response = await api.post('/Promotion/Full', fullPromotion);
+			console.log('Creating promotion with data:', fullPromotion);
 			return response;
 		} catch (error) {
 			return rejectWithValue(error.response.data || 'Failed to create full promotion');
@@ -87,28 +88,28 @@ export const updatePromotionGifts = createAsyncThunk(
 // Update a specific promotion
 export const updatePromotion = createAsyncThunk(
 	'promotions/updatePromotion',
-	async ({ promotionId, promotionData }, { rejectWithValue }) => {
+	async ({promotionId, promotionData}, {rejectWithValue}) => {
 		try {
+			console.log(`Updating promotion with ID ${promotionId} and data:`, promotionData);
 			const response = await api.put(`/Promotion/${promotionId}`, promotionData, {
 				headers: {
-					'Content-Type': 'application/json' // Ensure JSON content type is set
-				}
+					'Content-Type': 'application/json', // Ensure JSON content type is set
+				},
 			});
 			return response.data;
 		} catch (error) {
 			if (error.response) {
 				// Handle 400 and 500 status codes
 				if (error.response.status === 400) {
-					return rejectWithValue({ status: 400, errors: error.response.data.errors });
+					return rejectWithValue({status: 400, errors: error.response.data.errors});
 				} else if (error.response.status === 500) {
-					return rejectWithValue({ status: 500, detail: error.response.data.detail });
+					return rejectWithValue({status: 500, detail: error.response.data.detail});
 				}
 			}
-			return rejectWithValue({ status: 'unknown', detail: 'An unexpected error occurred.' });
+			return rejectWithValue({status: 'unknown', detail: 'An unexpected error occurred.'});
 		}
 	}
 );
-
 
 // Delete a promotion
 export const deletePromotion = createAsyncThunk(
@@ -116,6 +117,8 @@ export const deletePromotion = createAsyncThunk(
 	async (promotionId, {rejectWithValue}) => {
 		try {
 			await api.delete(`/Promotion/${promotionId}`);
+			console.log(`Deleting promotion with ID ${promotionId}`);
+
 			return promotionId;
 		} catch (error) {
 			if (error.response) {
@@ -224,25 +227,23 @@ export const promotionSlice = createSlice({
 	name: 'promotionSlice',
 	initialState: {
 		promotions: null,
-    promotionDetail: null,
+		promotionDetail: null,
 		status: 'idle',
 		loading: false,
 		error: null,
 	},
 	reducers: {},
 	extraReducers: (builder) => {
-		builder         
+		builder
 			// Fetch promotions
 			.addCase(fetchPromotions.pending, (state) => {
 				state.loading = true;
-				console.log("Fetching promotions: pending");
-
+				console.log('Fetching promotions: pending');
 			})
 			.addCase(fetchPromotions.fulfilled, (state, action) => {
 				state.loading = false;
 				state.promotions = action.payload;
-				console.log("Fetching promotions: fulfilled", action.payload);
-
+				console.log('Fetching promotions: fulfilled', action.payload);
 			})
 			.addCase(fetchPromotions.rejected, (state, action) => {
 				state.loading = false;
@@ -336,7 +337,7 @@ export const promotionSlice = createSlice({
 				state.promotions = state.promotions.filter((promo) => promo.Id !== action.payload);
 			})
 			.addCase(deletePromotion.rejected, (state, action) => {
-				console.error("Delete error:", action.payload);
+				console.error('Delete error:', action.payload);
 				state.loading = false;
 				state.error = action.payload;
 			})
@@ -388,6 +389,5 @@ export const promotionSlice = createSlice({
 				state.loading = false;
 				state.error = action.payload;
 			});
-			
 	},
 });

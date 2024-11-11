@@ -5,7 +5,6 @@ import {api} from '../../../services/api';
 export const fetchAllSizes = createAsyncThunk('sizes/fetchAll', async (_, {rejectWithValue}) => {
 	try {
 		const response = await api.get('/Size/All');
-		console.log('FetchAllSizes Response:', response);
 		return response;
 	} catch (error) {
 		console.log('Error: ', JSON.stringify(error));

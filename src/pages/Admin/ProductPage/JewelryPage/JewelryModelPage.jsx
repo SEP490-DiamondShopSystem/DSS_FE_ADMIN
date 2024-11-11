@@ -34,7 +34,7 @@ const JewelryModelPage = () => {
 	const [isRhodiumFinished, setIsRhodiumFinished] = React.useState('');
 	const [isEngravable, setIsEngravable] = React.useState('');
 	const [currentPage, setCurrentPage] = React.useState(1);
-	const [pageSize, setPageSize] = React.useState();
+	const [pageSize, setPageSize] = React.useState(5);
 	const [totalPage, setTotalPage] = useState(0);
 	const [errorCarat, setErrorCarat] = useState('');
 
@@ -461,7 +461,7 @@ const JewelryModelPage = () => {
 							</button>
 							<select
 								value={pageSize}
-								onChange={(e) => setPageSize(Number(e.target.value))}
+								onChange={(e) => setPageSize(Number(e.target.value), setCurrentPage(1))}
 								className="form-select p-2 border border-gray rounded-md"
 							>
 								<option value="5">5 per page</option>
@@ -1122,7 +1122,7 @@ const JewelryModelPage = () => {
 									<ul className="space-y-2 pl-4">
 										{selectedModel.MainDiamonds.map((diamond, index) => (
 											<li key={index}>
-												<div className="flex justify-between px-5 py-1 border ">
+												<div className="flex justify-between px-5 py-1 border">
 													<p>
 														<strong>Setting Type:</strong>{' '}
 														{diamond.SettingType}
@@ -1132,16 +1132,40 @@ const JewelryModelPage = () => {
 														{diamond.Quantity}
 													</p>
 													<p>
-														<strong>Carat Range:</strong>{' '}
-														{diamond.Shapes.caratFrom} -{' '}
-														{diamond.Shapes.caratTo} carats
+														<strong>Main Diamond Req ID:</strong>{' '}
+														{diamond.MainDiamondReqId || 'N/A'}
 													</p>
-													<p>
-														<strong>Shape:</strong>{' '}
-														{diamond.Shapes
-															? diamond.Shapes[0]?.Shape
-															: 'Not Available'}
-													</p>
+													{diamond.Shapes && diamond.Shapes.length > 0 ? (
+														<div>
+															
+															{diamond.Shapes.map(
+																(shape, shapeIndex) => (
+																	<div
+																		key={shapeIndex}
+																		className="pl-4 gap-3 flex justify-around "
+																	>
+																		<p>
+																			<strong>
+																				Shape:
+																			</strong>{' '}
+																			{shape.Shape
+																				?.ShapeName ||
+																				'Not Available'}{' '}
+																		</p>
+																		<p>
+																			<strong>
+																				Carat Range:
+																			</strong>{' '}
+																			{shape.CaratFrom} - {' '}
+																			{shape.CaratTo} carats
+																		</p>
+																	</div>
+																)
+															)}
+														</div>
+													) : (
+														<p>Shape: Not Available</p>
+													)}
 												</div>
 											</li>
 										))}
@@ -1165,7 +1189,7 @@ const JewelryModelPage = () => {
 											<li key={index}>
 												<div className="flex justify-between px-5 py-1 border">
 													<p>
-														<strong>Size:</strong> {sizeMetal.SizeId}{' '}
+														<strong>Size:</strong>{' '}
 														{sizeMetal.Size.Value} {sizeMetal.Size.Unit}
 													</p>
 													<p>

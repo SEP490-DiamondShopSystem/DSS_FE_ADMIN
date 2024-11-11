@@ -5,7 +5,6 @@ import { api } from '../../../services/api';
 export const fetchAllMetals = createAsyncThunk('metals/fetchAll', async (_, { rejectWithValue }) => {
   try {
     const response = await api.get('/JewelryModel/Metal/All');
-    console.log('FetchAllMetals Response:', response);
     return response;
   } catch (error) {
     console.log('Error: ', JSON.stringify(error));
@@ -15,12 +14,10 @@ export const fetchAllMetals = createAsyncThunk('metals/fetchAll', async (_, { re
 
 // Async thunk to update the price of a metal
 export const updateMetalPrice = createAsyncThunk('metals/updatePrice', async (metal) => {
-  console.log('Updating Metal Price:', { id: metal.id, price: metal.price }); // Log the data being passed
   const response = await api.put('/UpdatePrice', {
     id: metal.id,
     price: metal.price,
   });
-  console.log('UpdateMetalPrice Response:', response); // Log the response
   return response;
 });
 
