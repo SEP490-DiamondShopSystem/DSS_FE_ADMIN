@@ -20,7 +20,7 @@ const JewelryCreateForm = ({onClose}) => {
 	const [form] = Form.useForm();
 	const [isMaxDiamondsReached, setIsMaxDiamondsReached] = useState(false);
 	const [selectedModel, setSelectedModel] = useState(null);
-	const [selectedMetal, setSelectedMetal] = useState(null);  // New state for selected metal
+	const [selectedMetal, setSelectedMetal] = useState(null); // New state for selected metal
 
 	// Redux selectors and data fetching
 	const sizes = useSelector(getAllSizesSelector);
@@ -50,11 +50,10 @@ const JewelryCreateForm = ({onClose}) => {
 
 	const maxDiamonds = selectedModel ? selectedModel.MainDiamondCount : 0;
 
-	const filteredSizes = selectedModel && selectedMetal
-		? selectedModel.SizeMetals.filter(
-				(sizeMetal) => sizeMetal.MetalId === selectedMetal
-		  )
-		: [];
+	const filteredSizes =
+		selectedModel && selectedMetal
+			? selectedModel.SizeMetals.filter((sizeMetal) => sizeMetal.MetalId === selectedMetal)
+			: [];
 
 	// Initialize form with default values
 	useEffect(() => {
@@ -147,27 +146,21 @@ const JewelryCreateForm = ({onClose}) => {
 			return;
 		}
 
+		// Filter out any undefined or empty fields from the data
+		const finalData = {
+			...(ModelId && {modelId: ModelId}),
+			...(SizeId && {sizeId: SizeId}),
+			...(MentalId && {metalId: MentalId}),
+			...(status && {status}),
+			...(attachedDiamonds.length > 0 && {attachedDiamondIds: attachedDiamonds}),
+			...(sideDiamondOptId && {sideDiamondOptId}),
+		};
+
 		// Log the final data you're about to send
-		console.log('Final data to be dispatched:', {
-			modelId: ModelId,
-			sizeId: SizeId,
-			metalId: MentalId,
-			status,
-			attachedDiamondIds: attachedDiamonds,
-			sideDiamondOptId: sideDiamondOptId, // correctly pass the sideDiamondOptId outside of JewelryRequest
-		});
+		console.log('Final data to be dispatched:', finalData);
 
 		// Dispatch the createJewelry action with the correct data
-		dispatch(
-			createJewelry({
-				modelId: ModelId,
-				sizeId: SizeId,
-				metalId: MentalId,
-				status,
-				attachedDiamondIds: attachedDiamonds,
-				sideDiamondOptId: sideDiamondOptId, // passing sideDiamondOptId separately
-			})
-		);
+		dispatch(createJewelry(finalData));
 
 		// Reset form fields and close the modal
 		form.resetFields();
@@ -199,7 +192,8 @@ const JewelryCreateForm = ({onClose}) => {
 							<Option key={model.Id} value={model.Id}>
 								{model.Name} ({model.MainDiamondCount} main diamond
 								{model.SideDiamondOptionCount &&
-									`, ${model.SideDiamondOptionCount} side diamond`})
+									`, ${model.SideDiamondOptionCount} side diamond`}
+								)
 							</Option>
 						))}
 					</Select>
@@ -207,7 +201,7 @@ const JewelryCreateForm = ({onClose}) => {
 
 				<Form.Item label="Metal" name={['JewelryRequest', 'MentalId']}>
 					<Select
-						onChange={handleMetalChange}  // Update selected metal here
+						onChange={handleMetalChange} // Update selected metal here
 						placeholder="Select a metal"
 						disabled={!selectedModel}
 					>
@@ -252,7 +246,11 @@ const JewelryCreateForm = ({onClose}) => {
 								<Option key={diamond.Id} value={diamond.Id}>
 									<strong>Setting:</strong> {diamond.SettingType},
 									<strong> Shape:</strong> {diamond.ShapeName},
-									<strong> Clarity:</strong> {diamond.ClarityMin} {' - '}{diamond.ClarityMax}, <strong>Color:</strong> {diamond.ColorMin} {' - '} {diamond.ColorMax}, <strong>Carat: </strong> {diamond.CaratWeight}, <strong> Quantity:</strong> {diamond.Quantity}
+									<strong> Clarity:</strong> {diamond.ClarityMin} {' - '}
+									{diamond.ClarityMax}, <strong>Color:</strong> {diamond.ColorMin}{' '}
+									{' - '} {diamond.ColorMax}, <strong>Carat: </strong>{' '}
+									{diamond.CaratWeight}, <strong> Quantity:</strong>{' '}
+									{diamond.Quantity}
 								</Option>
 							))}
 						</Select>
@@ -267,15 +265,17 @@ const JewelryCreateForm = ({onClose}) => {
 						onChange={handleDiamondChange}
 						placeholder="Select diamonds"
 					>
-						{diamonds.map((diamond) => (
-							<Option
-								key={diamond.Id}
-								value={diamond.Id}
-								disabled={isMaxDiamondsReached}
-							>
-								{diamond.Title}
-							</Option>
-						))}
+						{diamonds
+							.filter((diamond) => diamond.JewelryId === null) // Filter diamonds where JewelryId is null
+							.map((diamond) => (
+								<Option
+									key={diamond.Id}
+									value={diamond.Id}
+									disabled={isMaxDiamondsReached}
+								>
+									{diamond.Title}
+								</Option>
+							))}
 					</Select>
 				</Form.Item>
 

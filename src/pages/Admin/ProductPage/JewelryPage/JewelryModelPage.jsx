@@ -438,30 +438,27 @@ const JewelryModelPage = () => {
 								))}
 							</ul>
 						)}{' '}
-						<div className="w-full flex justify-end gap-4 mb-4">
+						<div className="pagination-controls flex justify-center space-x-4 mt-4">
 							<button
 								onClick={handlePreviousPage}
-								hidden={currentPage === 1}
-								className="text-blue"
+								disabled={currentPage === 1}
+								className="px-4 py-2 bg-primary text-black rounded-lg hover:bg-primaryDark disabled:opacity-50"
 							>
 								Previous
 							</button>
-							<div className="flex justify-center items-center text-center">
-								Page {currentPage} / {totalPage}
-							</div>
-
+							<span className="text-lg">{`Page ${currentPage} of ${totalPage}`}</span>
 							<button
-								onClick={() =>
-									setCurrentPage((prev) => Math.min(prev + 1, totalPage))
-								}
+								onClick={handleNextPage}
 								disabled={currentPage === totalPage}
-								className="text-blue"
+								className="px-4 py-2 bg-primary text-black rounded-lg hover:bg-primaryDark disabled:opacity-50"
 							>
 								Next
 							</button>
 							<select
 								value={pageSize}
-								onChange={(e) => setPageSize(Number(e.target.value), setCurrentPage(1))}
+								onChange={(e) =>
+									setPageSize(Number(e.target.value), setCurrentPage(1))
+								}
 								className="form-select p-2 border border-gray rounded-md"
 							>
 								<option value="5">5 per page</option>
@@ -1137,7 +1134,6 @@ const JewelryModelPage = () => {
 													</p>
 													{diamond.Shapes && diamond.Shapes.length > 0 ? (
 														<div>
-															
 															{diamond.Shapes.map(
 																(shape, shapeIndex) => (
 																	<div
@@ -1145,9 +1141,7 @@ const JewelryModelPage = () => {
 																		className="pl-4 gap-3 flex justify-around "
 																	>
 																		<p>
-																			<strong>
-																				Shape:
-																			</strong>{' '}
+																			<strong>Shape:</strong>{' '}
 																			{shape.Shape
 																				?.ShapeName ||
 																				'Not Available'}{' '}
@@ -1156,7 +1150,7 @@ const JewelryModelPage = () => {
 																			<strong>
 																				Carat Range:
 																			</strong>{' '}
-																			{shape.CaratFrom} - {' '}
+																			{shape.CaratFrom} -{' '}
 																			{shape.CaratTo} carats
 																		</p>
 																	</div>
