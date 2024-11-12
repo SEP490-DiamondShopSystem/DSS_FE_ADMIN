@@ -4,11 +4,11 @@ import {api} from '../../services/api';
 // GET /api/Diamond/Price/PriceBoard
 export const fetchPriceBoard = createAsyncThunk(
 	'diamondPrice/fetchPriceBoard',
-	async ({isFancyShapePrice, isLabDiamond, cut, isSideDiamond}, {rejectWithValue}) => {
+	async ({shapeId, isLabDiamond, cut, isSideDiamond}, {rejectWithValue}) => {
 		try {
 			const response = await api.get('/Diamond/Price/PriceBoard', {
 				params: {
-					isFancyShapePrice,
+					shapeId,
 					isLabDiamond,
 					cut,
 					isSideDiamond,
@@ -44,12 +44,12 @@ export const fetchDiamondPrices = createAsyncThunk(
 // POST /api/Diamond/Price
 export const createDiamondPrice = createAsyncThunk(
 	'diamondPrice/createDiamondPrice',
-	async ({listPrices, isFancyShapePrice, isSideDiamond, isLabDiamond}, {rejectWithValue}) => {
+	async ({listPrices, shapeId, isSideDiamond, isLabDiamond}, {rejectWithValue}) => {
 		try {
 			// Log the data being sent to the API
 			console.log('Sending listPrices to API:', {
 				listPrices,
-				isFancyShapePrice,
+				shapeId,
 				isLabDiamond,
 				isSideDiamond,
 			});
@@ -57,7 +57,7 @@ export const createDiamondPrice = createAsyncThunk(
 			// Make the PUT request to update prices
 			const response = await api.post('/Diamond/Price', {
 				listPrices,
-				isFancyShapePrice,
+				shapeId,
 				isLabDiamond,
 				isSideDiamond,
 			});
@@ -79,14 +79,14 @@ export const createDiamondPrice = createAsyncThunk(
 export const updateDiamondPrices = createAsyncThunk(
 	'diamondPrice/updateDiamondPrices',
 	async (
-		{updatedDiamondPrices, isFancyShapePrice, isLabDiamond, isSideDiamond},
+		{updatedDiamondPrices, shapeId, isLabDiamond, isSideDiamond},
 		{rejectWithValue}
 	) => {
 		try {
 			// Log the data being sent to the API
 			console.log('Sending updatedDiamondPrices to API:', {
 				updatedDiamondPrices,
-				isFancyShapePrice,
+				shapeId,
 				isLabDiamond,
 				isSideDiamond,
 			});
@@ -94,7 +94,7 @@ export const updateDiamondPrices = createAsyncThunk(
 			// Make the PUT request to update prices
 			const response = await api.put('/Diamond/Price', {
 				updatedDiamondPrices,
-				isFancyShapePrice,
+				shapeId,
 				isLabDiamond,
 				isSideDiamond,
 			});
@@ -131,12 +131,12 @@ export const fetchDiamondPriceByShape = createAsyncThunk(
 
 export const deleteDiamondPrice = createAsyncThunk(
 	'diamondPrice/deleteDiamondPrice',
-	async ({deleteList, isFancyShapePrice, isLabDiamond, isSideDiamond}, {rejectWithValue}) => {
+	async ({deleteList, shapeId, isLabDiamond, isSideDiamond}, {rejectWithValue}) => {
 		try {
 			// Log the data being sent to the API for debugging
 			console.log('Sending delete request with:', {
 				deleteList,
-				isFancyShapePrice,
+				shapeId,
 				isLabDiamond,
 				isSideDiamond,
 			});
@@ -145,7 +145,7 @@ export const deleteDiamondPrice = createAsyncThunk(
 			const response = await api.delete('/Diamond/Price', {
 				data: {
 					deleteList,
-					isFancyShapePrice,
+					shapeId,
 					isLabDiamond,
 					isSideDiamond,
 				},
