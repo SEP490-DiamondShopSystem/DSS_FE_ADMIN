@@ -208,7 +208,7 @@ export const enums = {
 };
 
 export const enumMappings = {
-	DiamondOrigin: {
+	Origin: {
 		1: 'Natural',
 		2: 'Lab',
 		3: 'Both',

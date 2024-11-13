@@ -15,6 +15,24 @@ export const fetchPromotions = createAsyncThunk(
 		}
 	}
 );
+export const fetchPromotionDetail = createAsyncThunk(
+	'promotions/fetchPromotionDetail',
+	async (promotionId, {rejectWithValue}) => {
+		console.log('Fetching promotions...');
+		try {
+			const response = await api.get(`/Promotion/${promotionId}`);
+
+			// Log the fetched data here
+			console.log('Fetched promotion details:', response);
+
+			return response;
+		} catch (error) {
+			console.error('Failed to fetch promotions:', error.response?.data || error.message);
+			return rejectWithValue(error.response?.data || 'Failed to fetch promotions');
+		}
+	}
+);
+
 // Create a new promotion
 export const createPromotion = createAsyncThunk(
 	'promotions/createPromotion',
@@ -38,6 +56,7 @@ export const createFullPromotion = createAsyncThunk(
 			console.log('Creating promotion with data:', fullPromotion);
 			return response;
 		} catch (error) {
+			console.log('Creating promotion with data:', JSON.stringify(fullPromotion, null, 2));
 			return rejectWithValue(error.response.data || 'Failed to create full promotion');
 		}
 	}
@@ -249,7 +268,18 @@ export const promotionSlice = createSlice({
 				state.loading = false;
 				state.error = action.payload;
 			})
-
+			.addCase(fetchPromotionDetail.pending, (state) => {
+				state.loading = true;
+				state.error = null;
+			})
+			.addCase(fetchPromotionDetail.fulfilled, (state, action) => {
+				state.loading = false;
+				state.promotionDetail = action.payload;
+			})
+			.addCase(fetchPromotionDetail.rejected, (state, action) => {
+				state.loading = false;
+				state.error = action.payload;
+			})
 			// Create a new promotion
 			.addCase(createPromotion.pending, (state) => {
 				state.loading = true;
@@ -330,10 +360,10 @@ export const promotionSlice = createSlice({
 
 			// Delete a promotion
 			.addCase(deletePromotion.pending, (state) => {
-				state.loading = false;
+				state.loading = true;
 			})
 			.addCase(deletePromotion.fulfilled, (state, action) => {
-				state.loading = true;
+				state.loading = false;
 				state.promotions = state.promotions.filter((promo) => promo.Id !== action.payload);
 			})
 			.addCase(deletePromotion.rejected, (state, action) => {
@@ -347,7 +377,7 @@ export const promotionSlice = createSlice({
 				state.loading = true;
 			})
 			.addCase(pausePromotion.fulfilled, (state, action) => {
-				state.loading = true;
+				state.loading = false;
 				const index = state.promotions.findIndex((promo) => promo.Id === action.payload.Id);
 				if (index !== -1) {
 					state.promotions[index].Status = 'paused';
@@ -360,10 +390,10 @@ export const promotionSlice = createSlice({
 
 			// Cancel a promotion
 			.addCase(cancelPromotion.pending, (state) => {
-				state.loading = false;
+				state.loading = true;
 			})
 			.addCase(cancelPromotion.fulfilled, (state, action) => {
-				state.loading = true;
+				state.loading = false;
 				const index = state.promotions.findIndex((promo) => promo.Id === action.payload.Id);
 				if (index !== -1) {
 					state.promotions[index].Status = 'cancelled';
@@ -376,10 +406,10 @@ export const promotionSlice = createSlice({
 
 			// Update promotion thumbnail
 			.addCase(updatePromotionThumbnail.pending, (state) => {
-				state.loading = false;
+				state.loading = true;
 			})
 			.addCase(updatePromotionThumbnail.fulfilled, (state, action) => {
-				state.loading = true;
+				state.loading = false;
 				const index = state.promotions.findIndex((promo) => promo.Id === action.payload.Id);
 				if (index !== -1) {
 					state.promotions[index].Thumbnail = action.payload.Thumbnail;

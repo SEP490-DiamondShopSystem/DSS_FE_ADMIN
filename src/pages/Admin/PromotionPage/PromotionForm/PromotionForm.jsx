@@ -14,7 +14,7 @@ import {
 } from 'antd';
 import React from 'react';
 import {GiftForm} from './GiftForm';
-import {RequirementForm} from './RequirementForm';
+import {PromoReqForm} from './PromoReqForm';
 
 const {RangePicker} = DatePicker;
 const {Option} = Select;
@@ -32,8 +32,6 @@ const PromotionForm = ({
 	addGift,
 	shapes,
 }) => {
-	console.log('targetTypes', targetTypes);
-
 	return (
 		<div>
 			<Form
@@ -61,12 +59,11 @@ const PromotionForm = ({
 						</Col>
 						<Col span={12}>
 							<Form.Item
+								label="Valid Date"
 								name="validDate"
-								label="Valid Date Range"
 								rules={[
 									{required: true, message: 'Please select a valid date range'},
 								]}
-								className="mb-0"
 							>
 								<RangePicker
 									showTime
@@ -137,24 +134,19 @@ const PromotionForm = ({
 
 				{/* Requirement Section */}
 				<h3 className="text-xl font-semibold mt-6">Các Yêu Cầu</h3>
-				{/* <div className="flex space-x-4 mb-4">
-					<Button type="dashed" onClick={() => addRequirement('diamond')}>
+				<div className="flex space-x-4 mb-4">
+					<Button type="dashed" onClick={() => addRequirement()}>
 						<PlusOutlined /> Thêm Yêu Cầu
 					</Button>
-				</div> */}
+				</div>
 
 				{/* Dynamic Requirement List */}
-				<RequirementForm
-					targetTypes={targetTypes}
-					handleTargetTypeChange={handleTargetTypeChange}
-					shapes={shapes}
-					Option={Option}
-				/>
+				<PromoReqForm form={form} shapes={shapes} Option={Option} />
 
 				{/* Gift Section */}
 				<h3 className="text-lg font-semibold mt-6">Quà Tặng</h3>
 				<div className="flex space-x-4 mb-4">
-					<Button type="dashed" onClick={() => addGift('diamond')}>
+					<Button type="dashed" onClick={() => addGift()}>
 						<PlusOutlined /> Thêm Quà
 					</Button>
 				</div>
