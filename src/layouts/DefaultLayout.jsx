@@ -74,8 +74,16 @@ const DefaultLayout = () => {
 			getItem('Quản Lý Sản Phẩm', '/products', <ProductOutlined />, [
 				getItem('Danh Sách Trang Sức', '/products/jewelry-list', <RightOutlined />),
 				getItem('Danh Sách Kim Cương', '/products/diamond-list', <DiamondOutlined />),
-				getItem('Danh Sách Loại Trang Sức', '/products/jewelry-model-category-list', <RightOutlined />),
-				getItem('Danh Sách Mẫu Trang Sức', '/products/jewelry-model-list', <RightOutlined />),
+				getItem(
+					'Danh Sách Loại Trang Sức',
+					'/products/jewelry-model-category-list',
+					<RightOutlined />
+				),
+				getItem(
+					'Danh Sách Mẫu Trang Sức',
+					'/products/jewelry-model-list',
+					<RightOutlined />
+				),
 				getItem('Danh Sách Kim Loại', '/products/metal-list', <DiamondOutlined />),
 			]),
 
@@ -93,9 +101,16 @@ const DefaultLayout = () => {
 		(adminRole || managerRole || staffRole) &&
 			getItem('Quản Lí Khuyến Mãi', '/promotion', <GiftOutlined />),
 		(adminRole || managerRole || staffRole) &&
+			getItem('Quản Lí Giảm Giá', '/discount', <TagOutlined />),
+		(adminRole || managerRole || staffRole) &&
 			getItem('Quản Lí Vận Chuyển', '/deliveries', <DeliveredProcedureOutlined />),
 		(adminRole || managerRole || staffRole) &&
-			getItem('Quản Lí Giá Kim Cương', '/price', <TagOutlined />),
+			getItem('Quản Lí Phí Vận Chuyển', '/delivery-fee', <DeliveredProcedureOutlined />),
+		(adminRole || managerRole || staffRole) &&
+			getItem('Quản Lí Giá Kim Cương', '/dimond-price', <TagOutlined />, [
+				getItem('Quản Lí Giá Kim Cương Chính', '/diamond-price/main-diamond-price', <TagOutlined />),
+				getItem('Quản Lí Giá Kim Cương Tấm', '/diamond-price/side-diamond-price', <TagOutlined />),
+			]),
 	];
 
 	const handleClickMenuItem = (e) => {

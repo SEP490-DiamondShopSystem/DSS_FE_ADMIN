@@ -6,8 +6,8 @@ import {
 	createDiamondPrice,
 	updateDiamondPrices,
 	deleteDiamondPrice,
-} from '../../../redux/slices/diamondPriceSlice';
-import {getPriceBoardSelector, LoadingDiamondPriceSelector} from '../../../redux/selectors';
+} from '../../../../redux/slices/diamondPriceSlice';
+import {getPriceBoardSelector, LoadingDiamondPriceSelector} from '../../../../redux/selectors';
 
 const formatPrice = (price) => {
 	if (price === null || price === undefined) return 'N/A';
@@ -15,17 +15,15 @@ const formatPrice = (price) => {
 	return price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.') + ' VND';
 };
 
-const DiamondPricePage = () => {
+const SideDiamondPricePage = () => {
 	const dispatch = useDispatch();
 	const {priceBoard, loading} = useSelector((state) => ({
 		priceBoard: getPriceBoardSelector(state),
 		loading: LoadingDiamondPriceSelector(state),
 	}));
 	const [filters, setFilters] = useState({
-		shapeId: 1,
 		isLabDiamond: false,
 		cut: 1,
-		isSideDiamond: false,
 	});
 
 	const handleFilterChange = (filterName) => (event) => {
@@ -35,10 +33,8 @@ const DiamondPricePage = () => {
 		}));
 	};
 
-	const [shapeId, setShapeId] = useState(1);
 	const [isLabDiamond, setIsLabDiamond] = useState(false);
 	const [cut, setCut] = useState(1);
-	const [isSideDiamond, setIsSideDiamond] = useState(false);
 	const [editedCells, setEditedCells] = useState([]);
 	const [isEditing, setIsEditing] = useState(false);
 	const [selectedPrices, setSelectedPrices] = useState([]);
@@ -47,12 +43,9 @@ const DiamondPricePage = () => {
 	const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
 	useEffect(() => {
-		dispatch(fetchPriceBoard({shapeId, isLabDiamond, cut, isSideDiamond}));
-	}, [dispatch, shapeId, isLabDiamond, cut, isSideDiamond]);
+		dispatch(fetchPriceBoard({ isLabDiamond, cut}));
+	}, [dispatch, isLabDiamond, cut]);
 
-	const handleShapeChange = (event) => {
-		setShapeId(Number(event.target.value));
-	};
 	const handleCheckboxChange = (criteriaId) => {
 		setSelectedPrices(
 			(prev) =>
@@ -71,15 +64,13 @@ const DiamondPricePage = () => {
 		const deleteList = selectedPrices.map((criteriaId) => ({criteriaId}));
 		const payload = {
 			deleteList,
-			shapeId,
 			isLabDiamond,
-			isSideDiamond,
 		};
 
 		await dispatch(deleteDiamondPrice(payload)); // Wait for delete to finish
 		setSelectedPrices([]);
 		setShowDeleteConfirm(false);
-		await dispatch(fetchPriceBoard({shapeId, isLabDiamond, cut, isSideDiamond})); // Fetch updated board
+		await dispatch(fetchPriceBoard({ isLabDiamond, cut})); // Fetch updated board
 	};
 
 	const savePrices = async () => {
@@ -90,10 +81,10 @@ const DiamondPricePage = () => {
 
 		if (listPrices.length === 0) return;
 
-		await dispatch(createDiamondPrice({listPrices, shapeId, isLabDiamond, isSideDiamond})); // Wait for save to finish
+		await dispatch(createDiamondPrice({listPrices, isLabDiamond})); // Wait for save to finish
 		setEditedCells([]);
 		setIsCreating(false);
-		await dispatch(fetchPriceBoard({shapeId, isLabDiamond, cut, isSideDiamond})); // Fetch updated board
+		await dispatch(fetchPriceBoard({ isLabDiamond, cut})); // Fetch updated board
 	};
 
 	const handleSave = async () => {
@@ -105,14 +96,12 @@ const DiamondPricePage = () => {
 		await dispatch(
 			updateDiamondPrices({
 				updatedDiamondPrices: updatedPrices,
-				shapeId,
 				isLabDiamond,
-				isSideDiamond,
 			})
 		); // Wait for update to finish
 		setEditedCells([]);
 		setIsEditing(false);
-		await dispatch(fetchPriceBoard({shapeId, isLabDiamond, cut, isSideDiamond})); // Fetch updated board
+		await dispatch(fetchPriceBoard({ isLabDiamond, cut})); // Fetch updated board
 	};
 
 	const cancelDelete = () => {
@@ -124,10 +113,6 @@ const DiamondPricePage = () => {
 
 	const handleCutChange = (event) => {
 		setCut(Number(event.target.value));
-	};
-
-	const handleSideDiamondChange = (event) => {
-		setIsSideDiamond(event.target.checked);
 	};
 
 	const handleAddPriceToggle = () => {
@@ -227,10 +212,8 @@ const DiamondPricePage = () => {
 	};
 
 	const clearFilters = () => {
-		setShapeId(1);
 		setIsLabDiamond(false);
 		setCut(1);
-		setIsSideDiamond(false);
 	};
 
 	if (loading) {
@@ -325,17 +308,6 @@ const DiamondPricePage = () => {
 					Diamond Price Board
 				</h1>
 				<div className="flex flex-wrap gap-4 items-center justify-between p-4 ">
-					{/* Shape Selection */}
-					<div className="flex sm:flex-row items-center gap-2">
-						<input
-							type="checkbox"
-							checked={shapeId}
-							onChange={handleShapeChange}
-							className="rounded focus:ring-blue-500"
-						/>
-						<label className="text-lg font-semibold">Fancy Shapes</label>
-					</div>
-
 					{/* Lab Diamond Checkbox */}
 					<div className="flex items-center gap-2">
 						<input
@@ -364,18 +336,7 @@ const DiamondPricePage = () => {
 						</select>
 					</div>
 
-					{/* Side Diamond Checkbox */}
-					{(isCreating || isEditing) && (
-						<div className="flex items-center gap-2">
-							<input
-								type="checkbox"
-								checked={isSideDiamond}
-								onChange={handleSideDiamondChange}
-								className="rounded focus:ring-blue-500"
-							/>
-							<label className="text-lg font-semibold">Side Diamond</label>
-						</div>
-					)}
+			
 					{/* Clear Filters Button */}
 					<div>
 						<button
@@ -397,31 +358,6 @@ const DiamondPricePage = () => {
 		<div className="container gap-4 mx-auto p-6 bg-white rounded-lg shadow-lg">
 			<h1 className="text-5xl font-bold text-center text-blue-600">Diamond Price Board</h1>
 			<div className="flex flex-wrap gap-4 items-center justify-between p-4 bg-offWhite rounded-lg shadow-md">
-				{/* Shape Selection */}
-				<div className="flex sm:flex-row items-center gap-2">
-					<label htmlFor="cutSelect" className="text-lg font-semibold text-gray-800">
-						Shape:
-					</label>
-					<select
-						id="cutSelect"
-						value={shapeId}
-						onChange={handleShapeChange}
-						className="border border-gray-300 p-2 rounded shadow focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200 bg-white text-gray-700"
-						aria-label="Select Shape"
-					>
-						<option value="1">Round</option>
-						<option value="2">Princess</option>
-						<option value="3">Cushion</option>
-						<option value="4">Emerald</option>
-						<option value="5">Oval</option>
-						<option value="6">Radiant</option>
-						<option value="7">Asscher</option>
-						<option value="8">Marquise</option>
-						<option value="9">Heart</option>
-						<option value="10">Pear</option>
-					</select>
-				</div>
-
 				{/* Lab Diamond Checkbox */}
 				<div className="flex items-center gap-2">
 					<input
@@ -450,18 +386,6 @@ const DiamondPricePage = () => {
 						<option value="2">Very Good</option>
 						<option value="3">Excellent</option>
 					</select>
-				</div>
-
-				{/* Side Diamond Checkbox */}
-				{/* {(isCreating || isEditing) && ( */}
-				<div className="flex items-center gap-2">
-					<input
-						type="checkbox"
-						checked={isSideDiamond}
-						onChange={handleSideDiamondChange}
-						className="rounded focus:ring-blue-500"
-					/>
-					<label className="text-lg font-semibold">Side Diamond</label>
 				</div>
 				{/* )} */}
 
@@ -640,4 +564,4 @@ const DiamondPricePage = () => {
 	);
 };
 
-export default DiamondPricePage;
+export default SideDiamondPricePage;

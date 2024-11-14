@@ -17,8 +17,10 @@ import {sizeSlice} from './slices/jewelry/sizeSlice';
 import {enumSlice} from './slices/jewelry/enumSlice';
 import {shapeSlice} from './slices/shapeSlice';
 import {discountSlice} from './slices/discountSlice';
-
+import {deliveryFeeSlice} from './slices/deliveryFeeSlice';
+import {locationSlice} from './slices/locationSlice';
 const rootPersistConfig = {
+
 	key: 'root',
 	storage,
 	safelist: ['userSlice'], // Add 'transactionSlice' to persist
@@ -40,6 +42,8 @@ const rootReducer = combineReducers({
 	enumSlice: enumSlice.reducer,
 	shapeSlice: shapeSlice.reducer,
 	discountSlice: discountSlice.reducer,
+	deliveryFeeSlice: deliveryFeeSlice.reducer,
+	locationSlice: locationSlice.reducer,
 });
 
 const persistedReducer = persistReducer(rootPersistConfig, rootReducer);
