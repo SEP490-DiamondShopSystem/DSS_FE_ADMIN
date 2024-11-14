@@ -52,9 +52,11 @@ const DeliveryFeePage = () => {
 
 	const handleEditDeliveryFee = (deliveryFee) => {
 		setEditDeliveryFee(deliveryFee);
+		const province = locations.find((location) => location.Id === deliveryFee.ToLocationId);
+
 		form.setFieldsValue({
 			...deliveryFee,
-			provinceId: deliveryFee.ToLocationId, // Set the provinceId for editing
+			provinceId: deliveryFee.ToLocation, // Set the provinceId for editing
 		});
 		setIsModalVisible(true);
 	};
@@ -63,57 +65,55 @@ const DeliveryFeePage = () => {
 	const handleDeleteDeliveryFee = async (id) => {
 		dispatch(deleteDeliveryFee(id));
 		message.success('Delivery Fee deleted successfully!');
-        await dispatch(updateDeliveryFee(updatePayload));
-
+		await dispatch(updateDeliveryFee(updatePayload));
 	};
 
 	// Handle form submission for adding/updating delivery fees
-    const handleSubmit = async (values) => {
-        // Construct the payload for adding a delivery fee (POST)
-        const payload = {
-          fees: [
-            {
-              name: values.Name,          // Fee name
-              cost: values.Cost,          // Fee cost
-              provinceId: values.provinceId, // The selected location
-            },
-          ],
-        };
-      
-        if (editDeliveryFee) {
-          // When editing, construct the payload for updating (PUT)
-          const updatePayload = {
-            feeId: editDeliveryFee.Id,  // Use the existing delivery fee ID
-            name: values.Name,          // Fee name
-            cost: values.Cost,          // Fee cost
-            setActive: true,             // Assuming the fee is being set to active
-          };
-      
-          try {
-            // Dispatch the update action with the correct payload
-            await dispatch(updateDeliveryFee(updatePayload));
-            // Fetch the updated delivery fees list
-            await dispatch(fetchDeliveryFees({ isLocation: true }));
-            message.success('Delivery Fee updated successfully!');
-          } catch (error) {
-            message.error('Failed to update Delivery Fee!');
-          }
-        } else {
-          // When adding new, dispatch the add request (POST) with the constructed payload
-          try {
-            await dispatch(addDeliveryFee(payload));
-            // Fetch the updated delivery fees list
-            await dispatch(fetchDeliveryFees({ isLocation: true }));
-            message.success('Delivery Fee added successfully!');
-          } catch (error) {
-            message.error('Failed to add Delivery Fee!');
-          }
-        }
-      
-        // Close the modal after submit
-        setIsModalVisible(false);
-      };
-      
+	const handleSubmit = async (values) => {
+		// Construct the payload for adding a delivery fee (POST)
+		const payload = {
+			fees: [
+				{
+					name: values.Name, // Fee name
+					cost: values.Cost, // Fee cost
+					provinceId: values.provinceId, // The selected location
+				},
+			],
+		};
+
+		if (editDeliveryFee) {
+			// When editing, construct the payload for updating (PUT)
+			const updatePayload = {
+				feeId: editDeliveryFee.Id, // Use the existing delivery fee ID
+				name: values.Name, // Fee name
+				cost: values.Cost, // Fee cost
+				setActive: true, // Assuming the fee is being set to active
+			};
+
+			try {
+				// Dispatch the update action with the correct payload
+				await dispatch(updateDeliveryFee(updatePayload));
+				// Fetch the updated delivery fees list
+				await dispatch(fetchDeliveryFees({isLocation: true}));
+				message.success('Delivery Fee updated successfully!');
+			} catch (error) {
+				message.error('Failed to update Delivery Fee!');
+			}
+		} else {
+			// When adding new, dispatch the add request (POST) with the constructed payload
+			try {
+				await dispatch(addDeliveryFee(payload));
+				// Fetch the updated delivery fees list
+				await dispatch(fetchDeliveryFees({isLocation: true}));
+				message.success('Delivery Fee added successfully!');
+			} catch (error) {
+				message.error('Failed to add Delivery Fee!');
+			}
+		}
+
+		// Close the modal after submit
+		setIsModalVisible(false);
+	};
 
 	const handleCancel = () => {
 		setIsModalVisible(false);
@@ -214,8 +214,12 @@ const DeliveryFeePage = () => {
 						label="To Location"
 						name="provinceId"
 						rules={[{required: true, message: 'Please select a location!'}]}
+						style={{display: editDeliveryFee ? 'none' : 'block'}} // Hide when editing
 					>
-						<Select placeholder="Select a province">
+						<Select
+							placeholder="Select a province"
+							value={editDeliveryFee ? editDeliveryFee.ToLocationId : undefined}
+						>
 							{locations && locations.length > 0 ? (
 								locations.map((location) => (
 									<Option key={location.Id} value={location.Id}>
@@ -223,10 +227,11 @@ const DeliveryFeePage = () => {
 									</Option>
 								))
 							) : (
-								<Option disabled>No locations available</Option> // Handle case when no locations are available
+								<Option disabled>No locations available</Option>
 							)}
 						</Select>
 					</Form.Item>
+
 					<Form.Item>
 						<Button type="primary" htmlType="submit">
 							{editDeliveryFee ? 'Update' : 'Add'}
