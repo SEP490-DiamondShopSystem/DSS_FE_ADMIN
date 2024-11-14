@@ -25,7 +25,10 @@ export const getAllDeliverySelector = (state) => state.deliverySlice.deliveryLis
 export const getAllPromotionSelector = (state) => state.promotionSlice.promotions;
 export const LoadingPromotionSelector = (state) => state.promotionSlice.loading;
 export const getPromotionDetailSelector = (state) => state.promotionSlice.promotionDetail;
-
+//PROMOTION
+export const getAllDiscountSelector = (state) => state.discountSlice.discounts;
+export const LoadingDiscountSelector = (state) => state.discountSlice.loading;
+export const getDiscountDetailSelector = (state) => state.discountSlice.discountDetail;
 //DIAMOND
 export const getAllShapeSelector = (state) => state.diamondSlice.diamondShape;
 export const getAllDiamondSelector = (state) => state.diamondSlice.diamonds;

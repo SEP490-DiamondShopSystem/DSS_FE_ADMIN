@@ -16,7 +16,7 @@ import {jewelryModelSlice} from './slices/jewelry/jewelryModelSlice';
 import {sizeSlice} from './slices/jewelry/sizeSlice';
 import {enumSlice} from './slices/jewelry/enumSlice';
 import {shapeSlice} from './slices/shapeSlice';
-
+import {discountSlice} from './slices/discountSlice';
 
 const rootPersistConfig = {
 	key: 'root',
@@ -39,6 +39,7 @@ const rootReducer = combineReducers({
 	sizeSlice: sizeSlice.reducer,
 	enumSlice: enumSlice.reducer,
 	shapeSlice: shapeSlice.reducer,
+	discountSlice: discountSlice.reducer,
 });
 
 const persistedReducer = persistReducer(rootPersistConfig, rootReducer);

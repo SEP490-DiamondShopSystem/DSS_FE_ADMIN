@@ -13,6 +13,7 @@ import JewelryPage from '../pages/Admin/ProductPage/JewelryPage/JewelryPage';
 import JewelryModelCategoryPage from '../pages/Admin/ProductPage/JewelryPage/JewelryModelCategoryPage';
 import JewelryModelPage from '../pages/Admin/ProductPage/JewelryPage/JewelryModelPage';
 import PromotionPage from '../pages/Admin/PromotionPage';
+import DiscountPage from '../pages/Admin/DiscountPage';
 import SignUpPage from '../pages/Admin/SignUpPage/SignUp';
 import WarrantyPage from '../pages/Admin/WarrantyPage';
 import PrivateRoute from './PrivateRoute';
@@ -139,6 +140,14 @@ export const AdminRouters = () => {
 					element={
 						<PrivateRoute roles={['staff', 'admin', 'manager']}>
 							<PromotionPage />
+						</PrivateRoute>
+					}
+				/>
+				<Route
+					path="/discount"
+					element={
+						<PrivateRoute roles={['staff', 'admin', 'manager']}>
+							<DiscountPage />
 						</PrivateRoute>
 					}
 				/>
