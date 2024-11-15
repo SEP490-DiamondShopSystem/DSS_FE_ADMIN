@@ -15,9 +15,9 @@ import {
 	Table,
 	Tag,
 } from 'antd';
+import debounce from 'lodash/debounce';
 import {useDispatch, useSelector} from 'react-redux';
 import {useNavigate} from 'react-router-dom';
-import Loading from '../../../../components/Loading';
 import '../../../../css/antd.css';
 import {
 	getAllDiamondSelector,
@@ -32,9 +32,8 @@ import {
 	handleDeleteDiamond,
 } from '../../../../redux/slices/diamondSlice';
 import {formatPrice} from '../../../../utils';
-import {AddModalDiamond} from './AddModalDiamond/AddModalDiamond';
-import debounce from 'lodash/debounce';
 import {marks, marksClarity, marksCut} from '../../../../utils/constant';
+import {AddModalDiamond} from './AddModalDiamond/AddModalDiamond';
 
 const {Search} = Input;
 
@@ -59,6 +58,7 @@ const DiamondPage = () => {
 	const [pageSize, setPageSize] = useState(100);
 	const [start, setStart] = useState(0);
 	const [checked, setChecked] = useState(false);
+	const [checkedDiamondJewelry, setCheckedDiamondJewelry] = useState(false);
 
 	useEffect(() => {
 		dispatch(getDiamondFilter());
@@ -175,6 +175,7 @@ const DiamondPage = () => {
 				caratFrom: filters?.carat?.minCarat,
 				caratTo: filters?.carat?.maxCarat,
 				isLab: checked,
+				includeJewelryDiamond: checkedDiamondJewelry,
 			})
 		);
 	}, 500);
@@ -183,7 +184,7 @@ const DiamondPage = () => {
 		fetchDiamondData();
 
 		return () => fetchDiamondData.cancel();
-	}, [dispatch, filters, shape, checked]);
+	}, [dispatch, filters, shape, checked, checkedDiamondJewelry]);
 
 	useEffect(() => {
 		if (diamondList) {
@@ -218,10 +219,6 @@ const DiamondPage = () => {
 	console.log('diamonds', diamonds);
 	console.log('filters', filters);
 
-	const onSearch = (value) => {
-		setSearchText(value);
-	};
-
 	const handleShapeChange = (value) => {
 		console.log('value', value);
 
@@ -254,7 +251,10 @@ const DiamondPage = () => {
 	};
 
 	const handleChangeCheckbox = (e) => {
-		setChecked(e.target.checked); // Cập nhật trạng thái
+		setChecked(e.target.checked);
+	};
+	const handleChangeCheckboxDiamondJewelry = (e) => {
+		setCheckedDiamondJewelry(e.target.checked);
 	};
 
 	const showModelAdd = () => {
@@ -290,7 +290,7 @@ const DiamondPage = () => {
 	const text = <span>Lọc</span>;
 
 	const content = (
-		<div style={{width: 1000, textAlign: 'justify'}}>
+		<div className="my-4" style={{width: 1000, textAlign: 'justify'}}>
 			<Space wrap className="">
 				<div className="ml-10 min-w-44">
 					<p>Hình Dạng</p>
@@ -309,7 +309,7 @@ const DiamondPage = () => {
 							))}
 					</Select>
 				</div>
-				<div className="ml-10 min-w-44">
+				<div className="ml-10 min-w-96">
 					<p className="mb-4">Giá:</p>
 					<Slider
 						range
@@ -319,8 +319,10 @@ const DiamondPage = () => {
 						onChange={handlePriceChange}
 					/>
 				</div>
-
+			</Space>
+			<Space wrap className="my-5">
 				{/* Carat Range Slider */}
+
 				<div className="ml-10 min-w-44">
 					<p className="mb-4">Carat:</p>
 					<Slider
@@ -366,9 +368,19 @@ const DiamondPage = () => {
 						onChange={handleCutChange}
 					/>
 				</div>
+			</Space>
+			<Space wrap className="my-5">
 				<div className="ml-10">
 					<Checkbox checked={checked} onChange={handleChangeCheckbox}>
 						Kim Cương Nhân Tạo
+					</Checkbox>
+				</div>
+				<div className="ml-10">
+					<Checkbox
+						checked={checkedDiamondJewelry}
+						onChange={handleChangeCheckboxDiamondJewelry}
+					>
+						Kim Cương Đã Đính
 					</Checkbox>
 				</div>
 			</Space>

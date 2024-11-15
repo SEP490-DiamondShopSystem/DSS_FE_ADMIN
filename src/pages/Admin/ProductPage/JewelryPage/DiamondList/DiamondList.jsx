@@ -7,7 +7,7 @@ import Loading from '../../../../../components/Loading';
 import {LoadingDiamondSelector} from '../../../../../redux/selectors';
 import {formatPrice} from '../../../../../utils';
 
-export const DiamondList = ({diamond, handleDiamondSelectChange, currentDiamondId}) => {
+export const DiamondList = ({diamond, handleDiamondSelectChange, currentDiamondId, shape}) => {
 	const loading = useSelector(LoadingDiamondSelector);
 
 	return (
@@ -16,7 +16,8 @@ export const DiamondList = ({diamond, handleDiamondSelectChange, currentDiamondI
 				<Loading />
 			) : (
 				<>
-					{!Array.isArray(diamond) || diamond.length === 0 ? (
+					{!Array.isArray(diamond) ||
+					(diamond.length === 0 && shape === null && shape === undefined) ? (
 						<div className="flex items-center justify-center my-10">
 							<p className="text-2xl">Chưa có sản phẩm nào</p>
 						</div>

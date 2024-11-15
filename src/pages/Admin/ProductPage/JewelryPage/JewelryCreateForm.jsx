@@ -1,28 +1,75 @@
 import React, {useEffect, useState} from 'react';
+
+import {Checkbox, Form, message, Modal, Select, Slider, Space, Table} from 'antd';
+import debounce from 'lodash/debounce';
 import {useDispatch, useSelector} from 'react-redux';
-import {Form, Select, Button} from 'antd';
-import {getAllDiamond} from '../../../../redux/slices/diamondSlice';
-import {fetchAllSizes} from '../../../../redux/slices/jewelry/sizeSlice';
-import {createJewelry} from '../../../../redux/slices/jewelry/jewelrySlice';
-import {fetchAllJewelryModels} from '../../../../redux/slices/jewelry/jewelryModelSlice';
-import {fetchAllMetals} from '../../../../redux/slices/jewelry/metalSlice';
 import {
+	getAllDiamondSelector,
 	getAllJewelryModelsSelector,
 	getAllMetalsSelector,
-	getAllDiamondSelector,
 	getAllSizesSelector,
+	GetDiamondFilterSelector,
 } from '../../../../redux/selectors';
+import {getAllDiamond, getDiamondFilter} from '../../../../redux/slices/diamondSlice';
+import {fetchAllJewelryModels} from '../../../../redux/slices/jewelry/jewelryModelSlice';
+import {fetchAllMetals} from '../../../../redux/slices/jewelry/metalSlice';
+import {fetchAllSizes} from '../../../../redux/slices/jewelry/sizeSlice';
+import JewelryFormModal from './JewelryFormModal/JewelryFormModal';
+import {createJewelry} from '../../../../redux/slices/jewelry/jewelrySlice';
+import {DiamondList} from './DiamondList/DiamondList';
 
 const {Option} = Select;
 
-const JewelryCreateForm = ({onClose}) => {
+const JewelryCreateForm = ({onClose, isCreateFormOpen, setIsCreateFormOpen}) => {
 	const dispatch = useDispatch();
 	const [form] = Form.useForm();
+
 	const [isMaxDiamondsReached, setIsMaxDiamondsReached] = useState(false);
 	const [selectedModel, setSelectedModel] = useState(null);
-	const [selectedMetal, setSelectedMetal] = useState(null); // New state for selected metal
+	const [selectedMetal, setSelectedMetal] = useState(null);
+	const [selectedIndex, setSelectedIndex] = useState(0);
+	const [mainDiamondSelected, setMainDiamondSelected] = useState(null);
+	const [isModalVisible, setIsModalVisible] = useState(false);
+	const [filters, setFilters] = useState({});
+	const [shape, setShape] = useState('');
+	const [pageSize, setPageSize] = useState(100);
+	const [start, setStart] = useState(0);
+	const [checked, setChecked] = useState(false);
+	const [checkedDiamondJewelry, setCheckedDiamondJewelry] = useState(false);
+	const [diamondList, setDiamondList] = useState();
+	const [currentDiamondId, setCurrentDiamondId] = useState(null);
+	const [selectedDiamondList, setSelectedDiamondList] = useState([]);
 
-	// Redux selectors and data fetching
+	const mainDiamonds = selectedModel?.MainDiamonds;
+
+	const getDiamondForFilter = (index) => {
+		if (index >= 0 && index < selectedModel?.MainDiamonds?.length) {
+			return selectedModel?.MainDiamonds[index];
+		}
+		return null; // Nếu chỉ số không hợp lệ, trả về null
+	};
+
+	const diamondForFilter = getDiamondForFilter(selectedIndex);
+
+	const filterShape = diamondForFilter?.Shapes?.find((id) => id?.ShapeId === shape);
+
+	const filterLimits = useSelector(GetDiamondFilterSelector);
+	useEffect(() => {
+		dispatch(getDiamondFilter());
+	}, []);
+
+	useEffect(() => {
+		if (filterLimits) {
+			setFilters({
+				shape: shape,
+				carat: {
+					minCarat: filterLimits?.Carat?.Min,
+					maxCarat: filterLimits?.Carat?.Max,
+				},
+			});
+		}
+	}, [filterLimits]);
+
 	const sizes = useSelector(getAllSizesSelector);
 	useEffect(() => {
 		dispatch(fetchAllSizes());
@@ -40,8 +87,98 @@ const JewelryCreateForm = ({onClose}) => {
 
 	const diamonds = useSelector(getAllDiamondSelector);
 	useEffect(() => {
-		dispatch(getAllDiamond());
-	}, [dispatch]);
+		if (diamonds) {
+			setDiamondList(diamonds.Values);
+		}
+	}, [diamonds]);
+
+	const fetchDiamondData = debounce(() => {
+		dispatch(
+			getAllDiamond({
+				pageSize,
+				start,
+				shapeId: shape,
+				caratFrom: filters?.carat?.minCarat,
+				caratTo: filters?.carat?.maxCarat,
+				isLab: checked,
+				includeJewelryDiamond: checkedDiamondJewelry,
+			})
+		);
+	}, 500);
+
+	useEffect(() => {
+		fetchDiamondData();
+
+		return () => fetchDiamondData.cancel();
+	}, [dispatch, filters, shape, checked, checkedDiamondJewelry]);
+
+	const handleShapeChange = (value) => {
+		setShape(value);
+	};
+
+	const handleFilterChange = (type, value) => {
+		setFilters((prev) => ({
+			...prev,
+			[type]: value,
+		}));
+	};
+
+	const handleCaratChange = (value) => {
+		handleFilterChange('carat', {minCarat: value[0], maxCarat: value[1]});
+	};
+
+	const handleChangeCheckbox = (e) => {
+		setChecked(e.target.checked);
+	};
+	const handleChangeCheckboxDiamondJewelry = (e) => {
+		setCheckedDiamondJewelry(e.target.checked);
+	};
+
+	const saveSelectedDiamond = (
+		selectedDiamonds,
+		diamondForFilterId,
+		diamondListId,
+		diamondListTitle
+	) => {
+		// Tìm index của diamondForFilter trong array
+		const existingIndex = selectedDiamonds.findIndex(
+			(item) => item.diamondForFilterId === diamondForFilterId
+		);
+
+		const newDiamond = {
+			diamondForFilterId,
+			diamondListId,
+			diamondListTitle,
+		};
+
+		if (existingIndex !== -1) {
+			// Nếu đã tồn tại, thay thế bằng diamond mới
+			const updatedDiamonds = [...selectedDiamonds];
+			updatedDiamonds[existingIndex] = newDiamond;
+			return updatedDiamonds;
+		} else {
+			// Nếu không, thêm mới vào array
+			return [...selectedDiamonds, newDiamond];
+		}
+	};
+
+	// Hàm xử lý khi chọn diamond từ danh sách
+	const handleDiamondSelectChange = (diamond) => {
+		console.log('diamondSelect', diamond);
+
+		// Cập nhật currentDiamondId
+		setCurrentDiamondId(diamond);
+
+		// Lấy diamondForFilter hiện tại
+		const diamondForFilterId = diamondForFilter?.Id;
+
+		if (diamondForFilterId) {
+			// Lưu diamond vào selectedDiamondList
+			setSelectedDiamondList((prevList) =>
+				saveSelectedDiamond(prevList, diamondForFilterId, diamond.Id, diamond.Title)
+			);
+		}
+	};
 
 	// Filter metals based on selected model's supported metals
 	const filteredMetals = selectedModel
@@ -83,6 +220,7 @@ const JewelryCreateForm = ({onClose}) => {
 				},
 				sideDiamondOptId: '',
 			});
+			setSelectedDiamondList([]);
 		}
 
 		// Log model change
@@ -128,10 +266,6 @@ const JewelryCreateForm = ({onClose}) => {
 		// Extract JewelryRequest and sideDiamondOptId separately
 		const {JewelryRequest, attachedDiamondIds, sideDiamondOptId} = formValues;
 
-		console.log('Extracted JewelryRequest:', JewelryRequest);
-		console.log('Attached Diamonds:', attachedDiamondIds);
-		console.log('Side Diamonds:', sideDiamondOptId);
-
 		// Validation checks
 		const {ModelId, SizeId, MentalId, status} = JewelryRequest;
 
@@ -152,148 +286,183 @@ const JewelryCreateForm = ({onClose}) => {
 			...(SizeId && {sizeId: SizeId}),
 			...(MentalId && {metalId: MentalId}),
 			...(status && {status}),
-			...(attachedDiamonds.length > 0 && {attachedDiamondIds: attachedDiamonds}),
+			...(selectedDiamondList.length > 0 && {
+				attachedDiamondIds: selectedDiamondList.map((diamond) => diamond.diamondListId),
+			}),
 			...(sideDiamondOptId && {sideDiamondOptId}),
 		};
 
 		// Log the final data you're about to send
+		console.log('attachedDiamonds:', attachedDiamonds);
 		console.log('Final data to be dispatched:', finalData);
 
-		// Dispatch the createJewelry action with the correct data
-		dispatch(createJewelry(finalData));
+		dispatch(createJewelry(finalData)).then((res) => {
+			console.log('res', res);
 
-		// Reset form fields and close the modal
-		form.resetFields();
-		onClose();
+			if (res.payload) {
+				message.success('Tạo trang sức thành công!');
+				form.resetFields();
+				onClose();
+			} else {
+				message.warning('Xảy ra lỗi khi tạo trang sức!');
+			}
+		});
 	};
 
 	// Disable selecting more diamonds than the max allowed
 	const handleDiamondChange = (value) => {
-		if (value.length <= maxDiamonds) {
-			form.setFieldsValue({
-				attachedDiamondIds: value,
-			});
-			setIsMaxDiamondsReached(value.length === maxDiamonds);
-		} else {
-			alert(`You can only select up to ${maxDiamonds} diamonds.`);
-		}
-
-		// Log diamond selection changes
+		setSelectedIndex(value);
+		setCurrentDiamondId(null);
 		console.log('Selected Diamonds:', value);
 	};
 
+	const showModal = () => {
+		setIsModalVisible(true);
+	};
+
+	const handleOk = () => {
+		setIsModalVisible(false);
+	};
+
+	const handleCancel = () => {
+		setIsModalVisible(false);
+	};
+
+	console.log('selectedDiamondList', selectedDiamondList);
+
 	return (
-		<div className="p-4" style={{maxWidth: '1000px', minWidth: '900px', margin: '0 auto'}}>
-			<h2 className="text-2xl font-semibold text-primary mb-4">Add New Jewelry</h2>
-			<Form form={form} layout="vertical" onFinish={handleSubmit}>
-				<Form.Item label="Model ID" name={['JewelryRequest', 'ModelId']}>
-					<Select onChange={handleModelChange} placeholder="Select a model">
-						{Array.isArray(models) &&
-							models.map((model) => (
-								<Option key={model.Id} value={model.Id}>
-									{model.Name} ({model.MainDiamondCount} main diamond
-									{model.SideDiamondOptionCount &&
-										`, ${model.SideDiamondOptionCount} side diamond`}
-									)
-								</Option>
-							))}
-					</Select>
-				</Form.Item>
+		<div className="p-4">
+			<JewelryFormModal
+				models={models}
+				filteredMetals={filteredMetals}
+				filteredSizes={filteredSizes}
+				selectedModel={selectedModel}
+				selectedDiamondList={selectedDiamondList}
+				handleSubmit={handleSubmit}
+				handleModelChange={handleModelChange}
+				handleMetalChange={handleMetalChange}
+				handleChange={handleChange}
+				handleSideDiamondChange={handleSideDiamondChange}
+				onClose={onClose}
+				form={form}
+				showModal={showModal}
+				setSelectedDiamondList={setSelectedDiamondList}
+				isCreateFormOpen={isCreateFormOpen}
+				setIsCreateFormOpen={setIsCreateFormOpen}
+			/>
 
-				<Form.Item label="Metal" name={['JewelryRequest', 'MentalId']}>
+			<Modal
+				title="Yêu Cầu Kim Cương"
+				visible={isModalVisible}
+				onOk={handleOk}
+				onCancel={handleCancel}
+				okText="Gửi Yêu Cầu"
+				cancelText="Hủy"
+				style={{minWidth: 1000}}
+			>
+				<p></p>
+				<div className="my-10">
+					<label className="mr-5">Chấu vỏ trang sức</label>
 					<Select
-						onChange={handleMetalChange} // Update selected metal here
-						placeholder="Select a metal"
-						disabled={!selectedModel}
-					>
-						{Array.isArray(filteredMetals) &&
-							filteredMetals.map((metal) => (
-								<Option key={metal.Id} value={metal.Id}>
-									{metal.Name}
-								</Option>
-							))}
-					</Select>
-				</Form.Item>
-
-				<Form.Item label="Size" name={['JewelryRequest', 'SizeId']}>
-					<Select
-						onChange={(value) => handleChange('SizeId', value)}
-						placeholder="Select a size"
-						disabled={!selectedModel || !filteredSizes.length}
-					>
-						{filteredSizes.map((size) => (
-							<Option key={size.SizeId} value={size.SizeId}>
-								{size.Size.Id} {size.Size.Unit}
-							</Option>
-						))}
-					</Select>
-				</Form.Item>
-
-				<Form.Item label="Status" name={['JewelryRequest', 'status']}>
-					<Select onChange={(value) => handleChange('status', value)}>
-						<Option value={1}>Active</Option>
-						<Option value={2}>Sold</Option>
-						<Option value={3}>Locked</Option>
-					</Select>
-				</Form.Item>
-
-				<Form.Item label="Side Diamond Options" name={'sideDiamondOptId'}>
-					{selectedModel?.SideDiamonds?.length ? (
-						<Select
-							onChange={handleSideDiamondChange}
-							placeholder="Select Side Diamond Option"
-							disabled={!selectedModel}
-						>
-							{selectedModel.SideDiamonds.map((diamond) => (
-								<Option key={diamond.Id} value={diamond.Id}>
-									<strong>Setting:</strong> {diamond.SettingType},
-									<strong> Shape:</strong> {diamond.ShapeName},
-									<strong> Clarity:</strong> {diamond.ClarityMin} {' - '}
-									{diamond.ClarityMax}, <strong>Color:</strong> {diamond.ColorMin}{' '}
-									{' - '} {diamond.ColorMax}, <strong>Carat: </strong>{' '}
-									{diamond.CaratWeight}, <strong> Quantity:</strong>{' '}
-									{diamond.Quantity}
-								</Option>
-							))}
-						</Select>
-					) : (
-						<p>No side diamond options available for this model.</p>
-					)}
-				</Form.Item>
-
-				<Form.Item label="Attached Diamonds" name={['attachedDiamondIds']}>
-					<Select
-						mode="multiple"
+						// mode="multiple"
 						onChange={handleDiamondChange}
-						placeholder="Select diamonds"
+						placeholder="Chọn chấu"
+						className="w-64"
 					>
-						{Array.isArray(diamonds) &&
-							diamonds
-								.filter((diamond) => diamond.JewelryId === null) // Filter diamonds where JewelryId is null
-								.map((diamond) => (
-									<Option
-										key={diamond.Id}
-										value={diamond.Id}
-										disabled={isMaxDiamondsReached}
-									>
-										{diamond.Title}
+						{Array.isArray(mainDiamonds) &&
+							mainDiamonds.map((diamond, i) => (
+								<Select.Option
+									key={diamond.Id}
+									value={i} // value vẫn là 0 và 1 (nếu cần sử dụng cho logic khác)
+								>
+									{`Chấu ${i + 1}`}
+								</Select.Option>
+							))}
+					</Select>
+				</div>
+				<label className="font-semibold">Kim Cương Đã Chọn</label>
+				{selectedDiamondList.length > 0 && (
+					<div className="mb-5">
+						<Table
+							dataSource={selectedDiamondList.map((diamond, i) => ({
+								key: i,
+								index: i + 1,
+								diamondForFilterId: diamond.diamondForFilterId,
+								diamondListTitle: diamond.diamondListTitle || 'N/A',
+							}))}
+							columns={[
+								{
+									title: 'Chấu',
+									dataIndex: 'index',
+									key: 'index',
+									render: (text) => `Chấu ${text}`,
+								},
+								{
+									title: 'Kim Cương',
+									dataIndex: 'diamondListTitle',
+									key: 'diamondListTitle',
+								},
+							]}
+							pagination={false} // Tắt phân trang nếu không cần
+						/>
+					</div>
+				)}
+
+				<Space wrap className="">
+					<div className="min-w-44">
+						<p>Hình Dạng</p>
+						<Select
+							defaultValue=""
+							placeholder="Shape"
+							style={{width: 120}}
+							allowClear
+							onChange={handleShapeChange}
+						>
+							{diamondForFilter &&
+								diamondForFilter?.Shapes?.map((shape) => (
+									<Option key={shape.ShapeId} value={shape.ShapeId}>
+										{shape?.Shape?.ShapeName}
 									</Option>
 								))}
-					</Select>
-				</Form.Item>
+						</Select>
+					</div>
+					{filterShape && (
+						<div className="ml-10 min-w-44">
+							<p className="mb-4">Carat:</p>
+							<Slider
+								range
+								value={[filters?.carat?.minCarat, filters?.carat?.maxCarat]}
+								step={0.1}
+								min={filterShape?.CaratFrom || filterLimits?.Carat?.Min}
+								max={filterShape?.CaratTo || filterLimits?.Carat?.Max}
+								onChange={handleCaratChange}
+							/>
+						</div>
+					)}
 
-				<Form.Item className="flex justify-end">
-					<Button onClick={onClose} className="mr-4">
-						Cancel
-					</Button>
-					<Button onClick={() => form.resetFields()} className="mr-4">
-						Clear
-					</Button>
-					<Button type="primary" htmlType="submit">
-						Submit
-					</Button>
-				</Form.Item>
-			</Form>
+					<div className="ml-10">
+						<Checkbox checked={checked} onChange={handleChangeCheckbox}>
+							Kim Cương Nhân Tạo
+						</Checkbox>
+					</div>
+					<div className="ml-10">
+						<Checkbox
+							checked={checkedDiamondJewelry}
+							onChange={handleChangeCheckboxDiamondJewelry}
+						>
+							Kim Cương Đã Đính
+						</Checkbox>
+					</div>
+				</Space>
+				<div>
+					<DiamondList
+						diamond={diamondList}
+						handleDiamondSelectChange={handleDiamondSelectChange}
+						currentDiamondId={currentDiamondId}
+						shape={shape}
+					/>
+				</div>
+			</Modal>
 		</div>
 	);
 };

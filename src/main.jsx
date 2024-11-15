@@ -35,6 +35,9 @@ ReactDOM.createRoot(document.getElementById('root')).render(
 							headerBg: '#dec986',
 						},
 						Slider: {
+							trackBg: '#dec986',
+							trackHoverBg: '#ffed99',
+							dotActiveBorderColor: '#dec986',
 							colorPrimary: '#dec986',
 						},
 					},
