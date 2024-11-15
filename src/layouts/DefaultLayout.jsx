@@ -109,9 +109,19 @@ const DefaultLayout = () => {
 			getItem('Quản Lí Phí Vận Chuyển', '/delivery-fee', <DeliveredProcedureOutlined />),
 		(adminRole || managerRole || staffRole) &&
 			getItem('Quản Lí Giá Kim Cương', '/dimond-price', <TagOutlined />, [
-				getItem('Quản Lí Giá Kim Cương Chính', '/diamond-price/main-diamond-price', <TagOutlined />),
-				getItem('Quản Lí Giá Kim Cương Tấm', '/diamond-price/side-diamond-price', <TagOutlined />),
+				getItem(
+					'Quản Lí Giá Kim Cương Chính',
+					'/diamond-price/main-diamond-price',
+					<TagOutlined />
+				),
+				getItem(
+					'Quản Lí Giá Kim Cương Tấm',
+					'/diamond-price/side-diamond-price',
+					<TagOutlined />
+				),
 			]),
+		(adminRole || managerRole || staffRole) &&
+			getItem('Quản Lí Bài Viết', '/blogs', <DeliveredProcedureOutlined />),
 	];
 
 	const handleClickMenuItem = (e) => {

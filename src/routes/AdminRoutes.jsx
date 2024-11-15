@@ -23,7 +23,8 @@ import MetalPage from '../pages/Admin/ProductPage/JewelryPage/MetalPage';
 import OrderCustomizePage from '../pages/Admin/OrderCustomize/OrderCustomize';
 import DeliveryFeePage from '../pages/Admin/DeliveryFeePage';
 import OrderCustomizeDetail from '../pages/Admin/OrderCustomize/OrderDetail/OrderDetail';
-
+import SideDiamondPricePage from '../pages/Admin/DiamondPricePage/SideDiamondPricePage';
+import BlogPage from '../pages/Admin/BlogPage';
 export const AdminRouters = () => {
 	return (
 		<Routes>
@@ -163,6 +164,14 @@ export const AdminRouters = () => {
 					}
 				/>
 				<Route
+					path="/diamond-price/side-diamond-price"
+					element={
+						<PrivateRoute roles={['deliverer', 'staff', 'admin', 'manager']}>
+							<SideDiamondPricePage />
+						</PrivateRoute>
+					}
+				/>
+				<Route
 					path="/deliveries"
 					element={
 						<PrivateRoute roles={['staff', 'admin', 'manager']}>
@@ -175,6 +184,14 @@ export const AdminRouters = () => {
 					element={
 						<PrivateRoute roles={['staff', 'admin', 'manager']}>
 							<DeliveryFeePage />
+						</PrivateRoute>
+					}
+				/>
+				<Route
+					path="/blogs"
+					element={
+						<PrivateRoute roles={['staff', 'admin', 'manager']}>
+							<BlogPage />
 						</PrivateRoute>
 					}
 				/>
