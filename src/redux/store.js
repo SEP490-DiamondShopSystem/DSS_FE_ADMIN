@@ -13,10 +13,13 @@ import {metalSlice} from './slices/jewelry/metalSlice';
 import {jewelryModelCategorySlice} from './slices/jewelry/jewelryModelCategorySlice';
 import {jewelrySlice} from './slices/jewelry/jewelrySlice';
 import {jewelryModelSlice} from './slices/jewelry/jewelryModelSlice';
+import {paymentSlice} from './slices/paymentSlice';
+import {distanceSlice} from './slices/distanceSlice';
 import {sizeSlice} from './slices/jewelry/sizeSlice';
 import {enumSlice} from './slices/jewelry/enumSlice';
 import {shapeSlice} from './slices/shapeSlice';
 import {discountSlice} from './slices/discountSlice';
+import {customizeSlice} from './slices/customizeSlice';
 
 const rootPersistConfig = {
 	key: 'root',
@@ -36,10 +39,13 @@ const rootReducer = combineReducers({
 	jewelryModelCategorySlice: jewelryModelCategorySlice.reducer,
 	jewelrySlice: jewelrySlice.reducer,
 	jewelryModelSlice: jewelryModelSlice.reducer,
+	paymentSlice: paymentSlice.reducer,
+	distanceSlice: distanceSlice.reducer,
 	sizeSlice: sizeSlice.reducer,
 	enumSlice: enumSlice.reducer,
 	shapeSlice: shapeSlice.reducer,
 	discountSlice: discountSlice.reducer,
+	customizeSlice: customizeSlice.reducer,
 });
 
 const persistedReducer = persistReducer(rootPersistConfig, rootReducer);

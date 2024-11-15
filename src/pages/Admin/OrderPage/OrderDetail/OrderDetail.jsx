@@ -22,8 +22,6 @@ const OrderDetail = () => {
 
 	const [orders, setOrders] = useState();
 
-	console.log('orderDetail', orders);
-
 	useEffect(() => {
 		dispatch(getOrderDetail(id));
 	}, []);

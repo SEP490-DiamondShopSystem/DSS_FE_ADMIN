@@ -21,6 +21,7 @@ import AccountDetail from '../pages/Admin/AccountPage/AccountDetail/AccountDetai
 import DiamondPricePage from '../pages/Admin/DiamondPricePage';
 import MetalPage from '../pages/Admin/ProductPage/JewelryPage/MetalPage';
 import OrderCustomizePage from '../pages/Admin/OrderCustomize/OrderCustomize';
+import OrderCustomizeDetail from '../pages/Admin/OrderCustomize/OrderDetail/OrderDetail';
 
 export const AdminRouters = () => {
 	return (
@@ -55,7 +56,7 @@ export const AdminRouters = () => {
 					}
 				/>
 				<Route
-					path="/orders/preset"
+					path="/orders"
 					element={
 						<PrivateRoute roles={['deliverer', 'staff', 'admin', 'manager']}>
 							<OrderPage />
@@ -63,7 +64,7 @@ export const AdminRouters = () => {
 					}
 				/>
 				<Route
-					path="/orders/preset/:id"
+					path="/orders/:id"
 					element={
 						<PrivateRoute roles={['deliverer', 'staff', 'admin', 'manager']}>
 							<OrderDetail />
@@ -71,7 +72,7 @@ export const AdminRouters = () => {
 					}
 				/>
 				<Route
-					path="/orders/customize"
+					path="/request-customize"
 					element={
 						<PrivateRoute roles={['deliverer', 'staff', 'admin', 'manager']}>
 							<OrderCustomizePage />
@@ -79,13 +80,14 @@ export const AdminRouters = () => {
 					}
 				/>
 				<Route
-					path="/orders/customize/:id"
+					path="/request-customize/:id"
 					element={
 						<PrivateRoute roles={['deliverer', 'staff', 'admin', 'manager']}>
-							<OrderDetail />
+							<OrderCustomizeDetail />
 						</PrivateRoute>
 					}
 				/>
+
 				<Route
 					path="/products/jewelry-list"
 					element={

@@ -1,15 +1,40 @@
 import React, {useEffect, useState} from 'react';
 
-import {DeleteFilled, EditFilled, PlusOutlined} from '@ant-design/icons';
-import {Button, Image, Input, message, Modal, Select, Space, Table, Tag} from 'antd';
-import {Filter} from '../../../../components/Filter';
-import '../../../../css/antd.css';
-import {AddModalDiamond} from './AddModalDiamond/AddModalDiamond';
+import {DeleteFilled, PlusOutlined} from '@ant-design/icons';
+import {
+	Button,
+	Checkbox,
+	Image,
+	Input,
+	message,
+	Modal,
+	Popover,
+	Select,
+	Slider,
+	Space,
+	Table,
+	Tag,
+} from 'antd';
 import {useDispatch, useSelector} from 'react-redux';
 import {useNavigate} from 'react-router-dom';
-import {getAllDiamond, handleDeleteDiamond} from '../../../../redux/slices/diamondSlice';
-import {getAllDiamondSelector, LoadingDiamondSelector} from '../../../../redux/selectors';
+import Loading from '../../../../components/Loading';
+import '../../../../css/antd.css';
+import {
+	getAllDiamondSelector,
+	getAllShapeSelector,
+	GetDiamondFilterSelector,
+	LoadingDiamondSelector,
+} from '../../../../redux/selectors';
+import {
+	getAllDiamond,
+	getDiamondFilter,
+	getDiamondShape,
+	handleDeleteDiamond,
+} from '../../../../redux/slices/diamondSlice';
 import {formatPrice} from '../../../../utils';
+import {AddModalDiamond} from './AddModalDiamond/AddModalDiamond';
+import debounce from 'lodash/debounce';
+import {marks, marksClarity, marksCut} from '../../../../utils/constant';
 
 const {Search} = Input;
 
@@ -19,6 +44,8 @@ const DiamondPage = () => {
 
 	const diamondList = useSelector(getAllDiamondSelector);
 	const loading = useSelector(LoadingDiamondSelector);
+	const shapes = useSelector(getAllShapeSelector);
+	const filterLimits = useSelector(GetDiamondFilterSelector);
 
 	const [active, setActive] = useState('all');
 	const [type, setType] = useState('');
@@ -28,6 +55,33 @@ const DiamondPage = () => {
 	const [isModalVisible, setIsModalVisible] = useState(false);
 	const [diamonds, setDiamonds] = useState([]);
 	const [diamondId, setDiamondId] = useState();
+	const [filters, setFilters] = useState({});
+	const [pageSize, setPageSize] = useState(100);
+	const [start, setStart] = useState(0);
+	const [checked, setChecked] = useState(false);
+
+	useEffect(() => {
+		dispatch(getDiamondFilter());
+	}, []);
+
+	useEffect(() => {
+		if (filterLimits) {
+			setFilters({
+				shape: shape,
+				price: {minPrice: filterLimits?.Price?.Min, maxPrice: filterLimits?.Price?.Max},
+				carat: {
+					minCarat: filterLimits?.Carat?.Min,
+					maxCarat: filterLimits?.Carat?.Max,
+				},
+				color: {minColor: filterLimits?.Color?.Min, maxColor: filterLimits?.Color?.Max},
+				clarity: {
+					minClarity: filterLimits?.Clarity?.Min,
+					maxClarity: filterLimits?.Clarity?.Max,
+				},
+				cut: {minCut: filterLimits?.Cut?.Min, maxCut: filterLimits?.Cut?.Max},
+			});
+		}
+	}, [filterLimits]);
 
 	const columns = [
 		{
@@ -103,14 +157,39 @@ const DiamondPage = () => {
 	];
 
 	useEffect(() => {
-		dispatch(getAllDiamond());
+		dispatch(getDiamondShape());
 	}, []);
+
+	const fetchDiamondData = debounce(() => {
+		dispatch(
+			getAllDiamond({
+				pageSize,
+				start,
+				shapeId: shape,
+				cutFrom: filters?.cut?.minCut,
+				cutTo: filters?.cut?.maxCut,
+				colorFrom: filters?.color?.minColor,
+				colorTo: filters?.color?.maxColor,
+				clarityFrom: filters?.clarity?.minClarity,
+				clarityTo: filters?.clarity?.maxClarity,
+				caratFrom: filters?.carat?.minCarat,
+				caratTo: filters?.carat?.maxCarat,
+				isLab: checked,
+			})
+		);
+	}, 500);
+
+	useEffect(() => {
+		fetchDiamondData();
+
+		return () => fetchDiamondData.cancel();
+	}, [dispatch, filters, shape, checked]);
 
 	useEffect(() => {
 		if (diamondList) {
 			const diamondSetting =
 				diamondList &&
-				diamondList?.map((diamond) => ({
+				diamondList?.Values?.map((diamond) => ({
 					Id: diamond?.Id,
 					ShapeName: diamond?.DiamondShape?.ShapeName,
 					CriteriaId: diamond?.DiamondPrice?.CriteriaId,
@@ -137,23 +216,45 @@ const DiamondPage = () => {
 	}, [diamondList]);
 
 	console.log('diamonds', diamonds);
-
-	const filter = [
-		{name: 'All', value: 'all'},
-		{name: 'Activated', value: 'activated'},
-		{name: 'Expired', value: 'expired'},
-	];
-
-	const handleStatusBtn = (status) => {
-		setActive(status);
-	};
+	console.log('filters', filters);
 
 	const onSearch = (value) => {
 		setSearchText(value);
 	};
 
 	const handleShapeChange = (value) => {
+		console.log('value', value);
+
 		setShape(value);
+	};
+
+	const handleChange = (type, value) => {
+		setFilters((prev) => ({
+			...prev,
+			[type]: value,
+		}));
+	};
+
+	const handlePriceChange = (value) => {
+		handleChange('price', {minPrice: value[0], maxPrice: value[1]});
+	};
+
+	const handleCaratChange = (value) => {
+		handleChange('carat', {minCarat: value[0], maxCarat: value[1]});
+	};
+
+	const handleColorChange = (value) => {
+		handleChange('color', {minColor: value[0], maxColor: value[1]});
+	};
+	const handleClarityChange = (value) => {
+		handleChange('clarity', {minClarity: value[0], maxClarity: value[1]});
+	};
+	const handleCutChange = (value) => {
+		handleChange('cut', {minCut: value[0], maxCut: value[1]});
+	};
+
+	const handleChangeCheckbox = (e) => {
+		setChecked(e.target.checked); // Cập nhật trạng thái
 	};
 
 	const showModelAdd = () => {
@@ -186,40 +287,109 @@ const DiamondPage = () => {
 
 	// console.log(filteredData);
 
+	const text = <span>Lọc</span>;
+
+	const content = (
+		<div style={{width: 1000, textAlign: 'justify'}}>
+			<Space wrap className="">
+				<div className="ml-10 min-w-44">
+					<p>Hình Dạng</p>
+					<Select
+						defaultValue=""
+						placeholder="Shape"
+						style={{width: 120}}
+						allowClear
+						onChange={handleShapeChange}
+					>
+						{shapes &&
+							shapes?.map((shape) => (
+								<Option key={shape.Id} value={shape.Id}>
+									{shape?.ShapeName}
+								</Option>
+							))}
+					</Select>
+				</div>
+				<div className="ml-10 min-w-44">
+					<p className="mb-4">Giá:</p>
+					<Slider
+						range
+						value={[filters?.price?.minPrice, filters?.price?.maxPrice]}
+						min={filterLimits?.Price?.Min}
+						max={filterLimits?.Price?.Max}
+						onChange={handlePriceChange}
+					/>
+				</div>
+
+				{/* Carat Range Slider */}
+				<div className="ml-10 min-w-44">
+					<p className="mb-4">Carat:</p>
+					<Slider
+						range
+						value={[filters?.carat?.minCarat, filters?.carat?.maxCarat]}
+						step={0.1}
+						min={filterLimits?.Carat?.Min}
+						max={filterLimits?.Carat?.Max}
+						onChange={handleCaratChange}
+					/>
+				</div>
+
+				<div className="ml-10 min-w-72">
+					<p className="my-4">Color:</p>
+					<Slider
+						range
+						marks={marks}
+						min={filterLimits?.Color?.Min}
+						max={filterLimits?.Color?.Max}
+						value={[filters?.color?.minColor, filters?.color?.maxColor]}
+						onChange={handleColorChange}
+					/>
+				</div>
+				<div className="ml-10 min-w-72">
+					<p className="my-4">Clarity:</p>
+					<Slider
+						range
+						marks={marksClarity}
+						min={filterLimits?.Clarity?.Min}
+						max={filterLimits?.Clarity?.Max}
+						value={[filters?.clarity?.minClarity, filters?.clarity?.maxClarity]}
+						onChange={handleClarityChange}
+					/>
+				</div>
+				<div className="ml-10 min-w-72">
+					<p className="my-4">Cut:</p>
+					<Slider
+						range
+						marks={marksCut}
+						min={filterLimits?.Cut?.Min}
+						max={filterLimits?.Cut?.Max}
+						value={[filters?.cut?.minCut, filters?.cut?.maxCut]}
+						onChange={handleCutChange}
+					/>
+				</div>
+				<div className="ml-10">
+					<Checkbox checked={checked} onChange={handleChangeCheckbox}>
+						Kim Cương Nhân Tạo
+					</Checkbox>
+				</div>
+			</Space>
+		</div>
+	);
+	// if (diamondList === null || diamondList === undefined) <Loading />;
 	return (
 		<div className="mx-20 my-10">
 			{/* <Filter filter={filter} handleStatusBtn={handleStatusBtn} active={active} /> */}
+
 			<div>
 				<div className="flex items-center justify-between">
 					<div className="flex items-center my-5">
-						<p className="mr-3">Tìm kiếm</p>
-						<Search
-							className="w-60"
-							placeholder="input search text"
-							allowClear
-							onSearch={onSearch}
-						/>
-						<Space wrap className="ml-8">
-							<Select
-								defaultValue=""
-								placeholder="Shape"
-								style={{width: 120}}
-								allowClear
-								onChange={handleShapeChange}
-								options={[
-									{value: 'round', label: 'Round'},
-									{value: 'princess', label: 'Princess'},
-									{value: 'cushion', label: 'Cushion'},
-									{value: 'oval', label: 'Oval'},
-									{value: 'emerald', label: 'Emerald'},
-									{value: 'pear', label: 'Pear'},
-									{value: 'asscher', label: 'Asscher'},
-									{value: 'heart', label: 'Heart'},
-									{value: 'radiant', label: 'Radiant'},
-									{value: 'marquise', label: 'Marquise'},
-								]}
-							/>
-						</Space>
+						<Popover
+							placement="bottomLeft"
+							title={text}
+							content={content}
+							trigger={'click'}
+						>
+							<Button>Lọc Theo Tiêu Chí</Button>
+						</Popover>
 					</div>
 					<div>
 						<Button

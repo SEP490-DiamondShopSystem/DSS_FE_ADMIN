@@ -188,14 +188,15 @@ const JewelryCreateForm = ({onClose}) => {
 			<Form form={form} layout="vertical" onFinish={handleSubmit}>
 				<Form.Item label="Model ID" name={['JewelryRequest', 'ModelId']}>
 					<Select onChange={handleModelChange} placeholder="Select a model">
-						{models.map((model) => (
-							<Option key={model.Id} value={model.Id}>
-								{model.Name} ({model.MainDiamondCount} main diamond
-								{model.SideDiamondOptionCount &&
-									`, ${model.SideDiamondOptionCount} side diamond`}
-								)
-							</Option>
-						))}
+						{Array.isArray(models) &&
+							models.map((model) => (
+								<Option key={model.Id} value={model.Id}>
+									{model.Name} ({model.MainDiamondCount} main diamond
+									{model.SideDiamondOptionCount &&
+										`, ${model.SideDiamondOptionCount} side diamond`}
+									)
+								</Option>
+							))}
 					</Select>
 				</Form.Item>
 
@@ -205,11 +206,12 @@ const JewelryCreateForm = ({onClose}) => {
 						placeholder="Select a metal"
 						disabled={!selectedModel}
 					>
-						{filteredMetals.map((metal) => (
-							<Option key={metal.Id} value={metal.Id}>
-								{metal.Name}
-							</Option>
-						))}
+						{Array.isArray(filteredMetals) &&
+							filteredMetals.map((metal) => (
+								<Option key={metal.Id} value={metal.Id}>
+									{metal.Name}
+								</Option>
+							))}
 					</Select>
 				</Form.Item>
 
@@ -265,17 +267,18 @@ const JewelryCreateForm = ({onClose}) => {
 						onChange={handleDiamondChange}
 						placeholder="Select diamonds"
 					>
-						{diamonds
-							.filter((diamond) => diamond.JewelryId === null) // Filter diamonds where JewelryId is null
-							.map((diamond) => (
-								<Option
-									key={diamond.Id}
-									value={diamond.Id}
-									disabled={isMaxDiamondsReached}
-								>
-									{diamond.Title}
-								</Option>
-							))}
+						{Array.isArray(diamonds) &&
+							diamonds
+								.filter((diamond) => diamond.JewelryId === null) // Filter diamonds where JewelryId is null
+								.map((diamond) => (
+									<Option
+										key={diamond.Id}
+										value={diamond.Id}
+										disabled={isMaxDiamondsReached}
+									>
+										{diamond.Title}
+									</Option>
+								))}
 					</Select>
 				</Form.Item>
 
