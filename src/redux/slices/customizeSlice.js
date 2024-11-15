@@ -130,6 +130,8 @@ export const customizeSlice = createSlice({
 			})
 			.addCase(handleRejectCustomize.fulfilled, (state, action) => {
 				state.loading = false;
+				state.orderCustomizeDetail = action.payload;
+				state.orderStatusCustomizeDetail = action.payload.Status;
 			})
 			.addCase(handleRejectCustomize.rejected, (state, action) => {
 				state.loading = false;

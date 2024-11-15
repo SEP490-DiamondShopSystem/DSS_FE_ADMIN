@@ -175,7 +175,6 @@ const TimeLineOrder = ({orders, loading, statusOrder, paymentStatusOrder}) => {
 				: [...selectedDiamondList, updatedSelection];
 
 			setSelectedDiamondList(updatedList);
-			console.log('Updated Selected Diamond List:', updatedList); // Log danh sách đã cập nhật
 		} else {
 			message.warning('Vui lòng chọn cả yêu cầu và kim cương.');
 		}
@@ -282,10 +281,6 @@ const TimeLineOrder = ({orders, loading, statusOrder, paymentStatusOrder}) => {
 		} else if (res.payload.status === 400) {
 			message.error('Lỗi khi giao hàng.');
 		}
-	};
-
-	const handleCancelOrder = () => {
-		setIsCancelModalVisible(true);
 	};
 
 	const submitCancelOrder = async (values) => {
@@ -437,9 +432,10 @@ const TimeLineOrder = ({orders, loading, statusOrder, paymentStatusOrder}) => {
 									Xác Nhận
 								</Button>
 								<Button
-									type="text"
-									className="bg-red font-semibold w-32 rounded-full"
-									onClick={handleCancelOrder}
+									// type="text"
+									danger
+									className="font-semibold w-32 rounded-full"
+									onClick={handleReject}
 									disabled={loading}
 								>
 									Hủy Đơn
@@ -574,7 +570,7 @@ const TimeLineOrder = ({orders, loading, statusOrder, paymentStatusOrder}) => {
 							{selectedDiamondList?.map((item, i) => (
 								<div key={i}>
 									<p>
-										Yêu Cầu {item.diamondRequestId}: {item.diamondTitle}
+										Yêu Cầu {item.RequestCode}: {item.diamondTitle}
 									</p>
 								</div>
 							))}
