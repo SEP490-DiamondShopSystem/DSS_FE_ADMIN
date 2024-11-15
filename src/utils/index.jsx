@@ -66,6 +66,26 @@ export const getOrderStatus = (status) => {
 	}
 };
 
+export const getOrderCustomizeStatus = (status) => {
+	switch (status) {
+		case 1:
+			return 'Pending';
+		case 2:
+			return 'Priced';
+		case 3:
+			return 'Requesting';
+		case 4:
+			return 'Accepted';
+		case 5:
+			return 'Shop_Rejected';
+		case 6:
+			return 'Customer_Rejected';
+
+		default:
+			return 'Unknown';
+	}
+};
+
 export const getOrderStatusTag = (status) => {
 	switch (status) {
 		case 1:

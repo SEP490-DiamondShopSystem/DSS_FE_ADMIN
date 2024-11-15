@@ -36,6 +36,8 @@ const DefaultLayout = () => {
 	const [selectMenu, setSelectMenu] = useState(location.pathname);
 	const [openKeys, setOpenKeys] = useState([]);
 
+	const [hasRedirected, setHasRedirected] = useState(false);
+
 	useEffect(() => {
 		if (userDetail?.Roles) {
 			const isDeliverer = userDetail.Roles.some((role) => role?.RoleName === 'deliverer');
@@ -47,23 +49,26 @@ const DefaultLayout = () => {
 			setManagerRole(isManager);
 			setAdminRole(isAdmin);
 
-			// // Regular expression to match paths with optional ID parameter for preset orders
-			// const presetOrderPathRegex = /^\/orders\/preset(\/\d+)?$/;
-			// const customizeOrderPathRegex = /^\/orders\/customize(\/\d+)?$/;
+			// Define allowed paths for deliverer role, including detail pages
+			const allowedDelivererPaths = [
+				'^/orders(/\\d+)?$',
+				// '^/orders/customize(/\\d+)?$',
+			];
 
-			// console.log('isDeliverer', isDeliverer);
-			// console.log('presetOrderPathRegex', presetOrderPathRegex.test(location.pathname));
-			// console.log('customizeOrderPathRegex', customizeOrderPathRegex.test(location.pathname));
+			// Check if the current path matches any allowed path
+			const currentPath = location.pathname;
+			const isAllowedPath = allowedDelivererPaths.some((path) => {
+				const regex = new RegExp(path);
+				return regex.test(currentPath);
+			});
 
-			// const redirectTimeout = setTimeout(() => {
-			// 	if (isDeliverer && !presetOrderPathRegex.test(location.pathname)) {
-			// 		navigate('/orders/preset');
-			// 	}
-			// }, 50);
-
-			// return () => clearTimeout(redirectTimeout);
+			// Redirect only if deliverer is on a disallowed path and hasn't been redirected yet
+			if (isDeliverer && !isAllowedPath && !hasRedirected) {
+				navigate('/orders');
+				setHasRedirected(true); // Mark as redirected to avoid repeated redirects
+			}
 		}
-	}, [userDetail, navigate, location.pathname]);
+	}, [userDetail, navigate, location.pathname, hasRedirected]);
 
 	const items = [
 		(adminRole || managerRole || staffRole) &&
@@ -87,17 +92,13 @@ const DefaultLayout = () => {
 				getItem('Danh Sách Kim Loại', '/products/metal-list', <DiamondOutlined />),
 			]),
 
-		// Order Management only for roles with specific permissions
 		(adminRole || managerRole || staffRole || delivererRole) &&
-			getItem('Quản Lý Đặt Hàng', '/orders', <OrderedListOutlined />, [
-				getItem('Danh Sách Đặt Hàng Có Sẵn', '/orders/preset', <OrderedListOutlined />),
-				getItem(
-					'Danh Sách Đặt Hàng Thiết Kế',
-					'/orders/customize',
-					<OrderedListOutlined />
-				),
-			]),
+			getItem('Quản Lí Đặt Hàng', '/orders', <OrderedListOutlined />),
 
+		(adminRole || managerRole || staffRole) &&
+			getItem('Quản Lí Yêu Cầu Thiết Kế', '/request-customize', <OrderedListOutlined />),
+
+		,
 		(adminRole || managerRole || staffRole) &&
 			getItem('Quản Lí Khuyến Mãi', '/promotion', <GiftOutlined />),
 		(adminRole || managerRole || staffRole) &&

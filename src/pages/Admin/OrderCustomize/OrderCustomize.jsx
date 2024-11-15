@@ -6,11 +6,10 @@ import {useNavigate} from 'react-router-dom';
 import {Filter} from '../../../components/Filter';
 import {
 	getAllOrderCustomizeSelector,
-	getAllOrderSelector,
 	GetUserDetailSelector,
 	LoadingOrderSelector,
 } from '../../../redux/selectors';
-import {getAllOrder, getAllOrderCustomize} from '../../../redux/slices/orderSlice';
+import {getAllOrderCustomize} from '../../../redux/slices/customizeSlice';
 import {convertToVietnamDate, formatPrice} from '../../../utils';
 import {enums} from '../../../utils/constant';
 
@@ -45,16 +44,19 @@ const getEnumKey = (enumObj, value) => {
 
 const mapAttributes = (data, attributes) => {
 	return {
-		id: data?.JewelryModelId,
+		id: data?.Id,
 		EngravedFont: data?.EngravedFont,
 		EngravedText: data?.EngravedText,
+		AccountId: data.AccountId,
 		SizeId: data?.SizeId,
-		// orderTime: convertToVietnamDate(data?.CreatedDate),
-		status: getEnumKey(attributes?.OrderStatus, data?.Status),
+		orderTime: convertToVietnamDate(data?.CreatedDate),
+		expiredTime: convertToVietnamDate(data?.ExpiredDate),
+		status: getEnumKey(attributes?.CustomizeRequestStatus, data?.Status),
 		email: data?.Account?.Email,
 		totalAmount: formatPrice(data?.TotalPrice),
 		customer: null,
 		paymentMethod: getEnumKey(attributes?.PaymentStatus, data?.PaymentStatus),
+		RequestCode: data?.RequestCode,
 	};
 };
 
@@ -80,14 +82,13 @@ const OrderCustomizePage = () => {
 			getAllOrderCustomize({
 				pageSize: pageSize,
 				currentPage: current,
+				Email: searchText,
+				CreatedDate: startDate,
+				ExpiredDate: endDate,
+				Status: activeStatus,
 			})
 		);
-		// dispatch(getAllOrder());
 	}, [pageSize, current, activeStatus, startDate, endDate, searchText]);
-
-	console.log('orderList', orderList);
-	console.log('orders', orders);
-	console.log('userDetail', userDetail);
 
 	useEffect(() => {
 		if (userDetail?.Roles) {
@@ -106,12 +107,12 @@ const OrderCustomizePage = () => {
 	}, [orderList, enums]);
 
 	const columns = [
-		// {
-		// 	title: 'ID Đơn Hàng',
-		// 	dataIndex: 'id',
-		// 	key: 'id',
-		// 	align: 'center',
-		// },
+		{
+			title: 'Mã Yêu Cầu',
+			key: 'RequestCode',
+			dataIndex: 'RequestCode',
+			align: 'center',
+		},
 		{
 			title: 'Email',
 			key: 'email',
@@ -125,44 +126,11 @@ const OrderCustomizePage = () => {
 			align: 'center',
 		},
 		{
-			title: 'Giá Mẫu',
-			key: 'totalAmount',
-			dataIndex: 'totalAmount',
+			title: 'Thời Gian Hết Hạn',
+			dataIndex: 'expiredTime',
+			key: 'expiredTime',
 			align: 'center',
 		},
-
-		// {
-		// 	title: 'PT Thanh Toán',
-		// 	key: 'paymentMethod',
-		// 	dataIndex: 'paymentMethod',
-		// 	align: 'center',
-		// 	render: (status) => {
-		// 		const foundStatus = paymentStatusList.find((item) => item.name === status);
-
-		// 		let color = 'green';
-
-		// 		// Determine color based on status
-		// 		if (status === 'Refunding' || status === 'Refunded') {
-		// 			// 'canceled', 'rejected', 'shipFailed'
-		// 			color = 'red';
-		// 		} else if (status === 'Pending') {
-		// 			// 'refunded'
-		// 			color = 'orange';
-		// 		} else if (status === 'Deposited') {
-		// 			// 'deposited'
-		// 			color = 'blue';
-		// 		} else if (status === 'PaidAll') {
-		// 			// 'paidAll'
-		// 			color = 'cyan';
-		// 		}
-
-		// 		return (
-		// 			<Tag color={color}>
-		// 				{foundStatus ? foundStatus.name.toUpperCase() : status.toUpperCase()}
-		// 			</Tag>
-		// 		);
-		// 	},
-		// },
 
 		{
 			title: 'Trạng Thái',
@@ -186,16 +154,16 @@ const OrderCustomizePage = () => {
 				} else if (status === 'Pending') {
 					// 'refunded'
 					color = 'orange';
-				} else if (status === 'Processing') {
+				} else if (status === 'Requesting') {
 					// 'deposited'
 					color = 'blue';
-				} else if (status === 'Delivering') {
+				} else if (status === 'Priced') {
 					// 'paidAll'
 					color = 'cyan';
 				} else if (status === 'Prepared') {
 					// 'pending'
 					color = 'purple';
-				} else if (status === 'Success') {
+				} else if (status === 'Accepted') {
 					// 'refunding'
 					color = 'green';
 				}
@@ -217,7 +185,9 @@ const OrderCustomizePage = () => {
 						type="text"
 						className="bg-primary"
 						ghost
-						onClick={() => navigate(`/orders/${record.id}`)}
+						onClick={() =>
+							navigate(`/request-customize/${record.id}`, {state: {record}})
+						}
 					>
 						<EditFilled />
 					</Button>
@@ -240,6 +210,9 @@ const OrderCustomizePage = () => {
 		setSearchText(value);
 		console.log(value);
 	};
+
+	console.log('orderList', orderList);
+	console.log('orders', orders);
 
 	return (
 		<div className="mx-20 my-10">
@@ -276,6 +249,7 @@ const OrderCustomizePage = () => {
 						<Search
 							className="w-60"
 							placeholder="Tìm theo email"
+							type="email"
 							allowClear
 							onSearch={onSearch}
 						/>

@@ -16,14 +16,22 @@ export const AddModalDiamond = ({setShowModal, showModal}) => {
 		dispatch(getDiamondShape());
 	}, []);
 
-	console.log('shape', shapes);
+	const handleAddDiamondForm = () => {
+		Modal.confirm({
+			title: 'Vui Lòng Kiểm Tra Lại Thông Tin',
+			content: 'Bạn có chắc chắn muốn tiếp tục?',
+			okText: 'Xác nhận',
+			cancelText: 'Hủy',
+			onOk: handleOk,
+		});
+	};
 
 	const handleCancel = () => {
 		setShowModal(false);
 		// form.resetFields();
 	};
 
-	const onFinish = (values) => {
+	const handleOk = (values) => {
 		console.log('Form Values:', values);
 		const {
 			cut,
@@ -75,6 +83,7 @@ export const AddModalDiamond = ({setShowModal, showModal}) => {
 				measurement: measurements,
 				shapeId,
 				priceOffset,
+				certificate: 1,
 			})
 		).then((res) => {
 			if (res.payload !== undefined) {
@@ -96,8 +105,9 @@ export const AddModalDiamond = ({setShowModal, showModal}) => {
 			onCancel={handleCancel}
 			width={800}
 		>
-			<Form form={form} layout="vertical" onFinish={onFinish}>
+			<Form form={form} layout="vertical" onFinish={handleAddDiamondForm}>
 				{/* Diamond 4C Row */}
+				<label className="font-semibold">Thêm 4C</label>
 				<div className="flex flex-wrap gap-4">
 					<Form.Item name="cut" label="Cut" className="w-1/5">
 						<Select placeholder="Chọn Cut">
@@ -143,6 +153,7 @@ export const AddModalDiamond = ({setShowModal, showModal}) => {
 				</div>
 
 				{/* Details Row */}
+				<label className="font-semibold">Thêm Nâng Cao</label>
 				<div className="flex flex-wrap gap-4">
 					<Form.Item name="polish" label="Polish" className="w-1/4">
 						<Select placeholder="Chọn Polish">

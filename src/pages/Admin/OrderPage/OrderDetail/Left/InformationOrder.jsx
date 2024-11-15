@@ -99,7 +99,7 @@ const InformationOrder = ({orders, statusOrder, paymentStatusOrder}) => {
 					icon={<ArrowLeftOutlined />}
 					type="text"
 					className="bg-primary"
-					onClick={() => navigate('/orders/preset')}
+					onClick={() => navigate('/orders')}
 				>
 					Quay lại
 				</Button>
