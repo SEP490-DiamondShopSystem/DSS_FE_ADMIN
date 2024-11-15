@@ -98,3 +98,9 @@ export const getAllSizesSelector = (state) => state.sizeSlice.sizes;
 export const getAllEnumsSelector = (state) => state.enumSlice.enums;
 //SHAPE
 export const getAllDiamondShapesSelector = (state) => state.shapeSlice.shapes;
+//DELIVERY FEE
+export const getAllDeliveryFeesSelector = (state) => state.deliveryFeeSlice.fees;
+export const LoadingDeliveryFeeSelector = (state) => state.deliveryFeeSlice.loading;
+export const DeliveryFeelErrorSelector = (state) => state.deliveryFeeSlice.error;
+//LOCATION
+export const getAllLocationsSelector = (state) => state.locationSlice.locations;

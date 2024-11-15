@@ -21,6 +21,8 @@ import {shapeSlice} from './slices/shapeSlice';
 import {discountSlice} from './slices/discountSlice';
 import {customizeSlice} from './slices/customizeSlice';
 
+import {deliveryFeeSlice} from './slices/deliveryFeeSlice';
+import {locationSlice} from './slices/locationSlice';
 const rootPersistConfig = {
 	key: 'root',
 	storage,
@@ -45,6 +47,8 @@ const rootReducer = combineReducers({
 	enumSlice: enumSlice.reducer,
 	shapeSlice: shapeSlice.reducer,
 	discountSlice: discountSlice.reducer,
+	deliveryFeeSlice: deliveryFeeSlice.reducer,
+	locationSlice: locationSlice.reducer,
 	customizeSlice: customizeSlice.reducer,
 });
 

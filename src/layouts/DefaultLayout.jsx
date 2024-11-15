@@ -102,9 +102,16 @@ const DefaultLayout = () => {
 		(adminRole || managerRole || staffRole) &&
 			getItem('Quản Lí Khuyến Mãi', '/promotion', <GiftOutlined />),
 		(adminRole || managerRole || staffRole) &&
+			getItem('Quản Lí Giảm Giá', '/discount', <TagOutlined />),
+		(adminRole || managerRole || staffRole) &&
 			getItem('Quản Lí Vận Chuyển', '/deliveries', <DeliveredProcedureOutlined />),
 		(adminRole || managerRole || staffRole) &&
-			getItem('Quản Lí Giá Kim Cương', '/price', <TagOutlined />),
+			getItem('Quản Lí Phí Vận Chuyển', '/delivery-fee', <DeliveredProcedureOutlined />),
+		(adminRole || managerRole || staffRole) &&
+			getItem('Quản Lí Giá Kim Cương', '/dimond-price', <TagOutlined />, [
+				getItem('Quản Lí Giá Kim Cương Chính', '/diamond-price/main-diamond-price', <TagOutlined />),
+				getItem('Quản Lí Giá Kim Cương Tấm', '/diamond-price/side-diamond-price', <TagOutlined />),
+			]),
 	];
 
 	const handleClickMenuItem = (e) => {
