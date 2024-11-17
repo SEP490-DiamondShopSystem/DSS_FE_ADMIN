@@ -393,6 +393,11 @@ const InformationOrder = ({orders, statusOrder, paymentStatusOrder}) => {
 							<CheckCircleOutlined /> Khách Đồng Ý Đơn Thiết Kế
 						</p>
 					)}
+					{status === 'Accepted' && (
+						<p className=" text-darkGreen font-semibold bg-white p-2 rounded-full">
+							<CheckCircleOutlined /> Đơn Thiết Kế Đã Được Chấp Nhận
+						</p>
+					)}
 				</Col>
 				<Col span={12}></Col>
 			</Row>

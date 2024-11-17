@@ -24,7 +24,7 @@ const ORDER_STATUS_TEXTS = {
 	Shop_Rejected: 'Đã Từ Chối',
 	Customer_Rejected: 'Đã Hủy Đơn',
 	Requesting: 'Chờ Shop Xác Nhận Đơn Yêu Cầu',
-	Accepted: 'Đã Chấp Nhận',
+	Accepted: 'Shop Đã Chấp Nhận Đơn Thiết Kế',
 };
 
 const TimeLineOrder = ({orders, loading, statusOrder, paymentStatusOrder}) => {
@@ -49,6 +49,8 @@ const TimeLineOrder = ({orders, loading, statusOrder, paymentStatusOrder}) => {
 	const [selectedDiamondList, setSelectedDiamondList] = useState([]);
 
 	const diamondRequests = orders?.DiamondRequests;
+
+	console.log('status', status);
 
 	useEffect(() => {
 		if (selectedRequest) {
@@ -290,7 +292,7 @@ const TimeLineOrder = ({orders, loading, statusOrder, paymentStatusOrder}) => {
 		if (res.payload !== undefined) {
 			message.success('Từ chối thành công!');
 		} else if (res.payload.status === 400) {
-			message.error('Lỗi khi từ chối đơn hàng.');
+			message.error('Lỗi khi từ chối đơn thiết kế.');
 		}
 
 		setIsCancelModalVisible(false);
@@ -342,7 +344,7 @@ const TimeLineOrder = ({orders, loading, statusOrder, paymentStatusOrder}) => {
 					{status === 'Shop_Rejected' && paymentStatusOrder === 3 && (
 						<div className="border rounded-lg border-primary bg-tintWhite p-5 mb-5">
 							<div className="flex items-center mb-5" style={{fontSize: 16}}>
-								<p className="font-semibold">Trạng thái đơn hàng:</p>
+								<p className="font-semibold">Trạng thái đơn thiết kế:</p>
 								<p className="ml-5 text-red font-semibold">
 									<CloseCircleOutlined /> {ORDER_STATUS_TEXTS.Shop_Rejected}
 								</p>
@@ -362,9 +364,19 @@ const TimeLineOrder = ({orders, loading, statusOrder, paymentStatusOrder}) => {
 					{status === 'Shop_Rejected' && paymentStatusOrder === 4 && (
 						<div className="border rounded-lg border-primary bg-tintWhite p-5 mb-5">
 							<div className="flex items-center " style={{fontSize: 16}}>
-								<p className="font-semibold">Trạng thái đơn hàng:</p>
+								<p className="font-semibold">Trạng thái đơn thiết kế:</p>
 								<p className="ml-5 text-red font-semibold">
 									<CloseCircleOutlined /> {ORDER_STATUS_TEXTS.Shop_Rejected}
+								</p>
+							</div>
+						</div>
+					)}
+					{status === 'Accepted' && (
+						<div className="border rounded-lg border-primary bg-tintWhite p-5 mb-5">
+							<div className="flex items-center " style={{fontSize: 16}}>
+								<p className="font-semibold">Trạng thái đơn thiết kế:</p>
+								<p className="ml-5 text-darkGreen font-semibold bg-white p-2 rounded-full">
+									<CheckCircleOutlined /> {ORDER_STATUS_TEXTS.Accepted}
 								</p>
 							</div>
 						</div>
@@ -372,7 +384,7 @@ const TimeLineOrder = ({orders, loading, statusOrder, paymentStatusOrder}) => {
 					{status === 'Customer_Rejected' && paymentStatusOrder === 3 && (
 						<div className="border rounded-lg border-primary bg-tintWhite p-5 mb-5">
 							<div className="flex items-center mb-5" style={{fontSize: 16}}>
-								<p className="font-semibold">Trạng thái đơn hàng:</p>
+								<p className="font-semibold">Trạng thái đơn thiết kế:</p>
 								<p className="ml-5 text-red font-semibold">
 									<CloseCircleOutlined /> {ORDER_STATUS_TEXTS.Customer_Rejected}
 								</p>
@@ -392,7 +404,7 @@ const TimeLineOrder = ({orders, loading, statusOrder, paymentStatusOrder}) => {
 					{status === 'Customer_Rejected' && paymentStatusOrder === 4 && (
 						<div className="border rounded-lg border-primary bg-tintWhite p-5 mb-5">
 							<div className="flex items-center " style={{fontSize: 16}}>
-								<p className="font-semibold">Trạng thái đơn hàng:</p>
+								<p className="font-semibold">Trạng thái đơn thiết kế:</p>
 								<p className="ml-5 text-red font-semibold">
 									<CloseCircleOutlined /> {ORDER_STATUS_TEXTS.Customer_Rejected}
 								</p>
@@ -447,7 +459,7 @@ const TimeLineOrder = ({orders, loading, statusOrder, paymentStatusOrder}) => {
 					{/* {status === 'Requesting' && isAssigned && (
 						<div className="border rounded-lg border-primary bg-tintWhite p-5 mb-5">
 							<div className="flex items-center mb-5" style={{fontSize: 16}}>
-								<p className="font-semibold">Trạng thái đơn hàng:</p>
+								<p className="font-semibold">Trạng thái đơn thiết kế:</p>
 								<p className="ml-5">
 									<CheckCircleOutlined /> {ORDER_STATUS_TEXTS.Requesting}
 								</p>
@@ -477,7 +489,7 @@ const TimeLineOrder = ({orders, loading, statusOrder, paymentStatusOrder}) => {
 					{currentStep === 7 && (
 						<div className="border rounded-lg border-primary bg-tintWhite p-5 mb-5">
 							<div className="flex items-center mb-5" style={{fontSize: 16}}>
-								<p className="font-semibold">Trạng thái đơn hàng:</p>
+								<p className="font-semibold">Trạng thái đơn thiết kế:</p>
 								<p className="ml-5 text-red">Bị báo cáo</p>
 							</div>
 							<div className="flex justify-around">
