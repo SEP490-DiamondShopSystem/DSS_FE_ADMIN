@@ -4,12 +4,12 @@ import moment from 'moment';
 import React, {useEffect, useState} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
 import {getAllShapeSelector} from '../../../redux/selectors';
-import {getDiamondShape} from '../../../redux/slices/diamondSlice';
 import {
 	cancelPromotion,
 	createFullPromotion,
 	deletePromotion,
 	fetchPromotions,
+	fetchPromotionDetail,
 	updatePromotion,
 } from '../../../redux/slices/promotionSlice';
 import {enumMappings} from '../../../utils/constant';
@@ -30,13 +30,8 @@ const PromotionPage = ({promotionData}) => {
 	const [giftType, setGiftType] = useState({});
 	const [currentEditingIndex, setCurrentEditingIndex] = useState(null);
 
-	console.log('shapes', shapes);
-
 	useEffect(() => {
 		dispatch(fetchPromotions());
-	}, [dispatch]);
-	useEffect(() => {
-		dispatch(getDiamondShape());
 	}, [dispatch]);
 
 	const formatDate = (date) =>
@@ -44,9 +39,9 @@ const PromotionPage = ({promotionData}) => {
 
 	useEffect(() => {
 		if (promotionData) {
-			if (promotionData.require) {
+			if (promotionData.requirements) {
 				const initialTargetTypes = {};
-				promotionData.require.forEach((req, index) => {
+				promotionData.requirements.forEach((req, index) => {
 					initialTargetTypes[index] = req.targetType;
 				});
 				setTargetTypes(initialTargetTypes);
@@ -119,72 +114,96 @@ const PromotionPage = ({promotionData}) => {
 	};
 
 	const getTextForEnum = (enumType, value) => {
-		return enumMappings[enumType]?.[value] || 'Unknown';
+		return enumMappings[enumType]?.[value] || ' ';
 	};
 	const handleEdit = (promotion, index) => {
-		handleTargetTypeChange();
+		const promotionId = promotion.Id;
 		setEditingPromotionId(promotion.Id);
 		setIsEditing(true);
 		setCurrentEditingIndex(index);
 
-		form.setFieldsValue({
-			name: promotion.Name,
-			description: promotion.Description,
-			validDate: [
-				moment(promotion.StartDate, 'DD-MM-YYYY HH:mm:ss'),
-				moment(promotion.EndDate, 'DD-MM-YYYY HH:mm:ss'),
-			],
-			redemptionMode: promotion.RedemptionMode || 1,
-			isExcludeQualifierProduct: promotion.IsExcludeQualifierProduct || false,
-			priority: promotion.Priority || 1,
-			thumbnail: promotion.thumbnail,
+		dispatch(fetchPromotionDetail(promotionId)).then((res) => {
+			if (res.payload) {
+				const fetchedPromotion = res.payload;
+				const startDate = fetchedPromotion.StartDate
+					? moment(fetchedPromotion.StartDate, 'DD-MM-YYYY HH:mm:ss')
+					: null;
+				const endDate = fetchedPromotion.EndDate
+					? moment(fetchedPromotion.EndDate, 'DD-MM-YYYY HH:mm:ss')
+					: null;
 
-			// Nested requirements (PromoReqs)
-			require: promotion.PromoReqs.map((req) => ({
-				id: req.Id,
-				name: req.Name,
-				targetType: req.TargetType,
-				operator: req.Operator,
-				quantity: req.Quantity,
-				amount: req.Amount,
-				modelId: req.ModelId,
-				origin: getTextForEnum('DiamondOrigin', req.DiamondOrigin), // Map origin to displayable text
-				caratFrom: req.CaratFrom,
-				caratTo: req.CaratTo,
-				clarityFrom: getTextForEnum('Clarity', req.ClarityFrom), // Map clarity to displayable text
-				clarityTo: getTextForEnum('Clarity', req.ClarityTo),
-				cutFrom: getTextForEnum('Cut', req.CutFrom), // Map cut to displayable text
-				cutTo: getTextForEnum('Cut', req.CutTo),
-				colorFrom: getTextForEnum('Color', req.ColorFrom), // Map color to displayable text
-				colorTo: getTextForEnum('Color', req.ColorTo),
-				shapesIDs: req.PromoReqShapes,
-				type: req.Type || 'diamond',
-			})),
+				form.setFieldsValue({
+					name: fetchedPromotion.Name,
+					description: fetchedPromotion.Description,
+					validDate: [startDate, endDate],
+					isActive: fetchedPromotion.IsActive,
+					priority: fetchedPromotion.Priority || 1,
+					status: fetchedPromotion.Status || 2,
+					isExcludeQualifierProduct: fetchedPromotion.IsExcludeQualifierProduct || false,
+					redemptionMode: fetchedPromotion.RedemptionMode || 1,
+					thumbnail: fetchedPromotion.Thumbnail,
 
-			// Nested gifts (Gifts)
-			gifts: promotion.Gifts.map((gift) => ({
-				id: gift.Id,
-				name: gift.Name,
-				targetType: gift.TargetType,
-				unitType: gift.UnitType,
-				unitValue: gift.UnitValue,
-				amount: gift.Amount,
-				itemId: gift.ItemId,
-				shapesIDs: gift.DiamondGiftShapes,
-				origin: getTextForEnum('DiamondOrigin', gift.DiamondOrigin),
-				caratFrom: gift.CaratFrom,
-				caratTo: gift.CaratTo,
-				clarityFrom: getTextForEnum('Clarity', gift.ClarityFrom),
-				clarityTo: getTextForEnum('Clarity', gift.ClarityTo),
-				cutFrom: getTextForEnum('Cut', gift.CutFrom),
-				cutTo: getTextForEnum('Cut', gift.CutTo),
-				colorFrom: getTextForEnum('Color', gift.ColorFrom),
-				colorTo: getTextForEnum('Color', gift.ColorTo),
+					requirements: fetchedPromotion.PromoReqs.map((req) => {
+						const diamondSpec = req.DiamondRequirementSpec || {};
 
-				type: gift.Type || 'diamond',
-			})),
+						console.log('Requirement Diamond Spec:', diamondSpec); // Debugging log
+
+						return {
+							id: req.Id,
+							name: req.Name,
+							targetType: req.TargetType,
+							operator: req.Operator,
+							quantity: req.Quantity || 0,
+							amount: req.Amount || 0,
+							jewelryModelID: req.ModelId ,
+							diamondRequirementSpec: {
+								origin: diamondSpec.Origin? getTextForEnum('Origin', diamondSpec.Origin): '',
+								caratFrom: diamondSpec.CaratFrom ?? '',
+								caratTo: diamondSpec.CaratTo ?? '',
+								clarityFrom: diamondSpec.ClarityFrom? getTextForEnum('Clarity', diamondSpec.ClarityFrom): '',
+								clarityTo: diamondSpec.ClarityTo? getTextForEnum('Clarity', diamondSpec.ClarityTo): '',
+								cutFrom: diamondSpec.CutFrom? getTextForEnum('Cut', diamondSpec.CutFrom): '',
+								cutTo: diamondSpec.CutTo? getTextForEnum('Cut', diamondSpec.CutTo): '',
+								colorFrom: diamondSpec.ColorFrom? getTextForEnum('Color', diamondSpec.ColorFrom): '',
+								colorTo: diamondSpec.ColorTo? getTextForEnum('Color', diamondSpec.ColorTo): '',
+								shapesIDs: diamondSpec.ShapesIDs || [],
+							},
+						};
+					}),
+					gifts: fetchedPromotion.Gifts.map((gift) => {
+						const diamondSpec = gift.DiamondRequirementSpec || {};
+
+						console.log('Gift Diamond Spec:', diamondSpec); // Debugging log
+
+						return {
+							id: gift.Id,
+							name: gift.Name,
+							targetType: gift.TargetType,
+							unitType: gift.UnitType,
+							unitValue: gift.UnitValue || 0,
+							amount: gift.Amount || 0,
+							itemId: gift.ItemId || '',
+							diamondRequirementSpec: {
+								origin: diamondSpec.Origin? getTextForEnum('Origin', diamondSpec.Origin): '',
+								caratFrom: diamondSpec.CaratFrom ?? '',
+								caratTo: diamondSpec.CaratTo ?? '',
+								clarityFrom: diamondSpec.ClarityFrom? getTextForEnum('Clarity', diamondSpec.ClarityFrom): '',
+								clarityTo: diamondSpec.ClarityTo? getTextForEnum('Clarity', diamondSpec.ClarityTo): '',
+								cutFrom: diamondSpec.CutFrom? getTextForEnum('Cut', diamondSpec.CutFrom): '',
+								cutTo: diamondSpec.CutTo? getTextForEnum('Cut', diamondSpec.CutTo): '',
+								colorFrom: diamondSpec.ColorFrom? getTextForEnum('Color', diamondSpec.ColorFrom): '',
+								colorTo: diamondSpec.ColorTo? getTextForEnum('Color', diamondSpec.ColorTo): '',
+								shapesIDs: gift.DiamondRequirementSpec?.ShapesIDs || [],
+							},
+						};
+					}),
+				});
+			} else {
+				message.error('Failed to fetch promotion details.');
+			}
 		});
 	};
+
 	const handleCancel = async (id) => {
 		try {
 			await dispatch(cancelPromotion(id)); // Use your actual cancelPromotion logic
@@ -198,39 +217,32 @@ const PromotionPage = ({promotionData}) => {
 			// Validate the form fields
 			const row = await form.validateFields();
 
-			// Format the valid date range
-			const formattedDateRange = {
-				startDate: row.validDate[0].format('DD-MM-YYYY'),
-				endDate: row.validDate[1].format('DD-MM-YYYY'),
-			};
+			// Format the valid date range (from the form input)
+			const formattedStartDate = row.validDate[0].format('DD-MM-YYYY');
+			const formattedEndDate = row.validDate[1].format('DD-MM-YYYY');
 
-			// Create updated promotion data
-			const updatedPromotion = {
+			// Prepare promotion data with separate start and end dates
+			const promotionData = {
 				...row,
-				validDate: `${formattedDateRange.startDate} to ${formattedDateRange.endDate}`,
+				startDate: formattedStartDate,
+				endDate: formattedEndDate,
 			};
 
-			// Dispatch the update promotion action
-			await dispatch(
-				updatePromotion({id: editingKey, data: JSON.stringify(updatedPromotion)})
-			);
-
-			// Update local state with the new data for immediate UI feedback
-			const newData = [...promotions];
-			const index = newData.findIndex((item) => item.key === editingKey);
-			if (index > -1) {
-				const item = newData[index];
-				newData.splice(index, 1, {...item, ...updatedPromotion});
-				setPromotions(newData);
+			// Ensure that promotionId (editingPromotionId) is available
+			if (!editingPromotionId) {
+				message.error('Promotion ID is missing!');
+				return;
 			}
 
-			// Clear editing state and reset form
-			setEditingKey('');
-			setIsEditing(false);
-			form.resetFields();
+			console.log('Updating promotion with ID:', editingPromotionId); // Check if it's defined
+			console.log('Promotion Data:', promotionData);
+
+			// Dispatch the update action
+			await dispatch(updatePromotion({promotionId: editingPromotionId, promotionData}));
+
 			message.success('Promotion updated successfully!');
+			await dispatch(fetchPromotions());
 		} catch (err) {
-			// Handle errors
 			message.error('Please correct the form errors.');
 		}
 	};
@@ -254,9 +266,9 @@ const PromotionPage = ({promotionData}) => {
 
 	// Add a new requirement row based on the selected type
 	const addRequirement = (type) => {
-		const currentRequirements = form.getFieldValue('require') || [];
+		const currentRequirements = form.getFieldValue('requirements') || [];
 		form.setFieldsValue({
-			require: [...currentRequirements, {type}],
+			requirements: [...currentRequirements, {type}],
 		});
 	};
 	const addGift = (type) => {

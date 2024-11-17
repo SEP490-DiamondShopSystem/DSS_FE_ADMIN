@@ -1,218 +1,240 @@
-import React, {useState} from 'react';
-import {DeleteFilled, EditFilled, PlusOutlined} from '@ant-design/icons';
-import {Button, Image, Input, Select, Space, Table, Tag} from 'antd';
-import {Filter} from '../../../../components/Filter';
-import '../../../../css/antd.css';
-
-const {Search} = Input;
-
-const dataSource = [
-	{
-		key: '1',
-		id: 'P001',
-		image: 'https://example.com/image1.jpg',
-		productName: 'Diamond Ring',
-		type: 'ring',
-		sku: 'SKU001',
-		status: 'Activated',
-		price: '$5000',
-		name: 'Mike',
-	},
-	{
-		key: '2',
-		id: 'P002',
-		image: 'https://example.com/image2.jpg',
-		productName: 'Gold Necklace',
-		type: 'bracelets',
-		sku: 'SKU002',
-		status: 'Expired',
-		price: '$3000',
-		name: 'John',
-	},
-];
-
-const columns = [
-	{
-		title: 'ID',
-		dataIndex: 'id',
-		key: 'id',
-		align: 'center',
-	},
-	{
-		title: 'Image',
-		dataIndex: 'image',
-		key: 'image',
-		align: 'center',
-		render: (text) => <Image src={text} alt="product" style={{width: 50, height: 50}} />,
-	},
-	{
-		title: 'Product Name',
-		dataIndex: 'productName',
-		key: 'productName',
-		align: 'center',
-	},
-	{
-		title: 'Type',
-		key: 'type',
-		dataIndex: 'type',
-		align: 'center',
-	},
-	{
-		title: 'SKU',
-		key: 'sku',
-		dataIndex: 'sku',
-		align: 'center',
-	},
-	{
-		title: 'Status',
-		key: 'status',
-		dataIndex: 'status',
-		align: 'center',
-		render: (status) => {
-			let color = status.length > 5 ? 'geekblue' : 'green';
-			if (status === 'Expired') {
-				color = 'volcano';
-			}
-			return <Tag color={color}>{status.toUpperCase()}</Tag>;
-		},
-	},
-	{
-		title: 'Price',
-		key: 'price',
-		dataIndex: 'price',
-		align: 'center',
-	},
-	{
-		title: 'Action',
-		key: 'action',
-		align: 'center',
-		render: (_, record) => (
-			<Space size="middle">
-				<Button type="primary" ghost>
-					<EditFilled />
-				</Button>
-				<Button danger>
-					<DeleteFilled />
-				</Button>
-			</Space>
-		),
-	},
-];
+import React, {useEffect, useState} from 'react';
+import {useDispatch, useSelector} from 'react-redux';
+import {Form, Input, Button, Checkbox, Select, Row, Col, Spin, notification} from 'antd';
+import {SearchOutlined, PlusOutlined} from '@ant-design/icons';
+import {fetchAllJewelry} from '../../../../redux/slices/jewelry/jewelrySlice';
+import {
+	selectJewelryList,
+	selectJewelryLoading,
+	selectJewelryError,
+	selectJewelryTotalPage,
+} from '../../../../redux/selectors';
+import JewelryDetail from './JewelryDetail';
+import JewelryCreateForm from './JewelryCreateForm';
 
 const JewelryPage = () => {
-	const [active, setActive] = useState('all');
-	const [type, setType] = useState('');
-	const [metal, setMetal] = useState('');
-	const [searchText, setSearchText] = useState('');
+	const dispatch = useDispatch();
+	const jewelryList = useSelector(selectJewelryList);
+	const loading = useSelector(selectJewelryLoading);
+	const error = useSelector(selectJewelryError);
+	const totalPage = useSelector(selectJewelryTotalPage);
 
-	const filter = [
-		{name: 'All', value: 'all'},
-		{name: 'Activated', value: 'activated'},
-		{name: 'Expired', value: 'expired'},
-	];
+	const [selectedJewelry, setSelectedJewelry] = useState(null);
+	const [isCreateFormOpen, setIsCreateFormOpen] = useState(false);
+	const [currentPage, setCurrentPage] = useState(1);
+	const [pageSize, setPageSize] = useState(5);
 
-	const handleStatusBtn = (status) => {
-		setActive(status);
-	};
-
-	const onSearch = (value) => {
-		setSearchText(value);
-	};
-
-	const handleTypeChange = (value) => {
-		setType(value);
-	};
-
-	const handleMetalChange = (value) => {
-		setMetal(value);
-	};
-
-	const filteredData = dataSource.filter((item) => {
-		const matchesType = type ? item.type === type : true;
-		const matchesMetal = metal ? item.metal === metal : true;
-		const matchesSearch = item.productName.toLowerCase().includes(searchText.toLowerCase());
-		const matchesStatus =
-			active === 'all' ? true : item.status.toLowerCase() === active.toLowerCase();
-
-		// console.log('matchesType', matchesType);
-		// console.log('matchesMetal', matchesMetal);
-		// console.log('matchesSearch', matchesSearch);
-		// console.log('matchesStatus', matchesStatus);
-
-		return matchesType && matchesMetal && matchesSearch && matchesStatus;
+	const [filters, setFilters] = useState({
+		ModelName: '',
+		SerialCode: '',
+		MetalId: '',
+		SizeId: '',
+		HasSideDiamond: false,
+		Status: 1,
 	});
 
-	// console.log(filteredData);
+	const handleFilterChange = (e) => {
+		const {name, value} = e.target;
+		setFilters({...filters, [name]: value});
+	};
+
+	const handleHasSideDiamondChange = (e) => {
+		setFilters({...filters, HasSideDiamond: e.target.checked});
+	};
+
+	useEffect(() => {
+		dispatch(fetchAllJewelry({CurrentPage: currentPage, PageSize: pageSize, filters}));
+	}, [dispatch, currentPage, pageSize, filters]);
+
+	useEffect(() => {
+		if (error) {
+			notification.error({
+				message: 'Error',
+				description: error,
+				duration: 3,
+			});
+		}
+	}, [error]);
+
+	const handleJewelryClick = (jewelry) => {
+		setSelectedJewelry(jewelry);
+	};
+
+	const handleAddJewelry = () => {
+		setIsCreateFormOpen(true);
+	};
+
+	const handleCreateFormClose = () => {
+		setIsCreateFormOpen(false);
+	};
+
+	const handlePreviousPage = () => {
+		if (currentPage > 1) {
+			setCurrentPage(currentPage - 1);
+		}
+	};
+
+	const handleNextPage = () => {
+		if (currentPage < totalPage) {
+			setCurrentPage(currentPage + 1);
+		}
+	};
 
 	return (
-		<div className="mx-20 my-10">
-			<Filter filter={filter} handleStatusBtn={handleStatusBtn} active={active} />
-			<div>
-				<div className="flex items-center justify-between">
-					<div className="flex items-center my-5">
-						<p className="mr-3">Tìm kiếm</p>
-						<Search
-							className="w-60"
-							placeholder="input search text"
-							allowClear
-							onSearch={onSearch}
-						/>
-						<Space wrap className="ml-8">
-							<Select
-								defaultValue=""
-								style={{width: 120}}
-								allowClear
-								onChange={handleTypeChange}
-								options={[
-									{value: 'ring', label: 'Ring'},
-									{value: 'pendant', label: 'Pendant'},
-									{value: 'bracelets', label: 'Bracelets'},
-									{value: 'earrings', label: 'Earrings'},
-								]}
-							/>
-							<Select
-								defaultValue=""
-								style={{width: 120}}
-								allowClear
-								onChange={handleMetalChange}
-								options={[
-									{value: 'gold', label: 'Gold'},
-									{value: 'silver', label: 'Silver'},
-								]}
-							/>
-							<Select
-								defaultValue=""
-								style={{width: 120}}
-								allowClear
-								options={[
-									{value: 'round', label: 'Round'},
-									{value: 'princess', label: 'Princess'},
-									{value: 'cushion', label: 'Cushion'},
-									{value: 'oval', label: 'Oval'},
-									{value: 'emerald', label: 'Emerald'},
-									{value: 'pear', label: 'Pear'},
-									{value: 'asscher', label: 'Asscher'},
-									{value: 'heart', label: 'Heart'},
-									{value: 'radiant', label: 'Radiant'},
-									{value: 'marquise', label: 'Marquise'},
-								]}
-							/>
-						</Space>
-					</div>
-					<div>
-						<Button type="text" className="bg-primary" icon={<PlusOutlined />}>
-							Add
+		<div className="container mx-auto px-4">
+			<h1 className="text-4xl font-semibold text-primary mb-6">Jewelry Collection</h1>
+
+			{/* Filter Section */}
+			<div className="filter-section mb-6">
+				<h2 className="text-2xl font-semibold text-primary mb-4">Filters</h2>
+				<Form layout="inline" className="space-y-4">
+					<Row gutter={[16, 16]}>
+						{['ModelName', 'SerialCode', 'MetalId', 'SizeId'].map((field) => (
+							<Col span={8} key={field}>
+								<Form.Item label={field.replace(/([A-Z])/g, ' $1').toUpperCase()}>
+									<Input
+										name={field}
+										value={filters[field]}
+										onChange={handleFilterChange}
+										placeholder={`Enter ${field}`}
+										className="w-full"
+									/>
+								</Form.Item>
+							</Col>
+						))}
+						<Col span={8}>
+							<Form.Item label="Has Side Diamond">
+								<Checkbox
+									checked={filters.HasSideDiamond}
+									onChange={handleHasSideDiamondChange}
+									className="w-full"
+								/>
+							</Form.Item>
+						</Col>
+						<Col span={8}>
+							<Form.Item label="Status">
+								<Select
+									name="Status"
+									value={filters.Status}
+									onChange={(value) => setFilters({...filters, Status: value})}
+									className="w-full"
+								>
+									<Select.Option value={1}>Active</Select.Option>
+									<Select.Option value={2}>Inactive</Select.Option>
+									<Select.Option value={3}>Archived</Select.Option>
+								</Select>
+							</Form.Item>
+						</Col>
+					</Row>
+					<Form.Item>
+						<Button
+							type="primary"
+							icon={<SearchOutlined />}
+							onClick={() =>
+								dispatch(
+									fetchAllJewelry({
+										CurrentPage: currentPage,
+										PageSize: pageSize,
+										filters,
+									})
+								)
+							}
+							className="bg-primary text-black hover:bg-primaryDark"
+						>
+							Apply Filters
 						</Button>
-					</div>
+					</Form.Item>
+				</Form>
+			</div>
+
+			{/* Add Jewelry Button */}
+			<div className="flex justify-end mb-5">
+				<Button
+					type="primary"
+					icon={<PlusOutlined />}
+					onClick={handleAddJewelry}
+					className="bg-primary text-black hover:bg-primaryDark"
+				>
+					Add Jewelry
+				</Button>
+			</div>
+
+			{/* Loading, Error and Jewelry List */}
+			{loading && <Spin tip="Loading..." className="flex justify-center mt-5" />}
+			{error && <p className="text-red-500 text-center">{error}</p>}
+			{!loading && !error && (
+				<div className="jewelry-list grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+					{Array.isArray(jewelryList) &&
+						jewelryList.map((jewelry) => (
+							<div
+								key={jewelry.Id}
+								onClick={() => handleJewelryClick(jewelry)}
+								className="jewelry-item p-4 bg-tintWhite hover:bg-primaryLight shadow-lg rounded-lg cursor-pointer transition-all transform hover:scale-105"
+							>
+								<img
+									src={jewelry.thumbnail?.mediaPath || '/default-thumbnail.jpg'}
+									alt={jewelry.SerialCode}
+									className="w-full h-48 object-cover rounded-md border-2 border-gray mb-4"
+								/>
+								<div className="text-black">
+									<h2 className="text-lg font-semibold text-primary">
+										{jewelry.SerialCode}
+									</h2>
+									<p className="text-sm text-gray">
+										Category: {jewelry.Category?.Name}
+									</p>
+									<p className="text-sm font-medium text-darkGreen">
+										Price: {jewelry.TotalPrice.toLocaleString()} VND
+									</p>
+								</div>
+							</div>
+						))}
 				</div>
-				<div>
-					<Table
-						dataSource={filteredData}
-						columns={columns}
-						className="custom-table-header"
+			)}
+
+			{/* Pagination Controls */}
+			<div className="pagination-controls flex justify-center space-x-4 mt-4">
+				<Button
+					onClick={handlePreviousPage}
+					disabled={currentPage === 1}
+					className="bg-primary text-black hover:bg-primaryDark disabled:opacity-50"
+				>
+					Previous
+				</Button>
+				<span className="text-lg">{`Page ${currentPage} of ${totalPage}`}</span>
+				<Button
+					onClick={handleNextPage}
+					disabled={currentPage === totalPage}
+					className="bg-primary text-black hover:bg-primaryDark disabled:opacity-50"
+				>
+					Next
+				</Button>
+				<Select
+					value={pageSize}
+					onChange={(value) => setPageSize(value)}
+					className="form-select p-2 border border-gray rounded-md"
+				>
+					<Select.Option value={5}>5 per page</Select.Option>
+					<Select.Option value={10}>10 per page</Select.Option>
+					<Select.Option value={20}>20 per page</Select.Option>
+				</Select>
+			</div>
+
+			{/* Jewelry Detail Modal */}
+			{selectedJewelry && (
+				<JewelryDetail jewelry={selectedJewelry} onClose={() => setSelectedJewelry(null)} />
+			)}
+
+			{/* Jewelry Create Form Modal */}
+			{isCreateFormOpen && (
+				<div className="">
+					<JewelryCreateForm
+						onClose={handleCreateFormClose}
+						isCreateFormOpen={isCreateFormOpen}
+						setIsCreateFormOpen={setIsCreateFormOpen}
 					/>
 				</div>
-			</div>
+			)}
 		</div>
 	);
 };

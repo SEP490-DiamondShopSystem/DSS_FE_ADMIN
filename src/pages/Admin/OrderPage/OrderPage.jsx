@@ -228,7 +228,7 @@ const OrderPage = () => {
 						type="text"
 						className="bg-primary"
 						ghost
-						onClick={() => navigate(`/orders/preset/${record.id}`)}
+						onClick={() => navigate(`/orders/${record.id}`)}
 					>
 						<EditFilled />
 					</Button>

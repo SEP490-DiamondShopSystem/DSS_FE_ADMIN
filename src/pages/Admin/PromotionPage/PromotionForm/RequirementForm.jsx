@@ -5,7 +5,7 @@ import React from 'react';
 export const RequirementForm = ({targetTypes, handleTargetTypeChange, shapes, Option}) => {
 	return (
 		<div>
-			<Form.List name="requirements">
+			<Form.List name="require">
 				{(fields, {add, remove}) => (
 					<>
 						{fields.map(({key, name, fieldKey, ...restField}, index) => {

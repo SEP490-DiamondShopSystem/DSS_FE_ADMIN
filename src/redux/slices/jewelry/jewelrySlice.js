@@ -1,115 +1,127 @@
 import {createAsyncThunk, createSlice} from '@reduxjs/toolkit';
 import {api} from '../../../services/api';
 
-// Async thunk for fetching jewelry data
-export const fetchJewelry = createAsyncThunk(
-	'jewelry/fetchJewelry',
-	async (
-		{page, take, ModelName, SerialCode, MetalId, SizeId, HasSideDiamond, Status},
-		{rejectWithValue}
-	) => {
+// Thunk to fetch all jewelry items with pagination and optional filters
+export const fetchAllJewelry = createAsyncThunk(
+	'jewelry/fetchAll',
+	async (params, {rejectWithValue}) => {
 		try {
-			const response = await api.get('/api/Jewelry/Staff/All', {
-				params: {
-					page,
-					take,
-					ModelName,
-					SerialCode,
-					MetalId,
-					SizeId,
-					HasSideDiamond,
-					Status,
-				},
-			});
+			const response = await api.get('/Jewelry/Staff/All', {params});
+			console.log('fetchAllJewelry response:', response);
 			return response;
 		} catch (error) {
-			return rejectWithValue(error.response || error.message);
+			console.error('fetchAllJewelry error:', error.response);
+			return thunkAPI.rejectWithValue(error.response);
 		}
 	}
 );
+
+// Thunk to fetch a single jewelry detail by ID
 export const fetchJewelryDetail = createAsyncThunk(
-	'jewelry/fetchJewelryDetail',
-	async (jewelryId, {rejectWithValue}) => {
+	'jewelry/fetchDetail',
+	async (jewelryId, thunkAPI) => {
 		try {
-			const response = await api.get(`/api/Jewelry/Staff/Detail`, {
-				params: {jewelryId},
-			});
-			return response; 
+			const response = await api.get(`/Jewelry/Staff/Detail`, {params: {jewelryId}});
+			console.log('fetchJewelryDetail response:', response);
+			return response;
 		} catch (error) {
-			return rejectWithValue(error.response || error.message);
+			console.error('fetchJewelryDetail error:', error.response);
+			return thunkAPI.rejectWithValue(error.response);
 		}
 	}
 );
+
+// Thunk to create a new jewelry item
 export const createJewelry = createAsyncThunk(
-	'jewelry/createJewelry',
-	async ({jewelryRequest, sideDiamondOptId, attachedDiamondIds}, {rejectWithValue}) => {
+	'jewelry/create',
+	async ({modelId, sizeId, metalId, status, sideDiamondOptId, attachedDiamondIds}, thunkAPI) => {
 		try {
-			const response = await api.post('/api/Jewelry/Create', {
-				jewelryRequest,
+			const response = await api.post('/Jewelry/Create', {
+				jewelryRequest: {modelId, sizeId, metalId, status},
 				sideDiamondOptId,
 				attachedDiamondIds,
 			});
+			console.log('createJewelry response:', response);
 			return response;
 		} catch (error) {
-			if (error.response) {
-				return rejectWithValue(error.response);
-			}
-			return rejectWithValue(error.message);
+			console.error('createJewelry error:', error.response);
+			return thunkAPI.rejectWithValue(error.response);
 		}
 	}
 );
 
-const initialState = {
-	jewelryItems: [],
-	totalPage: 0,
-	currentPage: 0,
-	status: 'idle',
-	error: null,
-};
-
+// Jewelry slice to manage state
 export const jewelrySlice = createSlice({
-	name: 'jewelry',
-	initialState,
-	reducers: {},
+	name: 'jewelrySlice',
+	initialState: {
+		jewelryList: [],
+		totalPage: 0,
+		currentPage: 0,
+		jewelryDetail: null,
+		loading: false,
+		error: null,
+	},
+	reducers: {
+		clearJewelryDetail: (state) => {
+			state.jewelryDetail = null;
+			state.error = null;
+		},
+	},
 	extraReducers: (builder) => {
 		builder
-			.addCase(fetchJewelry.pending, (state) => {
-				state.status = 'loading';
+			// Handle fetchAllJewelry
+			.addCase(fetchAllJewelry.pending, (state) => {
+				state.loading = true;
 				state.error = null;
+				console.log('fetchAllJewelry pending');
 			})
-			.addCase(fetchJewelry.fulfilled, (state, action) => {
-				state.status = 'succeeded';
-				state.jewelryItems = action.payload.values;
-				state.totalPage = action.payload.totalPage;
-				state.currentPage = action.payload.currentPage;
+			.addCase(fetchAllJewelry.fulfilled, (state, action) => {
+				state.loading = false;
+				state.jewelryList = action.payload.Values || []; // Use 'Values' with a capital 'V'
+				state.totalPage = action.payload.TotalPage;
+				state.currentPage = action.payload.CurrentPage;
+				console.log('fetchAllJewelry fulfilled:', action.payload);
 			})
-			.addCase(fetchJewelry.rejected, (state, action) => {
-				state.status = 'failed';
+			.addCase(fetchAllJewelry.rejected, (state, action) => {
+				state.loading = false;
 				state.error = action.payload;
+				console.error('fetchAllJewelry rejected:', action.payload);
 			})
+
+			// Handle fetchJewelryDetail
 			.addCase(fetchJewelryDetail.pending, (state) => {
 				state.loading = true;
 				state.error = null;
+				console.log('fetchJewelryDetail pending');
 			})
 			.addCase(fetchJewelryDetail.fulfilled, (state, action) => {
 				state.loading = false;
-				state.jewelryDetail = action.payload; 
+				state.jewelryDetail = action.payload;
+				console.log('fetchJewelryDetail fulfilled:', action.payload);
 			})
 			.addCase(fetchJewelryDetail.rejected, (state, action) => {
 				state.loading = false;
 				state.error = action.payload;
+				console.error('fetchJewelryDetail rejected:', action.payload);
 			})
+
+			// Handle createJewelry
 			.addCase(createJewelry.pending, (state) => {
-				state.createStatus = 'loading';
-				state.createError = null;
+				state.loading = true;
+				state.error = null;
+				console.log('createJewelry pending');
 			})
 			.addCase(createJewelry.fulfilled, (state, action) => {
-				state.createStatus = 'succeeded';
-				state.jewelryData = action.payload;
+				state.loading = false;
+				state.jewelryList.push(action.payload);
+				console.log('createJewelry fulfilled:', action.payload);
 			})
 			.addCase(createJewelry.rejected, (state, action) => {
-				state.createStatus = 'failed';
-				state.createError = action.payload || 'Failed to create jewelry';
+				state.loading = false;
+				state.error = action.payload;
+				console.error('createJewelry rejected:', action.payload);
 			});
 	},
 });
+
+export const {clearJewelryDetail} = jewelrySlice.actions;

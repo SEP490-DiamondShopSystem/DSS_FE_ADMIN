@@ -14,8 +14,15 @@ export const LoadingOrderSelector = (state) => state.orderSlice.loading;
 export const getOrderDetailSelector = (state) => state.orderSlice.orderDetail;
 export const getOrderStatusDetailSelector = (state) => state.orderSlice.orderStatusDetail;
 export const getPaymentStatusDetailSelector = (state) => state.orderSlice.orderPaymentStatusDetail;
-export const getAllOrderCustomizeSelector = (state) => state.orderSlice.ordersCustomize;
-export const getOrderDetailCustomizeSelector = (state) => state.orderSlice.orderDetailCustomize;
+
+//CUSTOMIZE
+export const getAllOrderCustomizeSelector = (state) => state.customizeSlice.ordersCustomize;
+export const getOrderDetailCustomizeSelector = (state) => state.customizeSlice.orderDetailCustomize;
+export const getOrderStatusCustomizeDetailSelector = (state) =>
+	state.customizeSlice.orderStatusCustomizeDetail;
+export const getPaymentStatusCustomizeDetailSelector = (state) =>
+	state.customizeSlice.orderPaymentStatusCustomizeDetail;
+export const getOrderCustomizeDetailSelector = (state) => state.customizeSlice.orderCustomizeDetail;
 
 //DELIVERY
 export const LoadingDeliverySelector = (state) => state.deliverySlice.loading;
@@ -26,10 +33,16 @@ export const getAllPromotionSelector = (state) => state.promotionSlice.promotion
 export const LoadingPromotionSelector = (state) => state.promotionSlice.loading;
 export const getPromotionDetailSelector = (state) => state.promotionSlice.promotionDetail;
 
+//PROMOTION
+export const getAllDiscountSelector = (state) => state.discountSlice.discounts;
+export const LoadingDiscountSelector = (state) => state.discountSlice.loading;
+export const getDiscountDetailSelector = (state) => state.discountSlice.discountDetail;
+
 //DIAMOND
 export const getAllShapeSelector = (state) => state.diamondSlice.diamondShape;
 export const getAllDiamondSelector = (state) => state.diamondSlice.diamonds;
 export const LoadingDiamondSelector = (state) => state.diamondSlice.loading;
+export const GetDiamondFilterSelector = (state) => state.diamondSlice.filterLimits;
 
 // DIAMOND PRICE
 export const getPriceBoardSelector = (state) => state.diamondPriceSlice.priceBoard;
@@ -50,14 +63,12 @@ export const LoadingJewelryModelCategorySelector = (state) =>
 	state.jewelryModelCategorySlice.loading;
 export const JewelryModelCategoryErrorSelector = (state) => state.jewelryModelCategorySlice.error;
 // JEWELRY
-export const getAllJewelrySelector = (state) => state.jewelrySlice.jewelryItems;
-export const getTotalPageSelector = (state) => state.jewelrySlice.totalPage;
-export const getCurrentPageSelector = (state) => state.jewelrySlice.currentPage;
-export const getJewelryStatusSelector = (state) => state.jewelrySlice.status;
-export const getJewelryErrorSelector = (state) => state.jewelrySlice.error;
-export const getJewelryDetailSelector = (state) => state.jewelrySlice.jewelryDetail;
-export const getCreateJewelryStatusSelector = (state) => state.jewelrySlice.createStatus;
-export const getCreateJewelryErrorSelector = (state) => state.jewelrySlice.createError;
+export const selectJewelryList = (state) => state.jewelrySlice.jewelryList;
+export const selectJewelryTotalPage = (state) => state.jewelrySlice.totalPage;
+export const selectJewelryCurrentPage = (state) => state.jewelrySlice.currentPage;
+export const selectJewelryDetail = (state) => state.jewelrySlice.jewelryDetail;
+export const selectJewelryLoading = (state) => state.jewelrySlice.loading;
+export const selectJewelryError = (state) => state.jewelrySlice.error;
 // JEWELRY MODEL
 export const selectJewelryModels = (state) => state.jewelryModel.jewelryModels;
 export const selectJewelryModelDetail = (state) => state.jewelryModel.jewelryModelDetail;
@@ -65,3 +76,35 @@ export const selectTotalPages = (state) => state.jewelryModel.totalPage;
 export const selectCurrentPage = (state) => state.jewelryModel.currentPage;
 export const selectJewelryModelStatus = (state) => state.jewelryModel.status;
 export const selectJewelryModelError = (state) => state.jewelryModel.error;
+
+//PAYMENT
+export const LoadingPaymentSelector = (state) => state.paymentSlice.loading;
+export const GetAllPaymentSelector = (state) => state.paymentSlice.payment;
+
+// DISTANCE
+export const selectDistances = (state) => state.distanceSlice.distances;
+export const GetAllWardSelector = (state) => state.distanceSlice.ward;
+export const GetAllDistrictSelector = (state) => state.distanceSlice.district;
+export const CalculateLocationSelector = (state) => state.distanceSlice.location;
+export const selectLoading = (state) => state.distanceSlice.loading;
+export const selectError = (state) => state.distanceSlice.error;
+export const getAllJewelryModelsSelector = (state) => state.jewelryModelSlice.models;
+export const getJewelryModelDetailSelector = (state) => state.jewelryModelSlice.modelDetail;
+export const LoadingJewelryModelSelector = (state) => state.jewelryModelSlice.loading;
+export const JewelryModelErrorSelector = (state) => state.jewelryModelSlice.error;
+//SIZE
+export const getAllSizesSelector = (state) => state.sizeSlice.sizes;
+//ENUM
+export const getAllEnumsSelector = (state) => state.enumSlice.enums;
+//SHAPE
+export const getAllDiamondShapesSelector = (state) => state.shapeSlice.shapes;
+//DELIVERY FEE
+export const getAllDeliveryFeesSelector = (state) => state.deliveryFeeSlice.fees;
+export const LoadingDeliveryFeeSelector = (state) => state.deliveryFeeSlice.loading;
+export const DeliveryFeelErrorSelector = (state) => state.deliveryFeeSlice.error;
+//LOCATION
+export const getAllLocationsSelector = (state) => state.locationSlice.locations;
+//BLOG
+export const selectAllBlogs = (state) => state.blogSlice.blogs;
+export const selectBlogLoading = (state) => state.blogSlice.loading;
+export const selectBlogError = (state) => state.blogSlice.error;

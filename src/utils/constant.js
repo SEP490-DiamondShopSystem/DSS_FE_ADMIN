@@ -38,8 +38,8 @@ export const enums = {
 	Status: {
 		Scheduled: 1,
 		Active: 2,
-		Paused: 3,
-		Expired: 4,
+		Expired: 3,
+		Paused: 4,
 		Cancelled: 5,
 	},
 	TargetType: {
@@ -52,12 +52,16 @@ export const enums = {
 		Fix_Price: 2,
 		Free_Gift: 3,
 	},
+	DeliveryPackageStatus: {
+		Preparing: 1,
+		Delivering: 2,
+		Complete: 3,
+		Cancelled: 4,
+	},
 	OrderItemStatus: {
-		Pending: 0,
-		Prepared: 1,
-		Done: 2,
-		Removed: 3,
-		Replaced: 4,
+		Preparing: 0,
+		Done: 1,
+		Removed: 2,
 	},
 	OrderStatus: {
 		Pending: 1,
@@ -152,7 +156,8 @@ export const enums = {
 	Cut: {
 		Good: 1,
 		Very_Good: 2,
-		Excellent: 3,
+		Ideal: 3,
+		Astor_Ideal: 4,
 	},
 	Fluorescence: {
 		None: 1,
@@ -189,26 +194,35 @@ export const enums = {
 		Car: 1,
 		Plane: 2,
 	},
-	CustomizeDiamondRequestStatus: {
-		Accepted: 1,
-		Rejected: 2,
-		Invalid: 3,
-		Finish: 4,
+	CustomizeRequestStatus: {
+		Pending: 1,
+		Priced: 2,
+		Requesting: 3,
+		Accepted: 4,
+		Shop_Rejected: 5,
+		Customer_Rejected: 6,
 	},
 	AccountRoleType: {
 		Customer: 0,
 		Staff: 1,
 		None: -1,
 	},
-	ProductStatus: {
-		Active: 1,
-		Sold: 2,
-		Locked: 3,
+	Shapes: {
+		Round: 1,
+		Cushion: 3,
+		Emerald: 4,
+		Oval: 5,
+		Radiant: 6,
+		Asscher: 7,
+		Marquise: 8,
+		Heart: 9,
+		Princess: 2,
+		Pear: 10,
 	},
 };
 
 export const enumMappings = {
-	DiamondOrigin: {
+	Origin: {
 		1: 'Natural',
 		2: 'Lab',
 		3: 'Both',
@@ -321,4 +335,30 @@ export const enumMappings = {
 		4: 'Very Good',
 		5: 'Excellent',
 	},
+};
+
+export const marks = {
+	1: 'K',
+	2: 'J',
+	3: 'I',
+	4: 'H',
+	5: 'G',
+	6: 'F',
+	7: 'E',
+	8: 'D',
+};
+export const marksCut = {
+	1: 'Good',
+	2: 'Very Good',
+	3: 'Excelent',
+};
+export const marksClarity = {
+	1: 'SI2',
+	2: 'SI1',
+	3: 'VS2',
+	4: 'VS1',
+	5: 'VVS2',
+	6: 'VVS1',
+	7: 'IF',
+	8: 'FL',
 };

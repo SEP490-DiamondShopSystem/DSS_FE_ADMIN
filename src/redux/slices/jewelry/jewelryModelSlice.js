@@ -1,98 +1,127 @@
 import {createAsyncThunk, createSlice} from '@reduxjs/toolkit';
 import {api} from '../../../services/api';
 
-export const fetchJewelryModels = createAsyncThunk(
-	'jewelryModel/fetchJewelryModels',
-	async ({page, take, name, Category, IsRhodiumFinished, IsEngravable}, {rejectWithValue}) => {
+// Thunks for API calls
+export const fetchAllJewelryModels = createAsyncThunk(
+	'jewelryModel/fetchAllJewelryModels',
+	async (params, {rejectWithValue}) => {
 		try {
-			const response = await api.get('/api/JewelryModel/Staff/All', {
-				params: {
-					page,
-					take,
-					name,
-					Category,
-					IsRhodiumFinished,
-					IsEngravable,
-				},
-			});
+			const response = await api.get('/JewelryModel/Staff/All', {params});
+			console.log(response);
 			return response;
 		} catch (error) {
-			return rejectWithValue(error.response || error.message);
+			console.error('fetchAllJewelryModels error:', error); // Log the full error for better debugging
+			return rejectWithValue(error.response || error.message || 'An unknown error occurred');
 		}
 	}
 );
 
 export const fetchJewelryModelDetail = createAsyncThunk(
 	'jewelryModel/fetchJewelryModelDetail',
-	async (modelId, {rejectWithValue}) => {
+	async (modelId, thunkAPI) => {
 		try {
-			const response = await api.get('/api/JewelryModel/Staff/Detail', {
-				params: {modelId},
-			});
+			const response = await api.get(`/JewelryModel/Staff/Detail`, {params: {modelId}});
+			console.log('fetchJewelryModelDetail response:', response); // Log API response
 			return response;
 		} catch (error) {
-			return rejectWithValue(error.response || error.message);
+			console.error('fetchJewelryModelDetail error:', error.response || error); // Log error
+			return thunkAPI.rejectWithValue(error.response);
 		}
 	}
 );
+
 export const createJewelryModel = createAsyncThunk(
 	'jewelryModel/createJewelryModel',
-	async (payload, {rejectWithValue}) => {
+	async (modelData, thunkAPI) => {
 		try {
-			const response = await api.post('/api/JewelryModel/Create', payload);
-			return response;
-		} catch (error) {
-			return rejectWithValue(error.response);
-		}
-	}
-);
-
-export const createSizeMetalSpec = createAsyncThunk(
-	'jewelryModel/createSizeMetalSpec',
-	async (payload, {rejectWithValue}) => {
-		try {
-			const response = await api.post('/api/JewelryModel/Create/SizeMetal', payload);
-			return response;
-		} catch (error) {
-			return rejectWithValue(error.response);
-		}
-	}
-);
-
-export const createSideDiamondOption = createAsyncThunk(
-	'jewelryModel/createSideDiamondOption',
-	async (payload, {rejectWithValue}) => {
-		try {
-			const response = await api.post('/api/JewelryModel/Create/SideDiamondOption', payload);
-			return response;
-		} catch (error) {
-			return rejectWithValue(error.response);
-		}
-	}
-);
-
-export const updateSizeMetalSpec = createAsyncThunk(
-	'jewelryModel/updateSizeMetalSpec',
-	async (payload, {rejectWithValue}) => {
-		try {
-			const response = await api.put('/api/JewelryModel/Update/SizeMetal', payload);
-			return response;
-		} catch (error) {
-			return rejectWithValue(error.response);
-		}
-	}
-);
-
-export const deleteSizeMetalSpec = createAsyncThunk(
-	'jewelryModel/deleteSizeMetalSpec',
-	async ({modelId, metalId, sizeId}, {rejectWithValue}) => {
-		try {
-			const response = await api.delete('/api/JewelryModel/Delete/SizeMetal', {
-				params: {modelId, metalId, sizeId},
+			const response = await api.post('/JewelryModel/Create', modelData, {
+				headers: {'Content-Type': 'application/json-patch+json'},
 			});
+			console.log('createJewelryModel response:', response); // Log API response
 			return response;
 		} catch (error) {
-			return rejectWithValue(error.response);
+			console.error('createJewelryModel error:', error.response || error); // Log error
+			return thunkAPI.rejectWithValue(error.response);
+		}
+	}
+);
+
+export const createSizeMetalForJewelryModel = createAsyncThunk(
+	'jewelryModel/createSizeMetal',
+	async ({modelId, metalSizeSpec}, thunkAPI) => {
+		try {
+			const response = await api.post(
+				`/JewelryModel/Create/SizeMetal`,
+				{modelId, metalSizeSpec},
+				{
+					headers: {'Content-Type': 'application/json-patch+json'},
+				}
+			);
+			console.log('createSizeMetalForJewelryModel response:', response); // Log API response
+			return response;
+		} catch (error) {
+			console.error('createSizeMetalForJewelryModel error:', error.response || error); // Log error
+			return thunkAPI.rejectWithValue(error.response);
+		}
+	}
+);
+
+export const createSideDiamondOptionForJewelryModel = createAsyncThunk(
+	'jewelryModel/createSideDiamondOption',
+	async ({modelId, sideDiamondSpec}, thunkAPI) => {
+		try {
+			const response = await api.post(
+				`/JewelryModel/Create/SideDiamondOption`,
+				{modelId, sideDiamondSpec},
+				{
+					headers: {'Content-Type': 'application/json-patch+json'},
+				}
+			);
+			console.log('createSideDiamondOptionForJewelryModel response:', response); // Log API response
+			return response;
+		} catch (error) {
+			console.error('createSideDiamondOptionForJewelryModel error:', error.response || error); // Log error
+			return thunkAPI.rejectWithValue(error.response);
+		}
+	}
+);
+
+export const updateSizeMetalForJewelryModel = createAsyncThunk(
+	'jewelryModel/updateSizeMetal',
+	async ({modelId, sizeMetals}, thunkAPI) => {
+		const formData = new FormData();
+		formData.append('ModelId', modelId);
+		sizeMetals.forEach((item, index) => {
+			formData.append(`SizeMetals[${index}].sizeId`, item.sizeId);
+			formData.append(`SizeMetals[${index}].metalId`, item.metalId);
+			formData.append(`SizeMetals[${index}].weight`, item.weight);
+		});
+
+		try {
+			const response = await api.put('/JewelryModel/Update/SizeMetal', formData, {
+				headers: {'Content-Type': 'multipart/form-data'},
+			});
+			console.log('updateSizeMetalForJewelryModel response:', response); // Log API response
+			return response;
+		} catch (error) {
+			console.error('updateSizeMetalForJewelryModel error:', error.response || error); // Log error
+			return thunkAPI.rejectWithValue(error.response);
+		}
+	}
+);
+
+export const deleteSizeMetalFromJewelryModel = createAsyncThunk(
+	'jewelryModel/deleteSizeMetal',
+	async ({modelId, metalId, sizeId}, thunkAPI) => {
+		try {
+			const response = await api.delete('/JewelryModel/Delete/SizeMetal', {
+				params: {ModelId: modelId, MetalId: metalId, SizeId: sizeId},
+			});
+			console.log('deleteSizeMetalFromJewelryModel response:', response); // Log API response
+			return response;
+		} catch (error) {
+			console.error('deleteSizeMetalFromJewelryModel error:', error.response || error); // Log error
+			return thunkAPI.rejectWithValue(error.response);
 		}
 	}
 );
@@ -101,116 +130,135 @@ export const deleteSideDiamondOption = createAsyncThunk(
 	'jewelryModel/deleteSideDiamondOption',
 	async ({modelId, metalId, sizeId}, {rejectWithValue}) => {
 		try {
-			const response = await api.delete('/api/JewelryModel/Delete/SideDiamondOption', {
+			const response = await api.delete(`/JewelryModel/Delete/SideDiamondOption`, {
 				params: {modelId, metalId, sizeId},
 			});
+			console.log('deleteSideDiamondOption response:', response); // Log API response
 			return response;
 		} catch (error) {
-			return rejectWithValue(error.response);
+			console.error('deleteSideDiamondOption error:', error.response || error); // Log error
+			return rejectWithValue(error.response || 'Failed to delete side diamond option');
 		}
 	}
 );
-const initialState = {
-	jewelryModels: [],
-	jewelryModelDetail: null,
-	totalPage: 0,
-	currentPage: 0,
-	status: 'idle',
-	error: null,
-};
 
 export const jewelryModelSlice = createSlice({
 	name: 'jewelryModel',
-	initialState,
+	initialState: {
+		models: [],
+		modelDetail: null,
+		loading: false,
+		error: null,
+	},
 	reducers: {},
 	extraReducers: (builder) => {
 		builder
-			.addCase(fetchJewelryModels.pending, (state) => {
-				state.status = 'loading';
+			.addCase(fetchAllJewelryModels.pending, (state) => {
+				state.loading = true;
 				state.error = null;
+				console.log('fetchAllJewelryModels loading...'); // Log loading state
 			})
-			.addCase(fetchJewelryModels.fulfilled, (state, action) => {
-				state.status = 'succeeded';
-				state.jewelryModels = action.payload.values;
-				state.totalPage = action.payload.totalPage;
-				state.currentPage = action.payload.currentPage;
+			.addCase(fetchAllJewelryModels.fulfilled, (state, action) => {
+				state.loading = false;
+				state.models = action.payload.Values || []; // Set 'Values' to models
+				console.log('fetchAllJewelryModels fulfilled:', action.payload.Values); // Log response data
 			})
-			.addCase(fetchJewelryModels.rejected, (state, action) => {
-				state.status = 'failed';
-				state.error = action.payload;
+			.addCase(fetchAllJewelryModels.rejected, (state, action) => {
+				state.loading = false;
+				state.error = action.payload || 'An unknown error occurred'; // Ensure fallback to a string if error is undefined
+				console.error('fetchAllJewelryModels error:', state.error); // Log the error
 			})
-			.addCase(fetchJewelryModelDetail.pending, (state) => {
-				state.status = 'loading';
-				state.error = null;
-			})
+
 			.addCase(fetchJewelryModelDetail.fulfilled, (state, action) => {
-				state.status = 'succeeded';
-				state.jewelryModelDetail = action.payload;
-			})
-			.addCase(fetchJewelryModelDetail.rejected, (state, action) => {
-				state.status = 'failed';
-				state.error = action.payload;
+				state.modelDetail = action.payload;
+				console.log('fetchJewelryModelDetail fulfilled:', action.payload); // Log model detail
 			})
 			.addCase(createJewelryModel.pending, (state) => {
-				state.status = 'loading';
+				state.loading = true;
+				state.error = null;
+				console.log('createJewelryModel loading...'); // Log loading state
 			})
 			.addCase(createJewelryModel.fulfilled, (state, action) => {
-				state.status = 'succeeded';
-				state.jewelryModels.push(action.payload);
+				state.loading = false;
+				state.models.push(action.payload); // Add created model to the state
+				console.log('createJewelryModel fulfilled:', action.payload); // Log created model
 			})
 			.addCase(createJewelryModel.rejected, (state, action) => {
-				state.status = 'failed';
+				state.loading = false;
 				state.error = action.payload;
+				console.error('createJewelryModel failed:', action.payload); // Log error response
 			})
-			.addCase(createSizeMetalSpec.pending, (state) => {
-				state.status = 'loading';
+			.addCase(createSizeMetalForJewelryModel.pending, (state) => {
+				state.loading = true;
+				state.error = null;
+				console.log('createSizeMetalForJewelryModel loading...'); // Log loading state
 			})
-			.addCase(createSizeMetalSpec.fulfilled, (state, action) => {
-				state.status = 'succeeded';
+			.addCase(createSizeMetalForJewelryModel.fulfilled, (state, action) => {
+				state.loading = false;
+				console.log('createSizeMetalForJewelryModel fulfilled:', action.payload); // Log response data
 			})
-			.addCase(createSizeMetalSpec.rejected, (state, action) => {
-				state.status = 'failed';
+			.addCase(createSizeMetalForJewelryModel.rejected, (state, action) => {
+				state.loading = false;
 				state.error = action.payload;
+				console.error('createSizeMetalForJewelryModel failed:', action.payload); // Log error response
 			})
-			.addCase(createSideDiamondOption.pending, (state) => {
-				state.status = 'loading';
+			.addCase(createSideDiamondOptionForJewelryModel.pending, (state) => {
+				state.loading = true;
+				state.error = null;
+				console.log('createSideDiamondOptionForJewelryModel loading...'); // Log loading state
 			})
-			.addCase(createSideDiamondOption.fulfilled, (state, action) => {
-				state.status = 'succeeded';
+			.addCase(createSideDiamondOptionForJewelryModel.fulfilled, (state, action) => {
+				state.loading = false;
+				console.log('createSideDiamondOptionForJewelryModel fulfilled:', action.payload); // Log response data
 			})
-			.addCase(createSideDiamondOption.rejected, (state, action) => {
-				state.status = 'failed';
+			.addCase(createSideDiamondOptionForJewelryModel.rejected, (state, action) => {
+				state.loading = false;
 				state.error = action.payload;
+				console.error('createSideDiamondOptionForJewelryModel failed:', action.payload); // Log error response
 			})
-			.addCase(updateSizeMetalSpec.pending, (state) => {
-				state.status = 'loading';
+			.addCase(updateSizeMetalForJewelryModel.pending, (state) => {
+				state.loading = true;
+				state.error = null;
+				console.log('updateSizeMetalForJewelryModel loading...'); // Log loading state
 			})
-			.addCase(updateSizeMetalSpec.fulfilled, (state) => {
-				state.status = 'succeeded';
+			.addCase(updateSizeMetalForJewelryModel.fulfilled, (state, action) => {
+				state.loading = false;
+				console.log('updateSizeMetalForJewelryModel fulfilled:', action.payload); // Log response data
 			})
-			.addCase(updateSizeMetalSpec.rejected, (state, action) => {
-				state.status = 'failed';
+			.addCase(updateSizeMetalForJewelryModel.rejected, (state, action) => {
+				state.loading = false;
 				state.error = action.payload;
+				console.error('updateSizeMetalForJewelryModel failed:', action.payload); // Log error response
 			})
-			.addCase(deleteSizeMetalSpec.pending, (state) => {
-				state.status = 'loading';
+			.addCase(deleteSizeMetalFromJewelryModel.pending, (state) => {
+				state.loading = true;
+				state.error = null;
+				console.log('deleteSizeMetalFromJewelryModel loading...'); // Log loading state
 			})
-			.addCase(deleteSizeMetalSpec.fulfilled, (state) => {
-				state.status = 'succeeded';
+			.addCase(deleteSizeMetalFromJewelryModel.fulfilled, (state, action) => {
+				state.loading = false;
+				console.log('deleteSizeMetalFromJewelryModel fulfilled:', action.payload); // Log response data
 			})
-			.addCase(deleteSizeMetalSpec.rejected, (state, action) => {
-				state.status = 'failed';
+			.addCase(deleteSizeMetalFromJewelryModel.rejected, (state, action) => {
+				state.loading = false;
 				state.error = action.payload;
+				console.error('deleteSizeMetalFromJewelryModel failed:', action.payload); // Log error response
 			})
 			.addCase(deleteSideDiamondOption.pending, (state) => {
-				state.status = 'loading';
+				state.loading = true;
+				state.error = null;
+				console.log('deleteSideDiamondOption loading...'); // Log loading state
 			})
-			.addCase(deleteSideDiamondOption.fulfilled, (state) => {
-				state.status = 'succeeded';
+			.addCase(deleteSideDiamondOption.fulfilled, (state, action) => {
+				state.loading = false;
+				console.log('deleteSideDiamondOption fulfilled:', action.payload); // Log response data
 			})
 			.addCase(deleteSideDiamondOption.rejected, (state, action) => {
-				state.status = 'failed';
+				state.loading = false;
 				state.error = action.payload;
+				console.error('deleteSideDiamondOption failed:', action.payload); // Log error response
 			});
 	},
 });
+
+export default jewelryModelSlice.reducer;
