@@ -139,17 +139,17 @@ const OrderCustomizePage = () => {
 			align: 'center',
 			render: (status) => {
 				const foundStatus = statusList.find((item) => item.name === status);
+				console.log('foundStatus', foundStatus);
 
 				let color = 'green';
 
 				// Determine color based on status
 				if (
-					status === 'Cancelled' ||
-					status === 'Delivery Failed' ||
+					status === 'Shop Rejected' ||
+					status === 'Customer Rejected' ||
 					status === 'Refused' ||
 					status === 'Rejected'
 				) {
-					// 'canceled', 'rejected', 'shipFailed'
 					color = 'red';
 				} else if (status === 'Pending') {
 					// 'refunded'

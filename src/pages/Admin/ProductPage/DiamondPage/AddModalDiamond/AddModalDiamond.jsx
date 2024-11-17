@@ -16,13 +16,13 @@ export const AddModalDiamond = ({setShowModal, showModal}) => {
 		dispatch(getDiamondShape());
 	}, []);
 
-	const handleAddDiamondForm = () => {
+	const handleAddDiamondForm = (values) => {
 		Modal.confirm({
 			title: 'Vui Lòng Kiểm Tra Lại Thông Tin',
 			content: 'Bạn có chắc chắn muốn tiếp tục?',
 			okText: 'Xác nhận',
 			cancelText: 'Hủy',
-			onOk: handleOk,
+			onOk: () => handleOk(values),
 		});
 	};
 
