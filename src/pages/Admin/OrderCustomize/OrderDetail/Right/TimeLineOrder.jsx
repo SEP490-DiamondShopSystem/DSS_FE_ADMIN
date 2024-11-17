@@ -1,5 +1,5 @@
 import {CheckCircleOutlined, ClockCircleOutlined, CloseCircleOutlined} from '@ant-design/icons';
-import {Button, Form, Input, message, Modal, Select, Typography} from 'antd';
+import {Button, Form, Input, message, Modal, Select, Table, Typography} from 'antd';
 import debounce from 'lodash/debounce';
 import React, {useEffect, useState} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
@@ -76,7 +76,12 @@ const TimeLineOrder = ({orders, loading, statusOrder, paymentStatusOrder}) => {
 				symmetry: selectedRequest?.Symmetry,
 				girdle: selectedRequest?.Girdle,
 				polish: selectedRequest?.Polish,
-				IsLabGrown: selectedRequest?.IsLabGrown === null ? false : true,
+				IsLabGrown:
+					selectedRequest?.IsLabGrown === null
+						? false
+						: selectedRequest?.IsLabGrown === false
+						? false
+						: true,
 			});
 		}
 	}, [selectedRequest]);
@@ -206,11 +211,11 @@ const TimeLineOrder = ({orders, loading, statusOrder, paymentStatusOrder}) => {
 			(res) => {
 				console.log('res', res);
 
-				if (res.payload.status === 200 || res.payload.status === 201) {
+				if (res.payload.status === 400) {
+					message.warning(res.data.title);
+				} else if (res.payload) {
 					message.success('Thêm Kim Cương Thành Công!');
 					setIsModalVisible(false);
-				} else if (res.payload.status === 400) {
-					message.warning(res.error.message);
 				}
 			}
 		);
@@ -218,6 +223,7 @@ const TimeLineOrder = ({orders, loading, statusOrder, paymentStatusOrder}) => {
 
 	const handleCancel = () => {
 		setIsModalVisible(false);
+		setSelectedDiamondList([]);
 	};
 
 	const handleAcceptedConfirm = () => {
@@ -252,10 +258,10 @@ const TimeLineOrder = ({orders, loading, statusOrder, paymentStatusOrder}) => {
 			(res) => {
 				console.log('res', res);
 
-				if (res.payload.status === 200 || res.payload.status === 201) {
-					message.success('Thêm Kim Cương Thành Công!');
+				if (res.payload) {
+					message.success('Đã Chấp Nhận Đơn Yêu Cầu!');
 					setIsModalVisible(false);
-				} else if (res.payload.status === 400) {
+				} else {
 					message.warning(res.error.message);
 				}
 			}
@@ -341,7 +347,7 @@ const TimeLineOrder = ({orders, loading, statusOrder, paymentStatusOrder}) => {
 						</div>
 					)}
 
-					{status === 'Shop_Rejected' && paymentStatusOrder === 3 && (
+					{status === 'Shop_Rejected' && (
 						<div className="border rounded-lg border-primary bg-tintWhite p-5 mb-5">
 							<div className="flex items-center mb-5" style={{fontSize: 16}}>
 								<p className="font-semibold">Trạng thái đơn thiết kế:</p>
@@ -577,16 +583,28 @@ const TimeLineOrder = ({orders, loading, statusOrder, paymentStatusOrder}) => {
 					</div>
 
 					{selectedDiamondList.length > 0 && (
-						<>
-							<h4 className="mt-5 font-semibold">Thông Tin Yêu Cầu Kim Cương:</h4>
-							{selectedDiamondList?.map((item, i) => (
-								<div key={i}>
-									<p>
-										Yêu Cầu {item.RequestCode}: {item.diamondTitle}
-									</p>
-								</div>
-							))}
-						</>
+						<div className="my-5">
+							<Table
+								columns={[
+									{
+										title: 'Yêu Cầu',
+										dataIndex: 'diamondRequestId',
+										key: 'diamondRequestId',
+										render: (text, record) => `Yêu Cầu ${text}`,
+									},
+									{
+										title: 'Tiêu Đề Kim Cương',
+										dataIndex: 'diamondTitle',
+										key: 'diamondTitle',
+									},
+								]}
+								dataSource={selectedDiamondList?.map((item, index) => ({
+									...item,
+									key: index,
+								}))}
+								pagination={false}
+							/>
+						</div>
 					)}
 				</div>
 			</Modal>
