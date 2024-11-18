@@ -106,5 +106,8 @@ export const DeliveryFeelErrorSelector = (state) => state.deliveryFeeSlice.error
 export const getAllLocationsSelector = (state) => state.locationSlice.locations;
 //BLOG
 export const selectAllBlogs = (state) => state.blogSlice.blogs;
+export const selectBlogDetail = (state) => state.blogSlice.detailBlog;
 export const selectBlogLoading = (state) => state.blogSlice.loading;
 export const selectBlogError = (state) => state.blogSlice.error;
+export const selectBlogCurrentPage = (state) => state.blogSlice.currentPage;
+export const selectBlogTotalPage = (state) => state.blogSlice.totalPage;
