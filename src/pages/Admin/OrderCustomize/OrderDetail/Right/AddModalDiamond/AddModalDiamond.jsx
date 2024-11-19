@@ -8,7 +8,14 @@ import {getDiamondShape} from '../../../../../../redux/slices/diamondSlice';
 
 const {Option} = Select;
 
-export const AddModalDiamond = ({setShowModal, showModal, selectedRequest}) => {
+export const AddModalDiamond = ({
+	setShowModal,
+	showModal,
+	selectedRequest,
+	handleSaveDiamond,
+	handleDiamondSelectChange,
+	generateRandomSKU,
+}) => {
 	const [form] = Form.useForm();
 	const dispatch = useDispatch();
 
@@ -32,18 +39,6 @@ export const AddModalDiamond = ({setShowModal, showModal, selectedRequest}) => {
 		setShowModal(false);
 		// form.resetFields();
 	};
-
-	function generateRandomSKU(length = 16) {
-		const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-		let sku = '';
-
-		for (let i = 0; i < length; i++) {
-			const randomIndex = Math.floor(Math.random() * characters.length);
-			sku += characters[randomIndex];
-		}
-
-		return sku;
-	}
 
 	const handleOk = (values) => {
 		console.log('Form Values:', values);
@@ -231,11 +226,20 @@ export const AddModalDiamond = ({setShowModal, showModal, selectedRequest}) => {
 								{value: 4, label: 'Very Good'},
 								{value: 5, label: 'Excellent'},
 							]
-								.filter(
-									(option) =>
-										!selectedRequest?.Polish ||
-										selectedRequest?.Polish?.includes(option.value)
-								)
+								.filter((option) => {
+									// If Polish is an array, use includes; if it's a single value, check directly
+									if (Array.isArray(selectedRequest?.Polish)) {
+										return (
+											!selectedRequest?.Polish ||
+											selectedRequest?.Polish.includes(option.value)
+										);
+									} else {
+										return (
+											!selectedRequest?.Polish ||
+											selectedRequest?.Polish === option.value
+										);
+									}
+								})
 								.map((option) => (
 									<Option key={option.value} value={option.value}>
 										{option.label}
@@ -253,11 +257,20 @@ export const AddModalDiamond = ({setShowModal, showModal, selectedRequest}) => {
 								{value: 4, label: 'Very Good'},
 								{value: 5, label: 'Excellent'},
 							]
-								.filter(
-									(option) =>
-										!selectedRequest?.Symmetry ||
-										selectedRequest?.Symmetry?.includes(option.value)
-								)
+								.filter((option) => {
+									// If Symmetry is an array, use includes; if it's a single value, compare directly
+									if (Array.isArray(selectedRequest?.Symmetry)) {
+										return (
+											!selectedRequest?.Symmetry ||
+											selectedRequest?.Symmetry.includes(option.value)
+										);
+									} else {
+										return (
+											!selectedRequest?.Symmetry ||
+											selectedRequest?.Symmetry === option.value
+										);
+									}
+								})
 								.map((option) => (
 									<Option key={option.value} value={option.value}>
 										{option.label}
@@ -283,11 +296,20 @@ export const AddModalDiamond = ({setShowModal, showModal, selectedRequest}) => {
 								{value: 7, label: 'Very Thick'},
 								{value: 8, label: 'Extremely Thick'},
 							]
-								.filter(
-									(option) =>
-										!selectedRequest?.Girdle ||
-										selectedRequest?.Girdle?.includes(option.value)
-								)
+								.filter((option) => {
+									// Check if Girdle is an array or a single value
+									if (Array.isArray(selectedRequest?.Girdle)) {
+										return (
+											!selectedRequest?.Girdle ||
+											selectedRequest?.Girdle.includes(option.value)
+										);
+									} else {
+										return (
+											!selectedRequest?.Girdle ||
+											selectedRequest?.Girdle === option.value
+										);
+									}
+								})
 								.map((option) => (
 									<Option key={option.value} value={option.value}>
 										{option.label}
@@ -317,11 +339,20 @@ export const AddModalDiamond = ({setShowModal, showModal, selectedRequest}) => {
 								{value: 7, label: 'Very Large'},
 								{value: 8, label: 'Extremely Large'},
 							]
-								.filter(
-									(option) =>
-										!selectedRequest?.Culet ||
-										selectedRequest?.Culet.includes(option.value)
-								)
+								.filter((option) => {
+									// Check if Culet is an array or a single value
+									if (Array.isArray(selectedRequest?.Culet)) {
+										return (
+											!selectedRequest?.Culet ||
+											selectedRequest?.Culet.includes(option.value)
+										);
+									} else {
+										return (
+											!selectedRequest?.Culet ||
+											selectedRequest?.Culet === option.value
+										);
+									}
+								})
 								.map((option) => (
 									<Option key={option.value} value={option.value}>
 										{option.label}
@@ -388,11 +419,20 @@ export const AddModalDiamond = ({setShowModal, showModal, selectedRequest}) => {
 						<Select placeholder="Chọn Hình Dạng">
 							{shapes &&
 								shapes
-									.filter(
-										(shape) =>
-											!selectedRequest?.DiamondShapeId ||
-											selectedRequest?.DiamondShapeId?.includes(shape.Id)
-									)
+									.filter((shape) => {
+										// Check if DiamondShapeId is an array or a single value
+										if (Array.isArray(selectedRequest?.DiamondShapeId)) {
+											return (
+												!selectedRequest?.DiamondShapeId ||
+												selectedRequest?.DiamondShapeId.includes(shape.Id)
+											);
+										} else {
+											return (
+												!selectedRequest?.DiamondShapeId ||
+												selectedRequest?.DiamondShapeId === shape.Id
+											);
+										}
+									})
 									.map((shape) => (
 										<Option key={shape.Id} value={shape.Id}>
 											{shape.ShapeName}
@@ -444,7 +484,10 @@ export const AddModalDiamond = ({setShowModal, showModal, selectedRequest}) => {
 						<span>Tự Nhiên</span>
 						<Switch
 							className="mx-5"
-							disabled={selectedRequest?.IsLabGrown !== null} // Khóa nếu giá trị khác null
+							disabled={
+								selectedRequest?.IsLabGrown === null ||
+								selectedRequest?.IsLabGrown === false
+							}
 						/>
 						<span>Nhân Tạo</span>
 					</Form.Item>

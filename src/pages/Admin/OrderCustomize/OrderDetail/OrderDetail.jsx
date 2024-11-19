@@ -24,6 +24,15 @@ const OrderCustomizeDetail = () => {
 
 	const [orders, setOrders] = useState();
 
+	const diamondRequests = orders?.DiamondRequests?.filter(
+		(request) => request.DiamondId === null
+	);
+
+	const allDiamondRequests = orders?.DiamondRequests;
+
+	const allDiamondsHaveId =
+		orders?.DiamondRequests?.every((request) => request.DiamondId !== null) || false;
+
 	useEffect(() => {
 		dispatch(getOrderCustomizeDetail({RequestId: id, AccountId: order?.AccountId}));
 	}, []);
@@ -47,6 +56,9 @@ const OrderCustomizeDetail = () => {
 							orders={orders}
 							statusOrder={statusOrder}
 							paymentStatusOrder={paymentStatusOrder}
+							diamondRequests={diamondRequests}
+							allDiamondRequests={allDiamondRequests}
+							allDiamondsHaveId={allDiamondsHaveId}
 						/>
 					</div>
 				</div>

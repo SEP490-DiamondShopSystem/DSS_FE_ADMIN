@@ -25,7 +25,6 @@ export const getDiamondShape = createAsyncThunk(
 
 		try {
 			const response = await api.get(`/Diamond/Shape/All`);
-			console.log(response);
 
 			return response;
 		} catch (error) {
