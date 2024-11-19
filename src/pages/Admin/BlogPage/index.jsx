@@ -14,7 +14,7 @@ import {
 	selectBlogTotalPage,
 	selectBlogDetail,
 } from '../../../redux/selectors';
-import {Table, Button, Modal, Form, Input, Tag, Select, Upload, message} from 'antd';
+import {Table, Button, Modal, Form, Input, Tag, Select, Upload, message, Image} from 'antd';
 import {PlusOutlined, UploadOutlined} from '@ant-design/icons';
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
@@ -159,6 +159,7 @@ const BlogPage = () => {
 			setSelectedBlog(null);
 			setEditorContent('');
 			setTags([]);
+			await dispatch(fetchAllBlogs({CurrentPage: currentPage, PageSize: pageSize}));
 		} catch (error) {
 			console.error('Error creating/updating blog:', error);
 		}
@@ -184,10 +185,15 @@ const BlogPage = () => {
 		if (detail) {
 			form.setFieldsValue({title: detail.Title});
 
-			setThumbnailFile({
-				MediaPath: detail.Thumbnail?.MediaPath,
-				ContentType: detail.Thumbnail?.ContentType,
-			});
+			if (detail.Thumbnail?.MediaPath) {
+				setThumbnailFile(
+					new File([], detail.Thumbnail.MediaPath, {
+						type: detail.Thumbnail.ContentType || 'image/jpeg', // Provide a default type
+					})
+				);
+			} else {
+				setThumbnailFile(null); // Clear if no thumbnail is provided
+			}
 
 			// Correctly set the editor content and tags
 			// const htmlContent = plainTextToHTML(detail.Content || '');
@@ -214,6 +220,7 @@ const BlogPage = () => {
 		setSelectedBlog(null);
 		setEditorContent(''); // Clear editor
 		setTags([]); // Clear tags
+		setIsEditingContent(false);
 		await dispatch(fetchAllBlogs({CurrentPage: currentPage, PageSize: pageSize}));
 	};
 
@@ -349,65 +356,52 @@ const BlogPage = () => {
 							</div>
 						</div>
 					</Form.Item>
-					<Form.Item label="Thumbnail">
+					<Form.Item className="w-full" label="Thumbnail" style={{marginBottom: '16px'}}>
 						<Upload
 							beforeUpload={(file) => {
-								if (!file || !file.name) {
+								if (!file.name) {
 									message.error('Invalid file selected.');
 									return false;
 								}
 								const fileWithPreview = Object.assign(file, {
 									preview: URL.createObjectURL(file),
 								});
-
 								setThumbnailFile(fileWithPreview);
-								return false;
+								return false; // Prevent auto-upload
 							}}
-							fileList={
-								thumbnailFile
-									? [
-											{
-												uid: '-1',
-												name: thumbnailFile.name || 'Unknown file',
-												status: 'done', // Set status to 'done' for pre-upload files
-												url:
-													thumbnailFile.preview ||
-													thumbnailFile.MediaPath, // Use preview or MediaPath for the URL
-												file: thumbnailFile,
-												thumbUrl:
-													thumbnailFile.preview ||
-													thumbnailFile.MediaPath, // Use preview for thumbUrl
-											},
-									  ]
-									: []
-							} // Show the file in the list if thumbnailFile is available
-							onRemove={() => setThumbnailFile(null)} // Remove file from state
-							showUploadList={{
-								showRemoveIcon: true,
-								showPreviewIcon: true,
-							}}
+							onRemove={() => setThumbnailFile(null)}
+							showUploadList={false}
 						>
-							{/* Image Preview outside Upload component */}
-							{thumbnailFile && (
-								<div className="mt-2">
-									<img
-										src={thumbnailFile.preview || thumbnailFile.MediaPath} // Display preview or MediaPath as image source
-										alt={thumbnailFile.name}
+							{thumbnailFile ? (
+								<div className="w-full mt-2 relative flex flex-col align-middle gap-4">
+									<Image
+										src={
+											thumbnailFile.preview ||
+											thumbnailFile.MediaPath ||
+											'/path/to/placeholder.jpg'
+										}
+										alt="Thumbnail"
 										style={{
-											width: 100,
-											height: 100,
+											width: '120px',
+											height: '120px',
 											objectFit: 'cover',
-											borderRadius: '8px',
+											borderRadius: '12px',
+											boxShadow: '0 4px 8px rgba(0,0,0,0.1)',
 										}}
 									/>
+									<Button
+										danger
+										type="link"
+										onClick={() => setThumbnailFile(null)}
+									>
+										Clear
+									</Button>
 								</div>
+							) : (
+								<Button icon={<UploadOutlined />} style={{marginTop: '8px'}}>
+									Upload Thumbnail
+								</Button>
 							)}
-							<Button
-								icon={<UploadOutlined />}
-								className="transition-all duration-300 ease-in-out hover:bg-blue-500"
-							>
-								Upload Thumbnail
-							</Button>
 						</Upload>
 					</Form.Item>
 
