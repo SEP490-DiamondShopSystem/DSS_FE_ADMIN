@@ -1,7 +1,8 @@
-import {CheckCircleOutlined, ClockCircleOutlined, CloseCircleOutlined} from '@ant-design/icons';
-import {Button, Form, Input, message, Modal, Select, Typography} from 'antd';
-import debounce from 'lodash/debounce';
 import React, {useEffect, useState} from 'react';
+
+import {CheckCircleOutlined, ClockCircleOutlined, CloseCircleOutlined} from '@ant-design/icons';
+import {Button, Form, Input, message, Modal, Select, Table, Typography, Space} from 'antd';
+import debounce from 'lodash/debounce';
 import {useDispatch, useSelector} from 'react-redux';
 import {useParams} from 'react-router-dom';
 import Loading from '../../../../../components/Loading';
@@ -14,6 +15,7 @@ import {
 	handleCustomizeOrder,
 	handleRejectCustomize,
 } from '../../../../../redux/slices/customizeSlice';
+import {AddModalDiamond} from './AddModalDiamond/AddModalDiamond';
 
 const {Title, Text} = Typography;
 const {Option} = Select;
@@ -44,11 +46,15 @@ const TimeLineOrder = ({orders, loading, statusOrder, paymentStatusOrder}) => {
 	const [selectedRequest, setSelectedRequest] = useState(null);
 	const [diamonds, setDiamonds] = useState([]);
 	const [isModalVisible, setIsModalVisible] = useState(false);
+	const [isModalAddVisible, setIsModalAddVisible] = useState(false);
 	const [filters, setFilter] = useState({});
 	const [currentDiamondId, setCurrentDiamondId] = useState(null);
 	const [selectedDiamondList, setSelectedDiamondList] = useState([]);
 
 	const diamondRequests = orders?.DiamondRequests;
+
+	console.log('orders', orders);
+	console.log('diamondRequests', diamondRequests);
 
 	console.log('status', status);
 
@@ -136,6 +142,7 @@ const TimeLineOrder = ({orders, loading, statusOrder, paymentStatusOrder}) => {
 				polish: filters?.polish,
 				includeJewelryDiamond: false,
 				isLab: filters?.IsLabGrown,
+				diamondStatuses: 1,
 			})
 		);
 	}, 500);
@@ -186,6 +193,10 @@ const TimeLineOrder = ({orders, loading, statusOrder, paymentStatusOrder}) => {
 		setIsModalVisible(true);
 	};
 
+	const showModalAdd = () => {
+		setIsModalAddVisible(true);
+	};
+
 	const handleAddDiamond = () => {
 		Modal.confirm({
 			title: 'Xác nhận đơn thiết kế này',
@@ -218,6 +229,8 @@ const TimeLineOrder = ({orders, loading, statusOrder, paymentStatusOrder}) => {
 
 	const handleCancel = () => {
 		setIsModalVisible(false);
+		setSelectedDiamondList([]);
+		setSelectedRequest(null);
 	};
 
 	const handleAcceptedConfirm = () => {
@@ -245,8 +258,6 @@ const TimeLineOrder = ({orders, loading, statusOrder, paymentStatusOrder}) => {
 			DiamondId: diamond.DiamondId,
 			DiamondRequestId: diamond.DiamondRequestId,
 		}));
-
-		// console.log('diamondAssigning', diamondAssigning);
 
 		dispatch(handleCustomizeOrder({requestId: id, diamondAssigning: diamondAssigning})).then(
 			(res) => {
@@ -276,15 +287,6 @@ const TimeLineOrder = ({orders, loading, statusOrder, paymentStatusOrder}) => {
 		});
 	};
 
-	const handleRefund = async () => {
-		const res = await dispatch(handleRefundOrder(orders.Id));
-		if (res.payload !== undefined) {
-			message.warning('Xác nhận hoàn tiền!');
-		} else if (res.payload.status === 400) {
-			message.error('Lỗi khi giao hàng.');
-		}
-	};
-
 	const submitCancelOrder = async (values) => {
 		const res = await dispatch(handleOrderReject({orderId: orders.Id, reason: values.reason}));
 		console.log('err', res.payload);
@@ -297,6 +299,8 @@ const TimeLineOrder = ({orders, loading, statusOrder, paymentStatusOrder}) => {
 
 		setIsCancelModalVisible(false);
 	};
+
+	console.log('selectedRequest', selectedRequest);
 
 	return (
 		<div>
@@ -343,13 +347,13 @@ const TimeLineOrder = ({orders, loading, statusOrder, paymentStatusOrder}) => {
 
 					{status === 'Shop_Rejected' && paymentStatusOrder === 3 && (
 						<div className="border rounded-lg border-primary bg-tintWhite p-5 mb-5">
-							<div className="flex items-center mb-5" style={{fontSize: 16}}>
+							<div className="flex items-center" style={{fontSize: 16}}>
 								<p className="font-semibold">Trạng thái đơn thiết kế:</p>
 								<p className="ml-5 text-red font-semibold">
 									<CloseCircleOutlined /> {ORDER_STATUS_TEXTS.Shop_Rejected}
 								</p>
 							</div>
-							<div className="flex justify-around">
+							{/* <div className="flex justify-around">
 								<Button
 									type="text"
 									className="bg-primary font-semibold w-full rounded-full"
@@ -358,7 +362,7 @@ const TimeLineOrder = ({orders, loading, statusOrder, paymentStatusOrder}) => {
 								>
 									Xác nhận hoàn tiền
 								</Button>
-							</div>
+							</div> */}
 						</div>
 					)}
 					{status === 'Shop_Rejected' && paymentStatusOrder === 4 && (
@@ -389,7 +393,7 @@ const TimeLineOrder = ({orders, loading, statusOrder, paymentStatusOrder}) => {
 									<CloseCircleOutlined /> {ORDER_STATUS_TEXTS.Customer_Rejected}
 								</p>
 							</div>
-							<div className="flex justify-around">
+							{/* <div className="flex justify-around">
 								<Button
 									type="text"
 									className="bg-primary font-semibold w-full rounded-full"
@@ -398,7 +402,7 @@ const TimeLineOrder = ({orders, loading, statusOrder, paymentStatusOrder}) => {
 								>
 									Xác nhận hoàn tiền
 								</Button>
-							</div>
+							</div> */}
 						</div>
 					)}
 					{status === 'Customer_Rejected' && paymentStatusOrder === 4 && (
@@ -539,23 +543,31 @@ const TimeLineOrder = ({orders, loading, statusOrder, paymentStatusOrder}) => {
 			>
 				<div>
 					<label>Chọn Kim Cương Yêu Cầu</label>
-					<Select
-						placeholder="Chọn Kim Cương Yêu Cầu"
-						onChange={handleSelectChange}
-						className="w-full"
-						// style={{width: 200}}
-					>
-						{diamondRequests &&
-							diamondRequests.map((request) => (
-								<Select.Option
-									key={request.DiamondRequestId}
-									value={request.DiamondRequestId}
-								>
-									{`Yêu Cầu ${request.DiamondRequestId}`}
-								</Select.Option>
-							))}
-					</Select>
-
+					<div className="flex">
+						<Select
+							placeholder="Chọn Kim Cương Yêu Cầu"
+							onChange={handleSelectChange}
+							className="w-full"
+							// style={{width: 200}}
+						>
+							{diamondRequests &&
+								diamondRequests.map((request) => (
+									<Select.Option
+										key={request.DiamondRequestId}
+										value={request.DiamondRequestId}
+									>
+										{`Yêu Cầu ${request.DiamondRequestId}`}
+									</Select.Option>
+								))}
+						</Select>
+						<Button
+							className="ml-5"
+							disabled={selectedRequest === null}
+							onClick={showModalAdd}
+						>
+							Tạo Kim Cương Theo Yêu Cầu
+						</Button>
+					</div>
 					<div style={{marginTop: 16}}>
 						<label>Chọn Kim Cương Đang Có</label>
 						<DiamondList
@@ -572,7 +584,7 @@ const TimeLineOrder = ({orders, loading, statusOrder, paymentStatusOrder}) => {
 							onClick={handleSaveDiamond}
 							// disabled={selectedDiamondList?.length === diamondRequests?.length}
 						>
-							Chọn Kim Cương này
+							Chọn Kim Cương Này
 						</Button>
 					</div>
 
@@ -590,6 +602,11 @@ const TimeLineOrder = ({orders, loading, statusOrder, paymentStatusOrder}) => {
 					)}
 				</div>
 			</Modal>
+			<AddModalDiamond
+				showModal={isModalAddVisible}
+				setShowModal={setIsModalAddVisible}
+				selectedRequest={selectedRequest}
+			/>
 		</div>
 	);
 };

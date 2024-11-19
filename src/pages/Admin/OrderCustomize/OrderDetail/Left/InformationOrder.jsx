@@ -1,6 +1,11 @@
 import React, {useState} from 'react';
 
-import {ArrowLeftOutlined, CheckCircleOutlined, ClockCircleFilled} from '@ant-design/icons';
+import {
+	ArrowLeftOutlined,
+	CheckCircleOutlined,
+	ClockCircleFilled,
+	CloseCircleOutlined,
+} from '@ant-design/icons';
 import {Button, Col, Divider, Row, Table, Tag, Typography} from 'antd';
 import {useDispatch, useSelector} from 'react-redux';
 import {useNavigate} from 'react-router-dom';
@@ -74,7 +79,7 @@ const InformationOrder = ({orders, statusOrder, paymentStatusOrder}) => {
 			dataIndex: 'Metal',
 			key: 'metalName',
 			render: (text) => {
-				return text?.Name || 'No name available';
+				return text?.Name;
 			},
 		},
 		{
@@ -82,7 +87,7 @@ const InformationOrder = ({orders, statusOrder, paymentStatusOrder}) => {
 			dataIndex: 'SideDiamond',
 			key: 'sideDiamond',
 			render: (text) => {
-				return text?.CaratWeight || 'No name available';
+				return text?.CaratWeight;
 			},
 		},
 		{
@@ -90,26 +95,26 @@ const InformationOrder = ({orders, statusOrder, paymentStatusOrder}) => {
 			dataIndex: 'SideDiamond',
 			key: 'sideDiamond',
 			render: (text) => {
-				return text?.Quantity || 'No name available';
+				return text?.Quantity;
 			},
 		},
 		{
 			title: 'Chữ Khắc',
 			dataIndex: 'EngravedText',
 			key: 'engravedText',
-			render: (text) => text || 'No text',
+			render: (text) => text,
 		},
 		{
 			title: 'Ngày Tạo Đơn',
 			dataIndex: 'CreatedDate',
 			key: 'createdAt',
-			render: (text) => convertToVietnamDate(text),
+			render: (text) => text,
 		},
 		{
 			title: 'Ngày Hết Hạn',
 			dataIndex: 'ExpiredDate',
 			key: 'expiredDate',
-			render: (text) => convertToVietnamDate(text),
+			render: (text) => text,
 		},
 		{
 			title: 'Trạng Thái',
@@ -301,7 +306,6 @@ const InformationOrder = ({orders, statusOrder, paymentStatusOrder}) => {
 	);
 
 	console.log('orders', orders);
-	console.log('status', status);
 
 	return (
 		<div>
@@ -398,6 +402,11 @@ const InformationOrder = ({orders, statusOrder, paymentStatusOrder}) => {
 							<CheckCircleOutlined /> Đơn Thiết Kế Đã Được Chấp Nhận
 						</p>
 					)}
+					{status === 'Shop_Rejected' && (
+						<p className=" text-red font-semibold bg-white p-2 rounded-full">
+							<CloseCircleOutlined /> Đơn Thiết Kế Đã Bị Từ Chối
+						</p>
+					)}
 				</Col>
 				<Col span={12}></Col>
 			</Row>
@@ -436,6 +445,7 @@ const InformationOrder = ({orders, statusOrder, paymentStatusOrder}) => {
 					dataSource={orders ? [orders] : []}
 					pagination={false}
 					rowKey="Id"
+					size="large"
 					expandedRowRender={expandedRowRender}
 					expandedRowKeys={expandedRowKeys}
 					onExpand={handleExpand}

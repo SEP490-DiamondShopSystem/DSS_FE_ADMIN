@@ -73,8 +73,7 @@ const DefaultLayout = () => {
 	const items = [
 		(adminRole || managerRole || staffRole) &&
 			getItem('Dashboard', '/dashboard', <DashboardOutlined />),
-		(adminRole || managerRole || staffRole) &&
-			getItem('Quản Lí Tài Khoản', '/accounts', <UserOutlined />),
+		adminRole && getItem('Quản Lí Tài Khoản', '/accounts', <UserOutlined />),
 		(adminRole || managerRole || staffRole) &&
 			getItem('Quản Lý Sản Phẩm', '/products', <ProductOutlined />, [
 				getItem('Danh Sách Trang Sức', '/products/jewelry-list', <RightOutlined />),

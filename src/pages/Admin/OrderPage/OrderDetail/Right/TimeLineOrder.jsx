@@ -6,9 +6,11 @@ import Loading from '../../../../../components/Loading';
 import {
 	getAllDeliverySelector,
 	getAllUserSelector,
+	getOrderLogsDetailSelector,
 	GetUserDetailSelector,
 } from '../../../../../redux/selectors';
 import {
+	getOrderLog,
 	handleDeliveryFailed,
 	handleOrder,
 	handleOrderAssignDeliverer,
@@ -35,13 +37,15 @@ const ORDER_STATUS_TEXTS = {
 	Refused: 'Đã Từ Chối',
 };
 
-const TimeLineOrder = ({orders, loading, statusOrder, paymentStatusOrder}) => {
+const TimeLineOrder = ({orders, loading, statusOrder, paymentStatusOrder, id}) => {
 	const dispatch = useDispatch();
 
 	const userDetail = useSelector(GetUserDetailSelector);
 	const deliveryList = useSelector(getAllDeliverySelector);
 	const userDeliverer = useSelector(getAllUserSelector);
+	// const orderLogList = useSelector(getOrderLogsDetailSelector);
 
+	// const [orderLogs, setOrderLogs] = useState([]);
 	const [currentStep, setCurrentStep] = useState(0);
 	const [status, setStatus] = useState();
 	const [userRoleManager, setUserRoleManager] = useState(false);
@@ -52,6 +56,16 @@ const TimeLineOrder = ({orders, loading, statusOrder, paymentStatusOrder}) => {
 	const [selectedShipper, setSelectedShipper] = useState();
 	const [isAssigned, setIsAssigned] = useState(false);
 	const [deliverer, setDeliverer] = useState([]);
+
+	useEffect(() => {
+		dispatch(getAllUser({roleId: '44'}));
+	}, []);
+
+	// useEffect(() => {
+	// 	if (orderLogList) {
+	// 		setOrderLogs(orderLogList);
+	// 	}
+	// }, [orderLogList]);
 
 	useEffect(() => {
 		if (orders?.Id) {
@@ -85,10 +99,6 @@ const TimeLineOrder = ({orders, loading, statusOrder, paymentStatusOrder}) => {
 			);
 		}
 	}, [deliveryList]);
-
-	useEffect(() => {
-		dispatch(getAllUser({roleId: '44'}));
-	}, []);
 
 	useEffect(() => {
 		if (userDeliverer) {
@@ -188,13 +198,8 @@ const TimeLineOrder = ({orders, loading, statusOrder, paymentStatusOrder}) => {
 		setIsCancelModalVisible(false);
 	};
 
-	console.log('userRoleManager', userRoleManager);
-	console.log('userRoleDeliverer', userRoleDeliverer);
-	console.log('isAssigned', isAssigned);
-	console.log('status', status);
-	console.log('statusOrder', statusOrder);
-	console.log('paymentStatusOrder', paymentStatusOrder);
-	console.log('selectedShipper', selectedShipper);
+	// console.log('orderLogs', orderLogs);
+	// console.log('orderLogList', orderLogList);
 
 	return (
 		<div>
@@ -491,7 +496,7 @@ const TimeLineOrder = ({orders, loading, statusOrder, paymentStatusOrder}) => {
 			)}
 
 			<Title level={3}>Trạng Thái Đơn Hàng</Title>
-			<TimeLine status={status} />
+			<TimeLine status={status} loading={loading} id={id} orders={orders} />
 
 			<Modal
 				title="Hủy Đơn"

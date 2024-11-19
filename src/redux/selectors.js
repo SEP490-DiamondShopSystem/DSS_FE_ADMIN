@@ -14,6 +14,7 @@ export const LoadingOrderSelector = (state) => state.orderSlice.loading;
 export const getOrderDetailSelector = (state) => state.orderSlice.orderDetail;
 export const getOrderStatusDetailSelector = (state) => state.orderSlice.orderStatusDetail;
 export const getPaymentStatusDetailSelector = (state) => state.orderSlice.orderPaymentStatusDetail;
+export const getOrderLogsDetailSelector = (state) => state.orderSlice.orderLogs;
 
 //CUSTOMIZE
 export const getAllOrderCustomizeSelector = (state) => state.customizeSlice.ordersCustomize;
@@ -104,3 +105,7 @@ export const LoadingDeliveryFeeSelector = (state) => state.deliveryFeeSlice.load
 export const DeliveryFeelErrorSelector = (state) => state.deliveryFeeSlice.error;
 //LOCATION
 export const getAllLocationsSelector = (state) => state.locationSlice.locations;
+//BLOG
+export const selectAllBlogs = (state) => state.blogSlice.blogs;
+export const selectBlogLoading = (state) => state.blogSlice.loading;
+export const selectBlogError = (state) => state.blogSlice.error;

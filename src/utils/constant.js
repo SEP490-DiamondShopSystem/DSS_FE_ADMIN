@@ -156,8 +156,7 @@ export const enums = {
 	Cut: {
 		Good: 1,
 		Very_Good: 2,
-		Ideal: 3,
-		Astor_Ideal: 4,
+		Excellent: 3,
 	},
 	Fluorescence: {
 		None: 1,

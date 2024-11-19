@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 
 import {ArrowLeftOutlined} from '@ant-design/icons';
 import {Button, Col, Divider, Row, Table, Tag, Typography} from 'antd';
@@ -23,28 +23,35 @@ const InformationOrder = ({orders, statusOrder, paymentStatusOrder}) => {
 	const orderStatus = getOrderStatusTag(paymentStatusOrder);
 	const status = getOrderStatus(statusOrder);
 
-	const [dataSource, setDataSource] = useState([
-		{
-			orderId: orders?.Id,
-			orderTime: convertToVietnamDate(orders?.CreatedDate),
-			price: formatPrice(orders?.TotalPrice),
-			status: getOrderStatus(orders?.Status),
-			paymentStatus: orders?.PaymentStatus,
-			products: orders?.Items.map((item) => ({
-				productId: item?.Id,
-				productName: item?.Name,
-				productPrice: formatPrice(item?.PurchasedPrice),
-			})), // Mỗi sản phẩm trong đơn hàng
-		},
-	]);
+	const [dataSource, setDataSource] = useState([]);
 
-	console.log('orders', orders);
-	console.log('statusOrder', statusOrder);
+	useEffect(() => {
+		if (orders) {
+			const newDataSource = [
+				{
+					orderId: orders?.Id,
+					orderCode: orders?.OrderCode,
+					orderTime: orders?.CreatedDate,
+					price: formatPrice(orders?.TotalPrice),
+					status: getOrderStatus(orders?.Status),
+					paymentStatus: orders?.PaymentStatus,
+					products: orders?.Items?.map((item) => ({
+						productId: item?.Id,
+						productCode: item?.Diamond?.SerialCode || item?.Jewelry?.SerialCode,
+						productName: item?.Jewelry?.Model?.Name || item?.Diamond?.Title,
+						productPrice: formatPrice(item?.PurchasedPrice),
+					})),
+					UserRankAmountSaved: formatPrice(orders?.UserRankAmountSaved),
+				},
+			];
+			setDataSource(newDataSource);
+		}
+	}, [orders]);
 
 	const columns = [
 		{
-			title: 'ID',
-			dataIndex: 'orderId',
+			title: 'Mã đơn hàng',
+			dataIndex: 'orderCode',
 			align: 'center',
 		},
 		{
@@ -62,9 +69,9 @@ const InformationOrder = ({orders, statusOrder, paymentStatusOrder}) => {
 
 	const expandedColumns = [
 		{
-			title: 'ID',
-			dataIndex: 'productId',
-			key: 'productId',
+			title: 'Mã sản phẩm',
+			dataIndex: 'productCode',
+			key: 'productCode',
 			align: 'center',
 		},
 		{
@@ -142,10 +149,10 @@ const InformationOrder = ({orders, statusOrder, paymentStatusOrder}) => {
 					<Row gutter={[16, 16]} justify="center" align="middle" className="my-3">
 						<Col span={12}>
 							<Text strong style={{fontSize: 18}}>
-								{status === 'Cancelled' ? 'Ngày Hủy' : 'Ngày Từ Chối'}
+								{status === 'Cancelled' ? 'Thời Gian Hủy' : 'Thời Gian Từ Chối'}
 							</Text>
 							<br />
-							<Text>{convertToVietnamDate(orders?.CancelledDate)}</Text>
+							<Text>{orders?.CancelledDate}</Text>
 						</Col>
 						<Col span={12}>
 							<Text strong className="mb-5" style={{fontSize: 18}}>
@@ -205,10 +212,10 @@ const InformationOrder = ({orders, statusOrder, paymentStatusOrder}) => {
 			<Row gutter={[16, 16]} justify="center" align="middle" className="my-3">
 				<Col span={12}>
 					<Text strong style={{fontSize: 18}}>
-						Ngày Đặt Hàng
+						Thời Gian Đặt Hàng
 					</Text>
 					<br />
-					<Text>{convertToVietnamDate(orders?.CreatedDate)}</Text>
+					<Text>{orders?.CreatedDate}</Text>
 				</Col>
 
 				<Col span={12}>
@@ -234,6 +241,7 @@ const InformationOrder = ({orders, statusOrder, paymentStatusOrder}) => {
 				<Table
 					dataSource={dataSource}
 					columns={columns}
+					size="large"
 					pagination={{pageSize: 5}}
 					className="custom-table-header"
 					rowKey="orderId"

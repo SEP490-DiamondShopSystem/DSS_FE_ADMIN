@@ -17,7 +17,6 @@ export const getAllUser = createAsyncThunk('userSlice/getAllUser', async (params
 		}
 
 		const data = await api.get(url);
-		console.log(data);
 
 		return data;
 	} catch (error) {

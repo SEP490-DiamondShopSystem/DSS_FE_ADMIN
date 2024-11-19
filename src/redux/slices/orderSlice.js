@@ -154,6 +154,21 @@ export const handleOrderAssignDeliverer = createAsyncThunk(
 // 	}
 // );
 
+export const getOrderLog = createAsyncThunk(
+	'orderSlice/getOrderLog',
+	async (orderId, {rejectWithValue}) => {
+		try {
+			const response = await api.get(`/Order/Log/${orderId}`);
+			console.log(response);
+
+			return response;
+		} catch (error) {
+			console.log('Error: ', JSON.stringify(error.response.data));
+			return rejectWithValue(error.response.data);
+		}
+	}
+);
+
 export const orderSlice = createSlice({
 	name: 'orderSlice',
 	initialState: {
@@ -168,6 +183,7 @@ export const orderSlice = createSlice({
 		orderPaymentStatusCustomizeDetail: null,
 		loading: false,
 		error: null,
+		orderLogs: null,
 	},
 	reducers: {},
 	extraReducers: (builder) => {
@@ -264,6 +280,17 @@ export const orderSlice = createSlice({
 				state.orderPaymentStatusDetail = action.payload.PaymentStatus;
 			})
 			.addCase(handleRefundOrder.rejected, (state, action) => {
+				state.loading = false;
+				state.error = action.payload;
+			})
+			.addCase(getOrderLog.pending, (state) => {
+				state.loading = true;
+			})
+			.addCase(getOrderLog.fulfilled, (state, action) => {
+				state.loading = false;
+				state.orderLogs = action.payload;
+			})
+			.addCase(getOrderLog.rejected, (state, action) => {
 				state.loading = false;
 				state.error = action.payload;
 			});
