@@ -1,8 +1,10 @@
-import {Modal, Select, Form, Input, InputNumber, Switch, message} from 'antd';
+import {InfoCircleOutlined} from '@ant-design/icons';
+import {Form, Input, InputNumber, message, Modal, Popover, Select, Switch} from 'antd';
 import React, {useEffect} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
 import {getAllShapeSelector} from '../../../../../../redux/selectors';
-import {getDiamondShape, handleAddDiamond} from '../../../../../../redux/slices/diamondSlice';
+import {handleAddDiamondCustomize} from '../../../../../../redux/slices/customizeSlice';
+import {getDiamondShape} from '../../../../../../redux/slices/diamondSlice';
 
 const {Option} = Select;
 
@@ -31,6 +33,18 @@ export const AddModalDiamond = ({setShowModal, showModal, selectedRequest}) => {
 		// form.resetFields();
 	};
 
+	function generateRandomSKU(length = 16) {
+		const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+		let sku = '';
+
+		for (let i = 0; i < length; i++) {
+			const randomIndex = Math.floor(Math.random() * characters.length);
+			sku += characters[randomIndex];
+		}
+
+		return sku;
+	}
+
 	const handleOk = (values) => {
 		console.log('Form Values:', values);
 		const {
@@ -49,6 +63,7 @@ export const AddModalDiamond = ({setShowModal, showModal, selectedRequest}) => {
 			symmetry,
 			table,
 			withLenghtRatio,
+			lockPrice,
 			culet,
 		} = values;
 
@@ -75,15 +90,22 @@ export const AddModalDiamond = ({setShowModal, showModal, selectedRequest}) => {
 			measurement,
 		};
 		// console.log('diamond4c', diamond4c);
+		const createDiamond = {
+			diamond4c,
+			details,
+			measurement: measurements,
+			shapeId,
+			sku: generateRandomSKU(16),
+			certificate: 1,
+			priceOffset,
+		};
 
 		dispatch(
-			handleAddDiamond({
-				diamond4c,
-				details,
-				measurement: measurements,
-				shapeId,
-				priceOffset,
-				certificate: 1,
+			handleAddDiamondCustomize({
+				createDiamond,
+				customizeRequestId: selectedRequest?.CustomizeRequestId,
+				diamondRequestId: selectedRequest?.DiamondRequestId,
+				lockPrice: lockPrice || null,
 			})
 		).then((res) => {
 			if (res.payload !== undefined) {
@@ -96,6 +118,13 @@ export const AddModalDiamond = ({setShowModal, showModal, selectedRequest}) => {
 		});
 		// Do something with the values, like sending them to an API
 	};
+
+	const popoverContent = (
+		<div>
+			<p>Giá kim cương ở đây là giá đã được xác định là chính xác.</p>
+			<p>Nếu chưa chắc chắn, vui lòng không nhập.</p>
+		</div>
+	);
 
 	return (
 		<Modal
@@ -304,16 +333,52 @@ export const AddModalDiamond = ({setShowModal, showModal, selectedRequest}) => {
 
 				{/* Measurement Row */}
 				<div className="flex flex-wrap gap-4">
-					<Form.Item name="withLenghtRatio" label="Width-Length Ratio" className="w-1/4">
-						<InputNumber placeholder="Enter Width-Length Ratio" className="w-full" />
+					<Form.Item
+						name="withLenghtRatio"
+						label="Width-Length Ratio"
+						className="w-1/4"
+						rules={[{required: true, message: 'Vui lòng nhập Width-Length Ratio'}]}
+					>
+						<InputNumber
+							placeholder="Enter Width-Length Ratio (%)"
+							className="w-full"
+							min={0}
+							max={100}
+							formatter={(value) => `${value}%`}
+							parser={(value) => value.replace('%', '')}
+						/>
 					</Form.Item>
 
-					<Form.Item name="depth" label="Depth" className="w-1/4">
-						<InputNumber placeholder="Nhập Phần Trăm Depth" className="w-full" />
+					<Form.Item
+						name="depth"
+						label="Depth"
+						className="w-1/4"
+						rules={[{required: true, message: 'Vui lòng nhập Depth'}]}
+					>
+						<InputNumber
+							placeholder="Nhập Phần Trăm Depth (%)"
+							className="w-full"
+							min={0}
+							max={100}
+							formatter={(value) => `${value}%`}
+							parser={(value) => value.replace('%', '')}
+						/>
 					</Form.Item>
 
-					<Form.Item name="table" label="Table" className="w-1/4">
-						<InputNumber placeholder="Nhập Phần Trăm Table" className="w-full" />
+					<Form.Item
+						name="table"
+						label="Table"
+						className="w-1/4"
+						rules={[{required: true, message: 'Vui lòng nhập Table'}]}
+					>
+						<InputNumber
+							placeholder="Nhập Phần Trăm Table (%)"
+							className="w-full"
+							min={0}
+							max={100}
+							formatter={(value) => `${value}%`}
+							parser={(value) => value.replace('%', '')}
+						/>
 					</Form.Item>
 				</div>
 
@@ -342,13 +407,46 @@ export const AddModalDiamond = ({setShowModal, showModal, selectedRequest}) => {
 				</div>
 				<div>
 					<Form.Item
-						name="isLabDiamond"
-						label="Kim Cương Nhân Tạo"
-						valuePropName="checked"
-						initialValue={false}
-						className="w-1/3"
+						name="lockPrice"
+						label="Giá Kim Cương"
+						className="w-2/3"
+						initialValue={null}
+						rules={[
+							{type: 'number', min: 0, message: 'Giá phải là số lớn hơn hoặc bằng 0'},
+						]}
 					>
-						<Switch />
+						<InputNumber
+							className="w-full"
+							formatter={(value) => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
+							parser={(value) => value.replace(/,/g, '')}
+							addonAfter={
+								<Popover content={popoverContent} title="Thông tin giá kim cương">
+									<InfoCircleOutlined
+										style={{color: '#1890ff', cursor: 'pointer'}}
+									/>
+								</Popover>
+							}
+						/>
+					</Form.Item>
+				</div>
+				<div>
+					<Form.Item
+						name="isLabDiamond"
+						label="Nguồn Gốc Kim Cương"
+						valuePropName="checked"
+						initialValue={
+							selectedRequest?.IsLabGrown === null
+								? false
+								: selectedRequest?.IsLabGrown
+						}
+						className="w-1/3 flex items-center"
+					>
+						<span>Tự Nhiên</span>
+						<Switch
+							className="mx-5"
+							disabled={selectedRequest?.IsLabGrown !== null} // Khóa nếu giá trị khác null
+						/>
+						<span>Nhân Tạo</span>
 					</Form.Item>
 				</div>
 			</Form>

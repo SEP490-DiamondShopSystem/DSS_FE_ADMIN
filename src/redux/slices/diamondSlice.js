@@ -51,6 +51,7 @@ export const handleAddDiamond = createAsyncThunk(
 		}
 	}
 );
+
 export const handleDeleteDiamond = createAsyncThunk(
 	'diamondSlice/handleDeleteDiamond',
 	async (id, {rejectWithValue}) => {

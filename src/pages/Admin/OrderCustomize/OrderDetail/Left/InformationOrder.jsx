@@ -5,8 +5,9 @@ import {
 	CheckCircleOutlined,
 	ClockCircleFilled,
 	CloseCircleOutlined,
+	DeleteOutlined,
 } from '@ant-design/icons';
-import {Button, Col, Divider, Row, Table, Tag, Typography} from 'antd';
+import {Button, Col, Divider, Modal, Row, Table, Tag, Typography} from 'antd';
 import {useDispatch, useSelector} from 'react-redux';
 import {useNavigate} from 'react-router-dom';
 import {LoadingOrderSelector} from '../../../../../redux/selectors';
@@ -17,6 +18,7 @@ import {
 } from '../../../../../utils';
 import {enums} from '../../../../../utils/constant';
 import TimeLineOrder from '../Right/TimeLineOrder';
+import {handleDeleteDiamondCustomize} from '../../../../../redux/slices/customizeSlice';
 
 const {Title, Text} = Typography;
 
@@ -199,6 +201,20 @@ const InformationOrder = ({orders, statusOrder, paymentStatusOrder}) => {
 			key: 'IsLabGrown',
 			render: (shape) => (shape ? 'Nhân Tạo' : 'Tự Nhiên'),
 		},
+		{
+			title: '',
+			key: 'action',
+			render: (_, record) => {
+				console.log('record', record);
+
+				return record?.DiamondId ? (
+					<DeleteOutlined
+						style={{color: 'red', cursor: 'pointer'}}
+						onClick={() => handleDelete(record)}
+					/>
+				) : null;
+			},
+		},
 	];
 
 	const sub2Columns = [
@@ -304,6 +320,31 @@ const InformationOrder = ({orders, statusOrder, paymentStatusOrder}) => {
 			)}
 		/>
 	);
+
+	const handleDelete = (request) => {
+		Modal.confirm({
+			title: 'Xác nhận xóa',
+			content: 'Bạn có chắc chắn muốn xóa kim cương đã thêm trong yêu cầu này?',
+			okText: 'Xóa',
+			okType: 'danger',
+			cancelText: 'Hủy',
+			onOk: () => handleDeleteConfirm(request),
+			onCancel: () => {
+				console.log('Cancel deletion');
+			},
+		});
+	};
+
+	const handleDeleteConfirm = (request) => {
+		console.log('request', request);
+		dispatch(
+			handleDeleteDiamondCustomize({
+				diamondId: request?.DiamondId,
+				customizeRequestId: request?.CustomizeRequestId,
+				diamondRequestId: request?.DiamondRequestId,
+			})
+		);
+	};
 
 	console.log('orders', orders);
 

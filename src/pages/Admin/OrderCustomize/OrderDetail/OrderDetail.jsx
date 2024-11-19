@@ -49,13 +49,6 @@ const OrderCustomizeDetail = () => {
 							paymentStatusOrder={paymentStatusOrder}
 						/>
 					</div>
-					{/* <div className="pl-10" style={{width: '30%'}}>
-						<TimeLineOrder
-							orders={orders}
-							statusOrder={statusOrder}
-							paymentStatusOrder={paymentStatusOrder}
-						/>
-					</div> */}
 				</div>
 			)}
 		</>

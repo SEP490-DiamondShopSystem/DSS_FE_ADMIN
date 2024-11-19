@@ -51,7 +51,9 @@ const TimeLineOrder = ({orders, loading, statusOrder, paymentStatusOrder}) => {
 	const [currentDiamondId, setCurrentDiamondId] = useState(null);
 	const [selectedDiamondList, setSelectedDiamondList] = useState([]);
 
-	const diamondRequests = orders?.DiamondRequests;
+	const diamondRequests = orders?.DiamondRequests?.filter(
+		(request) => request.DiamondId === null
+	);
 
 	console.log('orders', orders);
 	console.log('diamondRequests', diamondRequests);

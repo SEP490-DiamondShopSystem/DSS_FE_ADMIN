@@ -24,6 +24,7 @@ export const getOrderStatusCustomizeDetailSelector = (state) =>
 export const getPaymentStatusCustomizeDetailSelector = (state) =>
 	state.customizeSlice.orderPaymentStatusCustomizeDetail;
 export const getOrderCustomizeDetailSelector = (state) => state.customizeSlice.orderCustomizeDetail;
+export const GetDiamondUnAvailableSelector = (state) => state.customizeSlice.diamondUnAvailable;
 
 //DELIVERY
 export const LoadingDeliverySelector = (state) => state.deliverySlice.loading;
