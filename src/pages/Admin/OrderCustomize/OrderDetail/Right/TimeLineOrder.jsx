@@ -131,7 +131,12 @@ const TimeLineOrder = ({
 				symmetry: selectedRequest?.Symmetry,
 				girdle: selectedRequest?.Girdle,
 				polish: selectedRequest?.Polish,
-				IsLabGrown: selectedRequest?.IsLabGrown === null ? false : true,
+				IsLabGrown:
+					selectedRequest?.IsLabGrown === null
+						? false
+						: selectedRequest?.IsLabGrown === false
+						? false
+						: true,
 			});
 		}
 	}, [selectedRequest]);

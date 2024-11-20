@@ -20,9 +20,10 @@ import {enumSlice} from './slices/jewelry/enumSlice';
 import {shapeSlice} from './slices/shapeSlice';
 import {discountSlice} from './slices/discountSlice';
 import {customizeSlice} from './slices/customizeSlice';
-
 import {deliveryFeeSlice} from './slices/deliveryFeeSlice';
 import {locationSlice} from './slices/locationSlice';
+import {blogSlice} from './slices/blogSlice';
+
 const rootPersistConfig = {
 	key: 'root',
 	storage,
@@ -50,6 +51,7 @@ const rootReducer = combineReducers({
 	deliveryFeeSlice: deliveryFeeSlice.reducer,
 	locationSlice: locationSlice.reducer,
 	customizeSlice: customizeSlice.reducer,
+	blogSlice: blogSlice.reducer,
 });
 
 const persistedReducer = persistReducer(rootPersistConfig, rootReducer);

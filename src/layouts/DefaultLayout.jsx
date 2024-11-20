@@ -117,6 +117,8 @@ const DefaultLayout = () => {
 					<TagOutlined />
 				),
 			]),
+		(adminRole || managerRole || staffRole) &&
+			getItem('Quản Lí Bài Viết', '/blogs', <DeliveredProcedureOutlined />),
 	];
 
 	const handleClickMenuItem = (e) => {

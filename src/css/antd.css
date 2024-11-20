@@ -1,0 +1,36 @@
+/* Add these styles to your CSS file */
+.rendered-content h1 {
+  font-size: 2.5rem; /* Adjust heading size */
+  font-weight: bold;
+  margin-bottom: 1rem;
+  color: #333;
+}
+
+.rendered-content h2 {
+  font-size: 2rem;
+  font-weight: bold;
+  margin-bottom: 1rem;
+  color: #444;
+}
+
+.rendered-content h3 {
+  font-size: 1.75rem;
+  font-weight: bold;
+  margin-bottom: 1rem;
+  color: #555;
+}
+
+.rendered-content p {
+  font-size: 1rem;
+  line-height: 1.8;
+  margin-bottom: 1rem;
+}
+
+.rendered-content ul, .rendered-content ol {
+  margin-left: 2rem;
+  margin-bottom: 1rem;
+}
+
+.rendered-content li {
+  font-size: 1rem;
+}

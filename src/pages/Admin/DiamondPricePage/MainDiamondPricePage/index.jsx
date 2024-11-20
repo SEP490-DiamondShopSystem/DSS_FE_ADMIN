@@ -313,7 +313,7 @@ const MainDiamondPricePage = () => {
 		return (
 			<div className="container mx-auto p-6 bg-offWhite rounded-lg shadow-lg">
 				<h1 className="text-5xl font-bold mb-6 text-center text-blue-600">
-					Diamond Price Board
+					Main Diamond Price Board
 				</h1>
 				<div className="flex flex-wrap gap-4 items-center justify-between p-4 ">
 					{/* Shape Selection */}
@@ -375,7 +375,7 @@ const MainDiamondPricePage = () => {
 
 	return (
 		<div className="container gap-4 mx-auto p-6 bg-white rounded-lg shadow-lg">
-			<h1 className="text-5xl font-bold text-center text-blue-600">Diamond Price Board</h1>
+			<h1 className="text-5xl font-bold text-center text-blue-600">Main Diamond Price Board</h1>
 			<div className="flex flex-wrap gap-4 items-center justify-between p-4 bg-offWhite rounded-lg shadow-md">
 				{/* Shape Selection */}
 				<div className="flex sm:flex-row items-center gap-2">
