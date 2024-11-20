@@ -62,14 +62,14 @@ const OrderDetail = () => {
 				<Loading />
 			) : (
 				<div className="w-full flex">
-					<div className="" style={{width: '70%'}}>
+					<div className="md:w-2/3">
 						<InformationOrder
 							orders={orders}
 							statusOrder={statusOrder}
 							paymentStatusOrder={paymentStatusOrder}
 						/>
 					</div>
-					<div className="pl-10" style={{width: '30%'}}>
+					<div className="pl-10 md:w-1/3">
 						<TimeLineOrder
 							orders={orders}
 							statusOrder={statusOrder}

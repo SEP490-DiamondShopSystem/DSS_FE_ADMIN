@@ -74,7 +74,7 @@ const DefaultLayout = () => {
 		(adminRole || managerRole || staffRole) &&
 			getItem('Dashboard', '/dashboard', <DashboardOutlined />),
 		adminRole && getItem('Quản Lí Tài Khoản', '/accounts', <UserOutlined />),
-		(adminRole || managerRole || staffRole) &&
+		(managerRole || staffRole) &&
 			getItem('Quản Lý Sản Phẩm', '/products', <ProductOutlined />, [
 				getItem('Danh Sách Trang Sức', '/products/jewelry-list', <RightOutlined />),
 				getItem('Danh Sách Kim Cương', '/products/diamond-list', <DiamondOutlined />),
@@ -91,25 +91,31 @@ const DefaultLayout = () => {
 				getItem('Danh Sách Kim Loại', '/products/metal-list', <DiamondOutlined />),
 			]),
 
-		(adminRole || managerRole || staffRole || delivererRole) &&
+		(managerRole || staffRole || delivererRole) &&
 			getItem('Quản Lí Đặt Hàng', '/orders', <OrderedListOutlined />),
 
-		(adminRole || managerRole || staffRole) &&
+		(managerRole || staffRole) &&
 			getItem('Quản Lí Yêu Cầu Thiết Kế', '/request-customize', <OrderedListOutlined />),
 
 		,
-		(adminRole || managerRole || staffRole) &&
-			getItem('Quản Lí Khuyến Mãi', '/promotion', <GiftOutlined />),
-		(adminRole || managerRole || staffRole) &&
-			getItem('Quản Lí Giảm Giá', '/discount', <TagOutlined />),
-		(adminRole || managerRole || staffRole) &&
+		(managerRole || staffRole) && getItem('Quản Lí Khuyến Mãi', '/promotion', <GiftOutlined />),
+		(managerRole || staffRole) && getItem('Quản Lí Giảm Giá', '/discount', <TagOutlined />),
+		(managerRole || staffRole) &&
 			getItem('Quản Lí Vận Chuyển', '/deliveries', <DeliveredProcedureOutlined />),
-		(adminRole || managerRole || staffRole) &&
+		(managerRole || staffRole) &&
 			getItem('Quản Lí Phí Vận Chuyển', '/delivery-fee', <DeliveredProcedureOutlined />),
-		(adminRole || managerRole || staffRole) &&
+		(managerRole || staffRole) &&
 			getItem('Quản Lí Giá Kim Cương', '/dimond-price', <TagOutlined />, [
-				getItem('Quản Lí Giá Kim Cương Chính', '/diamond-price/main-diamond-price', <TagOutlined />),
-				getItem('Quản Lí Giá Kim Cương Tấm', '/diamond-price/side-diamond-price', <TagOutlined />),
+				getItem(
+					'Quản Lí Giá Kim Cương Chính',
+					'/diamond-price/main-diamond-price',
+					<TagOutlined />
+				),
+				getItem(
+					'Quản Lí Giá Kim Cương Tấm',
+					'/diamond-price/side-diamond-price',
+					<TagOutlined />
+				),
 			]),
 	];
 

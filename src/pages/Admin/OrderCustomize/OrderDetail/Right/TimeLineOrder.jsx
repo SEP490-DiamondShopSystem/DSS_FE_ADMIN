@@ -25,10 +25,10 @@ const {Option} = Select;
 const ORDER_STATUS_TEXTS = {
 	Pending: 'Chờ Thêm Kim Cương Yêu Cầu',
 	Priced: 'Đã Thêm Kim Cương Yêu Cầu',
-	Shop_Rejected: 'Đã Từ Chối',
+	Shop_Rejected: 'Shop Đã Từ Chối',
 	Customer_Rejected: 'Đã Hủy Đơn',
 	Requesting: 'Chờ Shop Xác Nhận Đơn Yêu Cầu',
-	Accepted: 'Shop Đã Chấp Nhận Đơn Thiết Kế',
+	Accepted: 'Đã Chấp Nhận Đơn Thiết Kế',
 };
 
 const getClarityLabel = (clarityValue) => {
@@ -289,7 +289,7 @@ const TimeLineOrder = ({
 
 	const handleAddDiamond = () => {
 		Modal.confirm({
-			title: 'Xác nhận thêm kim cương này',
+			title: 'Xác nhận thêm các kim cương vào đơn thiết kế này',
 			content: 'Bạn có chắc chắn muốn tiếp tục?',
 			okText: 'Xác nhận',
 			cancelText: 'Hủy',
@@ -440,6 +440,31 @@ const TimeLineOrder = ({
 		});
 	};
 
+	const handleAccepted = async () => {
+		dispatch(handleCustomizeOrder({requestId: orders?.Id}))
+			.then((res) => {
+				console.log('res', res);
+
+				if (res?.payload) {
+					if (res.payload.status === 200) {
+						message.success('Chấp Nhận Đơn Thiết Kế Thành Công!');
+						setIsModalVisible(false);
+					} else if (res.payload.status === 400) {
+						message.warning('Đã xảy ra lỗi. Vui lòng kiểm tra thông tin và thử lại!');
+					} else {
+						message.error('Không thể xử lý yêu cầu. Vui lòng thử lại sau!');
+					}
+				} else {
+					message.error('Lỗi hệ thống. Không thể xử lý yêu cầu!');
+				}
+			})
+			.catch((error) => {
+				// Xử lý lỗi xảy ra trong quá trình dispatch
+				console.error('Lỗi:', error);
+				message.error('Đã xảy ra lỗi khi gửi yêu cầu. Vui lòng thử lại sau!');
+			});
+	};
+
 	const handleReject = () => {
 		Modal.confirm({
 			title: 'Từ chối đơn thiết kế này',
@@ -450,25 +475,6 @@ const TimeLineOrder = ({
 		});
 	};
 
-	const handleAccepted = async () => {
-		const diamondAssigning = diamondRequests?.map((diamond) => ({
-			DiamondId: diamond.DiamondId,
-			DiamondRequestId: diamond.DiamondRequestId,
-		}));
-
-		dispatch(handleCustomizeOrder({requestId: id, diamondAssigning: diamondAssigning})).then(
-			(res) => {
-				console.log('res', res);
-
-				if (res.payload.status === 200 || res.payload.status === 201) {
-					message.success('Thêm Kim Cương Thành Công!');
-					setIsModalVisible(false);
-				} else if (res.payload.status === 400) {
-					message.warning(res.error.message);
-				}
-			}
-		);
-	};
 	const handleRejectStatus = async () => {
 		// console.log('diamondAssigning', diamondAssigning);
 
@@ -519,7 +525,7 @@ const TimeLineOrder = ({
 									<Button
 										type="text"
 										className="bg-primary font-semibold w-32 rounded-full"
-										onClick={showModal}
+										onClick={allDiamondsHaveId ? handleAddDiamond : showModal}
 										disabled={loading}
 									>
 										{allDiamondsHaveId ? 'Xác Nhận Đơn' : 'Thêm Kim Cương'}
@@ -542,7 +548,7 @@ const TimeLineOrder = ({
 						</div>
 					)}
 
-					{status === 'Shop_Rejected' && paymentStatusOrder === 3 && (
+					{status === 'Shop_Rejected' && (
 						<div className="border rounded-lg border-primary bg-tintWhite p-5 mb-5">
 							<div className="flex items-center" style={{fontSize: 16}}>
 								<p className="font-semibold">Trạng thái đơn thiết kế:</p>
@@ -582,9 +588,9 @@ const TimeLineOrder = ({
 							</div>
 						</div>
 					)}
-					{status === 'Customer_Rejected' && paymentStatusOrder === 3 && (
+					{status === 'Customer_Rejected' && (
 						<div className="border rounded-lg border-primary bg-tintWhite p-5 mb-5">
-							<div className="flex items-center mb-5" style={{fontSize: 16}}>
+							<div className="flex items-center" style={{fontSize: 16}}>
 								<p className="font-semibold">Trạng thái đơn thiết kế:</p>
 								<p className="ml-5 text-red font-semibold">
 									<CloseCircleOutlined /> {ORDER_STATUS_TEXTS.Customer_Rejected}
@@ -602,16 +608,7 @@ const TimeLineOrder = ({
 							</div> */}
 						</div>
 					)}
-					{status === 'Customer_Rejected' && paymentStatusOrder === 4 && (
-						<div className="border rounded-lg border-primary bg-tintWhite p-5 mb-5">
-							<div className="flex items-center " style={{fontSize: 16}}>
-								<p className="font-semibold">Trạng thái đơn thiết kế:</p>
-								<p className="ml-5 text-red font-semibold">
-									<CloseCircleOutlined /> {ORDER_STATUS_TEXTS.Customer_Rejected}
-								</p>
-							</div>
-						</div>
-					)}
+
 					{status === 'Priced' && (
 						<div className="border rounded-lg border-primary bg-tintWhite p-5 mb-5">
 							<div className="flex items-center mb-5" style={{fontSize: 16}}>
@@ -652,54 +649,6 @@ const TimeLineOrder = ({
 									disabled={loading}
 								>
 									Hủy Đơn
-								</Button>
-							</div>
-						</div>
-					)}
-
-					{/* {status === 'Requesting' && isAssigned && (
-						<div className="border rounded-lg border-primary bg-tintWhite p-5 mb-5">
-							<div className="flex items-center mb-5" style={{fontSize: 16}}>
-								<p className="font-semibold">Trạng thái đơn thiết kế:</p>
-								<p className="ml-5">
-									<CheckCircleOutlined /> {ORDER_STATUS_TEXTS.Requesting}
-								</p>
-							</div>
-
-							{userRoleDeliverer ? (
-								<div className="flex justify-around">
-									<Button
-										type="text"
-										className="bg-primary font-semibold rounded-full w-full"
-										onClick={handleDeliveringStatus}
-									>
-										Bắt Đầu Giao Hàng
-									</Button>
-								</div>
-							) : (
-								<div>
-									<p className="mt-3 text-center font-semibold text-primary">
-										Chờ Deliverer Giao Hàng
-									</p>
-								</div>
-							)}
-						</div>
-					)} */}
-
-					{/* Bị báo cáo */}
-					{currentStep === 7 && (
-						<div className="border rounded-lg border-primary bg-tintWhite p-5 mb-5">
-							<div className="flex items-center mb-5" style={{fontSize: 16}}>
-								<p className="font-semibold">Trạng thái đơn thiết kế:</p>
-								<p className="ml-5 text-red">Bị báo cáo</p>
-							</div>
-							<div className="flex justify-around">
-								<Button
-									type="text"
-									className="bg-primary font-semibold w-full rounded-full"
-									onClick={() => setCurrentStep(0)}
-								>
-									Tiếp tục
 								</Button>
 							</div>
 						</div>

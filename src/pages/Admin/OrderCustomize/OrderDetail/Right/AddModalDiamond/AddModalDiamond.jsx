@@ -109,6 +109,8 @@ export const AddModalDiamond = ({
 					lockPrice: lockPrice || null,
 				})
 			).then((res) => {
+				console.log('res', res);
+
 				if (res.payload !== undefined) {
 					message.success('Thêm Cương Kim Thành Công!');
 					setShowModal(false);
@@ -516,20 +518,14 @@ export const AddModalDiamond = ({
 						name="isLabDiamond"
 						label="Nguồn Gốc Kim Cương"
 						valuePropName="checked"
-						initialValue={
-							selectedRequest?.IsLabGrown === null
-								? false
-								: selectedRequest?.IsLabGrown
-						}
+						initialValue={!!selectedRequest?.IsLabGrown} // Mặc định null thành false
 						className="w-1/3 flex items-center"
 					>
 						<span>Tự Nhiên</span>
 						<Switch
 							className="mx-5"
-							disabled={
-								selectedRequest?.IsLabGrown === null ||
-								selectedRequest?.IsLabGrown === false
-							}
+							disabled // Luôn vô hiệu hóa
+							checked={!!selectedRequest?.IsLabGrown} // Gán trạng thái: null => false, true/false giữ nguyên
 						/>
 						<span>Nhân Tạo</span>
 					</Form.Item>

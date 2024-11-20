@@ -3,6 +3,7 @@ import Loading from 'react-loading';
 import {useDispatch, useSelector} from 'react-redux';
 import {useLocation, useParams} from 'react-router-dom';
 import {
+	ErrorCustomizeSelector,
 	getOrderCustomizeDetailSelector,
 	getOrderStatusCustomizeDetailSelector,
 	getPaymentStatusCustomizeDetailSelector,
@@ -21,6 +22,7 @@ const OrderCustomizeDetail = () => {
 	const loading = useSelector(LoadingOrderSelector);
 	const statusOrder = useSelector(getOrderStatusCustomizeDetailSelector);
 	const paymentStatusOrder = useSelector(getPaymentStatusCustomizeDetailSelector);
+	const error = useSelector(ErrorCustomizeSelector);
 
 	const [orders, setOrders] = useState();
 	const [currentDiamondId, setCurrentDiamondId] = useState(null);
@@ -66,6 +68,7 @@ const OrderCustomizeDetail = () => {
 	console.log('orderDetail', orderDetail);
 	console.log('statusOrder', statusOrder);
 	console.log('selectedDiamond', selectedDiamond);
+	console.log('error', error);
 
 	return (
 		<>

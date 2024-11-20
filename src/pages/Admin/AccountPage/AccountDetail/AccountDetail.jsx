@@ -161,6 +161,7 @@ const AccountDetail = () => {
 							editing={editing}
 							onChange={onChange}
 							userInfo={userInfo}
+							userDetail={userDetail}
 						/>
 					</div>
 					<div style={{width: '40%'}}>
