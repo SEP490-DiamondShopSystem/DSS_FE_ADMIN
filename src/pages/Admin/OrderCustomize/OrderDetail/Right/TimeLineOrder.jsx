@@ -12,10 +12,12 @@ import {handleOrderReject, handleRefundOrder} from '../../../../../redux/slices/
 import {getOrderCustomizeStatus} from '../../../../../utils';
 import {DiamondList} from './DiamondList';
 import {
+	handleChangeDiamondCustomize,
 	handleCustomizeOrder,
 	handleRejectCustomize,
 } from '../../../../../redux/slices/customizeSlice';
 import {AddModalDiamond} from './AddModalDiamond/AddModalDiamond';
+import {Clarity, Color, Cut, ShapeName} from '../../../../../utils/constant';
 
 const {Title, Text} = Typography;
 const {Option} = Select;
@@ -29,6 +31,22 @@ const ORDER_STATUS_TEXTS = {
 	Accepted: 'Shop Đã Chấp Nhận Đơn Thiết Kế',
 };
 
+const getClarityLabel = (clarityValue) => {
+	return Object.keys(Clarity).find((key) => Clarity[key] === clarityValue) || clarityValue;
+};
+
+const getColorLabel = (colorValue) => {
+	return Object.keys(Color).find((key) => Color[key] === colorValue) || colorValue;
+};
+
+const getCutLabel = (cutValue) => {
+	return Object.keys(Cut).find((key) => Cut[key] === cutValue) || cutValue;
+};
+
+const getShapeLabel = (shapeId) => {
+	return Object.keys(ShapeName).find((key) => ShapeName[key] === shapeId) || shapeId;
+};
+
 const TimeLineOrder = ({
 	orders,
 	loading,
@@ -37,6 +55,20 @@ const TimeLineOrder = ({
 	diamondRequests,
 	allDiamondsHaveId,
 	allDiamondRequests,
+	currentDiamondId,
+	setCurrentDiamondId,
+	filteredDiamondRequests,
+	setFilteredDiamondRequests,
+	isModalVisible,
+	setIsModalVisible,
+	isModalAddVisible,
+	setIsModalAddVisible,
+	showModal,
+	showModalAdd,
+	setChangeDiamond,
+	changeDiamond,
+	selectedDiamond,
+	filteredRequests,
 }) => {
 	const dispatch = useDispatch();
 	const {id} = useParams();
@@ -53,11 +85,7 @@ const TimeLineOrder = ({
 	const [isAssigned, setIsAssigned] = useState(false);
 	const [selectedRequest, setSelectedRequest] = useState(null);
 	const [diamonds, setDiamonds] = useState([]);
-	const [isModalVisible, setIsModalVisible] = useState(false);
-	const [isModalAddVisible, setIsModalAddVisible] = useState(false);
 	const [filters, setFilter] = useState({});
-	const [currentDiamondId, setCurrentDiamondId] = useState(null);
-	const [filteredDiamondRequests, setFilteredDiamondRequests] = useState([]);
 
 	console.log('orders', orders);
 	console.log('diamondRequests', diamondRequests);
@@ -65,6 +93,7 @@ const TimeLineOrder = ({
 	console.log('currentDiamondId', currentDiamondId);
 	console.log('allDiamondRequests', allDiamondRequests);
 	console.log('filteredDiamondRequests', filteredDiamondRequests);
+	console.log('changeDiamond', changeDiamond);
 
 	console.log('status', status);
 	console.log('diamonds', diamonds);
@@ -74,6 +103,7 @@ const TimeLineOrder = ({
 			// Filter the array to only include requests where `Diamond` is not null
 			const filtered = allDiamondRequests.filter((request) => request.Diamond !== null);
 			setFilteredDiamondRequests(filtered);
+			// setChangeDiamond(filtered);
 		}
 	}, [allDiamondRequests]);
 
@@ -175,7 +205,11 @@ const TimeLineOrder = ({
 	}, [selectedRequest, dispatch, filters]);
 
 	const handleSelectChange = (value) => {
-		setSelectedRequest(diamondRequests.find((request) => request.DiamondRequestId === value));
+		setSelectedRequest(
+			orders?.Status === 1
+				? diamondRequests.find((request) => request.DiamondRequestId === value)
+				: filteredRequests.find((request) => request.DiamondRequestId === value)
+		);
 		setCurrentDiamondId(null);
 	};
 
@@ -186,51 +220,71 @@ const TimeLineOrder = ({
 	};
 
 	const handleSaveDiamond = () => {
-		if (selectedRequest && currentDiamondId) {
-			// Create the updated selection
-			const updatedSelection = {
-				...currentDiamondId,
-				diamondRequestId: selectedRequest.DiamondRequestId,
-			};
+		if (orders?.Status === 1) {
+			if (selectedRequest && currentDiamondId) {
+				// Create the updated selection
+				const updatedSelection = {
+					...currentDiamondId,
+					diamondRequestId: selectedRequest.DiamondRequestId,
+				};
 
-			// Check if the DiamondRequestId already exists in filteredDiamondRequests
-			const existingRequestIndex = filteredDiamondRequests.findIndex(
-				(request) => request.DiamondRequestId === selectedRequest.DiamondRequestId
-			);
+				// Check if the DiamondRequestId already exists in filteredDiamondRequests
+				const existingRequestIndex = filteredDiamondRequests.findIndex(
+					(request) => request.DiamondRequestId === selectedRequest.DiamondRequestId
+				);
 
-			let updatedList;
-			if (existingRequestIndex !== -1) {
-				// If the DiamondRequestId exists, update the existing entry
-				updatedList = filteredDiamondRequests.map((request, index) => {
-					if (index === existingRequestIndex) {
-						return {...request, ...updatedSelection};
-					}
-					return request;
-				});
+				let updatedList;
+				if (existingRequestIndex !== -1) {
+					// If the DiamondRequestId exists, update the existing entry
+					updatedList = filteredDiamondRequests.map((request, index) => {
+						if (index === existingRequestIndex) {
+							return {...request, ...updatedSelection};
+						}
+						return request;
+					});
+				} else {
+					// If the DiamondRequestId doesn't exist, add the new selection
+					updatedList = [
+						...filteredDiamondRequests,
+						{
+							DiamondRequestId: selectedRequest.DiamondRequestId,
+							...updatedSelection,
+						},
+					];
+				}
+
+				// Update the state with the new list
+				setFilteredDiamondRequests(updatedList);
 			} else {
-				// If the DiamondRequestId doesn't exist, add the new selection
-				updatedList = [
-					...filteredDiamondRequests,
-					{
-						DiamondRequestId: selectedRequest.DiamondRequestId,
-						...updatedSelection,
-					},
-				];
+				message.warning('Vui lòng chọn cả yêu cầu và kim cương.');
 			}
-
-			// Update the state with the new list
-			setFilteredDiamondRequests(updatedList);
 		} else {
-			message.warning('Vui lòng chọn cả yêu cầu và kim cương.');
+			if (selectedRequest && currentDiamondId) {
+				const updatedSelection = {
+					DiamondRequestId: selectedRequest.DiamondRequestId,
+					...currentDiamondId,
+				};
+
+				// Nếu đã tồn tại key là DiamondRequestId trong đối tượng changeDiamond
+				if (changeDiamond !== null) {
+					setChangeDiamond({
+						...changeDiamond,
+						[selectedRequest.DiamondRequestId]: {
+							...changeDiamond[selectedRequest.DiamondRequestId],
+							...updatedSelection,
+						},
+					});
+				} else {
+					// Nếu chưa tồn tại, thêm mới entry vào đối tượng
+					setChangeDiamond({
+						...changeDiamond,
+						[selectedRequest.DiamondRequestId]: updatedSelection,
+					});
+				}
+			} else {
+				message.warning('Vui lòng chọn cả yêu cầu và kim cương.');
+			}
 		}
-	};
-
-	const showModal = () => {
-		setIsModalVisible(true);
-	};
-
-	const showModalAdd = () => {
-		setIsModalAddVisible(true);
 	};
 
 	const handleAddDiamond = () => {
@@ -256,66 +310,119 @@ const TimeLineOrder = ({
 	};
 
 	const handleOk = () => {
-		const diamondAssigning = allDiamondRequests?.map((req) => {
-			// Find the matching entry in filteredDiamondRequests based on DiamondRequestId
-			const matchingDiamond = filteredDiamondRequests?.find(
-				(item) => item?.DiamondRequestId === req?.DiamondRequestId
-			);
+		if (orders?.Status === 1) {
+			const diamondAssigning = allDiamondRequests?.map((req) => {
+				// Find the matching entry in filteredDiamondRequests based on DiamondRequestId
+				const matchingDiamond = filteredDiamondRequests?.find(
+					(item) => item?.DiamondRequestId === req?.DiamondRequestId
+				);
 
-			// If a matching item is found, extract its Id; otherwise, set diamondId as null
-			const diamondId = matchingDiamond ? matchingDiamond?.Id : null;
+				// If a matching item is found, extract its Id; otherwise, set diamondId as null
+				const diamondId = matchingDiamond ? matchingDiamond?.Id : null;
 
-			const createDiamondCommand = req?.DiamondId
-				? {
+				const createDiamondCommand = req?.DiamondId
+					? {
+							diamond4c: {
+								cut: req?.Diamond?.Cut,
+								color: req?.Diamond?.Color,
+								clarity: req?.Diamond?.Clarity,
+								carat: req?.Diamond?.Carat,
+								isLabDiamond: req?.Diamond?.IsLabDiamond,
+							},
+							details: {
+								polish: req?.Diamond?.Polish,
+								symmetry: req?.Diamond?.Symmetry,
+								girdle: req?.Diamond?.Girdle,
+								fluorescence: req?.Diamond?.Fluorescence,
+								culet: req?.Diamond?.Culet,
+							},
+							measurement: {
+								withLenghtRatio: req?.Diamond?.WidthLengthRatio,
+								depth: req?.Diamond?.Depth,
+								table: req?.Diamond?.Table,
+								measurement: req?.Diamond?.Measurement,
+							},
+							shapeId: req?.Diamond?.DiamondShapeId,
+							sku: generateRandomSKU(16),
+							certificate: 1,
+							priceOffset: req?.Diamond?.PriceOffset,
+					  }
+					: null;
+
+				return {
+					diamondRequestId: req?.DiamondRequestId,
+					diamondId,
+					createDiamondCommand,
+				};
+			});
+
+			console.log('diamondAssigning', diamondAssigning);
+			dispatch(
+				handleCustomizeOrder({
+					requestId: orders?.Id,
+					sideDiamondOptId: orders?.SideDiamondId,
+					diamondAssigning,
+				})
+			).then((res) => {
+				if (res.payload) {
+					message.success('Xác nhận kim cương cho yêu cầu thành công!');
+				} else {
+					message.error('Có lỗi xảy ra !');
+				}
+			});
+		} else {
+			const diamondData = changeDiamond
+				? changeDiamond[selectedRequest?.DiamondRequestId]
+				: {};
+			const createDiamondCommand = diamondData?.Id
+				? null
+				: {
 						diamond4c: {
-							cut: req?.Diamond?.Cut,
-							color: req?.Diamond?.Color,
-							clarity: req?.Diamond?.Clarity,
-							carat: req?.Diamond?.Carat,
-							isLabDiamond: req?.Diamond?.IsLabDiamond,
+							cut: diamondData?.Cut,
+							color: diamondData?.Color,
+							clarity: diamondData?.Clarity,
+							carat: diamondData?.Carat,
+							isLabDiamond: diamondData?.IsLabDiamond,
 						},
 						details: {
-							polish: req?.Diamond?.Polish,
-							symmetry: req?.Diamond?.Symmetry,
-							girdle: req?.Diamond?.Girdle,
-							fluorescence: req?.Diamond?.Fluorescence,
-							culet: req?.Diamond?.Culet,
+							polish: diamondData?.Polish,
+							symmetry: diamondData?.Symmetry,
+							girdle: diamondData?.Girdle,
+							fluorescence: diamondData?.Fluorescence,
+							culet: diamondData?.Culet,
 						},
 						measurement: {
-							withLenghtRatio: req?.Diamond?.WidthLengthRatio,
-							depth: req?.Diamond?.Depth,
-							table: req?.Diamond?.Table,
-							measurement: req?.Diamond?.Measurement,
+							withLenghtRatio: diamondData?.WithLenghtRatio,
+							depth: diamondData?.Depth,
+							table: diamondData?.Table,
+							measurement: diamondData?.Measurement,
 						},
-						shapeId: req?.Diamond?.DiamondShapeId,
+						shapeId: diamondData?.DiamondShapeId,
 						sku: generateRandomSKU(16),
 						certificate: 1,
-						priceOffset: req?.Diamond?.PriceOffset,
-				  }
-				: null;
-
-			return {
-				diamondRequestId: req?.DiamondRequestId,
-				diamondId, // Set diamondId from filteredDiamondRequests based on matching DiamondRequestId
-				createDiamondCommand, // Set createDiamondCommand based on DiamondId presence
-			};
-		});
-
-		console.log('diamondAssigning', diamondAssigning);
-
-		dispatch(
-			handleCustomizeOrder({
-				requestId: orders?.Id,
-				sideDiamondOptId: orders?.SideDiamondId,
-				diamondAssigning,
-			})
-		).then((res) => {
-			if (res.payload) {
-				message.success('Xác nhận kim cương cho yêu cầu thành công!');
-			} else {
-				message.error('Có lỗi xảy ra !');
-			}
-		});
+						priceOffset: diamondData?.PriceOffset,
+				  };
+			console.log('createDiamondCommand', createDiamondCommand);
+			dispatch(
+				handleChangeDiamondCustomize({
+					customizeRequestId: selectedRequest?.CustomizeRequestId,
+					diamondRequestId: diamondData?.DiamondRequestId,
+					diamondId: diamondData?.Id || null,
+					createDiamondCommand,
+				})
+			)
+				.then((res) => {
+					if (res.payload) {
+						message.success('Kim cương đã được cập nhật thành công!');
+					} else {
+						message.error('Cập nhật kim cương thất bại. Vui lòng thử lại!');
+					}
+				})
+				.catch((error) => {
+					console.error('Lỗi khi cập nhật kim cương:', error);
+					message.error('Đã xảy ra lỗi hệ thống. Vui lòng thử lại sau!');
+				});
+		}
 	};
 
 	const handleCancel = () => {
@@ -629,23 +736,32 @@ const TimeLineOrder = ({
 				style={{minWidth: 1200}}
 			>
 				<div>
-					<label>Chọn Kim Cương Yêu Cầu</label>
+					<label>Chọn Yêu Cầu</label>
 					<div className="flex">
 						<Select
-							placeholder="Chọn Kim Cương Yêu Cầu"
+							placeholder="Chọn Yêu Cầu"
 							onChange={handleSelectChange}
+							allowClear
 							className="w-full"
 							// style={{width: 200}}
 						>
-							{diamondRequests &&
-								diamondRequests.map((request) => (
-									<Select.Option
-										key={request.DiamondRequestId}
-										value={request.DiamondRequestId}
-									>
-										{`Yêu Cầu ${request.DiamondRequestId}`}
-									</Select.Option>
-								))}
+							{orders?.Status === 1
+								? diamondRequests?.map((request) => (
+										<Select.Option
+											key={request.DiamondRequestId}
+											value={request.DiamondRequestId}
+										>
+											{`Yêu Cầu ${request.DiamondRequestId}`}
+										</Select.Option>
+								  ))
+								: filteredRequests?.map((request) => (
+										<Select.Option
+											key={request.DiamondRequestId}
+											value={request.DiamondRequestId}
+										>
+											{`Yêu Cầu ${request.DiamondRequestId}`}
+										</Select.Option>
+								  ))}
 						</Select>
 						<Button
 							className="ml-5"
@@ -674,7 +790,7 @@ const TimeLineOrder = ({
 					{filteredDiamondRequests?.length > 0 && (
 						<>
 							<h4 className="mt-5 font-semibold text-lg">
-								Thông Tin Kim Cương Có Sẵn Đã Chọn:
+								Thông Tin Kim Cương Đã Chọn:
 							</h4>
 							<Table
 								columns={[
@@ -700,15 +816,73 @@ const TimeLineOrder = ({
 							/>
 						</>
 					)}
+
+					{changeDiamond && (
+						<div className="my-5">
+							<h4 className="mt-5 font-semibold text-lg">
+								Thông Tin Kim Cương Thay Thế:
+							</h4>
+							<Table
+								columns={[
+									{
+										title: 'Yêu Cầu',
+										dataIndex: 'DiamondRequestId',
+										key: 'diamondRequestId',
+										// align: 'center',
+										render: (text) => <span>{text}</span>,
+									},
+									{
+										title: 'Kim Cương',
+										dataIndex: 'Title',
+										key: 'title',
+										// align: 'center',
+										render: (text, record) => (
+											<>
+												{text ? (
+													text
+												) : (
+													<>
+														<span>{record?.Carat} carat</span>{' '}
+														<span>{getColorLabel(record?.Color)}</span>-
+														<span>
+															{getClarityLabel(record?.Clarity)}
+														</span>{' '}
+														<span>{getCutLabel(record?.Cut)} Cut</span>{' '}
+														<span>
+															{getShapeLabel(record?.DiamondShapeId)}
+														</span>{' '}
+														diamond
+													</>
+												)}
+											</>
+										),
+									},
+								]}
+								dataSource={
+									changeDiamond
+										? [changeDiamond[selectedRequest?.DiamondRequestId]]
+										: []
+								}
+								rowKey="DiamondRequestId" // unique key for each row
+								pagination={false} // Optional: disable pagination if needed
+								className="my-5"
+							/>
+						</div>
+					)}
 				</div>
 			</Modal>
 			<AddModalDiamond
+				orders={orders}
 				showModal={isModalAddVisible}
 				setShowModal={setIsModalAddVisible}
 				selectedRequest={selectedRequest}
 				handleSaveDiamond={handleSaveDiamond}
 				handleDiamondSelectChange={handleDiamondSelectChange}
 				generateRandomSKU={generateRandomSKU}
+				changeDiamond={changeDiamond}
+				setChangeDiamond={setChangeDiamond}
+				selectedDiamond={selectedDiamond}
+				filteredRequests={filteredRequests}
 			/>
 		</div>
 	);

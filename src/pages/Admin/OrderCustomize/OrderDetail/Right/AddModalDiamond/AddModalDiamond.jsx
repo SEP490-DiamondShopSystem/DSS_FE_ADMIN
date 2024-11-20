@@ -9,12 +9,16 @@ import {getDiamondShape} from '../../../../../../redux/slices/diamondSlice';
 const {Option} = Select;
 
 export const AddModalDiamond = ({
+	orders,
 	setShowModal,
 	showModal,
 	selectedRequest,
 	handleSaveDiamond,
 	handleDiamondSelectChange,
 	generateRandomSKU,
+	changeDiamond,
+	setChangeDiamond,
+	filteredRequests,
 }) => {
 	const [form] = Form.useForm();
 	const dispatch = useDispatch();
@@ -42,6 +46,7 @@ export const AddModalDiamond = ({
 
 	const handleOk = (values) => {
 		console.log('Form Values:', values);
+
 		const {
 			cut,
 			color,
@@ -84,7 +89,7 @@ export const AddModalDiamond = ({
 			table,
 			measurement,
 		};
-		// console.log('diamond4c', diamond4c);
+
 		const createDiamond = {
 			diamond4c,
 			details,
@@ -95,23 +100,60 @@ export const AddModalDiamond = ({
 			priceOffset,
 		};
 
-		dispatch(
-			handleAddDiamondCustomize({
-				createDiamond,
-				customizeRequestId: selectedRequest?.CustomizeRequestId,
-				diamondRequestId: selectedRequest?.DiamondRequestId,
-				lockPrice: lockPrice || null,
-			})
-		).then((res) => {
-			if (res.payload !== undefined) {
-				message.success('Thêm Cương Kim Thành Công!');
-				setShowModal(false);
-				form.resetFields();
-			} else {
-				message.error('Kim tra lại thông số kim cương!');
-			}
-		});
-		// Do something with the values, like sending them to an API
+		if (orders?.Status === 1) {
+			dispatch(
+				handleAddDiamondCustomize({
+					createDiamond,
+					customizeRequestId: selectedRequest?.CustomizeRequestId,
+					diamondRequestId: selectedRequest?.DiamondRequestId,
+					lockPrice: lockPrice || null,
+				})
+			).then((res) => {
+				if (res.payload !== undefined) {
+					message.success('Thêm Cương Kim Thành Công!');
+					setShowModal(false);
+					form.resetFields();
+				} else {
+					message.error('Kim tra lại thông số kim cương!');
+				}
+			});
+		} else {
+			const updatedChangeDiamond = filteredRequests?.reduce((acc, diamond) => {
+				if (diamond.DiamondRequestId === selectedRequest?.DiamondRequestId) {
+					// Thay thế các trường trong đối tượng này bằng values từ form
+					acc[diamond.DiamondRequestId] = {
+						CustomizeRequestId: diamond?.CustomizeRequestId,
+						DiamondRequestId: diamond?.DiamondRequestId,
+						Cut: cut,
+						Color: color,
+						Clarity: clarity,
+						Carat: carat,
+						IsLabDiamond: isLabDiamond,
+						DiamondId: null,
+						DiamondShapeId: shapeId,
+						Polish: polish,
+						Symmetry: symmetry,
+						Girdle: girdle,
+						Fluorescence: fluorescence,
+						Culet: culet,
+						WithLenghtRatio: withLenghtRatio,
+						Depth: depth,
+						Table: table,
+						Measurement: measurement,
+						PriceOffset: priceOffset,
+					};
+				} else {
+					acc[diamond.DiamondRequestId] = diamond; // Giữ nguyên dữ liệu không thay đổi
+				}
+				return acc;
+			}, {});
+
+			// Cập nhật lại state changeDiamond với giá trị mới
+			setChangeDiamond(updatedChangeDiamond);
+			message.success('Thông tin kim cương đã được cập nhật!');
+			setShowModal(false);
+			form.resetFields();
+		}
 	};
 
 	const popoverContent = (
@@ -123,7 +165,7 @@ export const AddModalDiamond = ({
 
 	return (
 		<Modal
-			title="Thêm Kim Cương"
+			title={orders?.Status === 2 ? `Thay Đổi Kim Cương` : `Thêm Kim Cương`}
 			visible={showModal}
 			onOk={() => form.submit()}
 			onCancel={handleCancel}

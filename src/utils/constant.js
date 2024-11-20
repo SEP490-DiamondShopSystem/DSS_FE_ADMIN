@@ -361,3 +361,42 @@ export const marksClarity = {
 	7: 'IF',
 	8: 'FL',
 };
+export const Clarity = {
+	S12: 1,
+	S11: 2,
+	VS2: 3,
+	VS1: 4,
+	VVS2: 5,
+	VVS1: 6,
+	IF: 7,
+	FL: 8,
+};
+
+export const Color = {
+	K: 1,
+	J: 2,
+	I: 3,
+	H: 4,
+	G: 5,
+	F: 6,
+	E: 7,
+	D: 8,
+};
+
+export const Cut = {
+	Good: 1,
+	Very_Good: 2,
+	Excellent: 3,
+};
+export const ShapeName = {
+	Round: '1',
+	Princess: '2',
+	Emerald: '4',
+	Asscher: '7',
+	Marquise: '8',
+	Oval: '5',
+	Radiant: '6',
+	Pear: '10',
+	Heart: '9',
+	Cushion: '3',
+};

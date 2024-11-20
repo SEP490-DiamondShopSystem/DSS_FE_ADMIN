@@ -23,6 +23,12 @@ const OrderCustomizeDetail = () => {
 	const paymentStatusOrder = useSelector(getPaymentStatusCustomizeDetailSelector);
 
 	const [orders, setOrders] = useState();
+	const [currentDiamondId, setCurrentDiamondId] = useState(null);
+	const [filteredDiamondRequests, setFilteredDiamondRequests] = useState([]);
+	const [isModalVisible, setIsModalVisible] = useState(false);
+	const [isModalAddVisible, setIsModalAddVisible] = useState(false);
+	const [changeDiamond, setChangeDiamond] = useState(null);
+	const [selectedDiamond, setSelectedDiamond] = useState({});
 
 	const diamondRequests = orders?.DiamondRequests?.filter(
 		(request) => request.DiamondId === null
@@ -33,6 +39,10 @@ const OrderCustomizeDetail = () => {
 	const allDiamondsHaveId =
 		orders?.DiamondRequests?.every((request) => request.DiamondId !== null) || false;
 
+	const filteredRequests = allDiamondRequests?.filter(
+		(request) => selectedDiamond?.DiamondRequestId === request?.DiamondRequestId
+	);
+
 	useEffect(() => {
 		dispatch(getOrderCustomizeDetail({RequestId: id, AccountId: order?.AccountId}));
 	}, []);
@@ -42,8 +52,20 @@ const OrderCustomizeDetail = () => {
 		}
 	}, [orderDetail]);
 
+	const showModal = (values) => {
+		if (values) {
+			setSelectedDiamond(values);
+		}
+		setIsModalVisible(true);
+	};
+
+	const showModalAdd = () => {
+		setIsModalAddVisible(true);
+	};
+
 	console.log('orderDetail', orderDetail);
 	console.log('statusOrder', statusOrder);
+	console.log('selectedDiamond', selectedDiamond);
 
 	return (
 		<>
@@ -59,6 +81,20 @@ const OrderCustomizeDetail = () => {
 							diamondRequests={diamondRequests}
 							allDiamondRequests={allDiamondRequests}
 							allDiamondsHaveId={allDiamondsHaveId}
+							currentDiamondId={currentDiamondId}
+							setCurrentDiamondId={setCurrentDiamondId}
+							filteredDiamondRequests={filteredDiamondRequests}
+							setFilteredDiamondRequests={setFilteredDiamondRequests}
+							isModalVisible={isModalVisible}
+							setIsModalVisible={setIsModalVisible}
+							isModalAddVisible={isModalAddVisible}
+							setIsModalAddVisible={setIsModalAddVisible}
+							showModal={showModal}
+							showModalAdd={showModalAdd}
+							setChangeDiamond={setChangeDiamond}
+							changeDiamond={changeDiamond}
+							selectedDiamond={selectedDiamond}
+							filteredRequests={filteredRequests}
 						/>
 					</div>
 				</div>

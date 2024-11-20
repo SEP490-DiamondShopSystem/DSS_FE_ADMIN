@@ -119,13 +119,7 @@ export const handleChangeDiamondCustomize = createAsyncThunk(
 		console.log('params', params);
 
 		try {
-			const response = await api.put(`/Customize/Staff/ChangeDiamond`, {
-				headers: {
-					'Content-Type': 'application/json-patch+json',
-					Accept: '*/*',
-				},
-				data: params,
-			});
+			const response = await api.put(`/CustomizeRequest/Staff/ChangeDiamond`, params);
 			console.log(response);
 
 			return response;

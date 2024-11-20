@@ -33,6 +33,20 @@ const InformationOrder = ({
 	diamondRequests,
 	allDiamondsHaveId,
 	allDiamondRequests,
+	currentDiamondId,
+	setCurrentDiamondId,
+	filteredDiamondRequests,
+	setFilteredDiamondRequests,
+	isModalVisible,
+	setIsModalVisible,
+	isModalAddVisible,
+	setIsModalAddVisible,
+	showModal,
+	showModalAdd,
+	setChangeDiamond,
+	changeDiamond,
+	selectedDiamond,
+	filteredRequests,
 }) => {
 	const navigate = useNavigate();
 	const dispatch = useDispatch();
@@ -218,8 +232,6 @@ const InformationOrder = ({
 						title: '',
 						key: 'action',
 						render: (_, record) => {
-							console.log('record', record);
-
 							return record?.DiamondId ? (
 								<Tooltip title="Xóa Kim Cương Đã Thêm">
 									<DeleteOutlined
@@ -238,13 +250,14 @@ const InformationOrder = ({
 						title: '',
 						key: 'action',
 						render: (_, record) => {
-							console.log('record', record);
-
 							return record?.DiamondId ? (
 								<Tooltip title="Thay Đổi Kim Cương Đã Thêm">
 									<SwapOutlined
 										style={{cursor: 'pointer'}}
-										onClick={() => handleChange(record)}
+										// onClick={() => handleChange(record)}
+										onClick={() => {
+											showModal(record);
+										}}
 									/>
 								</Tooltip>
 							) : null;
@@ -479,6 +492,20 @@ const InformationOrder = ({
 						diamondRequests={diamondRequests}
 						allDiamondRequests={allDiamondRequests}
 						allDiamondsHaveId={allDiamondsHaveId}
+						currentDiamondId={currentDiamondId}
+						setCurrentDiamondId={setCurrentDiamondId}
+						filteredDiamondRequests={filteredDiamondRequests}
+						setFilteredDiamondRequests={setFilteredDiamondRequests}
+						isModalVisible={isModalVisible}
+						setIsModalVisible={setIsModalVisible}
+						isModalAddVisible={isModalAddVisible}
+						setIsModalAddVisible={setIsModalAddVisible}
+						showModal={showModal}
+						showModalAdd={showModalAdd}
+						setChangeDiamond={setChangeDiamond}
+						changeDiamond={changeDiamond}
+						selectedDiamond={selectedDiamond}
+						filteredRequests={filteredRequests}
 					/>
 				</div>
 			</div>
@@ -516,28 +543,6 @@ const InformationOrder = ({
 				</Col>
 				<Col span={12}></Col>
 			</Row>
-
-			{/* <Row gutter={[16, 16]} justify="center" align="middle" className="my-3">
-				<Col span={12}>
-					<Text strong style={{fontSize: 18}}>
-						Ngày Đặt Hàng
-					</Text>
-					<br />
-					<Text>{convertToVietnamDate(orders?.CreatedDate)}</Text>
-				</Col>
-
-				<Col span={12}>
-					{orders && orders?.CancelledReason === null && (
-						<>
-							<Text strong className="mb-5" style={{fontSize: 18}}>
-								Phương Thức Thanh Toán
-							</Text>
-							<br />
-							<Tag color={orderStatus.color}>{orderStatus.name.toUpperCase()}</Tag>
-						</>
-					)}
-				</Col>
-			</Row> */}
 
 			<Divider style={{borderColor: '#d9d9d9'}} />
 			<Row>
