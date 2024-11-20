@@ -18,7 +18,7 @@ export const DiamondList = ({diamond, handleDiamondSelectChange, currentDiamondI
 				<>
 					{!Array.isArray(diamond) || diamond.length === 0 ? (
 						<div className="flex items-center justify-center my-10">
-							<p className="text-2xl">Chưa có sản phẩm nào</p>
+							<p className="text-2xl">Chưa có sản phẩm phù hợp</p>
 						</div>
 					) : (
 						<>

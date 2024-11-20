@@ -3,6 +3,7 @@ import Loading from 'react-loading';
 import {useDispatch, useSelector} from 'react-redux';
 import {useLocation, useParams} from 'react-router-dom';
 import {
+	ErrorCustomizeSelector,
 	getOrderCustomizeDetailSelector,
 	getOrderStatusCustomizeDetailSelector,
 	getPaymentStatusCustomizeDetailSelector,
@@ -21,8 +22,28 @@ const OrderCustomizeDetail = () => {
 	const loading = useSelector(LoadingOrderSelector);
 	const statusOrder = useSelector(getOrderStatusCustomizeDetailSelector);
 	const paymentStatusOrder = useSelector(getPaymentStatusCustomizeDetailSelector);
+	const error = useSelector(ErrorCustomizeSelector);
 
 	const [orders, setOrders] = useState();
+	const [currentDiamondId, setCurrentDiamondId] = useState(null);
+	const [filteredDiamondRequests, setFilteredDiamondRequests] = useState([]);
+	const [isModalVisible, setIsModalVisible] = useState(false);
+	const [isModalAddVisible, setIsModalAddVisible] = useState(false);
+	const [changeDiamond, setChangeDiamond] = useState(null);
+	const [selectedDiamond, setSelectedDiamond] = useState({});
+
+	const diamondRequests = orders?.DiamondRequests?.filter(
+		(request) => request.DiamondId === null
+	);
+
+	const allDiamondRequests = orders?.DiamondRequests;
+
+	const allDiamondsHaveId =
+		orders?.DiamondRequests?.every((request) => request.DiamondId !== null) || false;
+
+	const filteredRequests = allDiamondRequests?.filter(
+		(request) => selectedDiamond?.DiamondRequestId === request?.DiamondRequestId
+	);
 
 	useEffect(() => {
 		dispatch(getOrderCustomizeDetail({RequestId: id, AccountId: order?.AccountId}));
@@ -33,8 +54,21 @@ const OrderCustomizeDetail = () => {
 		}
 	}, [orderDetail]);
 
+	const showModal = (values) => {
+		if (values) {
+			setSelectedDiamond(values);
+		}
+		setIsModalVisible(true);
+	};
+
+	const showModalAdd = () => {
+		setIsModalAddVisible(true);
+	};
+
 	console.log('orderDetail', orderDetail);
 	console.log('statusOrder', statusOrder);
+	console.log('selectedDiamond', selectedDiamond);
+	console.log('error', error);
 
 	return (
 		<>
@@ -47,15 +81,25 @@ const OrderCustomizeDetail = () => {
 							orders={orders}
 							statusOrder={statusOrder}
 							paymentStatusOrder={paymentStatusOrder}
+							diamondRequests={diamondRequests}
+							allDiamondRequests={allDiamondRequests}
+							allDiamondsHaveId={allDiamondsHaveId}
+							currentDiamondId={currentDiamondId}
+							setCurrentDiamondId={setCurrentDiamondId}
+							filteredDiamondRequests={filteredDiamondRequests}
+							setFilteredDiamondRequests={setFilteredDiamondRequests}
+							isModalVisible={isModalVisible}
+							setIsModalVisible={setIsModalVisible}
+							isModalAddVisible={isModalAddVisible}
+							setIsModalAddVisible={setIsModalAddVisible}
+							showModal={showModal}
+							showModalAdd={showModalAdd}
+							setChangeDiamond={setChangeDiamond}
+							changeDiamond={changeDiamond}
+							selectedDiamond={selectedDiamond}
+							filteredRequests={filteredRequests}
 						/>
 					</div>
-					{/* <div className="pl-10" style={{width: '30%'}}>
-						<TimeLineOrder
-							orders={orders}
-							statusOrder={statusOrder}
-							paymentStatusOrder={paymentStatusOrder}
-						/>
-					</div> */}
 				</div>
 			)}
 		</>

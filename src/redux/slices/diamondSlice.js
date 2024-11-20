@@ -25,7 +25,6 @@ export const getDiamondShape = createAsyncThunk(
 
 		try {
 			const response = await api.get(`/Diamond/Shape/All`);
-			console.log(response);
 
 			return response;
 		} catch (error) {
@@ -51,6 +50,7 @@ export const handleAddDiamond = createAsyncThunk(
 		}
 	}
 );
+
 export const handleDeleteDiamond = createAsyncThunk(
 	'diamondSlice/handleDeleteDiamond',
 	async (id, {rejectWithValue}) => {
@@ -89,6 +89,7 @@ export const getAllDiamond = createAsyncThunk(
 				culet,
 				includeJewelryDiamond,
 				isLab,
+				diamondStatuses,
 			} = params;
 			let url = '/Diamond/Page';
 			const queryParams = new URLSearchParams();
@@ -109,6 +110,8 @@ export const getAllDiamond = createAsyncThunk(
 			if (girdle) queryParams.append('diamond_Details.Girdle', girdle);
 			if (fluorescence) queryParams.append('diamond_Details.Fluorescence', fluorescence);
 			if (culet) queryParams.append('diamond_Details.Culet', culet);
+			if (diamondStatuses)
+				queryParams.append('GetDiamond_ManagerQuery.diamondStatuses', diamondStatuses);
 			if (includeJewelryDiamond !== null && includeJewelryDiamond !== undefined)
 				queryParams.append('includeJewelryDiamond', includeJewelryDiamond);
 			if (isLab !== null && isLab !== undefined) queryParams.append('isLab', isLab);

@@ -12,9 +12,6 @@ const PrivateRoute = ({children, roles}) => {
 
 	const dispatch = useDispatch();
 
-	console.log('userId', userId);
-	console.log(userDetail);
-
 	const [loading, setLoading] = useState(true);
 
 	useEffect(() => {

@@ -1,7 +1,7 @@
 import {Input} from 'antd';
 import React from 'react';
 
-export const EditInfo = ({user, editing, onChange, userInfo}) => {
+export const EditInfo = ({user, editing, onChange, userInfo, userDetail}) => {
 	return (
 		<div className="m-5 ">
 			<div className="border border-lightGray2 py-3 px-10 rounded-lg mb-10">
@@ -56,17 +56,21 @@ export const EditInfo = ({user, editing, onChange, userInfo}) => {
 			<div className="border border-lightGray2 py-3 px-10 rounded-lg ">
 				<p className="font-semibold text-xl">Địa Chỉ</p>
 
-				{userInfo?.Addresses?.map((address) => (
-					<div className="">
-						<div className="my-4">
-							<Input
-								className="font-semibold text-lg"
-								disabled={true}
-								value={`${address.Street} ${address.Ward} ${address.District} ${address.Province}`}
-							/>
+				{userDetail?.Addresses?.length > 0 ? (
+					userDetail?.Addresses?.map((address) => (
+						<div className="">
+							<div className="my-4">
+								<Input
+									className="font-semibold text-lg"
+									disabled={true}
+									value={`${address.Street} ${address.Ward} ${address.District} ${address.Province}`}
+								/>
+							</div>
 						</div>
-					</div>
-				))}
+					))
+				) : (
+					<div className="font-semibold text-lg my-2">Không Có Địa Chỉ</div>
+				)}
 			</div>
 		</div>
 	);
