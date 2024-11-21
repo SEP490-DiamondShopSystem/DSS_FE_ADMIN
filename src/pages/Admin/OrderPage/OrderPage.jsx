@@ -1,8 +1,10 @@
+import React, {useEffect, useState} from 'react';
+
 import {CalendarOutlined, EditFilled} from '@ant-design/icons';
 import {Button, DatePicker, Input, Space, Table, Tag} from 'antd';
-import React, {useEffect, useState} from 'react';
+import debounce from 'lodash/debounce';
 import {useDispatch, useSelector} from 'react-redux';
-import {useNavigate} from 'react-router-dom';
+import {Link, useNavigate} from 'react-router-dom';
 import {Filter} from '../../../components/Filter';
 import {
 	getAllOrderSelector,
@@ -10,7 +12,7 @@ import {
 	LoadingOrderSelector,
 } from '../../../redux/selectors';
 import {getAllOrder} from '../../../redux/slices/orderSlice';
-import {convertToVietnamDate, formatPrice} from '../../../utils';
+import {formatPrice} from '../../../utils';
 import {enums} from '../../../utils/constant';
 
 const {Search} = Input;
@@ -28,6 +30,7 @@ const statusList = [
 	{name: 'Success', value: '8'},
 	{name: 'Refused', value: '9'},
 ];
+
 const delivererStatusList = [
 	{name: 'All', value: ''},
 	{name: 'Prepared', value: '5'},
@@ -53,18 +56,6 @@ const getEnumKey = (enumObj, value) => {
 		: '';
 };
 
-const mapAttributes = (data, attributes) => {
-	return {
-		id: data?.Id,
-		orderTime: convertToVietnamDate(data?.CreatedDate),
-		status: getEnumKey(attributes?.OrderStatus, data?.Status),
-		email: data?.Account?.Email,
-		totalAmount: formatPrice(data?.TotalPrice),
-		customer: null,
-		paymentMethod: getEnumKey(attributes?.PaymentStatus, data?.PaymentStatus),
-	};
-};
-
 const OrderPage = () => {
 	const navigate = useNavigate();
 	const dispatch = useDispatch();
@@ -82,7 +73,7 @@ const OrderPage = () => {
 	const [current, setCurrent] = useState(1);
 	const [delivererRole, setDelivererRole] = useState(false);
 
-	useEffect(() => {
+	const fetchDiamondData = debounce(() => {
 		dispatch(
 			getAllOrder({
 				pageSize: pageSize,
@@ -93,12 +84,16 @@ const OrderPage = () => {
 				Email: searchText,
 			})
 		);
-		// dispatch(getAllOrder());
+	}, 1000);
+
+	useEffect(() => {
+		fetchDiamondData();
+
+		return () => fetchDiamondData.cancel();
 	}, [pageSize, current, activeStatus, startDate, endDate, searchText]);
 
-	console.log('orderList', orderList);
+	// console.log('orderList', orderList);
 	console.log('orders', orders);
-	console.log('userDetail', userDetail);
 
 	useEffect(() => {
 		if (userDetail?.Roles) {
@@ -110,19 +105,30 @@ const OrderPage = () => {
 
 	useEffect(() => {
 		if (orderList && enums) {
-			// Map diamond attributes to more readable values
+			const mapAttributes = (data, attributes) => ({
+				id: data?.Id,
+				orderTime: data?.CreatedDate,
+				status: getEnumKey(attributes?.OrderStatus, data?.Status),
+				email: data?.Account?.Email,
+				totalAmount: formatPrice(data?.TotalPrice),
+				customer: null,
+				paymentMethod: getEnumKey(attributes?.PaymentStatus, data?.PaymentStatus),
+				OrderCode: data.OrderCode,
+			});
+
 			const mappedData = orderList?.Values?.map((order) => mapAttributes(order, enums));
+
 			setOrders(mappedData);
 		}
 	}, [orderList, enums]);
 
 	const columns = [
-		// {
-		// 	title: 'ID Đơn Hàng',
-		// 	dataIndex: 'id',
-		// 	key: 'id',
-		// 	align: 'center',
-		// },
+		{
+			title: 'ID Đơn Hàng',
+			dataIndex: 'OrderCode',
+			key: 'OrderCode',
+			align: 'center',
+		},
 		{
 			title: 'Email',
 			key: 'email',
@@ -224,14 +230,11 @@ const OrderPage = () => {
 			align: 'center',
 			render: (_, record) => (
 				<Space size="middle">
-					<Button
-						type="text"
-						className="bg-primary"
-						ghost
-						onClick={() => navigate(`/orders/${record.id}`)}
-					>
-						<EditFilled />
-					</Button>
+					<Link to={`/orders/${record.id}`}>
+						<Button type="text" className="bg-primary">
+							<EditFilled />
+						</Button>
+					</Link>
 				</Space>
 			),
 		},

@@ -154,6 +154,38 @@ export const handleOrderAssignDeliverer = createAsyncThunk(
 // 	}
 // );
 
+export const getOrderLog = createAsyncThunk(
+	'orderSlice/getOrderLog',
+	async (orderId, {rejectWithValue}) => {
+		try {
+			const response = await api.get(`/Order/Log/${orderId}`);
+			console.log(response);
+
+			return response;
+		} catch (error) {
+			console.log('Error: ', JSON.stringify(error.response.data));
+			return rejectWithValue(error.response.data);
+		}
+	}
+);
+
+export const handleRedeliver = createAsyncThunk(
+	'orderSlice/handleRedeliver',
+	async ({orderId, delivererId}, {rejectWithValue}) => {
+		try {
+			const response = await api.put(
+				`/Order/Redeliver?orderId=${orderId}&delivererId=${delivererId}`
+			);
+			console.log(response);
+
+			return response;
+		} catch (error) {
+			console.log('Error: ', JSON.stringify(error.response.data));
+			return rejectWithValue(error.response.data);
+		}
+	}
+);
+
 export const orderSlice = createSlice({
 	name: 'orderSlice',
 	initialState: {
@@ -166,8 +198,10 @@ export const orderSlice = createSlice({
 		orderPaymentStatusDetail: null,
 		orderStatusCustomizeDetail: null,
 		orderPaymentStatusCustomizeDetail: null,
+		orderLogsDetail: null,
 		loading: false,
 		error: null,
+		orderLogs: null,
 	},
 	reducers: {},
 	extraReducers: (builder) => {
@@ -191,6 +225,7 @@ export const orderSlice = createSlice({
 				state.orderDetail = action.payload;
 				state.orderStatusDetail = action.payload.Status;
 				state.orderPaymentStatusDetail = action.payload.PaymentStatus;
+				state.orderLogsDetail = action.payload.Logs;
 			})
 			.addCase(getOrderDetail.rejected, (state, action) => {
 				state.loading = false;
@@ -213,6 +248,7 @@ export const orderSlice = createSlice({
 			.addCase(handleOrder.fulfilled, (state, action) => {
 				state.loading = false;
 				state.orderStatusDetail = action.payload.Status;
+				state.orderLogsDetail = action.payload.Logs;
 			})
 			.addCase(handleOrder.rejected, (state, action) => {
 				state.loading = false;
@@ -225,6 +261,7 @@ export const orderSlice = createSlice({
 				state.loading = false;
 				state.orderStatusDetail = action.payload.Status;
 				state.orderPaymentStatusDetail = action.payload.PaymentStatus;
+				state.orderLogsDetail = action.payload.Logs;
 			})
 			.addCase(handleOrderReject.rejected, (state, action) => {
 				state.loading = false;
@@ -236,6 +273,7 @@ export const orderSlice = createSlice({
 			.addCase(handleDeliveryFailed.fulfilled, (state, action) => {
 				state.loading = false;
 				state.orderStatusDetail = action.payload.Status;
+				state.orderLogsDetail = action.payload.Logs;
 			})
 			.addCase(handleDeliveryFailed.rejected, (state, action) => {
 				state.loading = false;
@@ -249,6 +287,7 @@ export const orderSlice = createSlice({
 				state.loading = false;
 				state.orderDetail = action.payload;
 				state.orderStatusDetail = action.payload.Status;
+				state.orderLogsDetail = action.payload.Logs;
 			})
 			.addCase(handleOrderAssignDeliverer.rejected, (state, action) => {
 				state.loading = false;
@@ -261,9 +300,34 @@ export const orderSlice = createSlice({
 				state.loading = false;
 				// state.orderDetail = action.payload;
 				state.orderStatusDetail = action.payload.Status;
+				state.orderLogsDetail = action.payload.Logs;
 				state.orderPaymentStatusDetail = action.payload.PaymentStatus;
 			})
 			.addCase(handleRefundOrder.rejected, (state, action) => {
+				state.loading = false;
+				state.error = action.payload;
+			})
+			.addCase(getOrderLog.pending, (state) => {
+				state.loading = true;
+			})
+			.addCase(getOrderLog.fulfilled, (state, action) => {
+				state.loading = false;
+				state.orderLogs = action.payload;
+			})
+			.addCase(getOrderLog.rejected, (state, action) => {
+				state.loading = false;
+				state.error = action.payload;
+			})
+			.addCase(handleRedeliver.pending, (state) => {
+				state.loading = true;
+			})
+			.addCase(handleRedeliver.fulfilled, (state, action) => {
+				state.loading = false;
+				state.orderDetail = action.payload;
+				state.orderStatusDetail = action.payload.Status;
+				state.orderLogsDetail = action.payload.Logs;
+			})
+			.addCase(handleRedeliver.rejected, (state, action) => {
 				state.loading = false;
 				state.error = action.payload;
 			});

@@ -7,6 +7,7 @@ export const GetUserDetailSelector = (state) => state.userLoginSlice.userDetail;
 export const getAllUserSelector = (state) => state.userSlice.users;
 export const getDetailUserSelector = (state) => state.userSlice.userAccount;
 export const getLoadingUserSelector = (state) => state.userSlice.loading;
+export const getAllDelivererSelector = (state) => state.userSlice.delivererList;
 
 //ORDER
 export const getAllOrderSelector = (state) => state.orderSlice.orders;
@@ -14,6 +15,8 @@ export const LoadingOrderSelector = (state) => state.orderSlice.loading;
 export const getOrderDetailSelector = (state) => state.orderSlice.orderDetail;
 export const getOrderStatusDetailSelector = (state) => state.orderSlice.orderStatusDetail;
 export const getPaymentStatusDetailSelector = (state) => state.orderSlice.orderPaymentStatusDetail;
+export const getOrderLogsDetailSelector = (state) => state.orderSlice.orderLogs;
+export const getOrderLogsSelector = (state) => state.orderSlice.orderLogsDetail;
 
 //CUSTOMIZE
 export const getAllOrderCustomizeSelector = (state) => state.customizeSlice.ordersCustomize;
@@ -23,6 +26,8 @@ export const getOrderStatusCustomizeDetailSelector = (state) =>
 export const getPaymentStatusCustomizeDetailSelector = (state) =>
 	state.customizeSlice.orderPaymentStatusCustomizeDetail;
 export const getOrderCustomizeDetailSelector = (state) => state.customizeSlice.orderCustomizeDetail;
+export const GetDiamondUnAvailableSelector = (state) => state.customizeSlice.diamondUnAvailable;
+export const ErrorCustomizeSelector = (state) => state.customizeSlice.error;
 
 //DELIVERY
 export const LoadingDeliverySelector = (state) => state.deliverySlice.loading;
@@ -62,6 +67,7 @@ export const getAllJewelryModelCategoriesSelector = (state) =>
 export const LoadingJewelryModelCategorySelector = (state) =>
 	state.jewelryModelCategorySlice.loading;
 export const JewelryModelCategoryErrorSelector = (state) => state.jewelryModelCategorySlice.error;
+
 // JEWELRY
 export const selectJewelryList = (state) => state.jewelrySlice.jewelryList;
 export const selectJewelryTotalPage = (state) => state.jewelrySlice.totalPage;
@@ -69,6 +75,7 @@ export const selectJewelryCurrentPage = (state) => state.jewelrySlice.currentPag
 export const selectJewelryDetail = (state) => state.jewelrySlice.jewelryDetail;
 export const selectJewelryLoading = (state) => state.jewelrySlice.loading;
 export const selectJewelryError = (state) => state.jewelrySlice.error;
+
 // JEWELRY MODEL
 export const selectJewelryModels = (state) => state.jewelryModel.jewelryModels;
 export const selectJewelryModelDetail = (state) => state.jewelryModel.jewelryModelDetail;
