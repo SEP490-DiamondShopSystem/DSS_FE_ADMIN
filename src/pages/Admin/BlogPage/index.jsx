@@ -186,11 +186,13 @@ const BlogPage = () => {
 			form.setFieldsValue({title: detail.Title});
 
 			if (detail.Thumbnail?.MediaPath) {
-				setThumbnailFile(
-					new File([], detail.Thumbnail.MediaPath, {
-						type: detail.Thumbnail.ContentType || 'image/jpeg', // Provide a default type
-					})
-				);
+				setThumbnailFile({
+					uid: '-1', // Unique identifier for the file
+					name: detail.Thumbnail.MediaPath.split('/').pop(),
+					status: 'done',
+					url: detail.Thumbnail.MediaPath,
+					preview: detail.Thumbnail.MediaPath,
+				});
 			} else {
 				setThumbnailFile(null); // Clear if no thumbnail is provided
 			}
@@ -314,21 +316,23 @@ const BlogPage = () => {
 				visible={isModalVisible}
 				onOk={handleCreateOrUpdate}
 				onCancel={onCancel}
+				width={900} // Make the modal wider
 				className="rounded-lg p-6"
 			>
-				<Form layout="vertical" form={form}>
+				<Form layout="vertical" form={form} style={{width: '100%'}}>
 					<Form.Item
 						name="title"
 						label="Title"
 						rules={[{required: true, message: 'Please enter the blog title!'}]}
+						className="mb-4"
 					>
 						<Input
 							placeholder="Enter blog title"
-							className="p-2 rounded-lg border-gray-300"
+							className="p-3 rounded-lg border-gray-300"
 						/>
 					</Form.Item>
 
-					<Form.Item name="tags" label="Tags">
+					<Form.Item name="tags" label="Tags" className="mb-4">
 						<div>
 							<Input
 								value={tagsInput}
@@ -340,7 +344,7 @@ const BlogPage = () => {
 									}
 								}}
 								placeholder="Press enter to add tags"
-								className="p-2 rounded-lg border-gray-300 mb-2"
+								className="p-3 rounded-lg border-gray-300 mb-2"
 							/>
 							<div>
 								{tags.map((tag, index) => (
@@ -349,6 +353,7 @@ const BlogPage = () => {
 										color="blue"
 										onClose={() => setTags(tags.filter((t) => t !== tag))}
 										closable
+										className="mb-1"
 									>
 										{tag}
 									</Tag>
@@ -356,66 +361,75 @@ const BlogPage = () => {
 							</div>
 						</div>
 					</Form.Item>
-					<Form.Item className="w-full" label="Thumbnail" style={{marginBottom: '16px'}}>
-						<Upload
-							beforeUpload={(file) => {
-								if (!file.name) {
-									message.error('Invalid file selected.');
+
+					<Form.Item className="mb-6" label="Thumbnail" style={{marginBottom: '16px'}}>
+						<div className="upload-section">
+							<Upload.Dragger
+								name="thumbnail"
+								beforeUpload={(file) => {
+									if (!file.name) {
+										message.error('Invalid file selected.');
+										return false;
+									}
+									const fileWithPreview = Object.assign(file, {
+										preview: URL.createObjectURL(file),
+									});
+									setThumbnailFile(fileWithPreview);
 									return false;
-								}
-								const fileWithPreview = Object.assign(file, {
-									preview: URL.createObjectURL(file),
-								});
-								setThumbnailFile(fileWithPreview);
-								return false; // Prevent auto-upload
-							}}
-							onRemove={() => setThumbnailFile(null)}
-							showUploadList={false}
-						>
-							{thumbnailFile ? (
-								<div className="w-full mt-2 relative flex flex-col align-middle gap-4">
-									<Image
-										src={
-											thumbnailFile.preview ||
-											thumbnailFile.MediaPath ||
-											'/path/to/placeholder.jpg'
-										}
-										alt="Thumbnail"
-										style={{
-											width: '120px',
-											height: '120px',
-											objectFit: 'cover',
-											borderRadius: '12px',
-											boxShadow: '0 4px 8px rgba(0,0,0,0.1)',
-										}}
-									/>
-									<Button
-										danger
-										type="link"
-										onClick={() => setThumbnailFile(null)}
-									>
-										Clear
-									</Button>
-								</div>
-							) : (
-								<Button icon={<UploadOutlined />} style={{marginTop: '8px'}}>
-									Upload Thumbnail
+								}}
+								onRemove={() => setThumbnailFile(null)}
+								showUploadList={false}
+								className="drag-upload-area rounded-lg border-dashed border-gray-400 bg-gray-50 p-6"
+							>
+								<p className="ant-upload-drag-icon">
+									<UploadOutlined />
+								</p>
+								<p className="ant-upload-text">
+									Drag and drop a file here, or click to select one
+								</p>
+								<p className="ant-upload-hint text-sm text-gray-500">
+									Supports single file upload. Ensure the file is an image.
+								</p>
+							</Upload.Dragger>
+						</div>
+
+						{thumbnailFile && (
+							<div className="preview-section mt-4 relative">
+								<Image
+									src={thumbnailFile.preview || thumbnailFile.url}
+									alt="Thumbnail Preview"
+									style={{
+										width: '100%',
+										height: 'auto',
+										borderRadius: '8px',
+										boxShadow: '0 4px 8px rgba(0,0,0,0.1)',
+									}}
+								/>
+								<Button
+									danger
+									type="link"
+									onClick={() => setThumbnailFile(null)}
+									className="mt-2"
+								>
+									Clear
 								</Button>
-							)}
-						</Upload>
+							</div>
+						)}
 					</Form.Item>
 
 					<Form.Item
 						name="contents"
 						label="Content"
-						rules={[{required: false, message: 'Please enter blog content!'}]}
+						className="mb-6"
+						rules={[{required: true, message: 'Please enter blog content!'}]}
 					>
 						{isEditingContent ? (
 							<div>
 								<ReactQuill
 									theme="snow"
-									value={editorContent} // Pass the content here when editing
-									onChange={setEditorContent} // Ensure state is updated when typing
+									value={editorContent}
+									onChange={setEditorContent}
+									style={{height: 300, borderRadius: '8px'}}
 									modules={{
 										toolbar: [
 											[{header: [1, 2, 3, false]}],
@@ -423,52 +437,28 @@ const BlogPage = () => {
 											[{size: ['small', false, 'large', 'huge']}],
 											['bold', 'italic', 'underline', 'strike'],
 											[{color: []}, {background: []}],
-											[{script: 'sub'}, {script: 'super'}],
 											[{list: 'ordered'}, {list: 'bullet'}],
-											[{indent: '-1'}, {indent: '+1'}],
 											[{align: []}],
-											['blockquote', 'code-block'],
-											['link', 'image'],
+											['link', 'image', 'video'],
 											['clean'],
 										],
 									}}
-									formats={[
-										'header',
-										'font',
-										'size',
-										'bold',
-										'italic',
-										'underline',
-										'strike',
-										'color',
-										'background',
-										'script',
-										'list',
-										'bullet',
-										'indent',
-										'align',
-										'blockquote',
-										'code-block',
-										'link',
-										'image',
-										'video',
-									]}
 								/>
 								<Button
 									onClick={handleCancelEditContent}
-									className="mt-2 bg-primary text-white"
+									className="mt-4 bg-gray-200 hover:bg-gray-300 text-black"
 								>
 									Cancel Edit
 								</Button>
 							</div>
 						) : (
 							<div>
-								<div className="rendered-content overflow-y-auto max-h-40 p-6 border rounded-lg shadow-lg bg-white">
+								<div className="rendered-content p-4 border rounded-lg shadow-lg bg-gray-100 overflow-y-auto max-h-44 ">
 									{ReactHtmlParser(sanitizedContent)}
 								</div>
 								<Button
 									onClick={handleEditContent}
-									className="mt-2 bg-primary text-white"
+									className="mt-4 bg-primary text-white"
 								>
 									Edit Content
 								</Button>
@@ -477,33 +467,6 @@ const BlogPage = () => {
 					</Form.Item>
 				</Form>
 			</Modal>
-			{/* Pagination Controls */}
-			{/* <div className="pagination-controls flex justify-center space-x-4 mt-4">
-				<Button
-					onClick={handlePreviousPage}
-					disabled={currentPage === 1}
-					className="bg-primary text-black hover:bg-primaryDark disabled:opacity-50"
-				>
-					Previous
-				</Button>
-				<span className="text-lg">{`Page ${currentPage} of ${totalPage}`}</span>
-				<Button
-					onClick={handleNextPage}
-					disabled={currentPage === totalPage}
-					className="bg-primary text-black hover:bg-primaryDark disabled:opacity-50"
-				>
-					Next
-				</Button>
-				<Select
-					value={pageSize}
-					onChange={(value) => setPageSize(value)}
-					className="form-select p-2 border border-gray rounded-md"
-				>
-					<Select.Option value={5}>5 per page</Select.Option>
-					<Select.Option value={10}>10 per page</Select.Option>
-					<Select.Option value={20}>20 per page</Select.Option>
-				</Select>
-			</div> */}
 		</div>
 	);
 };
