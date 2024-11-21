@@ -73,6 +73,8 @@ const OrderPage = () => {
 	const [current, setCurrent] = useState(1);
 	const [delivererRole, setDelivererRole] = useState(false);
 
+	console.log('orderList', orderList);
+
 	const fetchDiamondData = debounce(() => {
 		dispatch(
 			getAllOrder({
@@ -110,7 +112,8 @@ const OrderPage = () => {
 				totalAmount: formatPrice(data?.TotalPrice),
 				customer: null,
 				paymentMethod: getEnumKey(attributes?.PaymentStatus, data?.PaymentStatus),
-				OrderCode: data.OrderCode,
+				OrderCode: data?.OrderCode,
+				CustomizeRequestId: data?.CustomizeRequestId,
 			});
 
 			const mappedData = orderList?.Values?.map((order) => mapAttributes(order, enums));
@@ -144,7 +147,13 @@ const OrderPage = () => {
 			dataIndex: 'totalAmount',
 			align: 'center',
 		},
-
+		{
+			title: 'Loại Đơn Hàng',
+			key: 'CustomizeRequestId',
+			dataIndex: 'CustomizeRequestId',
+			align: 'center',
+			render: (CustomizeRequestId) => (CustomizeRequestId ? 'Đơn Thiết Kế' : 'Đơn Thường'),
+		},
 		{
 			title: 'PT Thanh Toán',
 			key: 'paymentMethod',

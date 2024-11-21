@@ -2486,3 +2486,8 @@ video {
 		padding: 0.5rem /* 8px */;
 	}
 }
+
+.my-1 {
+	margin-top: 0.25rem /* 4px */;
+	margin-bottom: 0.25rem /* 4px */;
+}

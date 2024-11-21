@@ -14,7 +14,6 @@ import {Breadcrumb, Layout, Menu, message} from 'antd';
 import {Link, Outlet, useLocation, useNavigate} from 'react-router-dom';
 import {imageExporter} from '../assets/images';
 import TopNavbar from '../components/TopNavBar/TopNavBar';
-import '../css/antd.css';
 import {GetUserDetailSelector} from '../redux/selectors';
 import {useSelector} from 'react-redux';
 

@@ -18,7 +18,6 @@ import {
 import debounce from 'lodash/debounce';
 import {useDispatch, useSelector} from 'react-redux';
 import {useNavigate} from 'react-router-dom';
-import '../../../../css/antd.css';
 import {
 	getAllDiamondSelector,
 	getAllShapeSelector,

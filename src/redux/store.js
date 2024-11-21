@@ -23,6 +23,7 @@ import {customizeSlice} from './slices/customizeSlice';
 import {deliveryFeeSlice} from './slices/deliveryFeeSlice';
 import {locationSlice} from './slices/locationSlice';
 import {blogSlice} from './slices/blogSlice';
+import {dashboardSlice} from './slices/dashboard';
 
 const rootPersistConfig = {
 	key: 'root',
@@ -52,6 +53,7 @@ const rootReducer = combineReducers({
 	locationSlice: locationSlice.reducer,
 	customizeSlice: customizeSlice.reducer,
 	blogSlice: blogSlice.reducer,
+	dashboardSlice: dashboardSlice.reducer,
 });
 
 const persistedReducer = persistReducer(rootPersistConfig, rootReducer);

@@ -69,6 +69,9 @@ const TimeLineOrder = ({orders, loading, statusOrder, paymentStatusOrder, id}) =
 	}, []);
 
 	console.log('deliverer', deliverer);
+	console.log('userRoleDeliverer', userRoleDeliverer);
+	console.log('userRoleManager', userRoleManager);
+	console.log('userRoleStaff', userRoleStaff);
 
 	// useEffect(() => {
 	// 	if (orderLogList) {
@@ -426,8 +429,7 @@ const TimeLineOrder = ({orders, loading, statusOrder, paymentStatusOrder, id}) =
 									<CheckCircleOutlined /> {ORDER_STATUS_TEXTS.Prepared}
 								</p>
 							</div>
-
-							{!userRoleManager && (
+							{Array.isArray(orders) && orders?.DelivererId ? (
 								<>
 									<div className="flex mt-2">
 										<p className="text-red mr-1">*</p>
@@ -468,15 +470,21 @@ const TimeLineOrder = ({orders, loading, statusOrder, paymentStatusOrder, id}) =
 										</Button>
 									</div>
 								</>
+							) : (
+								<div>
+									<p className="mt-3 text-center font-semibold text-primary">
+										Đơn Hàng Đã Chuyển Giao Cho Nhân Viên Giao Hàng
+									</p>
+								</div>
 							)}
 
-							{userRoleDeliverer ||
+							{/* {userRoleDeliverer ||
 								userRoleStaff ||
 								(!userRoleManager && (
 									<p className="mt-3 text-center">
 										Chờ Manager Chọn Chuyển Giao Đơn Hàng
 									</p>
-								))}
+								))} */}
 						</div>
 					)}
 
@@ -489,7 +497,7 @@ const TimeLineOrder = ({orders, loading, statusOrder, paymentStatusOrder, id}) =
 								</p>
 							</div>
 
-							{userRoleDeliverer ? (
+							{userRoleDeliverer && (
 								<div className="flex justify-around">
 									<Button
 										type="text"
@@ -498,12 +506,6 @@ const TimeLineOrder = ({orders, loading, statusOrder, paymentStatusOrder, id}) =
 									>
 										Bắt Đầu Giao Hàng
 									</Button>
-								</div>
-							) : (
-								<div>
-									<p className="mt-3 text-center font-semibold text-primary">
-										Chờ Deliverer Giao Hàng
-									</p>
 								</div>
 							)}
 						</div>
