@@ -2,7 +2,7 @@ import {createAsyncThunk, createSlice} from '@reduxjs/toolkit';
 import {api} from '../../services/api';
 
 export const getOrderCustomizeDetail = createAsyncThunk(
-	'orderSlice/getOrderCustomizeDetail',
+	'customizeSlice/getOrderCustomizeDetail',
 	async ({RequestId, AccountId}, {rejectWithValue}) => {
 		try {
 			const data = await api.get(
@@ -17,7 +17,7 @@ export const getOrderCustomizeDetail = createAsyncThunk(
 );
 
 export const getAllOrderCustomize = createAsyncThunk(
-	'orderSlice/getAllOrderCustomize',
+	'customizeSlice/getAllOrderCustomize',
 	async (params, {rejectWithValue}) => {
 		try {
 			const {currentPage, pageSize, Email, CreatedDate, ExpiredDate, Status} = params;
@@ -46,7 +46,7 @@ export const getAllOrderCustomize = createAsyncThunk(
 );
 
 export const handleCustomizeOrder = createAsyncThunk(
-	'orderSlice/handleCustomizeOrder',
+	'customizeSlice/handleCustomizeOrder',
 	async (body, {rejectWithValue}) => {
 		console.log('body', body);
 
@@ -61,7 +61,7 @@ export const handleCustomizeOrder = createAsyncThunk(
 );
 
 export const handleRejectCustomize = createAsyncThunk(
-	'orderSlice/handleRejectCustomize',
+	'customizeSlice/handleRejectCustomize',
 	async (id, {rejectWithValue}) => {
 		try {
 			const data = await api.put(`/CustomizeRequest/Staff/Reject?CustomizeRequestId=${id}`);
@@ -69,6 +69,63 @@ export const handleRejectCustomize = createAsyncThunk(
 		} catch (error) {
 			console.error(error);
 			return rejectWithValue(error);
+		}
+	}
+);
+
+export const handleAddDiamondCustomize = createAsyncThunk(
+	'customizeSlice/handleAddDiamondCustomize',
+	async (params, {rejectWithValue}) => {
+		console.log('params', params);
+
+		try {
+			const response = await api.post(`/Diamond/Unavailble`, params);
+			console.log(response);
+
+			return response;
+		} catch (error) {
+			console.log('Error: ', JSON.stringify(error.response.data));
+			return rejectWithValue(error.response.data);
+		}
+	}
+);
+
+export const handleDeleteDiamondCustomize = createAsyncThunk(
+	'customizeSlice/handleDeleteDiamondCustomize',
+	async (params, {rejectWithValue}) => {
+		console.log('params', params);
+
+		try {
+			const response = await api.delete(`/Diamond/Unavailble`, {
+				headers: {
+					'Content-Type': 'application/json-patch+json',
+					Accept: '*/*',
+				},
+				data: params,
+			});
+			console.log(response);
+
+			return response;
+		} catch (error) {
+			console.log('Error: ', JSON.stringify(error.response?.data));
+			return rejectWithValue(error.response?.data || error.message);
+		}
+	}
+);
+
+export const handleChangeDiamondCustomize = createAsyncThunk(
+	'customizeSlice/handleChangeDiamondCustomize',
+	async (params, {rejectWithValue}) => {
+		console.log('params', params);
+
+		try {
+			const response = await api.put(`/CustomizeRequest/Staff/ChangeDiamond`, params);
+			console.log(response);
+
+			return response;
+		} catch (error) {
+			console.log('Error: ', JSON.stringify(error.response?.data));
+			return rejectWithValue(error.response?.data || error.message);
 		}
 	}
 );
@@ -81,6 +138,7 @@ export const customizeSlice = createSlice({
 		orderStatusCustomizeDetail: null,
 		orderDetailCustomize: null,
 		orderPaymentStatusCustomizeDetail: null,
+		diamondUnAvailable: null,
 		loading: false,
 		error: null,
 	},
@@ -134,6 +192,37 @@ export const customizeSlice = createSlice({
 				state.orderStatusCustomizeDetail = action.payload.Status;
 			})
 			.addCase(handleRejectCustomize.rejected, (state, action) => {
+				state.loading = false;
+				state.error = action.payload;
+			})
+			.addCase(handleAddDiamondCustomize.pending, (state) => {
+				state.loading = true;
+			})
+			.addCase(handleAddDiamondCustomize.fulfilled, (state, action) => {
+				state.loading = false;
+				state.diamondUnAvailable = action.payload;
+			})
+			.addCase(handleAddDiamondCustomize.rejected, (state, action) => {
+				state.loading = false;
+				state.error = action.payload;
+			})
+			.addCase(handleDeleteDiamondCustomize.pending, (state) => {
+				state.loading = true;
+			})
+			.addCase(handleDeleteDiamondCustomize.fulfilled, (state, action) => {
+				state.loading = false;
+			})
+			.addCase(handleDeleteDiamondCustomize.rejected, (state, action) => {
+				state.loading = false;
+				state.error = action.payload;
+			})
+			.addCase(handleChangeDiamondCustomize.pending, (state) => {
+				state.loading = true;
+			})
+			.addCase(handleChangeDiamondCustomize.fulfilled, (state, action) => {
+				state.loading = false;
+			})
+			.addCase(handleChangeDiamondCustomize.rejected, (state, action) => {
 				state.loading = false;
 				state.error = action.payload;
 			});

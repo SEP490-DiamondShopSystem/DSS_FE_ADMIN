@@ -3,6 +3,11 @@ import React, {useEffect} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
 import {getAllShapeSelector} from '../../../../../redux/selectors';
 import {getDiamondShape, handleAddDiamond} from '../../../../../redux/slices/diamondSlice';
+import {
+	uploadDiamondThumbnail,
+	uploadCertificates,
+	uploadDiamondImages,
+} from '../../../../../redux/slices/filesSlice';
 
 const {Option} = Select;
 
@@ -30,6 +35,18 @@ export const AddModalDiamond = ({setShowModal, showModal}) => {
 		setShowModal(false);
 		// form.resetFields();
 	};
+
+	function generateRandomSKU(length = 16) {
+		const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+		let sku = '';
+
+		for (let i = 0; i < length; i++) {
+			const randomIndex = Math.floor(Math.random() * characters.length);
+			sku += characters[randomIndex];
+		}
+
+		return sku;
+	}
 
 	const handleOk = (values) => {
 		console.log('Form Values:', values);
@@ -84,6 +101,7 @@ export const AddModalDiamond = ({setShowModal, showModal}) => {
 				shapeId,
 				priceOffset,
 				certificate: 1,
+				sku: generateRandomSKU(16),
 			})
 		).then((res) => {
 			if (res.payload !== undefined) {
@@ -148,6 +166,8 @@ export const AddModalDiamond = ({setShowModal, showModal}) => {
 							step={0.01}
 							placeholder="Chọn Carat Weight"
 							className="w-full"
+							min={0.18}
+							max={30}
 						/>
 					</Form.Item>
 				</div>
@@ -218,16 +238,52 @@ export const AddModalDiamond = ({setShowModal, showModal}) => {
 
 				{/* Measurement Row */}
 				<div className="flex flex-wrap gap-4">
-					<Form.Item name="withLenghtRatio" label="Width-Length Ratio" className="w-1/4">
-						<InputNumber placeholder="Enter Width-Length Ratio" className="w-full" />
+					<Form.Item
+						name="withLenghtRatio"
+						label="Width-Length Ratio"
+						className="w-1/4"
+						rules={[{required: true, message: 'Vui lòng nhập Width-Length Ratio'}]}
+					>
+						<InputNumber
+							placeholder="Enter Width-Length Ratio (%)"
+							className="w-full"
+							min={0}
+							max={100}
+							formatter={(value) => `${value}%`}
+							parser={(value) => value.replace('%', '')}
+						/>
 					</Form.Item>
 
-					<Form.Item name="depth" label="Depth" className="w-1/4">
-						<InputNumber placeholder="Nhập Phần Trăm Depth" className="w-full" />
+					<Form.Item
+						name="depth"
+						label="Depth"
+						className="w-1/4"
+						rules={[{required: true, message: 'Vui lòng nhập Depth'}]}
+					>
+						<InputNumber
+							placeholder="Nhập Phần Trăm Depth (%)"
+							className="w-full"
+							min={0}
+							max={100}
+							formatter={(value) => `${value}%`}
+							parser={(value) => value.replace('%', '')}
+						/>
 					</Form.Item>
 
-					<Form.Item name="table" label="Table" className="w-1/4">
-						<InputNumber placeholder="Nhập Phần Trăm Table" className="w-full" />
+					<Form.Item
+						name="table"
+						label="Table"
+						className="w-1/4"
+						rules={[{required: true, message: 'Vui lòng nhập Table'}]}
+					>
+						<InputNumber
+							placeholder="Nhập Phần Trăm Table (%)"
+							className="w-full"
+							min={0}
+							max={100}
+							formatter={(value) => `${value}%`}
+							parser={(value) => value.replace('%', '')}
+						/>
 					</Form.Item>
 				</div>
 
@@ -251,12 +307,13 @@ export const AddModalDiamond = ({setShowModal, showModal}) => {
 				<div>
 					<Form.Item
 						name="isLabDiamond"
-						label="Kim Cương Nhân Tạo"
+						label="Nguồn Gốc Kim Cương"
 						valuePropName="checked"
-						initialValue={false}
-						className="w-1/3"
+						className="w-1/3 flex items-center"
 					>
-						<Switch />
+						<span>Tự Nhiên</span>
+						<Switch className="mx-5" />
+						<span>Nhân Tạo</span>
 					</Form.Item>
 				</div>
 			</Form>

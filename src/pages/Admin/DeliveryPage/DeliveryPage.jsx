@@ -15,7 +15,6 @@ import {
 	Tooltip,
 } from 'antd';
 import {Filter} from '../../../components/Filter';
-import '../../../css/antd.css';
 import {useDispatch, useSelector} from 'react-redux';
 import {
 	getAllDeliverySelector,

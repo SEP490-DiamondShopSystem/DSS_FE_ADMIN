@@ -1,7 +1,14 @@
 import React, {useState} from 'react';
 
-import {ArrowLeftOutlined, CheckCircleOutlined, ClockCircleFilled} from '@ant-design/icons';
-import {Button, Col, Divider, Row, Table, Tag, Typography} from 'antd';
+import {
+	ArrowLeftOutlined,
+	CheckCircleOutlined,
+	ClockCircleFilled,
+	CloseCircleOutlined,
+	DeleteOutlined,
+	SwapOutlined,
+} from '@ant-design/icons';
+import {Button, Col, Divider, Modal, Row, Table, Tag, Tooltip, Typography} from 'antd';
 import {useDispatch, useSelector} from 'react-redux';
 import {useNavigate} from 'react-router-dom';
 import {LoadingOrderSelector} from '../../../../../redux/selectors';
@@ -12,10 +19,35 @@ import {
 } from '../../../../../utils';
 import {enums} from '../../../../../utils/constant';
 import TimeLineOrder from '../Right/TimeLineOrder';
+import {
+	handleChangeDiamondCustomize,
+	handleDeleteDiamondCustomize,
+} from '../../../../../redux/slices/customizeSlice';
 
 const {Title, Text} = Typography;
 
-const InformationOrder = ({orders, statusOrder, paymentStatusOrder}) => {
+const InformationOrder = ({
+	orders,
+	statusOrder,
+	paymentStatusOrder,
+	diamondRequests,
+	allDiamondsHaveId,
+	allDiamondRequests,
+	currentDiamondId,
+	setCurrentDiamondId,
+	filteredDiamondRequests,
+	setFilteredDiamondRequests,
+	isModalVisible,
+	setIsModalVisible,
+	isModalAddVisible,
+	setIsModalAddVisible,
+	showModal,
+	showModalAdd,
+	setChangeDiamond,
+	changeDiamond,
+	selectedDiamond,
+	filteredRequests,
+}) => {
 	const navigate = useNavigate();
 	const dispatch = useDispatch();
 
@@ -74,7 +106,7 @@ const InformationOrder = ({orders, statusOrder, paymentStatusOrder}) => {
 			dataIndex: 'Metal',
 			key: 'metalName',
 			render: (text) => {
-				return text?.Name || 'No name available';
+				return text?.Name;
 			},
 		},
 		{
@@ -82,7 +114,7 @@ const InformationOrder = ({orders, statusOrder, paymentStatusOrder}) => {
 			dataIndex: 'SideDiamond',
 			key: 'sideDiamond',
 			render: (text) => {
-				return text?.CaratWeight || 'No name available';
+				return text?.CaratWeight;
 			},
 		},
 		{
@@ -90,26 +122,26 @@ const InformationOrder = ({orders, statusOrder, paymentStatusOrder}) => {
 			dataIndex: 'SideDiamond',
 			key: 'sideDiamond',
 			render: (text) => {
-				return text?.Quantity || 'No name available';
+				return text?.Quantity;
 			},
 		},
 		{
 			title: 'Chữ Khắc',
 			dataIndex: 'EngravedText',
 			key: 'engravedText',
-			render: (text) => text || 'No text',
+			render: (text) => text,
 		},
 		{
 			title: 'Ngày Tạo Đơn',
 			dataIndex: 'CreatedDate',
 			key: 'createdAt',
-			render: (text) => convertToVietnamDate(text),
+			render: (text) => text,
 		},
 		{
 			title: 'Ngày Hết Hạn',
 			dataIndex: 'ExpiredDate',
 			key: 'expiredDate',
-			render: (text) => convertToVietnamDate(text),
+			render: (text) => text,
 		},
 		{
 			title: 'Trạng Thái',
@@ -194,6 +226,45 @@ const InformationOrder = ({orders, statusOrder, paymentStatusOrder}) => {
 			key: 'IsLabGrown',
 			render: (shape) => (shape ? 'Nhân Tạo' : 'Tự Nhiên'),
 		},
+		...(orders?.Status === 1
+			? [
+					{
+						title: '',
+						key: 'action',
+						render: (_, record) => {
+							return record?.DiamondId ? (
+								<Tooltip title="Xóa Kim Cương Đã Thêm">
+									<DeleteOutlined
+										style={{color: 'red', cursor: 'pointer'}}
+										onClick={() => handleDelete(record)}
+									/>
+								</Tooltip>
+							) : null;
+						},
+					},
+			  ]
+			: []),
+		...(orders?.Status === 2
+			? [
+					{
+						title: '',
+						key: 'action',
+						render: (_, record) => {
+							return record?.DiamondId ? (
+								<Tooltip title="Thay Đổi Kim Cương Đã Thêm">
+									<SwapOutlined
+										style={{cursor: 'pointer'}}
+										// onClick={() => handleChange(record)}
+										onClick={() => {
+											showModal(record);
+										}}
+									/>
+								</Tooltip>
+							) : null;
+						},
+					},
+			  ]
+			: []),
 	];
 
 	const sub2Columns = [
@@ -300,8 +371,57 @@ const InformationOrder = ({orders, statusOrder, paymentStatusOrder}) => {
 		/>
 	);
 
+	const handleChange = (request) => {
+		Modal.confirm({
+			title: 'Xác nhận xóa',
+			content: 'Bạn có chắc chắn muốn xóa kim cương đã thêm trong yêu cầu này?',
+			okText: 'Xóa',
+			okType: 'danger',
+			cancelText: 'Hủy',
+			onOk: () => handleChangeConfirm(request),
+			onCancel: () => {
+				console.log('Cancel deletion');
+			},
+		});
+	};
+
+	const handleChangeConfirm = (request) => {
+		console.log('request', request);
+		dispatch(
+			handleChangeDiamondCustomize({
+				diamondId: request?.DiamondId,
+				customizeRequestId: request?.CustomizeRequestId,
+				diamondRequestId: request?.DiamondRequestId,
+			})
+		);
+	};
+
+	const handleDelete = (request) => {
+		Modal.confirm({
+			title: 'Xác nhận xóa',
+			content: 'Bạn có chắc chắn muốn xóa kim cương đã thêm trong yêu cầu này?',
+			okText: 'Xóa',
+			okType: 'danger',
+			cancelText: 'Hủy',
+			onOk: () => handleDeleteConfirm(request),
+			onCancel: () => {
+				console.log('Cancel deletion');
+			},
+		});
+	};
+
+	const handleDeleteConfirm = (request) => {
+		console.log('request', request);
+		dispatch(
+			handleDeleteDiamondCustomize({
+				diamondId: request?.DiamondId,
+				customizeRequestId: request?.CustomizeRequestId,
+				diamondRequestId: request?.DiamondRequestId,
+			})
+		);
+	};
+
 	console.log('orders', orders);
-	console.log('status', status);
 
 	return (
 		<div>
@@ -353,14 +473,14 @@ const InformationOrder = ({orders, statusOrder, paymentStatusOrder}) => {
 								Ngày Tạo Yêu Cầu
 							</Text>
 							<br />
-							<Text>{convertToVietnamDate(orders?.CreatedDate)}</Text>
+							<Text>{orders?.CreatedDate}</Text>
 						</Col>
 						<Col span={12}>
 							<Text strong style={{fontSize: 18}}>
 								Ngày Hết Hạn
 							</Text>
 							<br />
-							<Text>{convertToVietnamDate(orders?.ExpiredDate)}</Text>
+							<Text>{orders?.ExpiredDate}</Text>
 						</Col>
 					</Row>
 				</div>
@@ -369,6 +489,23 @@ const InformationOrder = ({orders, statusOrder, paymentStatusOrder}) => {
 						orders={orders}
 						statusOrder={statusOrder}
 						paymentStatusOrder={paymentStatusOrder}
+						diamondRequests={diamondRequests}
+						allDiamondRequests={allDiamondRequests}
+						allDiamondsHaveId={allDiamondsHaveId}
+						currentDiamondId={currentDiamondId}
+						setCurrentDiamondId={setCurrentDiamondId}
+						filteredDiamondRequests={filteredDiamondRequests}
+						setFilteredDiamondRequests={setFilteredDiamondRequests}
+						isModalVisible={isModalVisible}
+						setIsModalVisible={setIsModalVisible}
+						isModalAddVisible={isModalAddVisible}
+						setIsModalAddVisible={setIsModalAddVisible}
+						showModal={showModal}
+						showModalAdd={showModalAdd}
+						setChangeDiamond={setChangeDiamond}
+						changeDiamond={changeDiamond}
+						selectedDiamond={selectedDiamond}
+						filteredRequests={filteredRequests}
 					/>
 				</div>
 			</div>
@@ -398,31 +535,14 @@ const InformationOrder = ({orders, statusOrder, paymentStatusOrder}) => {
 							<CheckCircleOutlined /> Đơn Thiết Kế Đã Được Chấp Nhận
 						</p>
 					)}
+					{status === 'Shop_Rejected' && (
+						<p className=" text-red font-semibold bg-white p-2 rounded-full">
+							<CloseCircleOutlined /> Đơn Thiết Kế Đã Bị Từ Chối
+						</p>
+					)}
 				</Col>
 				<Col span={12}></Col>
 			</Row>
-
-			{/* <Row gutter={[16, 16]} justify="center" align="middle" className="my-3">
-				<Col span={12}>
-					<Text strong style={{fontSize: 18}}>
-						Ngày Đặt Hàng
-					</Text>
-					<br />
-					<Text>{convertToVietnamDate(orders?.CreatedDate)}</Text>
-				</Col>
-
-				<Col span={12}>
-					{orders && orders?.CancelledReason === null && (
-						<>
-							<Text strong className="mb-5" style={{fontSize: 18}}>
-								Phương Thức Thanh Toán
-							</Text>
-							<br />
-							<Tag color={orderStatus.color}>{orderStatus.name.toUpperCase()}</Tag>
-						</>
-					)}
-				</Col>
-			</Row> */}
 
 			<Divider style={{borderColor: '#d9d9d9'}} />
 			<Row>
@@ -430,12 +550,13 @@ const InformationOrder = ({orders, statusOrder, paymentStatusOrder}) => {
 					<Title level={4}>Chi Tiết Yêu Cầu Thiết Kế</Title>
 				</Col>
 			</Row>
-			<div className="mt-5">
+			<div className="mt-5 mx-10">
 				<Table
 					columns={mainColumns}
 					dataSource={orders ? [orders] : []}
 					pagination={false}
 					rowKey="Id"
+					size="large"
 					expandedRowRender={expandedRowRender}
 					expandedRowKeys={expandedRowKeys}
 					onExpand={handleExpand}

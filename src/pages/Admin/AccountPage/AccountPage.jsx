@@ -1,22 +1,20 @@
 import React, {useEffect, useState} from 'react';
+
+import {EditFilled, PlusOutlined} from '@ant-design/icons';
+import {Button, Form, Input, message, Modal, Select, Space, Table, Tag, Tooltip} from 'antd';
 import {useDispatch, useSelector} from 'react-redux';
-import {getAllUser, handleAddRole} from '../../../redux/slices/userSlice';
+import {useNavigate} from 'react-router-dom';
 import {
 	getAllUserSelector,
 	getLoadingUserSelector,
 	GetUserDetailSelector,
 } from '../../../redux/selectors';
-import {Button, Form, Input, message, Modal, Select, Space, Table, Tag, Tooltip} from 'antd';
-import {DeleteFilled, EditFilled, PlusOutlined, UpCircleFilled} from '@ant-design/icons';
-import {Filter} from '../../../components/Filter';
-import {Search} from '@mui/icons-material';
-import {useForm} from 'antd/es/form/Form';
 import {
 	handleAdminRegister,
 	handleRegisterDeliverer,
 	handleStaffRegister,
 } from '../../../redux/slices/userLoginSlice';
-import {useNavigate} from 'react-router-dom';
+import {getAllUser} from '../../../redux/slices/userSlice';
 
 const AccountPage = () => {
 	const [form] = Form.useForm();
@@ -77,6 +75,15 @@ const AccountPage = () => {
 							case 'customer':
 								color = 'green';
 								break;
+							case 'customer_bronze':
+								color = '#cd7f32';
+								break;
+							case 'customer_silver':
+								color = '#c0c0c0';
+								break;
+							case 'customer_gold':
+								color = '#ffd700';
+								break;
 							case 'admin':
 								color = 'red';
 								break;
@@ -90,8 +97,8 @@ const AccountPage = () => {
 								color = 'default';
 						}
 						return (
-							<Tag color={color} key={role.Id}>
-								{role.RoleName.toUpperCase()}
+							<Tag color={color} key={role?.Id}>
+								{role.RoleName.toUpperCase()?.replace('_', ' ')}
 							</Tag>
 						);
 					})}
@@ -105,17 +112,15 @@ const AccountPage = () => {
 			align: 'center',
 			render: (_, record) => (
 				<Space size="middle">
-					{isManager || record.Id === userDetail.Id ? (
-						<Tooltip title={`${isManager ? 'Xem Chi Tiết' : 'Sửa Thông Tin'} `}>
-							<Button
-								type="text"
-								className="bg-primary"
-								onClick={() => navigate(`/Accounts/${record.Id}`)}
-							>
-								<EditFilled />
-							</Button>
-						</Tooltip>
-					) : null}
+					<Tooltip title="Xem Chi Tiết">
+						<Button
+							type="text"
+							className="bg-primary"
+							onClick={() => navigate(`/Accounts/${record.Id}`)}
+						>
+							<EditFilled />
+						</Button>
+					</Tooltip>
 				</Space>
 			),
 		},
@@ -201,16 +206,6 @@ const AccountPage = () => {
 		console.log('role', value);
 	};
 
-	const onSearch = (value) => {
-		setSearchText(value);
-	};
-
-	// const filter = [
-	// 	{name: 'All', value: 'all'},
-	// 	{name: 'Activated', value: 'activated'},
-	// 	{name: 'Expired', value: 'expired'},
-	// ];
-
 	return (
 		<div className="mx-20 my-10">
 			{/* <Filter filter={filter} handleStatusBtn={handleStatusBtn} active={active} /> */}
@@ -218,57 +213,26 @@ const AccountPage = () => {
 				<div className="flex items-center justify-between">
 					<div className="flex items-center my-5">
 						<p className="mr-3 font-semibold">Tìm kiếm</p>
-						{/* <Search
-							className="w-60"
-							placeholder="input search text"
-							allowClear
-							onSearch={onSearch}
-						/> */}
+
 						<Space wrap className="">
 							<Select
 								// defaultValue=""
-								style={{width: 160}}
+								style={{width: 200}}
+								className="md:w-full"
 								allowClear
+								placeholder="CHỌN VAI TRÒ"
 								onChange={handleRoleChange}
 								options={[
-									{value: '', label: 'CHỌN VAI TRÒ'},
-									{value: '1', label: 'Customer'},
-									{value: '2', label: 'Customer Bronze'},
-									{value: '3', label: 'Customer Silver'},
-									{value: '4', label: 'Customer Gold'},
-									{value: '44', label: 'Deliverer'},
-									{value: '11', label: 'Staff'},
-									{value: '22', label: 'Manager'},
+									{value: '1', label: 'Khách Hàng'},
+									{value: '2', label: 'Khách Hàng Hạng Đồng'},
+									{value: '3', label: 'Khách Hàng Hạng Bạc'},
+									{value: '4', label: 'Khách Hàng Hạng Vàng'},
+									{value: '44', label: 'Nhân Viên Giao Hàng'},
+									{value: '11', label: 'Nhân Viên'},
+									{value: '22', label: 'Quản Lý'},
 									{value: '33', label: 'Admin'},
 								]}
 							/>
-							{/* <Select
-								defaultValue=""
-								style={{width: 120}}
-								allowClear
-								// onChange={handleMetalChange}
-								options={[
-									{value: 'gold', label: 'Gold'},
-									{value: 'silver', label: 'Silver'},
-								]}
-							/>
-							<Select
-								defaultValue=""
-								style={{width: 120}}
-								allowClear
-								options={[
-									{value: 'round', label: 'Round'},
-									{value: 'princess', label: 'Princess'},
-									{value: 'cushion', label: 'Cushion'},
-									{value: 'oval', label: 'Oval'},
-									{value: 'emerald', label: 'Emerald'},
-									{value: 'pear', label: 'Pear'},
-									{value: 'asscher', label: 'Asscher'},
-									{value: 'heart', label: 'Heart'},
-									{value: 'radiant', label: 'Radiant'},
-									{value: 'marquise', label: 'Marquise'},
-								]}
-							/> */}
 						</Space>
 					</div>
 					<div>

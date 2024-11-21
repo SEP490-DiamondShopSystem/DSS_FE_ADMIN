@@ -17,7 +17,6 @@ export const getAllUser = createAsyncThunk('userSlice/getAllUser', async (params
 		}
 
 		const data = await api.get(url);
-		console.log(data);
 
 		return data;
 	} catch (error) {
@@ -84,11 +83,26 @@ export const getUserAccountDetail = createAsyncThunk(
 	}
 );
 
+export const getDelivererAccount = createAsyncThunk(
+	'userSlice/getDelivererAccount',
+	async (_, {rejectWithValue}) => {
+		try {
+			const data = await api.get(`/Account/DelivererStatus/All`);
+
+			return data;
+		} catch (error) {
+			console.error(error);
+			return rejectWithValue(error);
+		}
+	}
+);
+
 export const userSlice = createSlice({
 	name: 'userSlice',
 	initialState: {
 		users: null,
 		userAccount: null,
+		delivererList: null,
 		loading: false,
 		error: null,
 	},
@@ -144,6 +158,17 @@ export const userSlice = createSlice({
 				state.loading = false;
 			})
 			.addCase(handleBanAccount.rejected, (state, action) => {
+				state.loading = false;
+				state.error = action.payload;
+			})
+			.addCase(getDelivererAccount.pending, (state) => {
+				state.loading = true;
+			})
+			.addCase(getDelivererAccount.fulfilled, (state, action) => {
+				state.loading = false;
+				state.delivererList = action.payload;
+			})
+			.addCase(getDelivererAccount.rejected, (state, action) => {
 				state.loading = false;
 				state.error = action.payload;
 			});

@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-
+import {DiamondUploadForm} from './DiamondUploadForm';
 import {DeleteFilled, PlusOutlined} from '@ant-design/icons';
 import {
 	Button,
@@ -18,7 +18,6 @@ import {
 import debounce from 'lodash/debounce';
 import {useDispatch, useSelector} from 'react-redux';
 import {useNavigate} from 'react-router-dom';
-import '../../../../css/antd.css';
 import {
 	getAllDiamondSelector,
 	getAllShapeSelector,
@@ -60,6 +59,9 @@ const DiamondPage = () => {
 	const [checked, setChecked] = useState(false);
 	const [checkedDiamondJewelry, setCheckedDiamondJewelry] = useState(false);
 
+	const [isFormVisible, setIsFormVisible] = useState(false); // for controlling the form visibility
+	const [selectedDiamondId, setSelectedDiamondId] = useState(null); // to store the selected diamondId
+
 	useEffect(() => {
 		dispatch(getDiamondFilter());
 	}, []);
@@ -89,7 +91,19 @@ const DiamondPage = () => {
 			dataIndex: 'Thumbnail',
 			key: 'Thumbnail',
 			align: 'center',
-			render: (text) => <Image src={text} alt="product" style={{width: 50, height: 50}} />,
+			render: (thumbnail) => (
+				<img
+					src={thumbnail?.MediaPath}
+					alt="Thumbnail"
+					style={{
+						width: 50,
+						height: 50,
+						objectFit: 'cover',
+						borderRadius: '8px',
+						boxShadow: '0 0 10px rgba(0,0,0,0.1)',
+					}}
+				/>
+			),
 		},
 
 		{
@@ -145,9 +159,12 @@ const DiamondPage = () => {
 			align: 'center',
 			render: (_, record) => (
 				<Space size="middle">
-					{/* <Button type="primary" ghost>
-					<EditFilled />
-				</Button> */}
+					<Button
+						type="primary"
+						onClick={() => handleView(record.Id)} // On click, open the form
+					>
+						View
+					</Button>
 					<Button danger onClick={() => showDeleteModal(record.Id)}>
 						<DeleteFilled />
 					</Button>
@@ -216,12 +233,7 @@ const DiamondPage = () => {
 		}
 	}, [diamondList]);
 
-	console.log('diamonds', diamonds);
-	console.log('filters', filters);
-
 	const handleShapeChange = (value) => {
-		console.log('value', value);
-
 		setShape(value);
 	};
 
@@ -264,14 +276,12 @@ const DiamondPage = () => {
 	const showDeleteModal = (id) => {
 		setIsModalVisible(true);
 		setDiamondId(id);
-		console.log('id', id);
 	};
 
 	const handleDelete = () => {
 		console.log('Deleted successfully');
 		dispatch(handleDeleteDiamond(diamondId)).then((res) => {
 			console.log('res', res);
-
 			if (res.payload !== undefined) {
 				message.success('Xóa Kim Cương Thành Công!');
 			} else {
@@ -285,7 +295,10 @@ const DiamondPage = () => {
 		setIsModalVisible(false);
 	};
 
-	// console.log(filteredData);
+	const handleView = (diamondId) => {
+		setSelectedDiamondId(diamondId); // Set the selected diamondId
+		setIsFormVisible(true); // Show the form
+	};
 
 	const text = <span>Lọc</span>;
 
@@ -425,6 +438,12 @@ const DiamondPage = () => {
 				</div>
 			</div>
 			<AddModalDiamond setShowModal={setShowModal} showModal={showModal} />
+			<DiamondUploadForm
+				diamondId={selectedDiamondId}
+				visible={isFormVisible}
+				onClose={() => setIsFormVisible(false)} // Close the form
+			/>
+
 			<Modal
 				title="Xóa Kim Cương"
 				visible={isModalVisible}
