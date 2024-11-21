@@ -3,6 +3,11 @@ import React, {useEffect} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
 import {getAllShapeSelector} from '../../../../../redux/selectors';
 import {getDiamondShape, handleAddDiamond} from '../../../../../redux/slices/diamondSlice';
+import {
+	uploadDiamondThumbnail,
+	uploadCertificates,
+	uploadDiamondImages,
+} from '../../../../../redux/slices/filesSlice';
 
 const {Option} = Select;
 

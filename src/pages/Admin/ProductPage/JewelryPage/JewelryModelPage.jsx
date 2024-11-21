@@ -4,6 +4,20 @@ import {
 	fetchAllJewelryModels,
 	createJewelryModel,
 } from '../../../../redux/slices/jewelry/jewelryModelSlice';
+import {
+	Button,
+	Checkbox,
+	Image,
+	Input,
+	message,
+	Modal,
+	Popover,
+	Select,
+	Slider,
+	Space,
+	Table,
+	Tag,
+} from 'antd';
 import {fetchAllMetals} from '../../../../redux/slices/jewelry/metalSlice';
 import {fetchAllSizes} from '../../../../redux/slices/jewelry/sizeSlice';
 import {fetchAllShapes} from '../../../../redux/slices/shapeSlice';
@@ -20,6 +34,7 @@ import {
 	getAllEnumsSelector,
 	getAllDiamondShapesSelector,
 } from '../../../../redux/selectors';
+import {JewelryModelUploadForm} from './JewelryModelUploadForm';
 
 const JewelryModelPage = () => {
 	const dispatch = useDispatch();
@@ -29,6 +44,9 @@ const JewelryModelPage = () => {
 	const [isSideDiamondsOpen, setIsSideDiamondsOpen] = useState(false);
 	const loading = useSelector(LoadingJewelryModelSelector);
 	const error = useSelector(JewelryModelErrorSelector);
+	const [selectedJewelryModelId, setSelectedJewelryModelId] = useState();
+	const [isFormVisible, setIsFormVisible] = useState(false); // for controlling the form visibility
+
 	const [name, setName] = React.useState('');
 	const [category, setCategory] = React.useState('');
 	const [isRhodiumFinished, setIsRhodiumFinished] = React.useState('');
@@ -277,6 +295,10 @@ const JewelryModelPage = () => {
 		setShowModal(false);
 		setSelectedModel(null);
 	};
+	const handleView = (jewelryModelId) => {
+		setSelectedJewelryModelId(jewelryModelId); // Set the selected diamondId
+		setIsFormVisible(true); // Show the form
+	};
 	const handleSubmit = (e) => {
 		e.preventDefault(); // Prevent default form submission behavior
 
@@ -425,14 +447,75 @@ const JewelryModelPage = () => {
 								{models.map((model) => (
 									<li
 										key={model.Id}
-										className="py-3 px-4 bg-white rounded-lg shadow-md mb-4 border border-lightGray cursor-pointer"
+										className="py-3 flex px-4 bg-white rounded-lg shadow-md mb-4 border border-lightGray cursor-pointer"
 										onClick={() => handleModelClick(model)}
 									>
-										<strong className="text-xl text-black">{model.Name}</strong>{' '}
-										- <span className="text-gray-600">{model.Description}</span>
-										<div className="text-sm text-gray-500">
-											Metal ID: {model.MetalId} | Size ID: {model.SizeId} |
-											Side Diamond: {model.SideDiamond ? 'Yes' : 'No'}
+										<div className="mt-2">
+											{model.Thumbnail?.MediaPath ? (
+												<img
+													src={model.Thumbnail.MediaPath} // Fixed the property name here
+													alt={model.Thumbnail.MediaName} // Fixed the property name here
+													className="w-32 h-32 object-cover rounded-md" // You can adjust these values to fit your layout
+												/>
+											) : (
+												<div className="w-32 h-32 bg-gray-300 flex items-center justify-center rounded-md">
+													<span className="text-gray-600">No Image</span>{' '}
+													{/* Fallback when no thumbnail */}
+												</div>
+											)}
+										</div>
+
+										<div className="ml-4">
+											<strong className="text-xl text-black">
+												{model.Name}
+											</strong>{' '}
+											-{' '}
+											<span className="text-gray-600">
+												{model.Description}
+											</span>
+											<div className="text-sm text-gray-500">
+												Side Diamond: {model.SideDiamond ? 'Yes' : 'No'}
+											</div>
+											{/* Displaying more model details conditionally */}
+											{model.IsEngravable && (
+												<div className="text-sm text-gray-500">
+													Engravable: Yes
+												</div>
+											)}
+											{model.IsRhodiumFinish && (
+												<div className="text-sm text-gray-500">
+													Rhodium Finish: Yes
+												</div>
+											)}
+											{model.MainDiamondCount > 0 && (
+												<div className="text-sm text-gray-500">
+													Main Diamonds: {model.MainDiamondCount}{' '}
+													{model.MainDiamondCount > 1
+														? 'stones'
+														: 'stone'}
+												</div>
+											)}
+											{model.MetalSupported &&
+												model.MetalSupported.length > 0 && (
+													<div className="text-sm text-gray-500">
+														Metals: {model.MetalSupported.join(', ')}
+													</div>
+												)}
+											{model.CraftmanFee > 0 && (
+												<div className="text-sm text-gray-500">
+													Craftman Fee: ${model.CraftmanFee}
+												</div>
+											)}
+											{/* Optionally, display a preview or more images */}
+											<div className="mt-2">
+												{model.ThumbnailPath && (
+													<img
+														src={model.ThumbnailPath}
+														alt={model.Name}
+														className="w-32 h-32 object-cover"
+													/>
+												)}
+											</div>
 										</div>
 									</li>
 								))}
@@ -466,6 +549,11 @@ const JewelryModelPage = () => {
 								<option value="20">20 per page</option>
 							</select>
 						</div>
+						<JewelryModelUploadForm
+							jewelryModelId={selectedJewelryModelId}
+							visible={isFormVisible}
+							onClose={() => setIsFormVisible(false)} // Close the form
+						/>
 					</div>
 
 					{/* Create New Model Form */}
@@ -512,7 +600,7 @@ const JewelryModelPage = () => {
 														/>
 														<label
 															htmlFor={field}
-															className="ml-2 text-gray-700"
+															className="ml-2 text-gray"
 														>
 															{field.replace(/([A-Z])/g, ' $1')}
 														</label>
@@ -1044,7 +1132,7 @@ const JewelryModelPage = () => {
 						<button
 							type="submit"
 							onClick={handleSubmit}
-							className="py-2 px-6 text-white bg-blue-600 rounded-md hover:bg-blue-700 focus:outline-none"
+							className="py-2 px-6 text-white bg-blue-600 rounded-md hover:bg-blue focus:outline-none"
 						>
 							Submit
 						</button>
@@ -1054,99 +1142,119 @@ const JewelryModelPage = () => {
 
 			{/* Modal for Jewelry Model Detail */}
 			{showModal && selectedModel && (
-				<div className="fixed inset-0 bg-gray bg-opacity-50 flex justify-center items-center z-50">
-					<div className="bg-tintWhite p-6 rounded-lg shadow-lg w-11/12 md:w-1/2 lg:w-1/3">
-						<h2 className="text-2xl font-semibold text-primary mb-6">Model Details</h2>
+				<div className="fixed inset-0 bg-gray bg-opacity-50 flex justify-center items-center p-3 z-50">
+					<div className="bg-white p-4 rounded-lg shadow-lg w-11/12 md:w-1/2 lg:w-2/3">
+						<h2 className="text-3xl font-semibold text-primary mb-6 text-center">
+							Model Details
+						</h2>
 
-						<div className="flex gap-6">
+						<div className="flex gap-8">
 							{/* Left Column */}
-							<div className="flex-1 min-w-[200px]">
-								<p>
+							<div className="flex-1">
+								<p className="text-lg font-medium text-gray">
 									<strong>Name:</strong> {selectedModel.Name}
 								</p>
-								<p>
+								<p className="text-lg font-medium text-gray">
 									<strong>Category:</strong> {selectedModel.Category.Name}
 								</p>
-								<p>
+								<p className="text-lg font-medium text-gray">
 									<strong>Model Code:</strong> {selectedModel.ModelCode}
 								</p>
-								<p>
-									<strong>Craftman Fee:</strong> {selectedModel.CraftmanFee}
+								<p className="text-lg font-medium text-gray">
+									<strong>Craftman Fee:</strong> {selectedModel.CraftmanFee} VND
 								</p>
-								<p>
+								<p className="text-lg font-medium text-gray">
 									<strong>Description:</strong> {selectedModel.Description}
 								</p>
-								<p>
+								<p className="text-lg font-medium text-gray">
 									<strong>Width:</strong> {selectedModel.Width} mm
 								</p>
-								<p>
+								<p className="text-lg font-medium text-gray">
 									<strong>Engravable:</strong>{' '}
 									{selectedModel.IsEngravable ? 'Yes' : 'No'}
 								</p>
 							</div>
 
 							{/* Right Column */}
-							<div className="flex-1 min-w-[200px]">
-								<p>
+							<div className="flex-1">
+								<p className="text-lg font-medium text-gray">
 									<strong>Main Diamond Count:</strong>{' '}
 									{selectedModel.MainDiamondCount}
 								</p>
-								<p>
+								<p className="text-lg font-medium text-gray">
 									<strong>Side Diamond Option Count:</strong>{' '}
 									{selectedModel.SideDiamondOptionCount}
 								</p>
-								<p>
+								<p className="text-lg font-medium text-gray">
 									<strong>Rhodium Finish:</strong>{' '}
 									{selectedModel.IsRhodiumFinish ? 'Yes' : 'No'}
 								</p>
-								<p>
+								<p className="text-lg font-medium text-gray">
 									<strong>Metal Supported:</strong>{' '}
 									{selectedModel.MetalSupported.join(', ')}
 								</p>
 							</div>
 						</div>
 
-						{/* Main Diamonds */}
+						{/* View Button */}
+						<Button
+							type="primary"
+							size="large"
+							onClick={() => handleView(selectedModel.Id)} // On click, open the form
+							className="mt-4 w-full"
+						>
+							View Model
+						</Button>
+
+						{/* Main Diamonds Section */}
 						{selectedModel.MainDiamonds && selectedModel.MainDiamonds.length > 0 && (
-							<div className="mt-6">
+							<div className="mt-6 ">
 								<h3
-									className="text-lg font-semibold cursor-pointer"
+									className="text-xl font-semibold cursor-pointer"
 									onClick={() => setIsMainDiamondsOpen(!isMainDiamondsOpen)}
 								>
 									Main Diamonds {isMainDiamondsOpen ? '▲' : '▼'}
 								</h3>
 								{isMainDiamondsOpen && (
-									<ul className="space-y-2 pl-4">
+									<ul className="space-y-4 mt-3 pl-4 max-h-24 overflow-y-auto border rounded-md">
 										{selectedModel.MainDiamonds.map((diamond, index) => (
-											<li key={index}>
-												<div className="flex justify-between px-5 py-1 border">
-													<p>
-														<strong>Setting Type:</strong>{' '}
-														{diamond.SettingType}
-													</p>
-													<p>
-														<strong>Quantity:</strong>{' '}
-														{diamond.Quantity}
-													</p>
-													<p>
-														<strong>Main Diamond Req ID:</strong>{' '}
-														{diamond.MainDiamondReqId || 'N/A'}
-													</p>
-													{diamond.Shapes && diamond.Shapes.length > 0 ? (
-														<div>
-															{diamond.Shapes.map(
+											<li key={index} className="border-b pb-4">
+												<div className="flex justify-between px-5 py-2">
+													<div>
+														<p className="text-gray">
+															<strong>Setting Type:</strong>{' '}
+															{diamond.SettingType}
+														</p>
+													</div>
+													<div>
+														<p className="text-gray">
+															<strong>Quantity:</strong>{' '}
+															{diamond.Quantity}
+														</p>
+													</div>
+													<div>
+														<p className="text-gray">
+															<strong>Main Diamond Req ID:</strong>{' '}
+															{diamond.MainDiamondReqId || 'N/A'}
+														</p>
+													</div>
+													<div>
+														{diamond.Shapes &&
+														diamond.Shapes.length > 0 ? (
+															diamond.Shapes.map(
 																(shape, shapeIndex) => (
 																	<div
 																		key={shapeIndex}
-																		className="pl-4 gap-3 flex justify-around "
+																		className="pl-4 gap-3 flex justify-between"
 																	>
-																		<p>
+																		<p className="text-gray">
 																			<strong>Shape:</strong>{' '}
 																			{shape.Shape
 																				?.ShapeName ||
-																				'Not Available'}{' '}
+																				'N/A'}
 																		</p>
-																		<p>
+
+																		<p className="text-gray">
 																			<strong>
 																				Carat Range:
 																			</strong>{' '}
@@ -1155,11 +1263,13 @@ const JewelryModelPage = () => {
 																		</p>
 																	</div>
 																)
-															)}
-														</div>
-													) : (
-														<p>Shape: Not Available</p>
-													)}
+															)
+														) : (
+															<p className="text-gray">
+																Shape: Not Available
+															</p>
+														)}
+													</div>
 												</div>
 											</li>
 										))}
@@ -1168,35 +1278,45 @@ const JewelryModelPage = () => {
 							</div>
 						)}
 
-						{/* Size Metals */}
+						{/* Size Metals Section */}
 						{selectedModel.SizeMetals && selectedModel.SizeMetals.length > 0 && (
-							<div className="mt-6">
+							<div className="mt-6  ">
 								<h3
-									className="text-lg font-semibold cursor-pointer"
+									className="text-xl font-semibold cursor-pointer"
 									onClick={() => setIsSizeMetalsOpen(!isSizeMetalsOpen)}
 								>
 									Size Metals {isSizeMetalsOpen ? '▲' : '▼'}
 								</h3>
 								{isSizeMetalsOpen && (
-									<ul className="space-y-2 pl-4">
+									<ul className="space-y-4 mt-3 pl-4 max-h-24 overflow-y-auto  border rounded-md">
 										{selectedModel.SizeMetals.map((sizeMetal, index) => (
-											<li key={index}>
-												<div className="flex justify-between px-5 py-1 border">
-													<p>
-														<strong>Size:</strong>{' '}
-														{sizeMetal.Size.Value} {sizeMetal.Size.Unit}
-													</p>
-													<p>
-														<strong>Metal:</strong>{' '}
-														{sizeMetal.Metal.Name}
-													</p>
-													<p>
-														<strong>Weight:</strong> {sizeMetal.Weight}g
-													</p>
-													<p>
-														<strong>Price:</strong>{' '}
-														{sizeMetal.Metal.Price} VND
-													</p>
+											<li key={index} className="border-b pb-4">
+												<div className="flex justify-between px-5 py-2">
+													<div>
+														<p className="text-gray">
+															<strong>Size:</strong>{' '}
+															{sizeMetal.Size.Value}{' '}
+															{sizeMetal.Size.Unit}
+														</p>
+													</div>
+													<div>
+														<p className="text-gray">
+															<strong>Metal:</strong>{' '}
+															{sizeMetal.Metal.Name}
+														</p>
+													</div>
+													<div>
+														<p className="text-gray">
+															<strong>Weight:</strong>{' '}
+															{sizeMetal.Weight} g
+														</p>
+													</div>
+													<div>
+														<p className="text-gray">
+															<strong>Price:</strong>{' '}
+															{sizeMetal.Metal.Price} VND
+														</p>
+													</div>
 												</div>
 											</li>
 										))}
@@ -1205,42 +1325,52 @@ const JewelryModelPage = () => {
 							</div>
 						)}
 
-						{/* Side Diamonds */}
+						{/* Side Diamonds Section */}
 						{selectedModel.SideDiamonds && selectedModel.SideDiamonds.length > 0 && (
-							<div className="mt-6">
+							<div className="mt-6 ">
 								<h3
-									className="text-lg font-semibold cursor-pointer"
+									className="text-xl font-semibold cursor-pointer"
 									onClick={() => setIsSideDiamondsOpen(!isSideDiamondsOpen)}
 								>
 									Side Diamonds {isSideDiamondsOpen ? '▲' : '▼'}
 								</h3>
 								{isSideDiamondsOpen && (
-									<ul className="space-y-2 pl-4">
+									<ul className="space-y-4 mt-3 pl-4 max-h-24 overflow-y-auto border rounded-md ">
 										{selectedModel.SideDiamonds.map((sideDiamond, index) => (
-											<li key={index}>
-												<div className="flex justify-between px-5 py-1 border">
-													<p>
-														<strong>Carat Weight:</strong>{' '}
-														{sideDiamond.CaratWeight}
-													</p>
-													<p>
-														<strong>Setting Type:</strong>{' '}
-														{sideDiamond.SettingType}
-													</p>
-													<p>
-														<strong>Quantity:</strong>{' '}
-														{sideDiamond.Quantity}
-													</p>
-													<p>
-														<strong>Color Range:</strong>{' '}
-														{sideDiamond.ColorMin} -{' '}
-														{sideDiamond.ColorMax}
-													</p>
-													<p>
-														<strong>Clarity Range:</strong>{' '}
-														{sideDiamond.ClarityMin} -{' '}
-														{sideDiamond.ClarityMax}
-													</p>
+											<li key={index} className="border-b pb-4">
+												<div className="flex justify-between px-5 py-2">
+													<div>
+														<p className="text-gray">
+															<strong>Carat Weight:</strong>{' '}
+															{sideDiamond.CaratWeight}
+														</p>
+													</div>
+													<div>
+														<p className="text-gray">
+															<strong>Setting Type:</strong>{' '}
+															{sideDiamond.SettingType}
+														</p>
+													</div>
+													<div>
+														<p className="text-gray">
+															<strong>Quantity:</strong>{' '}
+															{sideDiamond.Quantity}
+														</p>
+													</div>
+													<div>
+														<p className="text-gray">
+															<strong>Color Range:</strong>{' '}
+															{sideDiamond.ColorMin} -{' '}
+															{sideDiamond.ColorMax}
+														</p>
+													</div>
+													<div>
+														<p className="text-gray">
+															<strong>Clarity Range:</strong>{' '}
+															{sideDiamond.ClarityMin} -{' '}
+															{sideDiamond.ClarityMax}
+														</p>
+													</div>
 												</div>
 											</li>
 										))}
@@ -1249,12 +1379,13 @@ const JewelryModelPage = () => {
 							</div>
 						)}
 
-						<button
+						{/* Close Button */}
+						<Button
 							onClick={handleCloseModal}
-							className="mt-6 w-full px-6 py-2 bg-gray text-white rounded-md hover:bg-gray-600"
+							className="mt-6 w-full bg-gray text-white rounded-md hover:bg-gray-800"
 						>
 							Close
-						</button>
+						</Button>
 					</div>
 				</div>
 			)}

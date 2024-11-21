@@ -118,6 +118,10 @@ export const selectBlogLoading = (state) => state.blogSlice.loading;
 export const selectBlogError = (state) => state.blogSlice.error;
 export const selectBlogCurrentPage = (state) => state.blogSlice.currentPage;
 export const selectBlogTotalPage = (state) => state.blogSlice.totalPage;
+//FILES
+export const selectDiamondFiles = (state) => state.fileSlice.files;
+export const selectFileLoading = (state) => state.fileSlice.loading;
+export const selectFileError = (state) => state.fileSlice.error;
 
 //DASHBOARD
 export const GetAllTopSellingDiamondSelector = (state) => state.dashboardSlice.shapeSelling;

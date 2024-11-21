@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
-import {Form, Input, Button, Checkbox, Select, Row, Col, Spin, notification} from 'antd';
+import {Form, Input, Button, Checkbox, Select, Row, Col, Spin, notification, Card} from 'antd';
 import {SearchOutlined, PlusOutlined} from '@ant-design/icons';
 import {fetchAllJewelry} from '../../../../redux/slices/jewelry/jewelrySlice';
 import {
@@ -32,7 +32,7 @@ const JewelryPage = () => {
 		HasSideDiamond: false,
 		Status: 1,
 	});
-
+	const {Meta} = Card;
 	const handleFilterChange = (e) => {
 		const {name, value} = e.target;
 		setFilters({...filters, [name]: value});
@@ -169,24 +169,84 @@ const JewelryPage = () => {
 							<div
 								key={jewelry.Id}
 								onClick={() => handleJewelryClick(jewelry)}
-								className="jewelry-item p-4 bg-tintWhite hover:bg-primaryLight shadow-lg rounded-lg cursor-pointer transition-all transform hover:scale-105"
+								className="jewelry-item p-4 flex justify-between transition-all transform hover:scale-105"
 							>
-								<img
-									src={jewelry.thumbnail?.mediaPath || '/default-thumbnail.jpg'}
-									alt={jewelry.SerialCode}
-									className="w-full h-48 object-cover rounded-md border-2 border-gray mb-4"
-								/>
-								<div className="text-black">
-									<h2 className="text-lg font-semibold text-primary">
-										{jewelry.SerialCode}
-									</h2>
-									<p className="text-sm text-gray">
-										Category: {jewelry.Category?.Name}
-									</p>
-									<p className="text-sm font-medium text-darkGreen">
-										Price: {jewelry.TotalPrice.toLocaleString()} VND
-									</p>
-								</div>
+								<Card
+									hoverable
+									className="shadow-lg bg-tintWhite rounded-lg border border-gray-300 flex flex-row"
+								>
+									{/* Image on the Left */}
+									<div className="w-1/3 sm:w-1/4">
+										<img
+											alt={jewelry.SerialCode}
+											src={
+												jewelry.thumbnail?.mediaPath ||
+												'/default-thumbnail.jpg'
+											}
+											className="w-full h-48 object-cover rounded-md"
+											style={{boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)'}}
+										/>
+									</div>
+
+									{/* Description on the Right */}
+									<div className="w-2/3 sm:w-3/4 p-4">
+										<Meta
+											title={
+												<h2 className="text-lg font-semibold text-primary">
+													{jewelry.SerialCode}
+												</h2>
+											}
+											description={
+												<div className="space-y-2">
+													<p className="text-sm text-gray-500">
+														Category:{' '}
+														{jewelry.Model?.CategoryId || 'N/A'}
+													</p>
+													<p className="text-sm text-gray-500">
+														Metal: {jewelry.Metal?.Name || 'N/A'}
+													</p>
+													<p className="text-sm text-gray-500">
+														Price:{' '}
+														{jewelry.TotalPrice > 0
+															? jewelry.TotalPrice.toLocaleString()
+															: 'Contact for price'}{' '}
+														VND
+													</p>
+													<p className="text-sm text-gray-500">
+														Size: {jewelry.Size?.Value}{' '}
+														{jewelry.Size?.Unit}
+													</p>
+													<p className="text-sm text-gray-500">
+														Weight: {jewelry.Weight}{' '}
+														{jewelry.Size?.Unit}
+													</p>
+													{jewelry.Diamonds &&
+														jewelry.Diamonds.length > 0 && (
+															<p className="text-sm text-gray-500">
+																Diamonds: {jewelry.Diamonds.length}{' '}
+																Diamond
+																{jewelry.Diamonds.length > 1
+																	? 's'
+																	: ''}
+															</p>
+														)}
+													{jewelry.EngravedText && (
+														<p className="text-sm text-gray-500">
+															Engraving: {jewelry.EngravedText}
+														</p>
+													)}
+													<p className="text-sm font-medium text-darkGreen">
+														Total Price:{' '}
+														{jewelry.TotalPrice > 0
+															? jewelry.TotalPrice.toLocaleString()
+															: 'Contact for price'}{' '}
+														VND
+													</p>
+												</div>
+											}
+										/>
+									</div>
+								</Card>
 							</div>
 						))}
 				</div>

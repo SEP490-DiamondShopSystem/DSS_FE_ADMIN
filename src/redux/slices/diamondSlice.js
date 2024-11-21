@@ -4,12 +4,8 @@ import {api} from '../../services/api';
 export const getDiamondDetail = createAsyncThunk(
 	'diamondSlice/getDiamondDetail',
 	async (id, {rejectWithValue}) => {
-		console.log(id);
-
 		try {
 			const response = await api.get(`/Diamond/${id}`);
-			console.log(response);
-
 			return response;
 		} catch (error) {
 			console.log('Error: ', JSON.stringify(error.response.data));
@@ -21,8 +17,6 @@ export const getDiamondDetail = createAsyncThunk(
 export const getDiamondShape = createAsyncThunk(
 	'diamondSlice/getDiamondShape',
 	async (id, {rejectWithValue}) => {
-		console.log(id);
-
 		try {
 			const response = await api.get(`/Diamond/Shape/All`);
 
@@ -41,7 +35,6 @@ export const handleAddDiamond = createAsyncThunk(
 
 		try {
 			const response = await api.post(`/Diamond`, params);
-			console.log(response);
 
 			return response;
 		} catch (error) {
@@ -56,7 +49,6 @@ export const handleDeleteDiamond = createAsyncThunk(
 	async (id, {rejectWithValue}) => {
 		try {
 			const response = await api.delete(`/Diamond/${id}`);
-			console.log(response);
 
 			return response;
 		} catch (error) {
@@ -132,11 +124,8 @@ export const getAllDiamond = createAsyncThunk(
 export const getDiamondFilter = createAsyncThunk(
 	'diamondSlice/getDiamondFilter',
 	async (id, {rejectWithValue}) => {
-		console.log(id);
-
 		try {
 			const response = await api.get(`/Diamond/FilterLimit`);
-			console.log(response);
 
 			return response;
 		} catch (error) {
