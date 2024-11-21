@@ -1,7 +1,7 @@
 import React, {useEffect, useState} from 'react';
 
-import {ArrowLeftOutlined} from '@ant-design/icons';
-import {Button, Col, Divider, Row, Table, Tag, Typography} from 'antd';
+import {ArrowLeftOutlined, PlusOutlined, UploadOutlined} from '@ant-design/icons';
+import {Button, Col, Divider, Input, Modal, Row, Table, Tag, Typography, Upload} from 'antd';
 import {useDispatch, useSelector} from 'react-redux';
 import {useNavigate} from 'react-router-dom';
 import {
@@ -24,6 +24,16 @@ const InformationOrder = ({orders, statusOrder, paymentStatusOrder}) => {
 	const status = getOrderStatus(statusOrder);
 
 	const [dataSource, setDataSource] = useState([]);
+	const [description, setDescription] = useState('');
+	const [previewOpen, setPreviewOpen] = useState(false);
+	const [previewImage, setPreviewImage] = useState('');
+	const [previewTitle, setPreviewTitle] = useState('');
+	const [fileList, setFileList] = useState([]);
+
+	console.log('fileList', fileList);
+	console.log('previewTitle', previewTitle);
+	console.log('previewImage', previewImage);
+	console.log('previewOpen', previewOpen);
 
 	useEffect(() => {
 		if (orders) {
@@ -98,6 +108,24 @@ const InformationOrder = ({orders, statusOrder, paymentStatusOrder}) => {
 			/>
 		);
 	};
+
+	const handleDescription = (e) => {
+		console.log(e.target.value);
+	};
+
+	const handleCancel = () => setPreviewOpen(false);
+
+	const handlePreview = async (file) => {
+		console.log('file', file);
+
+		setPreviewImage(file.url || file.thumbUrl);
+		setPreviewOpen(true);
+		setPreviewTitle(file.name || file.url.substring(file.url.lastIndexOf('/') + 1));
+	};
+
+	const handleChange = ({fileList: newFileList}) => setFileList(newFileList);
+
+	console.log('orders', orders);
 
 	return (
 		<div>
@@ -225,13 +253,58 @@ const InformationOrder = ({orders, statusOrder, paymentStatusOrder}) => {
 								Phương Thức Thanh Toán
 							</Text>
 							<br />
-							<Tag color={orderStatus.color}>{orderStatus.name.toUpperCase()}</Tag>
+							{orders?.PaymentMethod?.MappedName}
 						</>
 					)}
 				</Col>
 			</Row>
-
 			<Divider style={{borderColor: '#d9d9d9'}} />
+			{statusOrder === 2 && (
+				<>
+					<Row>
+						<Col span={24}>
+							<Title level={4}>Tiến Trình Xử Lý</Title>
+						</Col>
+					</Row>
+					<div>
+						<Col span={12}>
+							<Text strong style={{fontSize: 18}}>
+								Mô Tả
+							</Text>
+							<br />
+							<Text className="">
+								<Input.TextArea onChange={handleDescription} />
+							</Text>
+						</Col>
+						<Col span={12} className="sm:w-full mt-5">
+							<Text strong style={{fontSize: 18}} className="sm:text-sm">
+								Hình Ảnh
+							</Text>
+							<br />
+							<Upload
+								action="/upload.do" // URL tải lên hoặc để trống nếu xử lý tệp cục bộ
+								listType="picture-card"
+								fileList={fileList}
+								onPreview={handlePreview}
+								onChange={handleChange}
+								beforeUpload={() => false}
+								className="sm:w-full"
+							>
+								{fileList.length >= 3 ? null : (
+									<div>
+										<PlusOutlined />
+										<div style={{marginTop: 8}} className="text-sm">
+											Upload
+										</div>
+									</div>
+								)}
+							</Upload>
+						</Col>
+					</div>
+					<Divider style={{borderColor: '#d9d9d9'}} />
+				</>
+			)}
+
 			<Row>
 				<Col span={24}>
 					<Title level={4}>Chi Tiết Sản Phẩm</Title>
@@ -249,6 +322,15 @@ const InformationOrder = ({orders, statusOrder, paymentStatusOrder}) => {
 					loading={loading}
 				/>
 			</div>
+			<Modal
+				open={previewOpen}
+				title={previewTitle}
+				footer={null}
+				onCancel={handleCancel}
+				className="sm:w-full"
+			>
+				<img alt="example" style={{width: '100%'}} src={previewImage} />
+			</Modal>
 		</div>
 	);
 };

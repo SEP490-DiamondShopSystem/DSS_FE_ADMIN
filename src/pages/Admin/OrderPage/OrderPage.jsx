@@ -92,9 +92,6 @@ const OrderPage = () => {
 		return () => fetchDiamondData.cancel();
 	}, [pageSize, current, activeStatus, startDate, endDate, searchText]);
 
-	// console.log('orderList', orderList);
-	console.log('orders', orders);
-
 	useEffect(() => {
 		if (userDetail?.Roles) {
 			const isDeliverer = userDetail.Roles.some((role) => role?.RoleName === 'deliverer');
@@ -243,7 +240,6 @@ const OrderPage = () => {
 	const handleDateChange = (dates, dateStrings) => {
 		setStartDate(dates[0]);
 		setEndDate(dates[1]);
-		console.log();
 	};
 
 	const handleStatusChange = (value) => {
@@ -252,7 +248,6 @@ const OrderPage = () => {
 
 	const onSearch = (value) => {
 		setSearchText(value);
-		console.log(value);
 	};
 
 	return (

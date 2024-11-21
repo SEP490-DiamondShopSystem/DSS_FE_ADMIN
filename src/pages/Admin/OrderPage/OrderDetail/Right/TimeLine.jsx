@@ -35,11 +35,21 @@ export const TimeLine = ({status, orders, loading, id}) => {
 		if (orders) {
 			const transformedSteps = orderLogList?.map((log, index) => {
 				const isLast = index === orderLogList?.length - 1;
-				const isErrorStatus = [3, 4, 7].includes(orderLogList);
 
+				// Kiểm tra nếu trạng thái là lỗi
+				const isErrorStatus = [3, 4, 7].includes(log.Status);
+
+				// Kiểm tra nếu trạng thái là thành công
+				const isSuccessStatus = log.Status === 8;
+
+				console.log('isLast', isLast);
+				console.log('isErrorStatus', isErrorStatus);
+				console.log('isSuccessStatus', isSuccessStatus);
+
+				// Đặt biểu tượng dựa trên trạng thái
 				let icon = isErrorStatus ? (
 					<CloseCircleOutlined style={{color: 'red'}} />
-				) : orderLogList === 8 ? (
+				) : isSuccessStatus ? (
 					<CheckCircleOutlined style={{color: 'green'}} />
 				) : isLast ? (
 					<ClockCircleOutlined />
@@ -56,6 +66,7 @@ export const TimeLine = ({status, orders, loading, id}) => {
 					),
 				};
 			});
+
 			setFilteredSteps(transformedSteps);
 		}
 	}, [orderLogList]);

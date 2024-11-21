@@ -473,14 +473,14 @@ const InformationOrder = ({
 								Ngày Tạo Yêu Cầu
 							</Text>
 							<br />
-							<Text>{convertToVietnamDate(orders?.CreatedDate)}</Text>
+							<Text>{orders?.CreatedDate}</Text>
 						</Col>
 						<Col span={12}>
 							<Text strong style={{fontSize: 18}}>
 								Ngày Hết Hạn
 							</Text>
 							<br />
-							<Text>{convertToVietnamDate(orders?.ExpiredDate)}</Text>
+							<Text>{orders?.ExpiredDate}</Text>
 						</Col>
 					</Row>
 				</div>

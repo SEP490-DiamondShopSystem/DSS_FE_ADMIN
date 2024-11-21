@@ -2423,3 +2423,66 @@ video {
 		width: 100%;
 	}
 }
+
+@media (min-width: 640px) {
+	.sm\:text-sm {
+		font-size: 0.875rem /* 14px */;
+		line-height: 1.25rem /* 20px */;
+	}
+}
+
+@media (min-width: 640px) {
+	.sm\:w-full {
+		width: 100%;
+	}
+}
+
+@media (min-width: 640px) {
+	.sm\:text-base {
+		font-size: 1rem /* 16px */;
+		line-height: 1.5rem /* 24px */;
+	}
+}
+
+@media (min-width: 640px) {
+	.sm\:flex-col {
+		flex-direction: column;
+	}
+}
+@media (min-width: 640px) {
+	.sm\:items-center {
+		align-items: center;
+	}
+}
+
+@media (min-width: 640px) {
+	.sm\:text-center {
+		text-align: center;
+	}
+}
+
+@media (min-width: 640px) {
+	.sm\:text-xs {
+		font-size: 0.75rem /* 12px */;
+		line-height: 1rem /* 16px */;
+	}
+}
+
+@media (min-width: 640px) {
+	.sm\:overflow-x-auto {
+		overflow-x: auto;
+	}
+}
+
+@media (min-width: 640px) {
+	.sm\:px-2 {
+		padding-left: 0.5rem /* 8px */;
+		padding-right: 0.5rem /* 8px */;
+	}
+}
+
+@media (min-width: 640px) {
+	.sm\:p-2 {
+		padding: 0.5rem /* 8px */;
+	}
+}

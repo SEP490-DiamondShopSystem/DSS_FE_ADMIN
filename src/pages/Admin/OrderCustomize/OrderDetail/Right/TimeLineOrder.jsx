@@ -451,13 +451,11 @@ const TimeLineOrder = ({
 				console.log('res', res);
 
 				if (res?.payload) {
-					if (res.payload.status === 200) {
+					if (res.payload) {
 						message.success('Chấp Nhận Đơn Thiết Kế Thành Công!');
 						setIsModalVisible(false);
-					} else if (res.payload.status === 400) {
-						message.warning('Đã xảy ra lỗi. Vui lòng kiểm tra thông tin và thử lại!');
 					} else {
-						message.error('Không thể xử lý yêu cầu. Vui lòng thử lại sau!');
+						message.warning('Đã xảy ra lỗi. Vui lòng kiểm tra thông tin và thử lại!');
 					}
 				} else {
 					message.error('Lỗi hệ thống. Không thể xử lý yêu cầu!');
@@ -486,10 +484,10 @@ const TimeLineOrder = ({
 		dispatch(handleRejectCustomize(id)).then((res) => {
 			console.log('res', res);
 
-			if (res.payload.status === 200 || res.payload.status === 201) {
+			if (res.payload) {
 				message.success('Hủy Đơn Yêu Cầu Thành Công!');
 				setIsModalVisible(false);
-			} else if (res.payload.status === 400) {
+			} else {
 				message.warning(res.error.message);
 			}
 		});

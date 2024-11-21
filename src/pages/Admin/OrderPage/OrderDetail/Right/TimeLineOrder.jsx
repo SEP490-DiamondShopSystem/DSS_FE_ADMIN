@@ -122,6 +122,16 @@ const TimeLineOrder = ({orders, loading, statusOrder, paymentStatusOrder, id}) =
 		}
 	}, [statusOrder]);
 
+	const handleAccept = () => {
+		Modal.confirm({
+			title: 'Đồng ý xác nhận đơn hàng này',
+			content: 'Bạn có chắc chắn muốn tiếp tục?',
+			okText: 'Xác nhận',
+			cancelText: 'Hủy',
+			onOk: handleAcceptStatus,
+		});
+	};
+
 	const handleAcceptStatus = async () => {
 		const res = await dispatch(handleOrder(orders.Id));
 		if (res.payload !== undefined) {
@@ -129,6 +139,16 @@ const TimeLineOrder = ({orders, loading, statusOrder, paymentStatusOrder, id}) =
 		} else if (res.payload.status === 400) {
 			message.error('Lỗi khi xác nhận đơn hàng.');
 		}
+	};
+
+	const handlePrepared = () => {
+		Modal.confirm({
+			title: 'Hoàn tất chuẩn bị đơn đặt hàng này',
+			content: 'Bạn có chắc chắn muốn tiếp tục?',
+			okText: 'Xác nhận',
+			cancelText: 'Hủy',
+			onOk: handlePreparedStatus,
+		});
 	};
 
 	const handlePreparedStatus = async () => {
@@ -139,7 +159,18 @@ const TimeLineOrder = ({orders, loading, statusOrder, paymentStatusOrder, id}) =
 			message.error('Lỗi khi chuẩn bị hàng.');
 		}
 	};
-	const handleAssignDeliverer = async () => {
+
+	const handleAssignDeliverer = () => {
+		Modal.confirm({
+			title: 'Xác nhận chuyển giao đơn đặt hàng này',
+			content: 'Bạn có chắc chắn muốn tiếp tục?',
+			okText: 'Xác nhận',
+			cancelText: 'Hủy',
+			onOk: handleAssignDelivererStatus,
+		});
+	};
+
+	const handleAssignDelivererStatus = async () => {
 		const res = await dispatch(
 			handleOrderAssignDeliverer({orderId: orders.Id, delivererId: selectedShipper})
 		);
@@ -151,6 +182,17 @@ const TimeLineOrder = ({orders, loading, statusOrder, paymentStatusOrder, id}) =
 			message.error('Lỗi khi chuyển giao cho shipper.');
 		}
 	};
+
+	const handleDelivering = () => {
+		Modal.confirm({
+			title: 'Bắt đầu giao đơn đặt hàng này',
+			content: 'Bạn có chắc chắn muốn tiếp tục?',
+			okText: 'Xác Nhận',
+			cancelText: 'Hủy',
+			onOk: handleDeliveringStatus,
+		});
+	};
+
 	const handleDeliveringStatus = async () => {
 		const res = await dispatch(handleOrder(orders.Id));
 		if (res.payload !== undefined) {
@@ -159,6 +201,17 @@ const TimeLineOrder = ({orders, loading, statusOrder, paymentStatusOrder, id}) =
 			message.error('Lỗi khi giao hàng.');
 		}
 	};
+
+	const handleDelivered = () => {
+		Modal.confirm({
+			title: 'Xác nhận giao hàng thành công đơn đặt hàng này',
+			content: 'Bạn có chắc chắn muốn tiếp tục?',
+			okText: 'Xác nhận',
+			cancelText: 'Hủy',
+			onOk: handleDeliveredStatus,
+		});
+	};
+
 	const handleDeliveredStatus = async () => {
 		const res = await dispatch(handleOrder(orders.Id));
 		if (res.payload !== undefined) {
@@ -168,10 +221,20 @@ const TimeLineOrder = ({orders, loading, statusOrder, paymentStatusOrder, id}) =
 		}
 	};
 
+	const handleFailedDelivered = () => {
+		Modal.confirm({
+			title: 'Xác nhận hủy giao đơn đặt hàng này',
+			content: 'Bạn có chắc chắn muốn tiếp tục?',
+			okText: 'Xác nhận',
+			cancelText: 'Hủy',
+			onOk: handleFailedDeliveredStatus,
+		});
+	};
+
 	const handleFailedDeliveredStatus = async () => {
 		const res = await dispatch(handleDeliveryFailed(orders.Id));
 		if (res.payload !== undefined) {
-			message.warning('Hủy giao hàng!');
+			message.warning('Đơn hàng giao hàng không thành công!');
 		} else if (res.payload.status === 400) {
 			message.error('Lỗi khi giao hàng.');
 		}
@@ -192,6 +255,16 @@ const TimeLineOrder = ({orders, loading, statusOrder, paymentStatusOrder, id}) =
 
 	const handleCancelOrder = () => {
 		setIsCancelModalVisible(true);
+	};
+
+	const handleRedeliverBtn = () => {
+		Modal.confirm({
+			title: 'Xác nhận giao lại đơn đặt hàng này',
+			content: 'Bạn có chắc chắn muốn tiếp tục?',
+			okText: 'Xác nhận',
+			cancelText: 'Hủy',
+			onOk: handleRedeliverStatus,
+		});
 	};
 
 	const handleRedeliverStatus = () => {
@@ -220,8 +293,7 @@ const TimeLineOrder = ({orders, loading, statusOrder, paymentStatusOrder, id}) =
 		setIsCancelModalVisible(false);
 	};
 
-	// console.log('orderLogs', orderLogs);
-	// console.log('orderLogList', orderLogList);
+	console.log('isAssigned', isAssigned);
 
 	return (
 		<div>
@@ -233,7 +305,7 @@ const TimeLineOrder = ({orders, loading, statusOrder, paymentStatusOrder, id}) =
 						<div className="border rounded-lg border-primary bg-tintWhite p-5 mb-5">
 							<div className="flex items-center mb-5" style={{fontSize: 16}}>
 								<p className="font-semibold">Trạng thái đơn hàng:</p>
-								<p className="ml-5">
+								<p className="ml-5 text-primary font-semibold">
 									<ClockCircleOutlined /> {ORDER_STATUS_TEXTS.Pending}
 								</p>
 							</div>
@@ -242,7 +314,7 @@ const TimeLineOrder = ({orders, loading, statusOrder, paymentStatusOrder, id}) =
 									<Button
 										type="text"
 										className="bg-primary font-semibold w-32 rounded-full"
-										onClick={handleAcceptStatus}
+										onClick={handleAccept}
 										disabled={loading}
 									>
 										Xác nhận
@@ -329,7 +401,7 @@ const TimeLineOrder = ({orders, loading, statusOrder, paymentStatusOrder, id}) =
 						<div className="border rounded-lg border-primary bg-tintWhite p-5 mb-5">
 							<div className="flex items-center mb-5" style={{fontSize: 16}}>
 								<p className="font-semibold">Trạng thái đơn hàng:</p>
-								<p className="ml-5">
+								<p className="ml-5 text-primary font-semibold">
 									<ClockCircleOutlined /> {ORDER_STATUS_TEXTS.Processing}
 								</p>
 							</div>
@@ -337,7 +409,7 @@ const TimeLineOrder = ({orders, loading, statusOrder, paymentStatusOrder, id}) =
 								<Button
 									type="text"
 									className="bg-primary font-semibold w-full rounded-full"
-									onClick={handlePreparedStatus}
+									onClick={handlePrepared}
 									disabled={loading}
 								>
 									Chuẩn bị hàng hoàn tất
@@ -346,16 +418,16 @@ const TimeLineOrder = ({orders, loading, statusOrder, paymentStatusOrder, id}) =
 						</div>
 					)}
 
-					{status === 'Prepared' && !isAssigned && (
+					{status === 'Prepared' && !userRoleDeliverer && (
 						<div className="border rounded-lg border-primary bg-tintWhite p-5 mb-5">
 							<div className="flex items-center" style={{fontSize: 16}}>
 								<p className="font-semibold">Trạng thái đơn hàng:</p>
-								<p className="ml-5">
+								<p className="ml-5 text-darkGreen font-semibold">
 									<CheckCircleOutlined /> {ORDER_STATUS_TEXTS.Prepared}
 								</p>
 							</div>
 
-							{userRoleManager && (
+							{!userRoleManager && (
 								<>
 									<div className="flex mt-2">
 										<p className="text-red mr-1">*</p>
@@ -408,11 +480,11 @@ const TimeLineOrder = ({orders, loading, statusOrder, paymentStatusOrder, id}) =
 						</div>
 					)}
 
-					{status === 'Prepared' && isAssigned && (
+					{status === 'Prepared' && userRoleDeliverer && (
 						<div className="border rounded-lg border-primary bg-tintWhite p-5 mb-5">
 							<div className="flex items-center mb-5" style={{fontSize: 16}}>
 								<p className="font-semibold">Trạng thái đơn hàng:</p>
-								<p className="ml-5">
+								<p className="ml-5 text-darkGreen font-semibold">
 									<CheckCircleOutlined /> {ORDER_STATUS_TEXTS.Prepared}
 								</p>
 							</div>
@@ -422,7 +494,7 @@ const TimeLineOrder = ({orders, loading, statusOrder, paymentStatusOrder, id}) =
 									<Button
 										type="text"
 										className="bg-primary font-semibold rounded-full w-full"
-										onClick={handleDeliveringStatus}
+										onClick={handleDelivering}
 									>
 										Bắt Đầu Giao Hàng
 									</Button>
@@ -442,7 +514,7 @@ const TimeLineOrder = ({orders, loading, statusOrder, paymentStatusOrder, id}) =
 						<div className="border rounded-lg border-primary bg-tintWhite p-5 mb-5">
 							<div className="flex items-center mb-5" style={{fontSize: 16}}>
 								<p className="font-semibold">Trạng thái đơn hàng:</p>
-								<p className="ml-5 ">
+								<p className="ml-5 text-primary font-semibold">
 									<ClockCircleOutlined /> {ORDER_STATUS_TEXTS.Delivering}
 								</p>
 							</div>
@@ -452,14 +524,14 @@ const TimeLineOrder = ({orders, loading, statusOrder, paymentStatusOrder, id}) =
 										<Button
 											type="text"
 											className="bg-primary font-semibold w-full rounded-full mr-5"
-											onClick={handleDeliveredStatus}
+											onClick={handleDelivered}
 										>
 											Đã Giao Hàng
 										</Button>
 										<Button
 											danger
 											className="font-semibold w-full rounded-full"
-											onClick={handleFailedDeliveredStatus}
+											onClick={handleFailedDelivered}
 										>
 											Hủy Giao Hàng
 										</Button>
@@ -514,7 +586,7 @@ const TimeLineOrder = ({orders, loading, statusOrder, paymentStatusOrder, id}) =
 										<Button
 											type="text"
 											className="bg-primary font-semibold w-full rounded-full"
-											onClick={handleRedeliverStatus}
+											onClick={handleRedeliverBtn}
 										>
 											Giao Lại
 										</Button>
