@@ -22,7 +22,6 @@ const OrderDetail = () => {
 	const paymentStatusOrder = useSelector(getPaymentStatusDetailSelector);
 
 	const [orders, setOrders] = useState();
-	const previousId = useRef(null);
 
 	useEffect(() => {
 		if (id && !loading) {
@@ -36,25 +35,11 @@ const OrderDetail = () => {
 		}
 	}, [orderDetail]);
 
-	// const fetchDiamondData = debounce(() => {
-	// 	if (orders?.Id && orders?.Id !== previousId.current) {
-	// 		dispatch(getOrderLog(orders?.Id));
-	// 		previousId.current = orders?.Id;
-	// 	}
-	// }, 1000);
-
-	// useEffect(() => {
-	// 	fetchDiamondData();
-	// 	return () => fetchDiamondData.cancel();
-	// }, [orders?.Id]);
-
 	useEffect(() => {
 		if (orders?.Id) {
 			dispatch(getOrderLog(orders?.Id));
 		}
 	}, [orders, dispatch]);
-
-	console.log('orders', orders);
 
 	return (
 		<>

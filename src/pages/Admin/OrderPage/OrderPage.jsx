@@ -73,6 +73,8 @@ const OrderPage = () => {
 	const [current, setCurrent] = useState(1);
 	const [delivererRole, setDelivererRole] = useState(false);
 
+	console.log('orderList', orderList);
+
 	const fetchDiamondData = debounce(() => {
 		dispatch(
 			getAllOrder({
@@ -92,9 +94,6 @@ const OrderPage = () => {
 		return () => fetchDiamondData.cancel();
 	}, [pageSize, current, activeStatus, startDate, endDate, searchText]);
 
-	// console.log('orderList', orderList);
-	console.log('orders', orders);
-
 	useEffect(() => {
 		if (userDetail?.Roles) {
 			const isDeliverer = userDetail.Roles.some((role) => role?.RoleName === 'deliverer');
@@ -113,7 +112,8 @@ const OrderPage = () => {
 				totalAmount: formatPrice(data?.TotalPrice),
 				customer: null,
 				paymentMethod: getEnumKey(attributes?.PaymentStatus, data?.PaymentStatus),
-				OrderCode: data.OrderCode,
+				OrderCode: data?.OrderCode,
+				CustomizeRequestId: data?.CustomizeRequestId,
 			});
 
 			const mappedData = orderList?.Values?.map((order) => mapAttributes(order, enums));
@@ -147,7 +147,13 @@ const OrderPage = () => {
 			dataIndex: 'totalAmount',
 			align: 'center',
 		},
-
+		{
+			title: 'Loại Đơn Hàng',
+			key: 'CustomizeRequestId',
+			dataIndex: 'CustomizeRequestId',
+			align: 'center',
+			render: (CustomizeRequestId) => (CustomizeRequestId ? 'Đơn Thiết Kế' : 'Đơn Thường'),
+		},
 		{
 			title: 'PT Thanh Toán',
 			key: 'paymentMethod',
@@ -243,7 +249,6 @@ const OrderPage = () => {
 	const handleDateChange = (dates, dateStrings) => {
 		setStartDate(dates[0]);
 		setEndDate(dates[1]);
-		console.log();
 	};
 
 	const handleStatusChange = (value) => {
@@ -252,7 +257,6 @@ const OrderPage = () => {
 
 	const onSearch = (value) => {
 		setSearchText(value);
-		console.log(value);
 	};
 
 	return (
