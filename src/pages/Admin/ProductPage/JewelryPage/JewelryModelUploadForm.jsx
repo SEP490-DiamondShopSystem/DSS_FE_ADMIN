@@ -1,0 +1,346 @@
+import React, {useState, useEffect} from 'react';
+import {useDispatch, useSelector} from 'react-redux';
+import {Modal, Form, Button, Upload, List, Image, message} from 'antd';
+import {
+	UploadOutlined,
+	FileImageOutlined,
+	FileProtectOutlined,
+	EditOutlined,
+} from '@ant-design/icons';
+import {
+	fetchJewelryModelFiles,
+	uploadJewelryModelThumbnail,
+	uploadCertificates,
+	uploadBaseImages,
+	deleteJewelryModelImages, // Import the delete action
+} from '../../../../redux/slices/filesSlice';
+import {selectFileLoading, selectFileError} from '../../../../redux/selectors';
+
+export const JewelryModelUploadForm  = ({jewelryModelId, visible, onClose}) => {
+	const dispatch = useDispatch();
+	const loading = useSelector(selectFileLoading);
+	const error = useSelector(selectFileError);
+
+	const [jewelryModelFiles, setJewelryModelFiles] = useState(null);
+	const [thumbnailFile, setThumbnailFile] = useState(null);
+	const [certificateFiles, setCertificateFiles] = useState([]);
+	const [imageFiles, setImageFiles] = useState([]);
+	const [isEditMode, setIsEditMode] = useState(false);
+
+	const [initialFiles, setInitialFiles] = useState({
+		thumbnail: null,
+		certificates: [],
+		images: [],
+	});
+
+	const [removedImagePaths, setRemovedImagePaths] = useState([]);
+
+	useEffect(() => {
+		if (jewelryModelId) {
+			dispatch(fetchJewelryModelFiles(jewelryModelId)).then((response) => {
+				if (response.payload) {
+					setJewelryModelFiles(response.payload);
+				}
+				console.log(jewelryModelFiles)
+			});
+		}
+	}, [jewelryModelId, dispatch]);
+    
+
+	useEffect(() => {
+		if (jewelryModelFiles) {
+			const initialThumbnail = jewelryModelFiles.Thumbnail?.MediaPath || null;
+			const initialCertificates = jewelryModelFiles.Certificates || [];
+			const initialImages = jewelryModelFiles.BaseImages || [];
+
+			setInitialFiles({
+				thumbnail: initialThumbnail,
+				certificates: initialCertificates,
+				images: initialImages,
+			});
+
+			setThumbnailFile(initialThumbnail);
+			setCertificateFiles(initialCertificates);
+			setImageFiles(initialImages);
+		}
+	}, [jewelryModelFiles]);
+
+	const handleCancel = () => {
+		setIsEditMode(false);
+		setThumbnailFile(initialFiles.thumbnail);
+		setCertificateFiles(initialFiles.certificates);
+		setImageFiles(initialFiles.images);
+		setRemovedImagePaths([]);
+		onClose();
+	};
+
+	const handleSwitchToEdit = () => {
+		setIsEditMode(true);
+	};
+
+	const handleSaveChanges = async () => {
+		if (
+			hasFileListChanged(thumbnailFile, initialFiles.thumbnail) ||
+			hasFileListChanged(certificateFiles, initialFiles.certificates) ||
+			hasFileListChanged(imageFiles, initialFiles.images) ||
+			removedImagePaths.length > 0
+		) {
+			handleThumbnailUpload();
+			handleCertificatesUpload();
+			handleImageUpload();
+			handleDeleteImages();
+		} else {
+			message.info('No changes detected, nothing to save');
+		}
+		await dispatch(fetchJewelryModelFiles(jewelryModelId)).then((response) => {
+			if (response.payload) {
+				setJewelryModelFiles(response.payload);
+			}
+		});
+		setIsEditMode(false);
+	};
+
+	const hasFileListChanged = (currentFileList, initialFileList) => {
+		if (Array.isArray(currentFileList)) {
+			return (
+				currentFileList.length !== initialFileList.length ||
+				!currentFileList.every(
+					(file, index) => file.MediaPath !== initialFileList[index].MediaPath
+				)
+			);
+		}
+		return currentFileList !== initialFileList;
+	};
+
+	// Handle removing images
+	const handleImageRemove = (file) => {
+		// Add the removed file's path to the removedImagePaths array
+		const imagePath = file.url || file.MediaPath; // Make sure to get the correct path
+		setRemovedImagePaths((prev) => [...prev, imagePath]);
+	};
+
+	// Handle the deletion of images by calling the API
+	const handleDeleteImages = () => {
+		if (removedImagePaths.length > 0) {
+			console.log('Deleting images:', removedImagePaths);
+
+			dispatch(deleteJewelryModelImages({jewelryModelId, imagePaths: removedImagePaths}))
+				.then(() => {
+					message.success('Images deleted successfully');
+				})
+				.catch((err) => {
+					message.error('Failed to delete images');
+				});
+		}
+	};
+
+	const handleThumbnailUpload = async () => {
+		if (!thumbnailFile || thumbnailFile === initialFiles.thumbnail) {
+			return;
+		}
+
+		console.log('Uploading Thumbnail for Diamond ID:', jewelryModelId);
+
+		try {
+			await dispatch(uploadJewelryModelThumbnail({jewelryModelId, formFile: thumbnailFile}));
+			message.success('Thumbnail uploaded successfully');
+		} catch (err) {
+			message.error('Failed to upload thumbnail');
+		}
+	};
+
+	const handleCertificatesUpload = async () => {
+		if (certificateFiles.length === 0 || certificateFiles === initialFiles.certificates) {
+			return;
+		}
+
+		console.log('Uploading Certificates for Diamond ID:', jewelryModelId);
+
+		try {
+			for (const file of certificateFiles) {
+				await dispatch(
+					uploadCertificates({jewelryModelId, certificateCode: file.name, formFile: file})
+				);
+			}
+			message.success('Certificates uploaded successfully');
+		} catch (err) {
+			message.error('Failed to upload certificates');
+		}
+	};
+
+	const handleImageUpload = async () => {
+		if (imageFiles.length === 0 || imageFiles === initialFiles.images) {
+			return;
+		}
+
+		console.log('Uploading Diamond Images for Diamond ID:', jewelryModelId);
+
+		try {
+			await dispatch(uploadBaseImages({jewelryModelId, formFiles: imageFiles}));
+			message.success('Diamond images uploaded successfully');
+		} catch (err) {
+			message.error('Failed to upload diamond images');
+		}
+	};
+
+	const handleFileChange = (fileList, setState) => {
+		setState(fileList);
+	};
+
+	return (
+		<Modal
+			title="Diamond's Files"
+			visible={visible}
+			onCancel={handleCancel}
+			footer={
+				isEditMode
+					? [
+							<Button key="cancel" onClick={handleCancel}>
+								Cancel
+							</Button>,
+							<Button
+								key="save"
+								type="primary"
+								loading={loading}
+								onClick={handleSaveChanges}
+							>
+								Save Changes
+							</Button>,
+					  ]
+					: [
+							<Button
+								key="edit"
+								type="primary"
+								icon={<EditOutlined />}
+								onClick={handleSwitchToEdit}
+							>
+								Switch to Edit Mode
+							</Button>,
+					  ]
+			}
+		>
+			{isEditMode ? (
+				<Form layout="vertical">
+					{/* Thumbnail Upload */}
+					<Form.Item label="Thumbnail">
+						<Upload
+							accept="image/*"
+							beforeUpload={(file) => {
+								setThumbnailFile(file);
+								return false;
+							}}
+							showUploadList={false}
+						>
+							<Button icon={<UploadOutlined />}>Select Thumbnail</Button>
+						</Upload>
+						{thumbnailFile && (
+							<img
+								src={typeof thumbnailFile === 'string' ? thumbnailFile : ''}
+								alt="Thumbnail Preview"
+								style={{
+									marginTop: 10,
+									width: '100px',
+									height: '100px',
+									objectFit: 'cover',
+								}}
+							/>
+						)}
+					</Form.Item>
+
+					{/* Certificates Upload */}
+					<Form.Item label="Certificates">
+						<Upload
+							accept="application/pdf"
+							beforeUpload={(file) => {
+								setCertificateFiles((fileList) => [...fileList, file]);
+								return false;
+							}}
+							onRemove={(file) => {
+								setCertificateFiles((fileList) =>
+									fileList.filter((item) => item.MediaPath !== file.url)
+								);
+							}}
+							showUploadList
+							fileList={certificateFiles.map((file, index) => ({
+								uid: index,
+								name: file.name,
+								url: file.MediaPath,
+								status: 'done',
+							}))}
+						>
+							<Button icon={<FileProtectOutlined />}>Select Certificates</Button>
+						</Upload>
+					</Form.Item>
+
+					{/* Diamond Images Upload */}
+					<Form.Item label="Jewelry Model Images">
+						<Upload
+							multiple
+							accept="image/*"
+							beforeUpload={(file) => {
+								setImageFiles((fileList) => [...fileList, file]);
+								return false;
+							}}
+							onRemove={(file) => {
+								handleImageRemove(file); // Track the removed image
+								setImageFiles((fileList) =>
+									fileList.filter((item) => item.MediaPath !== file.url)
+								);
+							}}
+							showUploadList
+							fileList={imageFiles.map((file, index) => ({
+								uid: index,
+								name: `Image ${index + 1}`,
+								url: file.MediaPath,
+								status: 'done',
+							}))}
+						>
+							<Button icon={<FileImageOutlined />}>Select Diamond Images</Button>
+						</Upload>
+					</Form.Item>
+				</Form>
+			) : (
+				<div>
+					{/* View Mode */}
+					<List
+						header={<b>Thumbnail</b>}
+						dataSource={thumbnailFile ? [thumbnailFile] : []}
+						renderItem={(item) => (
+							<List.Item>
+								<Image src={item} alt="Thumbnail" width={100} height={100} />
+							</List.Item>
+						)}
+					/>
+
+					<List
+						header={<b>Certificates</b>}
+						dataSource={certificateFiles}
+						renderItem={(item, index) => (
+							<List.Item>
+								<a href={item.MediaPath} target="_blank" rel="noopener noreferrer">
+									Certificate {index + 1}
+								</a>
+							</List.Item>
+						)}
+					/>
+
+					<List
+						header={<b>Diamond Images</b>}
+						grid={{gutter: 16, column: 4}}
+						dataSource={imageFiles}
+						renderItem={(item) => (
+							<List.Item>
+								<Image
+									src={item.MediaPath}
+									alt="Diamond Image"
+									width={100}
+									height={100}
+								/>
+							</List.Item>
+						)}
+					/>
+				</div>
+			)}
+		</Modal>
+	);
+};

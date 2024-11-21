@@ -19,6 +19,7 @@ export const fetchJewelryModelFiles = createAsyncThunk(
 	async (jewelryModelId, {rejectWithValue}) => {
 		try {
 			const response = await api.get(`/JewelryModelFiles/${jewelryModelId}/Files`);
+			console.log(response);
 			return response;
 		} catch (error) {
 			return rejectWithValue(error.response || error.message);
@@ -124,7 +125,10 @@ export const uploadBaseImages = createAsyncThunk(
 			formFiles.forEach((file) => formData.append('formFiles', file));
 			const response = await api.post(
 				`/JewelryModelFiles/${jewelryModelId}/Files/Images/Base`,
-				formData
+				formData,
+				{
+					headers: {'Content-Type': 'multipart/form-data'},
+				}
 			);
 			return response;
 		} catch (error) {
@@ -142,7 +146,10 @@ export const uploadMetalImages = createAsyncThunk(
 			formFiles.forEach((file) => formData.append('formFiles', file));
 			const response = await api.post(
 				`/JewelryModelFiles/${jewelryModelId}/Files/Images/Metals/${metalId}`,
-				formData
+				formData,
+				{
+					headers: {'Content-Type': 'multipart/form-data'},
+				}
 			);
 			return response;
 		} catch (error) {
@@ -161,7 +168,10 @@ export const uploadMainDiamondImages = createAsyncThunk(
 
 			const response = await api.post(
 				`/JewelryModelFiles/${jewelryModelId}/Files/Images/MainDiamonds`,
-				formData
+				formData,
+				{
+					headers: {'Content-Type': 'multipart/form-data'},
+				}
 			);
 			return response;
 		} catch (error) {
@@ -180,7 +190,10 @@ export const uploadSideDiamondImage = createAsyncThunk(
 			formData.append('sideDiamondOptionId', sideDiamondOptionId);
 			const response = await api.post(
 				`/JewelryModelFiles/${jewelryModelId}/Files/Images/SideDiamonds/Single`,
-				formData
+				formData,
+				{
+					headers: {'Content-Type': 'multipart/form-data'},
+				}
 			);
 			return response;
 		} catch (error) {
@@ -200,7 +213,10 @@ export const uploadCategorizedImage = createAsyncThunk(
 			formData.append('metalId', metalId);
 			const response = await api.post(
 				`/JewelryModelFiles/${jewelryModelId}/Files/Images/Categorize/Single`,
-				formData
+				formData,
+				{
+					headers: {'Content-Type': 'multipart/form-data'},
+				}
 			);
 			return response;
 		} catch (error) {
