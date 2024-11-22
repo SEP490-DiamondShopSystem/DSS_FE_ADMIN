@@ -42,7 +42,7 @@ export const createPromotion = createAsyncThunk(
 
 			return response;
 		} catch (error) {
-			return rejectWithValue(error.response.data || 'Failed to create promotion');
+			return rejectWithValue(error || 'Failed to create promotion');
 		}
 	}
 );
@@ -57,7 +57,7 @@ export const createFullPromotion = createAsyncThunk(
 			return response;
 		} catch (error) {
 			console.log('Creating promotion with data:', JSON.stringify(fullPromotion, null, 2));
-			return rejectWithValue(error.response.data || 'Failed to create full promotion');
+			return rejectWithValue(error || 'Failed to create full promotion');
 		}
 	}
 );
@@ -73,9 +73,9 @@ export const updatePromotionRequirements = createAsyncThunk(
 			if (error.response) {
 				// Handle 400 and 500 status codes
 				if (error.response.status === 400) {
-					return rejectWithValue({status: 400, errors: error.response.data.errors});
+					return rejectWithValue({status: 400, errors: error.errors});
 				} else if (error.response.status === 500) {
-					return rejectWithValue({status: 500, detail: error.response.data.detail});
+					return rejectWithValue({status: 500, detail: error.detail});
 				}
 			}
 			return rejectWithValue({status: 'unknown', detail: 'An unexpected error occurred.'});
@@ -94,9 +94,9 @@ export const updatePromotionGifts = createAsyncThunk(
 			if (error.response) {
 				// Handle 400 and 500 status codes
 				if (error.response.status === 400) {
-					return rejectWithValue({status: 400, errors: error.response.data.errors});
+					return rejectWithValue({status: 400, errors: error.errors});
 				} else if (error.response.status === 500) {
-					return rejectWithValue({status: 500, detail: error.response.data.detail});
+					return rejectWithValue({status: 500, detail: error.detail});
 				}
 			}
 			return rejectWithValue({status: 'unknown', detail: 'An unexpected error occurred.'});
@@ -120,9 +120,9 @@ export const updatePromotion = createAsyncThunk(
 			if (error.response) {
 				// Handle 400 and 500 status codes
 				if (error.response.status === 400) {
-					return rejectWithValue({status: 400, errors: error.response.data.errors});
+					return rejectWithValue({status: 400, errors: error.errors});
 				} else if (error.response.status === 500) {
-					return rejectWithValue({status: 500, detail: error.response.data.detail});
+					return rejectWithValue({status: 500, detail: error.detail});
 				}
 			}
 			return rejectWithValue({status: 'unknown', detail: 'An unexpected error occurred.'});
@@ -143,9 +143,9 @@ export const deletePromotion = createAsyncThunk(
 			if (error.response) {
 				// Handle 400 and 500 status codes
 				if (error.response.status === 400) {
-					return rejectWithValue({status: 400, errors: error.response.data.errors});
+					return rejectWithValue({status: 400, errors: error.errors});
 				} else if (error.response.status === 500) {
-					return rejectWithValue({status: 500, detail: error.response.data.detail});
+					return rejectWithValue({status: 500, detail: error.detail});
 				}
 			}
 			return rejectWithValue({status: 'unknown', detail: 'An unexpected error occurred.'});
@@ -164,9 +164,9 @@ export const pausePromotion = createAsyncThunk(
 			if (error.response) {
 				// Handle 400 and 500 status codes
 				if (error.response.status === 400) {
-					return rejectWithValue({status: 400, errors: error.response.data.errors});
+					return rejectWithValue({status: 400, errors: error.errors});
 				} else if (error.response.status === 500) {
-					return rejectWithValue({status: 500, detail: error.response.data.detail});
+					return rejectWithValue({status: 500, detail: error.detail});
 				}
 			}
 			return rejectWithValue({status: 'unknown', detail: 'An unexpected error occurred.'});
@@ -185,9 +185,9 @@ export const cancelPromotion = createAsyncThunk(
 			if (error.response) {
 				// Handle 400 and 500 status codes
 				if (error.response.status === 400) {
-					return rejectWithValue({status: 400, errors: error.response.data.errors});
+					return rejectWithValue({status: 400, errors: error.errors});
 				} else if (error.response.status === 500) {
-					return rejectWithValue({status: 500, detail: error.response.data.detail});
+					return rejectWithValue({status: 500, detail: error.detail});
 				}
 			}
 			return rejectWithValue({status: 'unknown', detail: 'An unexpected error occurred.'});
@@ -206,9 +206,9 @@ export const updatePromotionThumbnail = createAsyncThunk(
 			if (error.response) {
 				// Handle 400 and 500 status codes
 				if (error.response.status === 400) {
-					return rejectWithValue({status: 400, errors: error.response.data.errors});
+					return rejectWithValue({status: 400, errors: error.errors});
 				} else if (error.response.status === 500) {
-					return rejectWithValue({status: 500, detail: error.response.data.detail});
+					return rejectWithValue({status: 500, detail: error.detail});
 				}
 			}
 			return rejectWithValue({status: 'unknown', detail: 'An unexpected error occurred.'});
@@ -233,9 +233,9 @@ export const uploadPromotionThumbnail = createAsyncThunk(
 			if (error.response) {
 				// Handle 400 and 500 status codes
 				if (error.response.status === 400) {
-					return rejectWithValue({status: 400, errors: error.response.data.errors});
+					return rejectWithValue({status: 400, errors: error.errors});
 				} else if (error.response.status === 500) {
-					return rejectWithValue({status: 500, detail: error.response.data.detail});
+					return rejectWithValue({status: 500, detail: error.detail});
 				}
 			}
 			return rejectWithValue({status: 'unknown', detail: 'An unexpected error occurred.'});

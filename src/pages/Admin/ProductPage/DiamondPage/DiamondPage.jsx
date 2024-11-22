@@ -285,7 +285,7 @@ const DiamondPage = () => {
 			if (res.payload !== undefined) {
 				message.success('Xóa Kim Cương Thành Công!');
 			} else {
-				message.error('Có lỗi khi xóa kim cương.');
+				message.error(error?.data?.title || error?.detail);
 			}
 		});
 		setIsModalVisible(false);

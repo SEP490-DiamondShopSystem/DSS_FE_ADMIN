@@ -10,8 +10,8 @@ export const fetchDiscounts = createAsyncThunk(
 			const response = await api.get('/Discount');
 			return response;
 		} catch (error) {
-			console.error('Failed to fetch discounts:', error.response?.data || error.message);
-			return rejectWithValue(error.response?.data || 'Failed to fetch discounts');
+			console.error('Failed to fetch discounts:', error || error.message);
+			return rejectWithValue(error || 'Failed to fetch discounts');
 		}
 	}
 );
@@ -27,8 +27,8 @@ export const fetchDiscountDetail = createAsyncThunk(
 
 			return response;
 		} catch (error) {
-			console.error('Failed to fetch discounts:', error.response?.data || error.message);
-			return rejectWithValue(error.response?.data || 'Failed to fetch discounts');
+			console.error('Failed to fetch discounts:', error || error.message);
+			return rejectWithValue(error || 'Failed to fetch discounts');
 		}
 	}
 );

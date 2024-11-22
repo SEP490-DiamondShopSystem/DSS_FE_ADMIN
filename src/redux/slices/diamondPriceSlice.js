@@ -17,7 +17,7 @@ export const fetchPriceBoard = createAsyncThunk(
 			return response;
 		} catch (error) {
 			console.error('Error fetching price board:', error); // Log the full error
-			return rejectWithValue(error.response || error.message); // Return the response if available, otherwise return the error message
+			return rejectWithValue(error || error.message); // Return the response if available, otherwise return the error message
 		}
 	}
 );
@@ -36,7 +36,7 @@ export const fetchDiamondPrices = createAsyncThunk(
 			});
 			return response;
 		} catch (error) {
-			return rejectWithValue(error.response);
+			return rejectWithValue(error);
 		}
 	}
 );
@@ -70,7 +70,7 @@ export const createDiamondPrice = createAsyncThunk(
 		} catch (error) {
 			// Log the error response for better debugging
 			console.error('Error creating diamond prices:', error);
-			return rejectWithValue(error.response);
+			return rejectWithValue(error);
 		}
 	}
 );
@@ -107,7 +107,7 @@ export const updateDiamondPrices = createAsyncThunk(
 		} catch (error) {
 			// Log the error response for better debugging
 			console.error('Error updating diamond prices:', error);
-			return rejectWithValue(error.response);
+			return rejectWithValue(error);
 		}
 	}
 );
@@ -122,7 +122,7 @@ export const fetchDiamondPriceByShape = createAsyncThunk(
 			});
 			return response;
 		} catch (error) {
-			return rejectWithValue(error.response);
+			return rejectWithValue(error);
 		}
 	}
 );
@@ -160,8 +160,8 @@ export const deleteDiamondPrice = createAsyncThunk(
 			// Log the error response for better debugging
 			console.error('Error deleting diamond prices:', error);
 			// Handle different error response formats
-			if (error.response) {
-				return rejectWithValue(error.response.data); // Use the detailed error information
+			if (error) {
+				return rejectWithValue(error.data); // Use the detailed error information
 			}
 			return rejectWithValue({
 				type: 'Unknown Error',
@@ -181,7 +181,7 @@ export const deleteDiamondPriceShape = createAsyncThunk(
 			const response = await api.delete(`/Diamond/Price/${shapeId}/${criteriaId}`);
 			return response;
 		} catch (error) {
-			return rejectWithValue(error.response);
+			return rejectWithValue(error);
 		}
 	}
 );

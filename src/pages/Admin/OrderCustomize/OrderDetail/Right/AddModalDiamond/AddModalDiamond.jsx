@@ -116,7 +116,7 @@ export const AddModalDiamond = ({
 					setShowModal(false);
 					form.resetFields();
 				} else {
-					message.error('Kim tra lại thông số kim cương!');
+					message.error(error?.data?.title || error?.detail);
 				}
 			});
 		} else {

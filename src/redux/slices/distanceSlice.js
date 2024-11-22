@@ -8,8 +8,8 @@ export const fetchDistances = createAsyncThunk(
 			const response = await api.get('/Location/Province');
 			return response;
 		} catch (error) {
-			console.log('Error: ', JSON.stringify(error.response.data));
-			return rejectWithValue(error.response.data);
+			console.log('Error: ', JSON.stringify(error));
+			return rejectWithValue(error);
 		}
 	}
 );
@@ -21,8 +21,8 @@ export const fetchWard = createAsyncThunk(
 			const response = await api.get(`/Location/Ward/${districtId}`);
 			return response;
 		} catch (error) {
-			console.log('Error: ', JSON.stringify(error.response.data));
-			return rejectWithValue(error.response.data);
+			console.log('Error: ', JSON.stringify(error));
+			return rejectWithValue(error);
 		}
 	}
 );
@@ -36,8 +36,8 @@ export const fetchDistrict = createAsyncThunk(
 			const response = await api.get(`/Location/District/${provinceId}`);
 			return response;
 		} catch (error) {
-			console.log('Error: ', JSON.stringify(error.response.data));
-			return rejectWithValue(error.response.data);
+			console.log('Error: ', JSON.stringify(error));
+			return rejectWithValue(error);
 		}
 	}
 );
@@ -61,8 +61,8 @@ export const handleCalculateLocation = createAsyncThunk(
 
 			return response;
 		} catch (error) {
-			console.log('Error: ', JSON.stringify(error.response.data));
-			return rejectWithValue(error.response.data);
+			console.log('Error: ', JSON.stringify(error));
+			return rejectWithValue(error);
 		}
 	}
 );

@@ -145,7 +145,7 @@ const JewelryModelPage = () => {
 				}
 			})
 			.catch((error) => {
-				console.error('Error fetching jewelry models:', error); // Log any errors
+				message.error(error?.data?.title || error?.detail);
 			});
 	}, [dispatch, name, category, isRhodiumFinished, isEngravable, currentPage, pageSize]);
 	const metals = useSelector(getAllMetalsSelector); // Selector for getting metals from the store
@@ -356,7 +356,7 @@ const JewelryModelPage = () => {
 				console.log('Jewelry model created successfully:', formData);
 			})
 			.catch((error) => {
-				console.error('Error creating jewelry model:', error);
+				message.error(error?.data?.title || error?.detail);
 			});
 		dispatch(
 			fetchAllJewelryModels({

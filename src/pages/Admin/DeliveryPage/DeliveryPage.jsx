@@ -191,7 +191,7 @@ const DeliveryPage = () => {
 				message.success('Giao hàng sớm');
 				// window.location.reload();
 			} else {
-				message.error('Lỗi hệ thống!');
+				message.error(error?.data?.title || error?.detail);
 			}
 		});
 	};

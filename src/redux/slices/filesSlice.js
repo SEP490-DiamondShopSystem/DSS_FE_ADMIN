@@ -9,7 +9,7 @@ export const fetchDiamondFiles = createAsyncThunk(
 			const response = await api.get(`/Diamond/${diamondId}/Files`);
 			return response;
 		} catch (error) {
-			return rejectWithValue(error.response || error.message);
+			return rejectWithValue(error || error.message);
 		}
 	}
 );
@@ -20,7 +20,7 @@ export const fetchJewelryModelFiles = createAsyncThunk(
 			const response = await api.get(`/JewelryModelFiles/${jewelryModelId}/Files`);
 			return response;
 		} catch (error) {
-			return rejectWithValue(error.response || error.message);
+			return rejectWithValue(error || error.message);
 		}
 	}
 );
@@ -36,7 +36,7 @@ export const uploadDiamondThumbnail = createAsyncThunk(
 			});
 			return response;
 		} catch (error) {
-			return rejectWithValue(error.response || error.message);
+			return rejectWithValue(error || error.message);
 		}
 	}
 );
@@ -55,7 +55,7 @@ export const uploadJewelryModelThumbnail = createAsyncThunk(
 			);
 			return response;
 		} catch (error) {
-			return rejectWithValue(error.response || error.message);
+			return rejectWithValue(error || error.message);
 		}
 	}
 );
@@ -66,7 +66,7 @@ export const deleteDiamondThumbnail = createAsyncThunk(
 			const response = await api.delete(`/Diamond/${diamondId}/Files/Thumbnail`);
 			return response;
 		} catch (error) {
-			return rejectWithValue(error.response || error.message);
+			return rejectWithValue(error || error.message);
 		}
 	}
 );
@@ -79,7 +79,7 @@ export const deleteJewelryModelThumbnail = createAsyncThunk(
 			);
 			return response;
 		} catch (error) {
-			return rejectWithValue(error.response || error.message);
+			return rejectWithValue(error || error.message);
 		}
 	}
 );
@@ -95,7 +95,7 @@ export const uploadCertificates = createAsyncThunk(
 			});
 			return response;
 		} catch (error) {
-			return rejectWithValue(error.response || error.message);
+			return rejectWithValue(error || error.message);
 		}
 	}
 );
@@ -109,7 +109,7 @@ export const deleteCertificate = createAsyncThunk(
 			});
 			return response;
 		} catch (error) {
-			return rejectWithValue(error.response || error.message);
+			return rejectWithValue(error || error.message);
 		}
 	}
 );
@@ -129,7 +129,7 @@ export const uploadBaseImages = createAsyncThunk(
 			);
 			return response;
 		} catch (error) {
-			return rejectWithValue(error.response || error.message);
+			return rejectWithValue(error || error.message);
 		}
 	}
 );
@@ -155,7 +155,7 @@ export const uploadMetalImages = createAsyncThunk(
 			});
 			return response;
 		} catch (error) {
-			return rejectWithValue(error.response || error.message);
+			return rejectWithValue(error || error.message);
 		}
 	}
 );
@@ -181,7 +181,7 @@ export const uploadSideDiamondImage = createAsyncThunk(
 			});
 			return response;
 		} catch (error) {
-			return rejectWithValue(error.response || error.message);
+			return rejectWithValue(error || error.message);
 		}
 	}
 );
@@ -202,7 +202,7 @@ export const uploadMainDiamondImages = createAsyncThunk(
 			);
 			return response;
 		} catch (error) {
-			return rejectWithValue(error.response || error.message);
+			return rejectWithValue(error || error.message);
 		}
 	}
 );
@@ -231,7 +231,7 @@ export const uploadCategorizedImage = createAsyncThunk(
 			);
 			return response;
 		} catch (error) {
-			return rejectWithValue(error.response || error.message);
+			return rejectWithValue(error || error.message);
 		}
 	}
 );
@@ -246,7 +246,7 @@ export const deleteJewelryModelImages = createAsyncThunk(
 			});
 			return response;
 		} catch (error) {
-			return rejectWithValue(error.response || error.message);
+			return rejectWithValue(error || error.message);
 		}
 	}
 );
@@ -261,7 +261,7 @@ export const uploadDiamondImages = createAsyncThunk(
 			});
 			return response;
 		} catch (error) {
-			return rejectWithValue(error.response || error.message);
+			return rejectWithValue(error || error.message);
 		}
 	}
 );
@@ -275,7 +275,7 @@ export const deleteDiamondImages = createAsyncThunk(
 			});
 			return response;
 		} catch (error) {
-			return rejectWithValue(error.response || error.message);
+			return rejectWithValue(error || error.message);
 		}
 	}
 );

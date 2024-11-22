@@ -231,7 +231,7 @@ const PromotionPage = ({promotionData}) => {
 					}),
 				});
 			} else {
-				message.error('Failed to fetch promotion details.');
+				message.error(error?.data?.title || error?.detail);
 			}
 		});
 	};
@@ -241,7 +241,7 @@ const PromotionPage = ({promotionData}) => {
 			await dispatch(cancelPromotion(id)); // Use your actual cancelPromotion logic
 			message.success(`Promotion with id: ${id} has been canceled.`);
 		} catch (error) {
-			message.error('Failed to cancel the promotion. Please try again.');
+			message.error(error?.data?.title || error?.detail);
 		}
 	};
 	const handleUpdate = async () => {
@@ -262,7 +262,7 @@ const PromotionPage = ({promotionData}) => {
 
 			// Ensure that promotionId (editingPromotionId) is available
 			if (!editingPromotionId) {
-				message.error('Promotion ID is missing!');
+				message.error(error?.data?.title || error?.detail);
 				return;
 			}
 
@@ -275,7 +275,7 @@ const PromotionPage = ({promotionData}) => {
 			message.success('Promotion updated successfully!');
 			await dispatch(fetchPromotions());
 		} catch (err) {
-			message.error('Please correct the form errors.');
+			message.error(error?.data?.title || error?.detail);
 		}
 	};
 
@@ -285,7 +285,7 @@ const PromotionPage = ({promotionData}) => {
 				message.success(`Deleted promotion with id: ${id}`);
 			})
 			.catch((error) => {
-				message.error(`Failed to delete promotion: ${error.message}`);
+				message.error(error?.data?.title || error?.detail);
 			});
 	};
 

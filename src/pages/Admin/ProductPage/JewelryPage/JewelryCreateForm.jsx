@@ -304,7 +304,7 @@ const JewelryCreateForm = ({onClose, isCreateFormOpen, setIsCreateFormOpen}) => 
 				form.resetFields();
 				onClose();
 			} else {
-				message.warning('Xảy ra lỗi khi tạo trang sức!');
+				message.error(error?.data?.title || error?.detail);
 			}
 		});
 	};

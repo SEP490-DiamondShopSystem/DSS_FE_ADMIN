@@ -139,8 +139,8 @@ const TimeLineOrder = ({orders, loading, statusOrder, paymentStatusOrder, id}) =
 		const res = await dispatch(handleOrder(orders.Id));
 		if (res.payload !== undefined) {
 			message.success('Xác nhận thành công!');
-		} else if (res.payload.status === 400) {
-			message.error('Lỗi khi xác nhận đơn hàng.');
+		} else {
+			message.error(error?.data?.title || error?.detail);
 		}
 	};
 
@@ -158,8 +158,8 @@ const TimeLineOrder = ({orders, loading, statusOrder, paymentStatusOrder, id}) =
 		const res = await dispatch(handleOrder(orders.Id));
 		if (res.payload !== undefined) {
 			message.success('Chuẩn bị hàng hoàn tất!');
-		} else if (res.payload.status === 400) {
-			message.error('Lỗi khi chuẩn bị hàng.');
+		} else {
+			message.error(error?.data?.title || error?.detail);
 		}
 	};
 
@@ -181,8 +181,8 @@ const TimeLineOrder = ({orders, loading, statusOrder, paymentStatusOrder, id}) =
 		if (res.payload !== undefined) {
 			message.success('Đã chuyển giao cho shipper!');
 			localStorage.setItem(`isAssigned_${orders.Id}`, JSON.stringify(true));
-		} else if (res.payload.status === 400) {
-			message.error('Lỗi khi chuyển giao cho shipper.');
+		} else {
+			message.error(error?.data?.title || error?.detail);
 		}
 	};
 
@@ -200,8 +200,8 @@ const TimeLineOrder = ({orders, loading, statusOrder, paymentStatusOrder, id}) =
 		const res = await dispatch(handleOrder(orders.Id));
 		if (res.payload !== undefined) {
 			message.success('Xác nhận giao hàng!');
-		} else if (res.payload.status === 400) {
-			message.error('Lỗi khi giao hàng.');
+		} else {
+			message.error(error?.data?.title || error?.detail);
 		}
 	};
 
@@ -219,8 +219,8 @@ const TimeLineOrder = ({orders, loading, statusOrder, paymentStatusOrder, id}) =
 		const res = await dispatch(handleOrder(orders.Id));
 		if (res.payload !== undefined) {
 			message.success('Hoàn tất giao hàng!');
-		} else if (res.payload.status === 400) {
-			message.error('Lỗi khi giao hàng.');
+		} else{
+			message.error(error?.data?.title || error?.detail);
 		}
 	};
 
@@ -238,8 +238,8 @@ const TimeLineOrder = ({orders, loading, statusOrder, paymentStatusOrder, id}) =
 		const res = await dispatch(handleDeliveryFailed(orders.Id));
 		if (res.payload !== undefined) {
 			message.warning('Đơn hàng giao hàng không thành công!');
-		} else if (res.payload.status === 400) {
-			message.error('Lỗi khi giao hàng.');
+		} else {
+			message.error(error?.data?.title || error?.detail);
 		}
 	};
 
@@ -247,8 +247,8 @@ const TimeLineOrder = ({orders, loading, statusOrder, paymentStatusOrder, id}) =
 		const res = await dispatch(handleRefundOrder(orders.Id));
 		if (res.payload !== undefined) {
 			message.warning('Xác nhận hoàn tiền!');
-		} else if (res.payload.status === 400) {
-			message.error('Lỗi khi giao hàng.');
+		} else {
+			message.error(error?.data?.title || error?.detail);
 		}
 	};
 
@@ -276,8 +276,8 @@ const TimeLineOrder = ({orders, loading, statusOrder, paymentStatusOrder, id}) =
 				if (res.payload !== undefined) {
 					message.success('Đã chuyển giao cho shipper!');
 					localStorage.setItem(`isAssigned_${orders.Id}`, JSON.stringify(true));
-				} else if (res.payload.status === 400) {
-					message.error('Lỗi khi chuyển giao cho shipper.');
+				} else {
+					message.error(error?.data?.title || error?.detail);
 				}
 			}
 		);
@@ -289,8 +289,8 @@ const TimeLineOrder = ({orders, loading, statusOrder, paymentStatusOrder, id}) =
 
 		if (res.payload !== undefined) {
 			message.success('Từ chối thành công!');
-		} else if (res.payload.status === 400) {
-			message.error('Lỗi khi từ chối đơn hàng.');
+		} else {
+			message.error(error?.data?.title || error?.detail);
 		}
 
 		setIsCancelModalVisible(false);

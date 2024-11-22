@@ -163,8 +163,8 @@ export const getOrderLog = createAsyncThunk(
 
 			return response;
 		} catch (error) {
-			console.log('Error: ', JSON.stringify(error.response.data));
-			return rejectWithValue(error.response.data);
+			console.log('Error: ', JSON.stringify(error));
+			return rejectWithValue(error);
 		}
 	}
 );
@@ -180,8 +180,8 @@ export const handleRedeliver = createAsyncThunk(
 
 			return response;
 		} catch (error) {
-			console.log('Error: ', JSON.stringify(error.response.data));
-			return rejectWithValue(error.response.data);
+			console.log('Error: ', JSON.stringify(error));
+			return rejectWithValue(error);
 		}
 	}
 );

@@ -84,8 +84,8 @@ export const handleAddDiamondCustomize = createAsyncThunk(
 
 			return response;
 		} catch (error) {
-			console.log('Error: ', JSON.stringify(error.response.data));
-			return rejectWithValue(error.response.data);
+			console.log('Error: ', JSON.stringify(error));
+			return rejectWithValue(error);
 		}
 	}
 );
@@ -107,8 +107,8 @@ export const handleDeleteDiamondCustomize = createAsyncThunk(
 
 			return response;
 		} catch (error) {
-			console.log('Error: ', JSON.stringify(error.response?.data));
-			return rejectWithValue(error.response?.data || error.message);
+			console.log('Error: ', JSON.stringify(error));
+			return rejectWithValue(error || error.message);
 		}
 	}
 );
@@ -124,8 +124,8 @@ export const handleChangeDiamondCustomize = createAsyncThunk(
 
 			return response;
 		} catch (error) {
-			console.log('Error: ', JSON.stringify(error.response?.data));
-			return rejectWithValue(error.response?.data || error.message);
+			console.log('Error: ', JSON.stringify(error));
+			return rejectWithValue(error || error.message);
 		}
 	}
 );

@@ -8,8 +8,8 @@ export const getDiamondDetail = createAsyncThunk(
 			const response = await api.get(`/Diamond/${id}`);
 			return response;
 		} catch (error) {
-			console.log('Error: ', JSON.stringify(error.response.data));
-			return rejectWithValue(error.response.data);
+			console.log('Error: ', JSON.stringify(error));
+			return rejectWithValue(error);
 		}
 	}
 );
@@ -22,8 +22,8 @@ export const getDiamondShape = createAsyncThunk(
 
 			return response;
 		} catch (error) {
-			console.log('Error: ', JSON.stringify(error.response.data));
-			return rejectWithValue(error.response.data);
+			console.log('Error: ', JSON.stringify(error));
+			return rejectWithValue(error);
 		}
 	}
 );
@@ -38,8 +38,8 @@ export const handleAddDiamond = createAsyncThunk(
 
 			return response;
 		} catch (error) {
-			console.log('Error: ', JSON.stringify(error.response.data));
-			return rejectWithValue(error.response.data);
+			console.log('Error: ', JSON.stringify(error));
+			return rejectWithValue(error);
 		}
 	}
 );
@@ -52,8 +52,8 @@ export const handleDeleteDiamond = createAsyncThunk(
 
 			return response;
 		} catch (error) {
-			console.log('Error: ', JSON.stringify(error.response.data));
-			return rejectWithValue(error.response.data);
+			console.log('Error: ', JSON.stringify(error));
+			return rejectWithValue(error);
 		}
 	}
 );
@@ -115,8 +115,8 @@ export const getAllDiamond = createAsyncThunk(
 			const response = await api.get(url);
 			return response;
 		} catch (error) {
-			console.log('Error: ', JSON.stringify(error.response.data));
-			return rejectWithValue(error.response.data);
+			console.log('Error: ', JSON.stringify(error));
+			return rejectWithValue(error);
 		}
 	}
 );
@@ -129,8 +129,8 @@ export const getDiamondFilter = createAsyncThunk(
 
 			return response;
 		} catch (error) {
-			console.log('Error: ', JSON.stringify(error.response.data));
-			return rejectWithValue(error.response.data);
+			console.log('Error: ', JSON.stringify(error));
+			return rejectWithValue(error);
 		}
 	}
 );

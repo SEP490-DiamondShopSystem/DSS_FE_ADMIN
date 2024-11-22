@@ -22,7 +22,6 @@ import {selectFileLoading, selectFileError} from '../../../../redux/selectors';
 export const JewelryModelUploadForm = ({jewelryModelId, visible, onClose}) => {
 	const dispatch = useDispatch();
 	const loading = useSelector(selectFileLoading);
-	const error = useSelector(selectFileError);
 
 	const [jewelryModelFiles, setJewelryModelFiles] = useState(null);
 	const [selectedSideDiamond, setSelectedSideDiamond] = useState(null);
@@ -188,7 +187,7 @@ export const JewelryModelUploadForm = ({jewelryModelId, visible, onClose}) => {
 					message.success('Images deleted successfully');
 				})
 				.catch((err) => {
-					message.error('Failed to delete images');
+					message.error(error?.data?.title || error?.detail);
 				});
 		}
 	};
@@ -203,8 +202,8 @@ export const JewelryModelUploadForm = ({jewelryModelId, visible, onClose}) => {
 		try {
 			await dispatch(uploadJewelryModelThumbnail({jewelryModelId, formFile: thumbnailFile}));
 			message.success('Thumbnail uploaded successfully');
-		} catch (err) {
-			message.error('Failed to upload thumbnail');
+		} catch (err){
+			message.error(error?.data?.title || error?.detail);
 		}
 	};
 	const handleUploadCategorizedImage = async () => {
@@ -228,7 +227,7 @@ export const JewelryModelUploadForm = ({jewelryModelId, visible, onClose}) => {
 			dispatch(fetchJewelryModelFiles(jewelryModelId)); // Refresh the data
 			setCategorizedFile(null); // Reset the categorized file after upload
 		} catch (error) {
-			message.error('Failed to upload categorized image');
+			message.error(error?.data?.title || error?.detail);
 		}
 	};
 	const handleUploadSideDiamondImage = async () => {
@@ -246,7 +245,7 @@ export const JewelryModelUploadForm = ({jewelryModelId, visible, onClose}) => {
 			message.success('Side Diamond image uploaded successfully');
 			setSideDiamondFile(null); // Reset the state after upload
 		} catch (err) {
-			message.error('Failed to upload Side Diamond image');
+			message.error(error?.data?.title || error?.detail);
 		}
 	};
 
@@ -261,7 +260,7 @@ export const JewelryModelUploadForm = ({jewelryModelId, visible, onClose}) => {
 			message.success('Metal image uploaded successfully');
 			setMetalFile(null);
 		} catch (err) {
-			message.error('Failed to upload Metal image');
+			message.error(error?.data?.title || error?.detail);
 		}
 	};
 	const handleImageUpload = async () => {
@@ -275,7 +274,7 @@ export const JewelryModelUploadForm = ({jewelryModelId, visible, onClose}) => {
 			await dispatch(uploadBaseImages({jewelryModelId, formFiles: imageFiles}));
 			message.success('Diamond images uploaded successfully');
 		} catch (err) {
-			message.error('Failed to upload diamond images');
+			message.error(error?.data?.title || error?.detail);
 		}
 	};
 

@@ -109,7 +109,7 @@ export const AddModalDiamond = ({setShowModal, showModal}) => {
 				setShowModal(false);
 				form.resetFields();
 			} else {
-				message.error('Kim tra lại thông số kim cương!');
+				message.error(error?.data?.title || error?.detail);
 			}
 		});
 		// Do something with the values, like sending them to an API

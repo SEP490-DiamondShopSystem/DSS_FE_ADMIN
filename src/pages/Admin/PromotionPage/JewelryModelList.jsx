@@ -52,7 +52,7 @@ const JewelryModelList = ({onSelectModel}) => {
 				}
 			})
 			.catch((error) => {
-				console.error('Error fetching jewelry models:', error); // Log any errors
+				message.error(error?.data?.title || error?.detail);
 			});
 	}, [dispatch, name, category, isRhodiumFinished, isEngravable, currentPage, pageSize]);
 	useEffect(() => {
