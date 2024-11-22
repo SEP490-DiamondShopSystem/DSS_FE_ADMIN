@@ -140,7 +140,7 @@ export const uploadMetalImages = createAsyncThunk(
 	async ({jewelryModelId, metalId, formFiles}, {rejectWithValue}) => {
 		try {
 			const formData = new FormData();
-			formFiles.forEach((file) => formData.append('formFiles', file));
+			formData.append('formFiles', formFiles);
 			const response = await api.post(
 				`/JewelryModelFiles/${jewelryModelId}/Files/Images/Metals/${metalId}`,
 				formData,
@@ -148,13 +148,43 @@ export const uploadMetalImages = createAsyncThunk(
 					headers: {'Content-Type': 'multipart/form-data'},
 				}
 			);
+			console.log('Uploading Metal Image:', {
+				jewelryModelId,
+				formFiles,
+				metalId,
+			});
 			return response;
 		} catch (error) {
 			return rejectWithValue(error.response || error.message);
 		}
 	}
 );
-
+// Upload Side Diamond Image
+export const uploadSideDiamondImage = createAsyncThunk(
+	'jewelryModelFiles/uploadSideDiamondImage',
+	async ({jewelryModelId, image, sideDiamondOptionId}, {rejectWithValue}) => {
+		try {
+			const formData = new FormData();
+			formData.append('image', image);
+			formData.append('sideDiamondOptionId', sideDiamondOptionId);
+			const response = await api.post(
+				`/JewelryModelFiles/${jewelryModelId}/Files/Images/SideDiamonds/Single`,
+				formData,
+				{
+					headers: {'Content-Type': 'multipart/form-data'},
+				}
+			);
+			console.log('Uploading Side Diamond Image:', {
+				jewelryModelId,
+				image,
+				sideDiamondOptionId,
+			});
+			return response;
+		} catch (error) {
+			return rejectWithValue(error.response || error.message);
+		}
+	}
+);
 // Upload Main Diamond Images
 export const uploadMainDiamondImages = createAsyncThunk(
 	'jewelryModelFiles/uploadMainDiamondImages',
@@ -177,27 +207,7 @@ export const uploadMainDiamondImages = createAsyncThunk(
 	}
 );
 
-// Upload Side Diamond Image
-export const uploadSideDiamondImage = createAsyncThunk(
-	'jewelryModelFiles/uploadSideDiamondImage',
-	async ({jewelryModelId, formFiles, sideDiamondOptionId}, {rejectWithValue}) => {
-		try {
-			const formData = new FormData();
-			formData.append('formFiles', formFiles);
-			formData.append('sideDiamondOptionId', sideDiamondOptionId);
-			const response = await api.post(
-				`/JewelryModelFiles/${jewelryModelId}/Files/Images/SideDiamonds/Single`,
-				formData,
-				{
-					headers: {'Content-Type': 'multipart/form-data'},
-				}
-			);
-			return response;
-		} catch (error) {
-			return rejectWithValue(error.response || error.message);
-		}
-	}
-);
+
 
 export const uploadCategorizedImage = createAsyncThunk(
 	'jewelryModelFiles/uploadCategorizedImage',
@@ -281,112 +291,176 @@ export const fileSlice = createSlice({
 	reducers: {},
 	extraReducers: (builder) => {
 		builder
-			// Fetch Diamond Files
-			.addCase(fetchDiamondFiles.pending, (state) => {
-				state.loading = true;
-			})
-			.addCase(fetchDiamondFiles.fulfilled, (state, action) => {
-				state.loading = false;
-				state.files = action.payload;
-			})
-			.addCase(fetchDiamondFiles.rejected, (state, action) => {
-				state.loading = false;
-				state.error = action.payload;
-			})
-			// Fetch Jewelry Model Files
-			.addCase(fetchJewelryModelFiles.pending, (state) => {
-				state.loading = true;
-			})
-			.addCase(fetchJewelryModelFiles.fulfilled, (state, action) => {
-				state.loading = false;
-				state.files = action.payload;
-			})
-			.addCase(fetchJewelryModelFiles.rejected, (state, action) => {
-				state.loading = false;
-				state.error = action.payload;
-			})
-			// Upload Diamond Thumbnail
-			.addCase(uploadDiamondThumbnail.pending, (state) => {
-				state.loading = true;
-			})
-			.addCase(uploadDiamondThumbnail.fulfilled, (state, action) => {
-				state.loading = false;
-				state.files = {...state.files, thumbnail: action.payload};
-			})
-			.addCase(uploadDiamondThumbnail.rejected, (state, action) => {
-				state.loading = false;
-				state.error = action.payload;
-			})
-			// Upload Jewelry Model Thumbnail
-			.addCase(uploadJewelryModelThumbnail.pending, (state) => {
-				state.loading = true;
-			})
-			.addCase(uploadJewelryModelThumbnail.fulfilled, (state, action) => {
-				state.loading = false;
-				state.files = {...state.files, thumbnail: action.payload};
-			})
-			.addCase(uploadJewelryModelThumbnail.rejected, (state, action) => {
-				state.loading = false;
-				state.error = action.payload;
-			})
-			// Delete Diamond Thumbnail
-			.addCase(deleteDiamondThumbnail.pending, (state) => {
-				state.loading = true;
-			})
-			.addCase(deleteDiamondThumbnail.fulfilled, (state) => {
-				state.loading = false;
-				state.files = {...state.files, thumbnail: null};
-			})
-			.addCase(deleteDiamondThumbnail.rejected, (state, action) => {
-				state.loading = false;
-				state.error = action.payload;
-			})
-			// Delete Jewelry Model Thumbnail
-			.addCase(deleteJewelryModelThumbnail.pending, (state) => {
-				state.loading = true;
-			})
-			.addCase(deleteJewelryModelThumbnail.fulfilled, (state) => {
-				state.loading = false;
-				state.files = {...state.files, thumbnail: null};
-			})
-			.addCase(deleteJewelryModelThumbnail.rejected, (state, action) => {
-				state.loading = false;
-				state.error = action.payload;
-			})
-			// Upload Certificates
-			.addCase(uploadCertificates.pending, (state) => {
-				state.loading = true;
-			})
-			.addCase(uploadCertificates.fulfilled, (state, action) => {
-				state.loading = false;
-				state.files = {...state.files, certificates: action.payload};
-			})
-			.addCase(uploadCertificates.rejected, (state, action) => {
-				state.loading = false;
-				state.error = action.payload;
-			})
-			// Delete Certificate
-			.addCase(deleteCertificate.pending, (state) => {
-				state.loading = true;
-			})
-			.addCase(deleteCertificate.fulfilled, (state) => {
-				state.loading = false;
-			})
-			.addCase(deleteCertificate.rejected, (state, action) => {
-				state.loading = false;
-				state.error = action.payload;
-			})
-			// Upload Base Images
-			.addCase(uploadBaseImages.pending, (state) => {
-				state.loading = true;
-			})
-			.addCase(uploadBaseImages.fulfilled, (state, action) => {
-				state.loading = false;
-				state.files = {...state.files, baseImages: action.payload};
-			})
-			.addCase(uploadBaseImages.rejected, (state, action) => {
-				state.loading = false;
-				state.error = action.payload;
-			});
-	},
+		  // Fetch Diamond Files
+		  .addCase(fetchDiamondFiles.pending, (state) => {
+			state.loading = true;
+		  })
+		  .addCase(fetchDiamondFiles.fulfilled, (state, action) => {
+			state.loading = false;
+			state.files = action.payload;
+		  })
+		  .addCase(fetchDiamondFiles.rejected, (state, action) => {
+			state.loading = false;
+			state.error = action.payload;
+		  })
+		  // Fetch Jewelry Model Files
+		  .addCase(fetchJewelryModelFiles.pending, (state) => {
+			state.loading = true;
+		  })
+		  .addCase(fetchJewelryModelFiles.fulfilled, (state, action) => {
+			state.loading = false;
+			state.files = action.payload;
+		  })
+		  .addCase(fetchJewelryModelFiles.rejected, (state, action) => {
+			state.loading = false;
+			state.error = action.payload;
+		  })
+		  // Upload Diamond Thumbnail
+		  .addCase(uploadDiamondThumbnail.pending, (state) => {
+			state.loading = true;
+		  })
+		  .addCase(uploadDiamondThumbnail.fulfilled, (state, action) => {
+			state.loading = false;
+			state.files = { ...state.files, thumbnail: action.payload };
+		  })
+		  .addCase(uploadDiamondThumbnail.rejected, (state, action) => {
+			state.loading = false;
+			state.error = action.payload;
+		  })
+		  // Upload Jewelry Model Thumbnail
+		  .addCase(uploadJewelryModelThumbnail.pending, (state) => {
+			state.loading = true;
+		  })
+		  .addCase(uploadJewelryModelThumbnail.fulfilled, (state, action) => {
+			state.loading = false;
+			state.files = { ...state.files, thumbnail: action.payload };
+		  })
+		  .addCase(uploadJewelryModelThumbnail.rejected, (state, action) => {
+			state.loading = false;
+			state.error = action.payload;
+		  })
+		  // Delete Diamond Thumbnail
+		  .addCase(deleteDiamondThumbnail.pending, (state) => {
+			state.loading = true;
+		  })
+		  .addCase(deleteDiamondThumbnail.fulfilled, (state) => {
+			state.loading = false;
+			state.files = { ...state.files, thumbnail: null };
+		  })
+		  .addCase(deleteDiamondThumbnail.rejected, (state, action) => {
+			state.loading = false;
+			state.error = action.payload;
+		  })
+		  // Delete Jewelry Model Thumbnail
+		  .addCase(deleteJewelryModelThumbnail.pending, (state) => {
+			state.loading = true;
+		  })
+		  .addCase(deleteJewelryModelThumbnail.fulfilled, (state) => {
+			state.loading = false;
+			state.files = { ...state.files, thumbnail: null };
+		  })
+		  .addCase(deleteJewelryModelThumbnail.rejected, (state, action) => {
+			state.loading = false;
+			state.error = action.payload;
+		  })
+		  // Upload Certificates
+		  .addCase(uploadCertificates.pending, (state) => {
+			state.loading = true;
+		  })
+		  .addCase(uploadCertificates.fulfilled, (state, action) => {
+			state.loading = false;
+			state.files = { ...state.files, certificates: action.payload };
+		  })
+		  .addCase(uploadCertificates.rejected, (state, action) => {
+			state.loading = false;
+			state.error = action.payload;
+		  })
+		  // Upload Side Diamond Image
+		  .addCase(uploadSideDiamondImage.pending, (state) => {
+			console.log('Uploading Side Diamond Image...');
+			state.loading = true;
+		  })
+		  .addCase(uploadSideDiamondImage.fulfilled, (state, action) => {
+			state.loading = false;
+			state.files = { ...state.files, sideDiamondImage: action.payload };
+		  })
+		  .addCase(uploadSideDiamondImage.rejected, (state, action) => {
+			console.log('Side Diamond Image upload failed:', action.payload);
+			state.loading = false;
+			state.error = action.payload;
+		  })
+		  // Upload Base Images
+		  .addCase(uploadBaseImages.pending, (state) => {
+			state.loading = true;
+		  })
+		  .addCase(uploadBaseImages.fulfilled, (state, action) => {
+			state.loading = false;
+			state.files = { ...state.files, baseImages: action.payload };
+		  })
+		  .addCase(uploadBaseImages.rejected, (state, action) => {
+			state.loading = false;
+			state.error = action.payload;
+		  })
+		  // Upload Metal Images
+		  .addCase(uploadMetalImages.pending, (state) => {
+			state.loading = true;
+		  })
+		  .addCase(uploadMetalImages.fulfilled, (state, action) => {
+			state.loading = false;
+			state.files = { ...state.files, metalImages: action.payload };
+		  })
+		  .addCase(uploadMetalImages.rejected, (state, action) => {
+			state.loading = false;
+			state.error = action.payload;
+		  })
+		  // Upload Main Diamond Images
+		  .addCase(uploadMainDiamondImages.pending, (state) => {
+			state.loading = true;
+		  })
+		  .addCase(uploadMainDiamondImages.fulfilled, (state, action) => {
+			state.loading = false;
+			state.files = { ...state.files, mainDiamondImages: action.payload };
+		  })
+		  .addCase(uploadMainDiamondImages.rejected, (state, action) => {
+			state.loading = false;
+			state.error = action.payload;
+		  })
+		  // Upload Categorized Image
+		  .addCase(uploadCategorizedImage.pending, (state) => {
+			state.loading = true;
+		  })
+		  .addCase(uploadCategorizedImage.fulfilled, (state, action) => {
+			state.loading = false;
+			state.files = { ...state.files, categorizedImage: action.payload };
+		  })
+		  .addCase(uploadCategorizedImage.rejected, (state, action) => {
+			state.loading = false;
+			state.error = action.payload;
+		  })
+		  // Delete Diamond Images
+		  .addCase(deleteDiamondImages.pending, (state) => {
+			state.loading = true;
+		  })
+		  .addCase(deleteDiamondImages.fulfilled, (state) => {
+			state.loading = false;
+			state.files = { ...state.files, deletedDiamondImages: true };
+		  })
+		  .addCase(deleteDiamondImages.rejected, (state, action) => {
+			state.loading = false;
+			state.error = action.payload;
+		  })
+		  // Delete Jewelry Model Images
+		  .addCase(deleteJewelryModelImages.pending, (state) => {
+			state.loading = true;
+		  })
+		  .addCase(deleteJewelryModelImages.fulfilled, (state) => {
+			state.loading = false;
+			state.files = { ...state.files, deletedJewelryModelImages: true };
+		  })
+		  .addCase(deleteJewelryModelImages.rejected, (state, action) => {
+			state.loading = false;
+			state.error = action.payload;
+		  });
+	  },
+	  
 });
