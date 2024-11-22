@@ -7,7 +7,6 @@ export const fetchDiamondFiles = createAsyncThunk(
 	async (diamondId, {rejectWithValue}) => {
 		try {
 			const response = await api.get(`/Diamond/${diamondId}/Files`);
-			console.log(response);
 			return response;
 		} catch (error) {
 			return rejectWithValue(error.response || error.message);
@@ -19,7 +18,6 @@ export const fetchJewelryModelFiles = createAsyncThunk(
 	async (jewelryModelId, {rejectWithValue}) => {
 		try {
 			const response = await api.get(`/JewelryModelFiles/${jewelryModelId}/Files`);
-			console.log(response);
 			return response;
 		} catch (error) {
 			return rejectWithValue(error.response || error.message);
@@ -36,7 +34,6 @@ export const uploadDiamondThumbnail = createAsyncThunk(
 			const response = await api.post(`/Diamond/${diamondId}/Files/Thumbnail`, formData, {
 				headers: {'Content-Type': 'multipart/form-data'},
 			});
-			console.log(response);
 			return response;
 		} catch (error) {
 			return rejectWithValue(error.response || error.message);
@@ -183,10 +180,10 @@ export const uploadMainDiamondImages = createAsyncThunk(
 // Upload Side Diamond Image
 export const uploadSideDiamondImage = createAsyncThunk(
 	'jewelryModelFiles/uploadSideDiamondImage',
-	async ({jewelryModelId, image, sideDiamondOptionId}, {rejectWithValue}) => {
+	async ({jewelryModelId, formFiles, sideDiamondOptionId}, {rejectWithValue}) => {
 		try {
 			const formData = new FormData();
-			formData.append('image', image);
+			formData.append('formFiles', formFiles);
 			formData.append('sideDiamondOptionId', sideDiamondOptionId);
 			const response = await api.post(
 				`/JewelryModelFiles/${jewelryModelId}/Files/Images/SideDiamonds/Single`,
@@ -202,15 +199,19 @@ export const uploadSideDiamondImage = createAsyncThunk(
 	}
 );
 
-// Upload Categorized Image
 export const uploadCategorizedImage = createAsyncThunk(
 	'jewelryModelFiles/uploadCategorizedImage',
 	async ({jewelryModelId, imageFile, sideDiamondOptId, metalId}, {rejectWithValue}) => {
 		try {
+			if (!imageFile) {
+				return rejectWithValue('No image file provided.');
+			}
+
 			const formData = new FormData();
 			formData.append('imageFile', imageFile);
 			formData.append('sideDiamondOptId', sideDiamondOptId);
 			formData.append('metalId', metalId);
+
 			const response = await api.post(
 				`/JewelryModelFiles/${jewelryModelId}/Files/Images/Categorize/Single`,
 				formData,

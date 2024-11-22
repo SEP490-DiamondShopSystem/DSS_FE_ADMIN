@@ -134,6 +134,7 @@ const PromotionPage = ({promotionData}) => {
 
 				form.setFieldsValue({
 					name: fetchedPromotion.Name,
+					promoCode: fetchedPromotion.PromoCode,
 					description: fetchedPromotion.Description,
 					validDate: [startDate, endDate],
 					isActive: fetchedPromotion.IsActive,
@@ -155,17 +156,32 @@ const PromotionPage = ({promotionData}) => {
 							operator: req.Operator,
 							quantity: req.Quantity || 0,
 							amount: req.Amount || 0,
-							jewelryModelID: req.ModelId ,
+							jewelryModelId: req.JewelryModelId,
+							promotionId:req.PromotionId,
 							diamondRequirementSpec: {
-								origin: diamondSpec.Origin? getTextForEnum('Origin', diamondSpec.Origin): '',
+								origin: diamondSpec.Origin
+									? getTextForEnum('Origin', diamondSpec.Origin)
+									: '',
 								caratFrom: diamondSpec.CaratFrom ?? '',
 								caratTo: diamondSpec.CaratTo ?? '',
-								clarityFrom: diamondSpec.ClarityFrom? getTextForEnum('Clarity', diamondSpec.ClarityFrom): '',
-								clarityTo: diamondSpec.ClarityTo? getTextForEnum('Clarity', diamondSpec.ClarityTo): '',
-								cutFrom: diamondSpec.CutFrom? getTextForEnum('Cut', diamondSpec.CutFrom): '',
-								cutTo: diamondSpec.CutTo? getTextForEnum('Cut', diamondSpec.CutTo): '',
-								colorFrom: diamondSpec.ColorFrom? getTextForEnum('Color', diamondSpec.ColorFrom): '',
-								colorTo: diamondSpec.ColorTo? getTextForEnum('Color', diamondSpec.ColorTo): '',
+								clarityFrom: diamondSpec.ClarityFrom
+									? getTextForEnum('Clarity', diamondSpec.ClarityFrom)
+									: '',
+								clarityTo: diamondSpec.ClarityTo
+									? getTextForEnum('Clarity', diamondSpec.ClarityTo)
+									: '',
+								cutFrom: diamondSpec.CutFrom
+									? getTextForEnum('Cut', diamondSpec.CutFrom)
+									: '',
+								cutTo: diamondSpec.CutTo
+									? getTextForEnum('Cut', diamondSpec.CutTo)
+									: '',
+								colorFrom: diamondSpec.ColorFrom
+									? getTextForEnum('Color', diamondSpec.ColorFrom)
+									: '',
+								colorTo: diamondSpec.ColorTo
+									? getTextForEnum('Color', diamondSpec.ColorTo)
+									: '',
 								shapesIDs: diamondSpec.ShapesIDs || [],
 							},
 						};
@@ -183,16 +199,32 @@ const PromotionPage = ({promotionData}) => {
 							unitValue: gift.UnitValue || 0,
 							amount: gift.Amount || 0,
 							itemId: gift.ItemId || '',
+							promotionId:gift.PromotionId,
+
 							diamondRequirementSpec: {
-								origin: diamondSpec.Origin? getTextForEnum('Origin', diamondSpec.Origin): '',
+								origin: diamondSpec.Origin
+									? getTextForEnum('Origin', diamondSpec.Origin)
+									: '',
 								caratFrom: diamondSpec.CaratFrom ?? '',
-								caratTo: diamondSpec.CaratTo ?? '',
-								clarityFrom: diamondSpec.ClarityFrom? getTextForEnum('Clarity', diamondSpec.ClarityFrom): '',
-								clarityTo: diamondSpec.ClarityTo? getTextForEnum('Clarity', diamondSpec.ClarityTo): '',
-								cutFrom: diamondSpec.CutFrom? getTextForEnum('Cut', diamondSpec.CutFrom): '',
-								cutTo: diamondSpec.CutTo? getTextForEnum('Cut', diamondSpec.CutTo): '',
-								colorFrom: diamondSpec.ColorFrom? getTextForEnum('Color', diamondSpec.ColorFrom): '',
-								colorTo: diamondSpec.ColorTo? getTextForEnum('Color', diamondSpec.ColorTo): '',
+								caratTo: diamondSpec.CaratTo ?? '', 
+								clarityFrom: diamondSpec.ClarityFrom
+									? getTextForEnum('Clarity', diamondSpec.ClarityFrom)
+									: '',
+								clarityTo: diamondSpec.ClarityTo
+									? getTextForEnum('Clarity', diamondSpec.ClarityTo)
+									: '',
+								cutFrom: diamondSpec.CutFrom
+									? getTextForEnum('Cut', diamondSpec.CutFrom)
+									: '',
+								cutTo: diamondSpec.CutTo
+									? getTextForEnum('Cut', diamondSpec.CutTo)
+									: '',
+								colorFrom: diamondSpec.ColorFrom
+									? getTextForEnum('Color', diamondSpec.ColorFrom)
+									: '',
+								colorTo: diamondSpec.ColorTo
+									? getTextForEnum('Color', diamondSpec.ColorTo)
+									: '',
 								shapesIDs: gift.DiamondRequirementSpec?.ShapesIDs || [],
 							},
 						};
@@ -284,6 +316,11 @@ const PromotionPage = ({promotionData}) => {
 			title: 'Khuyến Mãi',
 			dataIndex: 'Name',
 			key: 'name',
+		},
+		{
+			title: 'Mã Khuyến Mãi',
+			dataIndex: 'PromoCode',
+			key: 'promoCode',
 		},
 		{
 			title: 'Mô Tả',

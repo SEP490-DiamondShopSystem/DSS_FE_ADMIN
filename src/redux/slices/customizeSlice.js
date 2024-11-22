@@ -80,7 +80,7 @@ export const handleAddDiamondCustomize = createAsyncThunk(
 
 		try {
 			const response = await api.post(`/Diamond/Unavailble`, params);
-			console.log(response);
+			;
 
 			return response;
 		} catch (error) {
@@ -103,7 +103,7 @@ export const handleDeleteDiamondCustomize = createAsyncThunk(
 				},
 				data: params,
 			});
-			console.log(response);
+			;
 
 			return response;
 		} catch (error) {
@@ -120,7 +120,7 @@ export const handleChangeDiamondCustomize = createAsyncThunk(
 
 		try {
 			const response = await api.put(`/CustomizeRequest/Staff/ChangeDiamond`, params);
-			console.log(response);
+			;
 
 			return response;
 		} catch (error) {

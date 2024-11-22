@@ -9,7 +9,6 @@ export const createBlog = createAsyncThunk(
 			const response = await api.post('/Blog/Create', blogData, {
 				headers: {'Content-Type': 'multipart/form-data'},
 			});
-			console.log(response);
 			return response;
 		} catch (error) {
 			console.error('Error Response:', error.response);
@@ -26,7 +25,7 @@ export const updateBlog = createAsyncThunk(
 			const response = await api.post('/Blog/Update', blogData, {
 				headers: {'Content-Type': 'multipart/form-data'},
 			});
-			console.log(response);
+			;
 			return response;
 		} catch (error) {
 			return rejectWithValue(error.response || 'Error updating blog');
@@ -52,7 +51,7 @@ export const fetchAllBlogs = createAsyncThunk(
 			const response = await api.get('/Blog/Staff/All', {
 				params: {CurrentPage, PageSize},
 			});
-			console.log(response);
+			;
 			return response; // Adjust based on actual API response structure
 		} catch (error) {
 			const message = error.response?.message || 'Error fetching blogs';

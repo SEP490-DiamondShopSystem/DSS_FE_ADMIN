@@ -159,7 +159,7 @@ export const getOrderLog = createAsyncThunk(
 	async (orderId, {rejectWithValue}) => {
 		try {
 			const response = await api.get(`/Order/Log/${orderId}`);
-			console.log(response);
+			;
 
 			return response;
 		} catch (error) {
@@ -176,7 +176,7 @@ export const handleRedeliver = createAsyncThunk(
 			const response = await api.put(
 				`/Order/Redeliver?orderId=${orderId}&delivererId=${delivererId}`
 			);
-			console.log(response);
+			;
 
 			return response;
 		} catch (error) {

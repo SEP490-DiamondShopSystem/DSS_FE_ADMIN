@@ -56,6 +56,17 @@ const PromotionForm = ({
 									placeholder="Enter promotion name"
 								/>
 							</Form.Item>
+							<Form.Item
+								name="promoCode"
+								label="Promotion Code"
+								rules={[{required: true, message: 'Please enter a promotion code'}]}
+								className="mb-0"
+							>
+								<Input
+									className="border border-gray-300 rounded-md p-2 focus:border-blue-500"
+									placeholder="Enter promotion code"
+								/>
+							</Form.Item>
 						</Col>
 						<Col span={12}>
 							<Form.Item
@@ -88,21 +99,23 @@ const PromotionForm = ({
 
 				<Form.Item label="Additional Settings" className="mb-0">
 					<Row gutter={16}>
-						<Col span={8}>
-							<Form.Item
-								name="redemptionMode"
-								label="Redemption Mode"
-								initialValue={1} // Always set to 1
-								className="mb-0"
-							>
-								<InputNumber
-									min={1}
-									className="border border-gray-300 rounded-md"
-									placeholder="1"
-									disabled
-								/>
-							</Form.Item>
-						</Col>
+						{false && (
+							<Col span={8}>
+								<Form.Item
+									name="redemptionMode"
+									label="Redemption Mode"
+									initialValue={1} // Always set to 1
+									className="mb-0"
+								>
+									<InputNumber
+										min={1}
+										className="border border-gray-300 rounded-md"
+										placeholder="1"
+										disabled
+									/>
+								</Form.Item>
+							</Col>
+						)}
 						<Col span={8}>
 							<Form.Item
 								name="isExcludeQualifierProduct"
@@ -114,21 +127,23 @@ const PromotionForm = ({
 								<Switch className="text-blue-600" />
 							</Form.Item>
 						</Col>
-						<Col span={8}>
-							<Form.Item
-								name="priority"
-								label="Priority"
-								initialValue={1} // Always set to 1
-								className="mb-0"
-							>
-								<InputNumber
-									min={1}
-									className="border border-gray-300 rounded-md"
-									placeholder="1"
-									disabled
-								/>
-							</Form.Item>
-						</Col>
+						{false && (
+							<Col span={8}>
+								<Form.Item
+									name="priority"
+									label="Priority"
+									initialValue={1} // Always set to 1
+									className="mb-0"
+								>
+									<InputNumber
+										min={1}
+										className="border border-gray-300 rounded-md"
+										placeholder="1"
+										disabled
+									/>
+								</Form.Item>
+							</Col>
+						)}
 					</Row>
 				</Form.Item>
 

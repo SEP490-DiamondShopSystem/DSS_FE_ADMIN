@@ -57,7 +57,7 @@ export const handleCalculateLocation = createAsyncThunk(
 					'Content-Type': 'multipart/form-data',
 				},
 			});
-			console.log(response);
+			;
 
 			return response;
 		} catch (error) {

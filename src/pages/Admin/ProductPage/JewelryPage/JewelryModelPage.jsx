@@ -436,8 +436,6 @@ const JewelryModelPage = () => {
 								<option value="false">No</option>
 							</select>
 						</div>
-						{/* Pagination Controls */}
-						{/* Models List */}
 						{loading ? (
 							<p>Loading...</p>
 						) : error ? (
