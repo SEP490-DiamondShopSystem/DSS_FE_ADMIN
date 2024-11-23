@@ -14,9 +14,6 @@ export const TimeLine = ({status, orders, loading, id}) => {
 	const [filteredSteps, setFilteredSteps] = useState([]);
 	const [modalVisible, setModalVisible] = useState(false); // Modal visibility state
 
-	console.log('log', log);
-	console.log('childLogList', childLogList);
-
 	useEffect(() => {
 		if (orders) {
 			const transformedSteps = orderLogList?.map((log, index) => {
@@ -74,7 +71,6 @@ export const TimeLine = ({status, orders, loading, id}) => {
 
 	const handleViewDetailProcessing = (log) => {
 		setLog(log);
-		console.log('log ở đây', log);
 
 		setModalVisible(true);
 	};

@@ -169,11 +169,6 @@ const InformationOrder = ({orders, statusOrder, paymentStatusOrder}) => {
 
 	console.log('orders', orders);
 
-	// Giả sử fileList là danh sách các tệp đã chọn
-	// const imageFiles = fileList?.filter((file) => file?.type);
-
-	console.log('imageFiles', imageFiles);
-
 	const handleLogProcessing = () => {
 		if (!fileList || fileList.length === 0) {
 			message.error('Vui lòng chọn ít nhất một tệp hình ảnh!');
@@ -466,15 +461,123 @@ const InformationOrder = ({orders, statusOrder, paymentStatusOrder}) => {
 					<Button type="primary mt-5 w-1/2" onClick={handleLogDeliver}>
 						Gửi
 					</Button>
-					<Divider style={{borderColor: '#d9d9d9'}} />
 				</>
 			)}
+
+			<Row>
+				<Col span={24}>
+					<Title level={4}>Chi Tiết Giao Dịch</Title>
+				</Col>
+			</Row>
+			{orders?.Transactions?.map((transaction) => (
+				<>
+					<Col span={24}>
+						<Title level={5}>Thông tin giao dịch</Title>
+					</Col>
+					<Row gutter={[16, 16]} justify="center" align="middle" className="my-3">
+						<Col span={12}>
+							<Text strong style={{fontSize: 18}}>
+								Mã giao dịch
+							</Text>
+							<br />
+							<Text className="flex items-center">
+								<p className="font-semibold">{transaction?.AppTransactionCode}</p>
+							</Text>
+						</Col>
+						<Col span={12}>
+							<Text strong style={{fontSize: 18}}>
+								Mô tả giao dịch
+							</Text>
+							<br />
+							<Text>{transaction?.Description}</Text>
+						</Col>
+					</Row>
+					<Row gutter={[16, 16]} justify="center" align="middle" className="my-3">
+						<Col span={12}>
+							<Text strong style={{fontSize: 18}}>
+								Ngày thanh toán
+							</Text>
+							<br />
+							<Text>{transaction?.PayDate}</Text>
+						</Col>
+						<Col span={12}>
+							<Text strong style={{fontSize: 18}}>
+								Số tiền giao dịch
+							</Text>
+							<br />
+							<Text>{formatPrice(transaction?.TransactionAmount)}</Text>
+						</Col>
+					</Row>
+
+					<Row gutter={[16, 16]} justify="center" align="middle" className="my-3">
+						<Col span={12}>
+							<Text strong style={{fontSize: 18}}>
+								Số tiền phạt
+							</Text>
+							<br />
+							<Text>{formatPrice(transaction?.FineAmount)}</Text>
+						</Col>
+
+						<Col span={12}></Col>
+					</Row>
+					<Col span={24}>
+						<Title level={5}>Thông tin phương thức thanh toán</Title>
+					</Col>
+					<Row gutter={[16, 16]} justify="center" align="middle" className="my-3">
+						<Col span={12}>
+							<Text strong style={{fontSize: 18}}>
+								Phương thức
+							</Text>
+							<br />
+							<Text className="flex items-center">
+								<Tag color="blue" className="font-semibold">
+									{transaction?.PayMethod?.MethodName}
+								</Tag>
+							</Text>
+						</Col>
+						<Col span={12}>
+							<Text strong style={{fontSize: 18}}>
+								Mã giao dịch Paygate
+							</Text>
+							<br />
+							<Text>{transaction?.PaygateTransactionCode}</Text>
+						</Col>
+					</Row>
+					<Col span={24}>
+						<Title level={5}>Thông tin giao dịch khác</Title>
+					</Col>
+					<Row gutter={[16, 16]} justify="center" align="middle" className="my-3">
+						<Col span={12}>
+							<Text strong style={{fontSize: 18}}>
+								Loại giao dịch
+							</Text>
+							<br />
+							<Text className="flex items-center">
+								<Text
+									className={`font-semibold ${
+										transaction?.TransactionType === 1
+											? 'text-darkGreen'
+											: 'text-red'
+									}`}
+								>
+									{transaction?.TransactionType === 1
+										? 'Thanh Toán'
+										: 'Hoàn Tiền'}
+								</Text>
+							</Text>
+						</Col>
+						<Col span={12}></Col>
+					</Row>
+					<Divider style={{borderColor: '#d9d9d9'}} />
+				</>
+			))}
 
 			<Row>
 				<Col span={24}>
 					<Title level={4}>Chi Tiết Sản Phẩm</Title>
 				</Col>
 			</Row>
+
 			<div className="font-semibold w-full  py-10 bg-white rounded-lg">
 				<Table
 					dataSource={dataSource}
