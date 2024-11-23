@@ -2602,3 +2602,39 @@ video {
 		margin-bottom: 1.25rem /* 20px */;
 	}
 }
+
+@media (min-width: 640px) {
+	.sm\:w-auto {
+		width: auto;
+	}
+}
+
+@media (min-width: 640px) {
+	.sm\:ml-10 {
+		margin-left: 2.5rem /* 40px */;
+	}
+}
+
+@media (min-width: 640px) {
+	.sm\:my-5 {
+		margin-top: 1.25rem /* 20px */;
+		margin-bottom: 1.25rem /* 20px */;
+	}
+}
+
+@media (min-width: 640px) {
+	.sm\:text-base {
+		font-size: 1rem /* 16px */;
+		line-height: 1.5rem /* 24px */;
+	}
+}
+
+@media (min-width: 768px) {
+	.md\:w-full {
+		width: 100%;
+	}
+}
+
+.gap-1 {
+	gap: 0.25rem /* 4px */;
+}

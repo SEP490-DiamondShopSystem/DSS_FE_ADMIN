@@ -260,7 +260,7 @@ const OrderPage = () => {
 				active={activeStatus}
 			/>
 			<div className="flex flex-col sm:flex-row sm:items-center">
-				<Space wrap className="w-full">
+				<Space wrap className="w-full my-5">
 					<div className="flex items-center my-3 sm:my-5">
 						<p className="mr-3 text-sm sm:text-base">Tìm theo ngày:</p>
 					</div>
@@ -284,15 +284,15 @@ const OrderPage = () => {
 						/>
 					</div>
 
-					<div className="flex items-center my-3 sm:my-5 sm:ml-10 w-full sm:w-auto">
+					<div className="flex items-center my-3 sm:my-5 ml-5">
 						<p className="mr-3 text-sm sm:text-base">Tìm kiếm:</p>
-						<Search
-							className="w-full sm:w-60"
-							placeholder="Tìm theo email"
-							allowClear
-							onSearch={onSearch}
-						/>
 					</div>
+					<Search
+						className="w-full sm:w-60"
+						placeholder="Tìm theo email"
+						allowClear
+						onSearch={onSearch}
+					/>
 				</Space>
 			</div>
 
