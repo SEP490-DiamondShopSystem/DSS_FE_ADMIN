@@ -740,14 +740,15 @@ const JewelryModelPage = () => {
 																<option value="">
 																	Select Shape
 																</option>
-																{shapes.map((shape) => (
-																	<option
-																		key={shape.id}
-																		value={shape.Id}
-																	>
-																		{shape.ShapeName}
-																	</option>
-																))}
+																{Array.isArray(shapes) &&
+																	shapes.map((shape) => (
+																		<option
+																			key={shape.id}
+																			value={shape.Id}
+																		>
+																			{shape.ShapeName}
+																		</option>
+																	))}
 															</select>
 															<input
 																type="number"
@@ -838,11 +839,12 @@ const JewelryModelPage = () => {
 													className="form-input w-full p-2 border border-gray-300 rounded-md"
 												>
 													<option value="">Select Shape</option>
-													{shapes.map((shape) => (
-														<option key={shape.id} value={shape.Id}>
-															{shape.ShapeName}
-														</option>
-													))}
+													{Array.isArray(shapes) &&
+														shapes.map((shape) => (
+															<option key={shape.id} value={shape.Id}>
+																{shape.ShapeName}
+															</option>
+														))}
 												</select>
 
 												<select

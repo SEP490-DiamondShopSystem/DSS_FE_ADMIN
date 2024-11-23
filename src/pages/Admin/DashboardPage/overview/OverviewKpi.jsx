@@ -44,7 +44,7 @@ export const OverviewKpi = (props) => {
 				height="350"
 				options={chartOptionsOverride || chartOptions}
 				series={chartSeries}
-				type="bar" // Sử dụng loại biểu đồ line để hiển thị
+				type="line" // Sử dụng loại biểu đồ line để hiển thị
 			/>
 		</Card>
 	);

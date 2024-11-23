@@ -1,17 +1,18 @@
-import React, {useEffect, useRef, useState} from 'react';
-import InformationOrder from './Left/InformationOrder';
-import TimeLineOrder from './Right/TimeLineOrder';
+import React, {useEffect, useState} from 'react';
+
+import Loading from 'react-loading';
 import {useDispatch, useSelector} from 'react-redux';
+import {useParams} from 'react-router-dom';
 import {
+	getOrderChildLogSelector,
 	getOrderDetailSelector,
 	getOrderStatusDetailSelector,
 	getPaymentStatusDetailSelector,
 	LoadingOrderSelector,
 } from '../../../../redux/selectors';
-import {useLocation, useParams} from 'react-router-dom';
-import Loading from 'react-loading';
 import {getOrderDetail, getOrderLog} from '../../../../redux/slices/orderSlice';
-import debounce from 'lodash/debounce';
+import InformationOrder from './Left/InformationOrder';
+import TimeLineOrder from './Right/TimeLineOrder';
 
 const OrderDetail = () => {
 	const {id} = useParams();
@@ -20,6 +21,7 @@ const OrderDetail = () => {
 	const loading = useSelector(LoadingOrderSelector);
 	const statusOrder = useSelector(getOrderStatusDetailSelector);
 	const paymentStatusOrder = useSelector(getPaymentStatusDetailSelector);
+	const childLogOrder = useSelector(getOrderChildLogSelector);
 
 	const [orders, setOrders] = useState();
 
@@ -27,7 +29,7 @@ const OrderDetail = () => {
 		if (id && !loading) {
 			dispatch(getOrderDetail(id));
 		}
-	}, [id]);
+	}, [id, statusOrder, paymentStatusOrder, childLogOrder]);
 
 	useEffect(() => {
 		if (orderDetail && !loading) {
@@ -49,14 +51,14 @@ const OrderDetail = () => {
 				<div className="w-full flex">
 					<div className="md:w-2/3">
 						<InformationOrder
-							orders={orders}
+							orders={orderDetail}
 							statusOrder={statusOrder}
 							paymentStatusOrder={paymentStatusOrder}
 						/>
 					</div>
 					<div className="pl-10 md:w-1/3">
 						<TimeLineOrder
-							orders={orders}
+							orders={orderDetail}
 							statusOrder={statusOrder}
 							paymentStatusOrder={paymentStatusOrder}
 							loading={loading}

@@ -1,5 +1,5 @@
 import {Modal, Select, Form, Input, InputNumber, Switch, message} from 'antd';
-import React, {useEffect} from 'react';
+import React, {useEffect, useState} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
 import {getAllShapeSelector} from '../../../../../redux/selectors';
 import {getDiamondShape, handleAddDiamond} from '../../../../../redux/slices/diamondSlice';
@@ -16,6 +16,8 @@ export const AddModalDiamond = ({setShowModal, showModal}) => {
 	const dispatch = useDispatch();
 
 	const shapes = useSelector(getAllShapeSelector);
+
+	const [isLabDiamond, setIsLabDiamond] = useState();
 
 	useEffect(() => {
 		dispatch(getDiamondShape());
@@ -48,6 +50,11 @@ export const AddModalDiamond = ({setShowModal, showModal}) => {
 		return sku;
 	}
 
+	const handleSwitchChange = (checked) => {
+		setIsLabDiamond(checked);
+		console.log(checked);
+	};
+
 	const handleOk = (values) => {
 		console.log('Form Values:', values);
 		const {
@@ -55,7 +62,6 @@ export const AddModalDiamond = ({setShowModal, showModal}) => {
 			color,
 			clarity,
 			carat,
-			isLabDiamond,
 			depth,
 			fluorescence,
 			girdle,
@@ -69,12 +75,14 @@ export const AddModalDiamond = ({setShowModal, showModal}) => {
 			culet,
 		} = values;
 
+		console.log('isLabDiamond', isLabDiamond);
+
 		const diamond4c = {
 			cut,
 			color,
 			clarity,
 			carat,
-			isLabDiamond,
+			isLabDiamond: isLabDiamond,
 		};
 
 		const details = {
@@ -103,16 +111,16 @@ export const AddModalDiamond = ({setShowModal, showModal}) => {
 				certificate: 1,
 				sku: generateRandomSKU(16),
 			})
-		).then((res) => {
-			if (res.payload !== undefined) {
+		)
+			.unwrap()
+			.then((res) => {
 				message.success('Thêm Cương Kim Thành Công!');
 				setShowModal(false);
 				form.resetFields();
-			} else {
-				message.error(error?.data?.title || error?.detail);
-			}
-		});
-		// Do something with the values, like sending them to an API
+			})
+			.catch((error) => {
+				message.error(error?.data?.title || error?.title);
+			});
 	};
 
 	return (
@@ -301,7 +309,15 @@ export const AddModalDiamond = ({setShowModal, showModal}) => {
 					</Form.Item>
 
 					<Form.Item name="priceOffset" label="Giá Offset" className="w-1/3">
-						<InputNumber min={0} placeholder="Nhập Giá Offset" className="w-full" />
+						<InputNumber
+							min={0.0}
+							step={0.1}
+							placeholder="Nhập Giá Offset"
+							className="w-full"
+							defaultValue={0.0}
+							formatter={(value) => `${value || 0.0}`}
+							parser={(value) => parseFloat(value || 0.0)}
+						/>
 					</Form.Item>
 				</div>
 				<div>
@@ -312,7 +328,11 @@ export const AddModalDiamond = ({setShowModal, showModal}) => {
 						className="w-1/3 flex items-center"
 					>
 						<span>Tự Nhiên</span>
-						<Switch className="mx-5" />
+						<Switch
+							className="mx-5"
+							checked={isLabDiamond}
+							onChange={handleSwitchChange}
+						/>
 						<span>Nhân Tạo</span>
 					</Form.Item>
 				</div>

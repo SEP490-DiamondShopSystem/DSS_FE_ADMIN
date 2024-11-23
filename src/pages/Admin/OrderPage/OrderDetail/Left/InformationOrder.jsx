@@ -1,7 +1,19 @@
 import React, {useEffect, useState} from 'react';
 
 import {ArrowLeftOutlined, PlusOutlined, UploadOutlined} from '@ant-design/icons';
-import {Button, Col, Divider, Input, Modal, Row, Table, Tag, Typography, Upload} from 'antd';
+import {
+	Button,
+	Col,
+	Divider,
+	Input,
+	message,
+	Modal,
+	Row,
+	Table,
+	Tag,
+	Typography,
+	Upload,
+} from 'antd';
 import {useDispatch, useSelector} from 'react-redux';
 import {useNavigate} from 'react-router-dom';
 import {
@@ -11,6 +23,10 @@ import {
 	getOrderStatusTag,
 } from '../../../../../utils';
 import {LoadingOrderSelector} from '../../../../../redux/selectors';
+import {
+	handleOrderLogDeliver,
+	handleOrderLogProcessing,
+} from '../../../../../redux/slices/orderSlice';
 
 const {Title, Text} = Typography;
 
@@ -29,11 +45,10 @@ const InformationOrder = ({orders, statusOrder, paymentStatusOrder}) => {
 	const [previewImage, setPreviewImage] = useState('');
 	const [previewTitle, setPreviewTitle] = useState('');
 	const [fileList, setFileList] = useState([]);
+	const [messageProcessing, setMessageProcessing] = useState();
+	const [imageFiles, setImageFiles] = useState([]);
 
 	console.log('fileList', fileList);
-	console.log('previewTitle', previewTitle);
-	console.log('previewImage', previewImage);
-	console.log('previewOpen', previewOpen);
 
 	useEffect(() => {
 		if (orders) {
@@ -43,6 +58,7 @@ const InformationOrder = ({orders, statusOrder, paymentStatusOrder}) => {
 					orderCode: orders?.OrderCode,
 					orderTime: orders?.CreatedDate,
 					price: formatPrice(orders?.TotalPrice),
+					shippingPrice: formatPrice(orders?.ShippingFee),
 					status: getOrderStatus(orders?.Status),
 					paymentStatus: orders?.PaymentStatus,
 					products: orders?.Items?.map((item) => ({
@@ -51,9 +67,11 @@ const InformationOrder = ({orders, statusOrder, paymentStatusOrder}) => {
 						productName: item?.Jewelry?.Model?.Name || item?.Diamond?.Title,
 						productPrice: formatPrice(item?.PurchasedPrice),
 					})),
-					UserRankAmountSaved: formatPrice(orders?.UserRankAmountSaved),
+					UserRankAmountSaved: orders?.UserRankAmountSaved,
+					...orders,
 				},
 			];
+
 			setDataSource(newDataSource);
 		}
 	}, [orders]);
@@ -62,18 +80,36 @@ const InformationOrder = ({orders, statusOrder, paymentStatusOrder}) => {
 		{
 			title: 'Mã đơn hàng',
 			dataIndex: 'orderCode',
-			align: 'center',
+			// align: 'center',
 		},
 		{
 			title: 'Thời gian đặt hàng',
 			dataIndex: 'orderTime',
-			align: 'center',
+			// align: 'center',
 		},
 
 		{
-			title: 'Tổng Giá',
+			title: 'Phí phát sinh',
 			dataIndex: 'price',
-			align: 'center',
+			// align: 'center',
+			render: (_, record) => (
+				<div className="flex flex-col">
+					<div>Phí giao hàng: {record.shippingPrice}</div>
+					{record?.UserRankAmountSaved !== 0 && (
+						<div>Khách hàng thân thiết: -{formatPrice(record.UserRankAmountSaved)}</div>
+					)}
+				</div>
+			),
+		},
+		{
+			title: 'Tổng giá',
+			dataIndex: 'price',
+			// align: 'center',
+			render: (_, record) => (
+				<div className="flex flex-col">
+					<div className="">{record.price}</div>
+				</div>
+			),
 		},
 	];
 
@@ -110,7 +146,7 @@ const InformationOrder = ({orders, statusOrder, paymentStatusOrder}) => {
 	};
 
 	const handleDescription = (e) => {
-		console.log(e.target.value);
+		setMessageProcessing(e.target.value);
 	};
 
 	const handleCancel = () => setPreviewOpen(false);
@@ -123,9 +159,63 @@ const InformationOrder = ({orders, statusOrder, paymentStatusOrder}) => {
 		setPreviewTitle(file.name || file.url.substring(file.url.lastIndexOf('/') + 1));
 	};
 
-	const handleChange = ({fileList: newFileList}) => setFileList(newFileList);
+	const handleChange = ({fileList: newFileList}) => {
+		if (newFileList.length > 3) {
+			message.warning('Bạn chỉ có thể tải tối đa 3 hình ảnh!');
+			return;
+		}
+		setFileList(newFileList);
+	};
 
 	console.log('orders', orders);
+
+	const handleLogProcessing = () => {
+		if (!fileList || fileList.length === 0) {
+			message.error('Vui lòng chọn ít nhất một tệp hình ảnh!');
+			return;
+		}
+
+		dispatch(
+			handleOrderLogProcessing({
+				orderId: orders?.Id,
+				message: messageProcessing,
+				images: imageFiles,
+			})
+		)
+			.unwrap()
+			.then(() => {
+				message.success('Đã gửi thành công!');
+			})
+			.catch((error) => {
+				message.error(
+					error?.data?.title || error?.title || 'Đã xảy ra lỗi, vui lòng thử lại.'
+				);
+			});
+	};
+
+	const handleLogDeliver = () => {
+		if (!fileList || fileList.length === 0) {
+			message.error('Vui lòng chọn ít nhất một tệp hình ảnh!');
+			return;
+		}
+
+		dispatch(
+			handleOrderLogDeliver({
+				orderId: orders?.Id,
+				message: messageProcessing,
+				images: imageFiles,
+			})
+		)
+			.unwrap()
+			.then(() => {
+				message.success('Đã gửi thành công!');
+			})
+			.catch((error) => {
+				message.error(
+					error?.data?.title || error?.title || 'Đã xảy ra lỗi, vui lòng thử lại.'
+				);
+			});
+	};
 
 	return (
 		<div>
@@ -282,12 +372,22 @@ const InformationOrder = ({orders, statusOrder, paymentStatusOrder}) => {
 							</Text>
 							<br />
 							<Upload
+								multiple
 								action="/upload.do" // URL tải lên hoặc để trống nếu xử lý tệp cục bộ
+								accept="image/*"
 								listType="picture-card"
 								fileList={fileList}
 								onPreview={handlePreview}
 								onChange={handleChange}
-								beforeUpload={() => false}
+								beforeUpload={(file) => {
+									setFileList((prevFileList) => [...prevFileList, file]);
+									return false;
+								}}
+								onRemove={(file) => {
+									setFileList((prevFileList) =>
+										prevFileList.filter((item) => item.uid !== file.uid)
+									);
+								}}
 								className="sm:w-full"
 							>
 								{fileList.length >= 3 ? null : (
@@ -301,15 +401,183 @@ const InformationOrder = ({orders, statusOrder, paymentStatusOrder}) => {
 							</Upload>
 						</Col>
 					</div>
+					<Button type="primary mt-5 w-1/2" onClick={handleLogProcessing}>
+						Gửi
+					</Button>
 					<Divider style={{borderColor: '#d9d9d9'}} />
 				</>
 			)}
+			{statusOrder === 6 && (
+				<>
+					<Row>
+						<Col span={24}>
+							<Title level={4}>Cập Nhật Giao Hàng</Title>
+						</Col>
+					</Row>
+					<div>
+						<Col span={12}>
+							<Text strong style={{fontSize: 18}}>
+								Mô Tả
+							</Text>
+							<br />
+							<Text className="">
+								<Input.TextArea onChange={handleDescription} />
+							</Text>
+						</Col>
+						<Col span={12} className="sm:w-full mt-5">
+							<Text strong style={{fontSize: 18}} className="sm:text-sm">
+								Hình Ảnh
+							</Text>
+							<br />
+							<Upload
+								multiple
+								action="/upload.do"
+								accept="image/*"
+								listType="picture-card"
+								fileList={fileList}
+								onPreview={handlePreview}
+								onChange={handleChange}
+								beforeUpload={(file) => {
+									setFileList((prevFileList) => [...prevFileList, file]);
+									return false;
+								}}
+								onRemove={(file) => {
+									setFileList((prevFileList) =>
+										prevFileList.filter((item) => item.uid !== file.uid)
+									);
+								}}
+							>
+								{fileList.length >= 3 ? null : (
+									<div>
+										<PlusOutlined />
+										<div style={{marginTop: 8}} className="text-sm">
+											Upload
+										</div>
+									</div>
+								)}
+							</Upload>
+						</Col>
+					</div>
+					<Button type="primary mt-5 w-1/2" onClick={handleLogDeliver}>
+						Gửi
+					</Button>
+				</>
+			)}
+
+			<Row>
+				<Col span={24}>
+					<Title level={4}>Chi Tiết Giao Dịch</Title>
+				</Col>
+			</Row>
+			{orders?.Transactions?.map((transaction) => (
+				<>
+					<Col span={24}>
+						<Title level={5}>Thông tin giao dịch</Title>
+					</Col>
+					<Row gutter={[16, 16]} justify="center" align="middle" className="my-3">
+						<Col span={12}>
+							<Text strong style={{fontSize: 18}}>
+								Mã giao dịch
+							</Text>
+							<br />
+							<Text className="flex items-center">
+								<p className="font-semibold">{transaction?.AppTransactionCode}</p>
+							</Text>
+						</Col>
+						<Col span={12}>
+							<Text strong style={{fontSize: 18}}>
+								Mô tả giao dịch
+							</Text>
+							<br />
+							<Text>{transaction?.Description}</Text>
+						</Col>
+					</Row>
+					<Row gutter={[16, 16]} justify="center" align="middle" className="my-3">
+						<Col span={12}>
+							<Text strong style={{fontSize: 18}}>
+								Ngày thanh toán
+							</Text>
+							<br />
+							<Text>{transaction?.PayDate}</Text>
+						</Col>
+						<Col span={12}>
+							<Text strong style={{fontSize: 18}}>
+								Số tiền giao dịch
+							</Text>
+							<br />
+							<Text>{formatPrice(transaction?.TransactionAmount)}</Text>
+						</Col>
+					</Row>
+
+					<Row gutter={[16, 16]} justify="center" align="middle" className="my-3">
+						<Col span={12}>
+							<Text strong style={{fontSize: 18}}>
+								Số tiền phạt
+							</Text>
+							<br />
+							<Text>{formatPrice(transaction?.FineAmount)}</Text>
+						</Col>
+
+						<Col span={12}></Col>
+					</Row>
+					<Col span={24}>
+						<Title level={5}>Thông tin phương thức thanh toán</Title>
+					</Col>
+					<Row gutter={[16, 16]} justify="center" align="middle" className="my-3">
+						<Col span={12}>
+							<Text strong style={{fontSize: 18}}>
+								Phương thức
+							</Text>
+							<br />
+							<Text className="flex items-center">
+								<Tag color="blue" className="font-semibold">
+									{transaction?.PayMethod?.MethodName}
+								</Tag>
+							</Text>
+						</Col>
+						<Col span={12}>
+							<Text strong style={{fontSize: 18}}>
+								Mã giao dịch Paygate
+							</Text>
+							<br />
+							<Text>{transaction?.PaygateTransactionCode}</Text>
+						</Col>
+					</Row>
+					<Col span={24}>
+						<Title level={5}>Thông tin giao dịch khác</Title>
+					</Col>
+					<Row gutter={[16, 16]} justify="center" align="middle" className="my-3">
+						<Col span={12}>
+							<Text strong style={{fontSize: 18}}>
+								Loại giao dịch
+							</Text>
+							<br />
+							<Text className="flex items-center">
+								<Text
+									className={`font-semibold ${
+										transaction?.TransactionType === 1
+											? 'text-darkGreen'
+											: 'text-red'
+									}`}
+								>
+									{transaction?.TransactionType === 1
+										? 'Thanh Toán'
+										: 'Hoàn Tiền'}
+								</Text>
+							</Text>
+						</Col>
+						<Col span={12}></Col>
+					</Row>
+					<Divider style={{borderColor: '#d9d9d9'}} />
+				</>
+			))}
 
 			<Row>
 				<Col span={24}>
 					<Title level={4}>Chi Tiết Sản Phẩm</Title>
 				</Col>
 			</Row>
+
 			<div className="font-semibold w-full  py-10 bg-white rounded-lg">
 				<Table
 					dataSource={dataSource}

@@ -8,7 +8,6 @@ import Loading from '../../../../../components/Loading';
 import {
 	getAllDelivererSelector,
 	getAllDeliverySelector,
-	getAllUserSelector,
 	GetUserDetailSelector,
 } from '../../../../../redux/selectors';
 import {
@@ -45,10 +44,7 @@ const TimeLineOrder = ({orders, loading, statusOrder, paymentStatusOrder, id}) =
 	const userDetail = useSelector(GetUserDetailSelector);
 	const deliveryList = useSelector(getAllDeliverySelector);
 	const delivererList = useSelector(getAllDelivererSelector);
-	const userDeliverer = useSelector(getAllUserSelector);
-	// const orderLogList = useSelector(getOrderLogsDetailSelector);
 
-	// const [orderLogs, setOrderLogs] = useState([]);
 	const [currentStep, setCurrentStep] = useState(0);
 	const [status, setStatus] = useState();
 	const [userRoleManager, setUserRoleManager] = useState(false);
@@ -61,31 +57,8 @@ const TimeLineOrder = ({orders, loading, statusOrder, paymentStatusOrder, id}) =
 	const [deliverer, setDeliverer] = useState([]);
 
 	useEffect(() => {
-		dispatch(getAllUser({roleId: '44'}));
-	}, []);
-
-	useEffect(() => {
 		dispatch(getDelivererAccount());
-	}, []);
-
-	console.log('deliverer', deliverer);
-	console.log('userRoleDeliverer', userRoleDeliverer);
-	console.log('userRoleManager', userRoleManager);
-	console.log('userRoleStaff', userRoleStaff);
-
-	// useEffect(() => {
-	// 	if (orderLogList) {
-	// 		setOrderLogs(orderLogList);
-	// 	}
-	// }, [orderLogList]);
-
-	useEffect(() => {
-		if (orders?.Id) {
-			const savedIsAssigned =
-				JSON.parse(localStorage.getItem(`isAssigned_${orders.Id}`)) || false;
-			setIsAssigned(savedIsAssigned);
-		}
-	}, [orders]);
+	}, [dispatch]);
 
 	useEffect(() => {
 		if (userDetail?.Roles) {
@@ -98,19 +71,6 @@ const TimeLineOrder = ({orders, loading, statusOrder, paymentStatusOrder, id}) =
 			setUserRoleDeliverer(isDeliverer);
 		}
 	}, [userDetail]);
-
-	useEffect(() => {
-		if (deliveryList) {
-			setDeliveries(
-				deliveryList?.map((delivery) => ({
-					Id: delivery.Id,
-					DeliveryDate: convertToVietnamDate(delivery.DeliveryDate),
-					DelivererId: delivery.DelivererId,
-					DeliveryMethod: delivery.DeliveryMethod,
-				}))
-			);
-		}
-	}, [deliveryList]);
 
 	useEffect(() => {
 		if (delivererList) {
@@ -131,6 +91,7 @@ const TimeLineOrder = ({orders, loading, statusOrder, paymentStatusOrder, id}) =
 			content: 'Bạn có chắc chắn muốn tiếp tục?',
 			okText: 'Xác nhận',
 			cancelText: 'Hủy',
+			okType: 'primary',
 			onOk: handleAcceptStatus,
 		});
 	};
@@ -150,6 +111,7 @@ const TimeLineOrder = ({orders, loading, statusOrder, paymentStatusOrder, id}) =
 			content: 'Bạn có chắc chắn muốn tiếp tục?',
 			okText: 'Xác nhận',
 			cancelText: 'Hủy',
+			okType: 'primary',
 			onOk: handlePreparedStatus,
 		});
 	};
@@ -169,6 +131,7 @@ const TimeLineOrder = ({orders, loading, statusOrder, paymentStatusOrder, id}) =
 			content: 'Bạn có chắc chắn muốn tiếp tục?',
 			okText: 'Xác nhận',
 			cancelText: 'Hủy',
+			okType: 'primary',
 			onOk: handleAssignDelivererStatus,
 		});
 	};
@@ -192,6 +155,7 @@ const TimeLineOrder = ({orders, loading, statusOrder, paymentStatusOrder, id}) =
 			content: 'Bạn có chắc chắn muốn tiếp tục?',
 			okText: 'Xác Nhận',
 			cancelText: 'Hủy',
+			okType: 'primary',
 			onOk: handleDeliveringStatus,
 		});
 	};
@@ -210,6 +174,7 @@ const TimeLineOrder = ({orders, loading, statusOrder, paymentStatusOrder, id}) =
 			title: 'Xác nhận giao hàng thành công đơn đặt hàng này',
 			content: 'Bạn có chắc chắn muốn tiếp tục?',
 			okText: 'Xác nhận',
+			okType: 'primary',
 			cancelText: 'Hủy',
 			onOk: handleDeliveredStatus,
 		});
@@ -219,7 +184,7 @@ const TimeLineOrder = ({orders, loading, statusOrder, paymentStatusOrder, id}) =
 		const res = await dispatch(handleOrder(orders.Id));
 		if (res.payload !== undefined) {
 			message.success('Hoàn tất giao hàng!');
-		} else{
+		} else {
 			message.error(error?.data?.title || error?.detail);
 		}
 	};
@@ -230,6 +195,7 @@ const TimeLineOrder = ({orders, loading, statusOrder, paymentStatusOrder, id}) =
 			content: 'Bạn có chắc chắn muốn tiếp tục?',
 			okText: 'Xác nhận',
 			cancelText: 'Hủy',
+			okType: 'danger',
 			onOk: handleFailedDeliveredStatus,
 		});
 	};
@@ -266,6 +232,7 @@ const TimeLineOrder = ({orders, loading, statusOrder, paymentStatusOrder, id}) =
 			content: 'Bạn có chắc chắn muốn tiếp tục?',
 			okText: 'Xác nhận',
 			cancelText: 'Hủy',
+			okType: 'primary',
 			onOk: handleRedeliverStatus,
 		});
 	};
@@ -285,7 +252,6 @@ const TimeLineOrder = ({orders, loading, statusOrder, paymentStatusOrder, id}) =
 
 	const submitCancelOrder = async (values) => {
 		const res = await dispatch(handleOrderReject({orderId: orders.Id, reason: values.reason}));
-		console.log('err', res.payload);
 
 		if (res.payload !== undefined) {
 			message.success('Từ chối thành công!');
@@ -296,7 +262,7 @@ const TimeLineOrder = ({orders, loading, statusOrder, paymentStatusOrder, id}) =
 		setIsCancelModalVisible(false);
 	};
 
-	console.log('isAssigned', isAssigned);
+	console.log('orders', orders);
 
 	return (
 		<div>
@@ -312,7 +278,7 @@ const TimeLineOrder = ({orders, loading, statusOrder, paymentStatusOrder, id}) =
 									<ClockCircleOutlined /> {ORDER_STATUS_TEXTS.Pending}
 								</p>
 							</div>
-							{userRoleManager ? (
+							{userRoleManager || userRoleManager ? (
 								<div className="flex justify-around">
 									<Button
 										type="text"
@@ -328,7 +294,7 @@ const TimeLineOrder = ({orders, loading, statusOrder, paymentStatusOrder, id}) =
 										onClick={handleCancelOrder}
 										disabled={loading}
 									>
-										Hủy bỏ
+										Hủy đơn
 									</Button>
 								</div>
 							) : (
@@ -411,11 +377,19 @@ const TimeLineOrder = ({orders, loading, statusOrder, paymentStatusOrder, id}) =
 							<div className="flex justify-around">
 								<Button
 									type="text"
-									className="bg-primary font-semibold w-full rounded-full"
+									className="bg-primary font-semibold rounded-full"
 									onClick={handlePrepared}
 									disabled={loading}
 								>
 									Chuẩn bị hàng hoàn tất
+								</Button>
+								<Button
+									type="text"
+									className="bg-red font-semibold w-32 rounded-full"
+									onClick={handleCancelOrder}
+									disabled={loading}
+								>
+									Hủy đơn
 								</Button>
 							</div>
 						</div>
@@ -429,7 +403,7 @@ const TimeLineOrder = ({orders, loading, statusOrder, paymentStatusOrder, id}) =
 									<CheckCircleOutlined /> {ORDER_STATUS_TEXTS.Prepared}
 								</p>
 							</div>
-							{Array.isArray(orders) && orders?.DelivererId ? (
+							{orders && orders?.DelivererId === null ? (
 								<>
 									<div className="flex mt-2">
 										<p className="text-red mr-1">*</p>
@@ -545,7 +519,7 @@ const TimeLineOrder = ({orders, loading, statusOrder, paymentStatusOrder, id}) =
 						</div>
 					)}
 
-					{status === 'Delivery_Failed' && userRoleManager && userRoleStaff && (
+					{status === 'Delivery_Failed' && userRoleStaff && (
 						<div className="border rounded-lg border-primary bg-tintWhite p-5 mb-5">
 							<div className="flex items-center mb-5" style={{fontSize: 16}}>
 								<p className="font-semibold">Trạng thái đơn hàng:</p>
@@ -553,50 +527,50 @@ const TimeLineOrder = ({orders, loading, statusOrder, paymentStatusOrder, id}) =
 									<CloseCircleOutlined /> {ORDER_STATUS_TEXTS.Delivery_Failed}
 								</p>
 							</div>
-							{userRoleManager && (
-								<>
-									<div className="flex mt-2">
-										<p className="text-red mr-1">*</p>
-										<p>Chọn giao hàng</p>
-									</div>
-									<Select
-										defaultValue=""
-										className="w-full mb-5"
-										onChange={handleChange}
+
+							<>
+								<div className="flex mt-2">
+									<p className="text-red mr-1">*</p>
+									<p>Chọn giao hàng</p>
+								</div>
+								<Select
+									defaultValue=""
+									className="w-full mb-5"
+									onChange={handleChange}
+								>
+									{deliverer &&
+										deliverer?.map((user) => (
+											<Option key={user?.Account?.Id}>
+												<Space>
+													{user?.Account?.Email}{' '}
+													<div>
+														<CircleIcon
+															style={{
+																color: user?.IsFree
+																	? 'green'
+																	: 'red',
+																fontSize: '16px',
+															}}
+														/>
+													</div>
+													{user?.BusyMessage}
+												</Space>
+											</Option>
+										))}
+								</Select>
+								<div className="flex justify-around">
+									<Button
+										type="text"
+										className="bg-primary font-semibold w-full rounded-full"
+										onClick={handleRedeliverBtn}
 									>
-										{deliverer &&
-											deliverer?.map((user) => (
-												<Option key={user?.Account?.Id}>
-													<Space>
-														{user?.Account?.Email}{' '}
-														<div>
-															<CircleIcon
-																style={{
-																	color: user?.IsFree
-																		? 'green'
-																		: 'red',
-																	fontSize: '16px',
-																}}
-															/>
-														</div>
-														{user?.BusyMessage}
-													</Space>
-												</Option>
-											))}
-									</Select>
-									<div className="flex justify-around">
-										<Button
-											type="text"
-											className="bg-primary font-semibold w-full rounded-full"
-											onClick={handleRedeliverBtn}
-										>
-											Giao Lại
-										</Button>
-									</div>
-								</>
-							)}
+										Giao Lại
+									</Button>
+								</div>
+							</>
 						</div>
 					)}
+
 					{status === 'Delivery_Failed' && userRoleDeliverer && (
 						<div className="border rounded-lg border-primary bg-tintWhite p-5 mb-5">
 							<div className="flex items-center" style={{fontSize: 16}}>
