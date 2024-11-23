@@ -22,7 +22,7 @@ export const updateBlog = createAsyncThunk(
 	'blog/updateBlog',
 	async (blogData, {rejectWithValue}) => {
 		try {
-			const response = await api.post('/Blog/Update', blogData, {
+			const response = await api.put('/Blog/Update', blogData, {
 				headers: {'Content-Type': 'multipart/form-data'},
 			});
 			return response;
@@ -31,14 +31,17 @@ export const updateBlog = createAsyncThunk(
 		}
 	}
 );
-
 // Async thunk for removing a blog
 export const removeBlog = createAsyncThunk('blog/removeBlog', async (blogId, {rejectWithValue}) => {
 	try {
-		const response = await api.post(`/Blog/Remove?BlogId=${blogId}`);
-		return blogId; // Return the blogId to remove from state
+		// Make a DELETE request with the blogId as a query parameter
+		const response = await api.delete(`/Blog/Remove`, {params: {BlogId: blogId}});
+
+		// Assuming the response is successful, return the blogId to remove it from the state
+		return blogId;
 	} catch (error) {
-		return rejectWithValue(error || 'Error removing blog');
+		// Handle errors and pass the error message to rejectWithValue for better error management
+		return rejectWithValue(error.response?.data?.message || 'Error removing blog');
 	}
 });
 

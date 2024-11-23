@@ -596,9 +596,9 @@ export const PromoReqForm = ({form, shapes, Option}) => {
 															<div className="flex items-center gap-2">
 																<Input
 																	readOnly
-																	value={selectedModel?.id}
+																	value={selectedModel?.Id}
 																	placeholder={
-																		selectedModel?.name
+																		selectedModel?.Name
 																	}
 																/>
 																<Button

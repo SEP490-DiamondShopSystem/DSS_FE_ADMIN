@@ -81,8 +81,17 @@ const JewelryModelList = ({onSelectModel}) => {
 	};
 	const handleSelectModel = () => {
 		if (onSelectModel && selectedModel) {
-			console.log('Selected Model:', selectedModel.Id, selectedModel.Name); // Log the model's details to the console
-			onSelectModel({id: selectedModel.Id, name: selectedModel.Name}); // Pass selected model ID and Name to parent
+			onSelectModel({
+				Id: selectedModel.Id,
+				Name: selectedModel.Name,
+				SizeMetals: selectedModel.SizeMetals,
+				MetalSupported: selectedModel.MetalSupported,
+				MainDiamonds: selectedModel.MainDiamonds,
+				MainDiamondCount: selectedModel.MainDiamondCount,
+				ModelCode: selectedModel.ModelCode,
+				SideDiamondOptionCount: selectedModel.SideDiamondOptionCount,
+				SideDiamonds: selectedModel.SideDiamonds,
+			}); // Pass selected model ID and Name to parent
 			setShowModal(false); // Close modal after selection
 		}
 	};
