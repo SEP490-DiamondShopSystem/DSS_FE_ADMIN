@@ -1,7 +1,19 @@
 import React, {useEffect, useState} from 'react';
 
 import {ArrowLeftOutlined, PlusOutlined, UploadOutlined} from '@ant-design/icons';
-import {Button, Col, Divider, Input, Modal, Row, Table, Tag, Typography, Upload} from 'antd';
+import {
+	Button,
+	Col,
+	Divider,
+	Input,
+	message,
+	Modal,
+	Row,
+	Table,
+	Tag,
+	Typography,
+	Upload,
+} from 'antd';
 import {useDispatch, useSelector} from 'react-redux';
 import {useNavigate} from 'react-router-dom';
 import {
@@ -11,6 +23,7 @@ import {
 	getOrderStatusTag,
 } from '../../../../../utils';
 import {LoadingOrderSelector} from '../../../../../redux/selectors';
+import {handleOrderLogProcessing} from '../../../../../redux/slices/orderSlice';
 
 const {Title, Text} = Typography;
 
@@ -29,8 +42,10 @@ const InformationOrder = ({orders, statusOrder, paymentStatusOrder}) => {
 	const [previewImage, setPreviewImage] = useState('');
 	const [previewTitle, setPreviewTitle] = useState('');
 	const [fileList, setFileList] = useState([]);
+	const [messageProcessing, setMessageProcessing] = useState();
+	const [imageFiles, setImageFiles] = useState([]);
 
-	console.log('orders', orders);
+	console.log('fileList', fileList);
 
 	useEffect(() => {
 		if (orders) {
@@ -128,7 +143,7 @@ const InformationOrder = ({orders, statusOrder, paymentStatusOrder}) => {
 	};
 
 	const handleDescription = (e) => {
-		console.log(e.target.value);
+		setMessageProcessing(e.target.value);
 	};
 
 	const handleCancel = () => setPreviewOpen(false);
@@ -141,9 +156,44 @@ const InformationOrder = ({orders, statusOrder, paymentStatusOrder}) => {
 		setPreviewTitle(file.name || file.url.substring(file.url.lastIndexOf('/') + 1));
 	};
 
-	const handleChange = ({fileList: newFileList}) => setFileList(newFileList);
+	const handleChange = ({fileList: newFileList}) => {
+		if (newFileList.length > 3) {
+			message.warning('Bạn chỉ có thể tải tối đa 3 hình ảnh!');
+			return;
+		}
+		setFileList(newFileList);
+	};
 
 	console.log('orders', orders);
+
+	// Giả sử fileList là danh sách các tệp đã chọn
+	// const imageFiles = fileList?.filter((file) => file?.type);
+
+	console.log('imageFiles', imageFiles);
+
+	const handleLogProcessing = () => {
+		if (!fileList || fileList.length === 0) {
+			message.error('Vui lòng chọn ít nhất một tệp hình ảnh!');
+			return;
+		}
+
+		dispatch(
+			handleOrderLogProcessing({
+				orderId: orders?.Id,
+				message: messageProcessing,
+				images: imageFiles,
+			})
+		)
+			.unwrap()
+			.then(() => {
+				message.success('Đã gửi thành công!');
+			})
+			.catch((error) => {
+				message.error(
+					error?.data?.title || error?.title || 'Đã xảy ra lỗi, vui lòng thử lại.'
+				);
+			});
+	};
 
 	return (
 		<div>
@@ -300,12 +350,17 @@ const InformationOrder = ({orders, statusOrder, paymentStatusOrder}) => {
 							</Text>
 							<br />
 							<Upload
+								multiple
 								action="/upload.do" // URL tải lên hoặc để trống nếu xử lý tệp cục bộ
+								accept="image/*"
 								listType="picture-card"
 								fileList={fileList}
 								onPreview={handlePreview}
 								onChange={handleChange}
-								beforeUpload={() => false}
+								beforeUpload={(file) => {
+									setImageFiles((fileList) => [...fileList, file]);
+									return false;
+								}}
 								className="sm:w-full"
 							>
 								{fileList.length >= 3 ? null : (
@@ -319,6 +374,9 @@ const InformationOrder = ({orders, statusOrder, paymentStatusOrder}) => {
 							</Upload>
 						</Col>
 					</div>
+					<Button type="primary" onClick={handleLogProcessing}>
+						Gửi
+					</Button>
 					<Divider style={{borderColor: '#d9d9d9'}} />
 				</>
 			)}

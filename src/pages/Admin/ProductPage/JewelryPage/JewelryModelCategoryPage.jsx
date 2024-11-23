@@ -43,7 +43,7 @@ const JewelryModelCategoryPage = () => {
         parentCategoryId: '',
       }); // Reset form after submit
     } else {
-      alert('Please fill in the name and description');
+      message.error(error?.data?.title || error?.detail);
     }
   };
   

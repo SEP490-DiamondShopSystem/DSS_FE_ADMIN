@@ -128,30 +128,39 @@ export const handleOrderAssignDeliverer = createAsyncThunk(
 	}
 );
 
-// export const handleOrderComplete = createAsyncThunk(
-// 	'orderSlice/handleOrderComplete',
-// 	async (id, {rejectWithValue}) => {
-// 		try {
-// 			const data = await api.put(`/Order/Complete?orderId=${id}`);
-// 			return data;
-// 		} catch (error) {
-// 			console.error(error);
-// 			return rejectWithValue(error);
-// 		}
-// 	}
-// );
+export const handleOrderLogProcessing = createAsyncThunk(
+	'orderSlice/handleOrderLogProcessing',
+	async ({orderId, message, images}, {rejectWithValue}) => {
+		try {
+			const formData = new FormData();
+
+			images.forEach((file) => formData.append('images', file));
+
+			formData.append('message', message);
+
+			const data = await api.post(`/Order/Log/${orderId}/Processing`, formData, {
+				headers: {
+					'Content-Type': 'multipart/form-data',
+				},
+			});
+
+			return data;
+		} catch (error) {
+			console.error(error);
+			return rejectWithValue(error);
+		}
+	}
+);
 
 export const getOrderLog = createAsyncThunk(
 	'orderSlice/getOrderLog',
 	async (orderId, {rejectWithValue}) => {
 		try {
 			const response = await api.get(`/Order/Log/${orderId}`);
-			console.log(response);
-
 			return response;
 		} catch (error) {
-			console.log('Error: ', JSON.stringify(error.response.data));
-			return rejectWithValue(error.response.data);
+			console.log('Error: ', JSON.stringify(error));
+			return rejectWithValue(error);
 		}
 	}
 );
@@ -163,12 +172,10 @@ export const handleRedeliver = createAsyncThunk(
 			const response = await api.put(
 				`/Order/Redeliver?orderId=${orderId}&delivererId=${delivererId}`
 			);
-			console.log(response);
-
 			return response;
 		} catch (error) {
-			console.log('Error: ', JSON.stringify(error.response.data));
-			return rejectWithValue(error.response.data);
+			console.log('Error: ', JSON.stringify(error));
+			return rejectWithValue(error);
 		}
 	}
 );
@@ -272,7 +279,6 @@ export const orderSlice = createSlice({
 			})
 			.addCase(handleOrderAssignDeliverer.fulfilled, (state, action) => {
 				state.loading = false;
-				state.orderDetail = action.payload;
 				state.orderStatusDetail = action.payload.Status;
 				state.orderLogsDetail = action.payload.Logs;
 			})
@@ -310,11 +316,23 @@ export const orderSlice = createSlice({
 			})
 			.addCase(handleRedeliver.fulfilled, (state, action) => {
 				state.loading = false;
-				state.orderDetail = action.payload;
+				// state.orderDetail = action.payload;
 				state.orderStatusDetail = action.payload.Status;
 				state.orderLogsDetail = action.payload.Logs;
 			})
 			.addCase(handleRedeliver.rejected, (state, action) => {
+				state.loading = false;
+				state.error = action.payload;
+			})
+			.addCase(handleOrderLogProcessing.pending, (state) => {
+				state.loading = true;
+			})
+			.addCase(handleOrderLogProcessing.fulfilled, (state, action) => {
+				state.loading = false;
+				state.orderStatusDetail = action.payload.Status;
+				state.orderLogsDetail = action.payload.Logs;
+			})
+			.addCase(handleOrderLogProcessing.rejected, (state, action) => {
 				state.loading = false;
 				state.error = action.payload;
 			});

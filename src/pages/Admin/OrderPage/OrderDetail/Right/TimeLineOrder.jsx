@@ -68,11 +68,6 @@ const TimeLineOrder = ({orders, loading, statusOrder, paymentStatusOrder, id}) =
 		dispatch(getDelivererAccount());
 	}, []);
 
-	console.log('deliverer', deliverer);
-	console.log('userRoleDeliverer', userRoleDeliverer);
-	console.log('userRoleManager', userRoleManager);
-	console.log('userRoleStaff', userRoleStaff);
-
 	// useEffect(() => {
 	// 	if (orderLogList) {
 	// 		setOrderLogs(orderLogList);
@@ -139,8 +134,8 @@ const TimeLineOrder = ({orders, loading, statusOrder, paymentStatusOrder, id}) =
 		const res = await dispatch(handleOrder(orders.Id));
 		if (res.payload !== undefined) {
 			message.success('Xác nhận thành công!');
-		} else if (res.payload.status === 400) {
-			message.error('Lỗi khi xác nhận đơn hàng.');
+		} else {
+			message.error(error?.data?.title || error?.detail);
 		}
 	};
 
@@ -158,8 +153,8 @@ const TimeLineOrder = ({orders, loading, statusOrder, paymentStatusOrder, id}) =
 		const res = await dispatch(handleOrder(orders.Id));
 		if (res.payload !== undefined) {
 			message.success('Chuẩn bị hàng hoàn tất!');
-		} else if (res.payload.status === 400) {
-			message.error('Lỗi khi chuẩn bị hàng.');
+		} else {
+			message.error(error?.data?.title || error?.detail);
 		}
 	};
 
@@ -181,8 +176,8 @@ const TimeLineOrder = ({orders, loading, statusOrder, paymentStatusOrder, id}) =
 		if (res.payload !== undefined) {
 			message.success('Đã chuyển giao cho shipper!');
 			localStorage.setItem(`isAssigned_${orders.Id}`, JSON.stringify(true));
-		} else if (res.payload.status === 400) {
-			message.error('Lỗi khi chuyển giao cho shipper.');
+		} else {
+			message.error(error?.data?.title || error?.detail);
 		}
 	};
 
@@ -200,8 +195,8 @@ const TimeLineOrder = ({orders, loading, statusOrder, paymentStatusOrder, id}) =
 		const res = await dispatch(handleOrder(orders.Id));
 		if (res.payload !== undefined) {
 			message.success('Xác nhận giao hàng!');
-		} else if (res.payload.status === 400) {
-			message.error('Lỗi khi giao hàng.');
+		} else {
+			message.error(error?.data?.title || error?.detail);
 		}
 	};
 
@@ -219,8 +214,8 @@ const TimeLineOrder = ({orders, loading, statusOrder, paymentStatusOrder, id}) =
 		const res = await dispatch(handleOrder(orders.Id));
 		if (res.payload !== undefined) {
 			message.success('Hoàn tất giao hàng!');
-		} else if (res.payload.status === 400) {
-			message.error('Lỗi khi giao hàng.');
+		} else {
+			message.error(error?.data?.title || error?.detail);
 		}
 	};
 
@@ -238,8 +233,8 @@ const TimeLineOrder = ({orders, loading, statusOrder, paymentStatusOrder, id}) =
 		const res = await dispatch(handleDeliveryFailed(orders.Id));
 		if (res.payload !== undefined) {
 			message.warning('Đơn hàng giao hàng không thành công!');
-		} else if (res.payload.status === 400) {
-			message.error('Lỗi khi giao hàng.');
+		} else {
+			message.error(error?.data?.title || error?.detail);
 		}
 	};
 
@@ -247,8 +242,8 @@ const TimeLineOrder = ({orders, loading, statusOrder, paymentStatusOrder, id}) =
 		const res = await dispatch(handleRefundOrder(orders.Id));
 		if (res.payload !== undefined) {
 			message.warning('Xác nhận hoàn tiền!');
-		} else if (res.payload.status === 400) {
-			message.error('Lỗi khi giao hàng.');
+		} else {
+			message.error(error?.data?.title || error?.detail);
 		}
 	};
 
@@ -276,8 +271,8 @@ const TimeLineOrder = ({orders, loading, statusOrder, paymentStatusOrder, id}) =
 				if (res.payload !== undefined) {
 					message.success('Đã chuyển giao cho shipper!');
 					localStorage.setItem(`isAssigned_${orders.Id}`, JSON.stringify(true));
-				} else if (res.payload.status === 400) {
-					message.error('Lỗi khi chuyển giao cho shipper.');
+				} else {
+					message.error(error?.data?.title || error?.detail);
 				}
 			}
 		);
@@ -285,18 +280,17 @@ const TimeLineOrder = ({orders, loading, statusOrder, paymentStatusOrder, id}) =
 
 	const submitCancelOrder = async (values) => {
 		const res = await dispatch(handleOrderReject({orderId: orders.Id, reason: values.reason}));
-		console.log('err', res.payload);
 
 		if (res.payload !== undefined) {
 			message.success('Từ chối thành công!');
-		} else if (res.payload.status === 400) {
-			message.error('Lỗi khi từ chối đơn hàng.');
+		} else {
+			message.error(error?.data?.title || error?.detail);
 		}
 
 		setIsCancelModalVisible(false);
 	};
 
-	console.log('isAssigned', isAssigned);
+	console.log('orders', orders);
 
 	return (
 		<div>
@@ -312,7 +306,7 @@ const TimeLineOrder = ({orders, loading, statusOrder, paymentStatusOrder, id}) =
 									<ClockCircleOutlined /> {ORDER_STATUS_TEXTS.Pending}
 								</p>
 							</div>
-							{userRoleManager ? (
+							{userRoleManager || userRoleManager ? (
 								<div className="flex justify-around">
 									<Button
 										type="text"
@@ -437,7 +431,7 @@ const TimeLineOrder = ({orders, loading, statusOrder, paymentStatusOrder, id}) =
 									<CheckCircleOutlined /> {ORDER_STATUS_TEXTS.Prepared}
 								</p>
 							</div>
-							{Array.isArray(orders) && orders?.DelivererId ? (
+							{orders && orders?.DelivererId === null ? (
 								<>
 									<div className="flex mt-2">
 										<p className="text-red mr-1">*</p>
@@ -553,7 +547,7 @@ const TimeLineOrder = ({orders, loading, statusOrder, paymentStatusOrder, id}) =
 						</div>
 					)}
 
-					{status === 'Delivery_Failed' && userRoleManager && userRoleStaff && (
+					{status === 'Delivery_Failed' && userRoleStaff && (
 						<div className="border rounded-lg border-primary bg-tintWhite p-5 mb-5">
 							<div className="flex items-center mb-5" style={{fontSize: 16}}>
 								<p className="font-semibold">Trạng thái đơn hàng:</p>
@@ -561,50 +555,50 @@ const TimeLineOrder = ({orders, loading, statusOrder, paymentStatusOrder, id}) =
 									<CloseCircleOutlined /> {ORDER_STATUS_TEXTS.Delivery_Failed}
 								</p>
 							</div>
-							{userRoleManager && (
-								<>
-									<div className="flex mt-2">
-										<p className="text-red mr-1">*</p>
-										<p>Chọn giao hàng</p>
-									</div>
-									<Select
-										defaultValue=""
-										className="w-full mb-5"
-										onChange={handleChange}
+
+							<>
+								<div className="flex mt-2">
+									<p className="text-red mr-1">*</p>
+									<p>Chọn giao hàng</p>
+								</div>
+								<Select
+									defaultValue=""
+									className="w-full mb-5"
+									onChange={handleChange}
+								>
+									{deliverer &&
+										deliverer?.map((user) => (
+											<Option key={user?.Account?.Id}>
+												<Space>
+													{user?.Account?.Email}{' '}
+													<div>
+														<CircleIcon
+															style={{
+																color: user?.IsFree
+																	? 'green'
+																	: 'red',
+																fontSize: '16px',
+															}}
+														/>
+													</div>
+													{user?.BusyMessage}
+												</Space>
+											</Option>
+										))}
+								</Select>
+								<div className="flex justify-around">
+									<Button
+										type="text"
+										className="bg-primary font-semibold w-full rounded-full"
+										onClick={handleRedeliverBtn}
 									>
-										{deliverer &&
-											deliverer?.map((user) => (
-												<Option key={user?.Account?.Id}>
-													<Space>
-														{user?.Account?.Email}{' '}
-														<div>
-															<CircleIcon
-																style={{
-																	color: user?.IsFree
-																		? 'green'
-																		: 'red',
-																	fontSize: '16px',
-																}}
-															/>
-														</div>
-														{user?.BusyMessage}
-													</Space>
-												</Option>
-											))}
-									</Select>
-									<div className="flex justify-around">
-										<Button
-											type="text"
-											className="bg-primary font-semibold w-full rounded-full"
-											onClick={handleRedeliverBtn}
-										>
-											Giao Lại
-										</Button>
-									</div>
-								</>
-							)}
+										Giao Lại
+									</Button>
+								</div>
+							</>
 						</div>
 					)}
+
 					{status === 'Delivery_Failed' && userRoleDeliverer && (
 						<div className="border rounded-lg border-primary bg-tintWhite p-5 mb-5">
 							<div className="flex items-center" style={{fontSize: 16}}>

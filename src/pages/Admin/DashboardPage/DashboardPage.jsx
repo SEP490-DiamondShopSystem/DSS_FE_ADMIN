@@ -86,9 +86,11 @@ const DashboardPage = () => {
 	const [endDate, setEndDate] = useState(null);
 	const [orders, setOrders] = useState();
 
+	console.log('orders', orders);
+
 	useEffect(() => {
 		const now = dayjs();
-		const sevenDaysAgo = now.subtract(30, 'day');
+		const sevenDaysAgo = now.subtract(7, 'day');
 
 		setStartDate(sevenDaysAgo.format('DD-MM-YYYY HH:mm:ss'));
 		setEndDate(now.format('DD-MM-YYYY HH:mm:ss'));
@@ -151,50 +153,12 @@ const DashboardPage = () => {
 		return statusMapping[statusId] || 'Unknown';
 	};
 
-	// Fake data
-	const fakeData = {
-		users: {
-			players: {total_player: 5000},
-			stadiums: {total_stadium_account: 120},
-		},
-		blogs: {total_blog: 250},
-		premiums: {total_premium: 30},
-		matches: {
-			total_match: 80,
-			compare_last_month: 15.3,
-			match_by_time: [
-				{time: '10:00 AM', total_match: 10},
-				{time: '12:00 PM', total_match: 20},
-				{time: '2:00 PM', total_match: 30},
-			],
-		},
-		bookings: {
-			bookings: {
-				total_booking: 700,
-				booking_by_day_of_week: [
-					{day: 0, total: 100}, // Monday
-					{day: 1, total: 150}, // Tuesday
-					{day: 2, total: 200}, // Wednesday
-				],
-			},
-		},
-		revenues: {
-			income: {total_income: 5000000},
-			revenue: {total_revenue: 10000000},
-		},
-	};
-
 	const handleChange = () => {
 		setChange(!change);
 	};
 
 	const handleOrderChange = () => {
 		setChangeChart(!changeChart);
-	};
-
-	const handleDateChange = (dates, dateStrings) => {
-		setStartDate(dates[0]);
-		setEndDate(dates[1]);
 	};
 
 	return (
@@ -281,15 +245,21 @@ const DashboardPage = () => {
 														Đến
 													</span>
 													<RangePicker
-														format="DD-MM-YYYY"
+														format="DD-MM-YYYY HH:mm:ss"
 														suffixIcon={<CalendarOutlined />}
 														style={{border: 'none', width: '100%'}}
 														value={[
 															startDate
-																? dayjs(startDate, 'DD-MM-YYYY')
+																? dayjs(
+																		startDate,
+																		'DD-MM-YYYY HH:mm:ss'
+																  )
 																: null,
 															endDate
-																? dayjs(endDate, 'DD-MM-YYYY')
+																? dayjs(
+																		endDate,
+																		'DD-MM-YYYY HH:mm:ss'
+																  )
 																: null,
 														]}
 														disabled
@@ -317,10 +287,17 @@ const DashboardPage = () => {
 												{
 													name: 'Tổng Giá',
 													data:
-														orders?.CompletedOrder?.filter(
-															(item) =>
-																item.CompleteDate && item.TotalPrice
-														)
+														orders?.CompletedOrder?.filter((item) => {
+															// Check if CompleteDate exists and is a valid date after parsing
+															return (
+																item.CompleteDate &&
+																dayjs(
+																	item.CompleteDate,
+																	'DD-MM-YYYY HH:mm:ss',
+																	true
+																).isValid()
+															);
+														})
 															?.sort(
 																(a, b) =>
 																	new Date(
@@ -336,8 +313,8 @@ const DashboardPage = () => {
 																	'DD-MM-YYYY HH:mm:ss'
 																)
 																	.toDate()
-																	.getTime(),
-																y: formatPrice(item.TotalPrice),
+																	.getTime(), // Convert to timestamp
+																y: formatPrice(item.TotalPrice), // Format price
 															})) || [],
 												},
 											]}

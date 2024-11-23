@@ -80,35 +80,49 @@ const MainDiamondPricePage = () => {
 	};
 
 	const savePrices = async () => {
-		const listPrices = editedCells.map((cell) => ({
-			diamondCriteriaId: cell.diamondCriteriaId,
-			price: Number(cell.price),
-		}));
+		try {
+			const listPrices = editedCells.map((cell) => ({
+				diamondCriteriaId: cell.diamondCriteriaId,
+				price: Number(cell.price),
+			}));
 
-		if (listPrices.length === 0) return;
+			if (listPrices.length === 0) return;
 
-		await dispatch(createDiamondPrice({listPrices, shapeId, isLabDiamond})); // Wait for save to finish
-		setEditedCells([]);
-		setIsCreating(false);
-		await dispatch(fetchPriceBoard({shapeId, isLabDiamond, cut})); // Fetch updated board
+			await dispatch(createDiamondPrice({listPrices, shapeId, isLabDiamond}));
+
+			setEditedCells([]);
+			setIsCreating(false);
+
+			await dispatch(fetchPriceBoard({shapeId, isLabDiamond, cut}));
+		} catch (error) {
+			message.error(error?.data?.title || error?.detail);
+
+			setIsCreating(false);
+		}
 	};
 
 	const handleSave = async () => {
-		const updatedPrices = editedCells.map((cell) => ({
-			diamondCriteriaId: cell.diamondCriteriaId,
-			price: Number(cell.price),
-		}));
+		try {
+			const updatedPrices = editedCells.map((cell) => ({
+				diamondCriteriaId: cell.diamondCriteriaId,
+				price: Number(cell.price),
+			}));
 
-		await dispatch(
-			updateDiamondPrices({
-				updatedDiamondPrices: updatedPrices,
-				shapeId,
-				isLabDiamond,
-			})
-		); // Wait for update to finish
-		setEditedCells([]);
-		setIsEditing(false);
-		await dispatch(fetchPriceBoard({shapeId, isLabDiamond, cut})); // Fetch updated board
+			await dispatch(
+				updateDiamondPrices({
+					updatedDiamondPrices: updatedPrices,
+					shapeId,
+					isLabDiamond,
+				})
+			); // Wait for update to finish
+			setEditedCells([]);
+
+			await dispatch(fetchPriceBoard({shapeId, isLabDiamond, cut}));
+		} catch (error) {
+			message.error(error?.data?.title || error?.detail);
+
+			setIsCreating(false);
+		}
 	};
 
 	const cancelDelete = () => {
@@ -355,7 +369,6 @@ const MainDiamondPricePage = () => {
 						</select>
 					</div>
 
-			
 					{/* Clear Filters Button */}
 					<div>
 						<button
@@ -375,7 +388,9 @@ const MainDiamondPricePage = () => {
 
 	return (
 		<div className="container gap-4 mx-auto p-6 bg-white rounded-lg shadow-lg">
-			<h1 className="text-5xl font-bold text-center text-blue-600">Main Diamond Price Board</h1>
+			<h1 className="text-5xl font-bold text-center text-blue-600">
+				Main Diamond Price Board
+			</h1>
 			<div className="flex flex-wrap gap-4 items-center justify-between p-4 bg-offWhite rounded-lg shadow-md">
 				{/* Shape Selection */}
 				<div className="flex sm:flex-row items-center gap-2">

@@ -62,46 +62,58 @@ const SideDiamondPricePage = () => {
 	};
 
 	const confirmDelete = async () => {
-		const deleteList = selectedPrices.map((criteriaId) => ({criteriaId}));
-		const payload = {
-			deleteList,
-			isLabDiamond,
-		};
+		try {
+			const deleteList = selectedPrices.map((criteriaId) => ({criteriaId}));
+			const payload = {
+				deleteList,
+				isLabDiamond,
+			};
 
-		await dispatch(deleteDiamondPrice(payload)); // Wait for delete to finish
+			await dispatch(deleteDiamondPrice(payload)); // Wait for delete to finish
+		} catch (error) {
+			message.error(error?.data?.title || error?.detail);
+		}
 		setSelectedPrices([]);
 		setShowDeleteConfirm(false);
 		await dispatch(fetchPriceBoard({isLabDiamond, isSideDiamond})); // Fetch updated board
 	};
 
 	const savePrices = async () => {
-		const listPrices = editedCells.map((cell) => ({
-			diamondCriteriaId: cell.diamondCriteriaId,
-			price: Number(cell.price),
-		}));
+		try {
+			const listPrices = editedCells.map((cell) => ({
+				diamondCriteriaId: cell.diamondCriteriaId,
+				price: Number(cell.price),
+			}));
 
-		if (listPrices.length === 0) return;
+			if (listPrices.length === 0) return;
 
-		await dispatch(createDiamondPrice({listPrices, isLabDiamond, isSideDiamond, shapeId})); // Wait for save to finish
+			await dispatch(createDiamondPrice({listPrices, isLabDiamond, isSideDiamond, shapeId}));
+		} catch (error) {
+			message.error(error?.data?.title || error?.detail);
+		}
 		setEditedCells([]);
 		setIsCreating(false);
 		await dispatch(fetchPriceBoard({isLabDiamond, isSideDiamond})); // Fetch updated board
 	};
 
 	const handleSave = async () => {
-		const updatedPrices = editedCells.map((cell) => ({
-			diamondCriteriaId: cell.diamondCriteriaId,
-			price: Number(cell.price),
-		}));
+		try {
+			const updatedPrices = editedCells.map((cell) => ({
+				diamondCriteriaId: cell.diamondCriteriaId,
+				price: Number(cell.price),
+			}));
 
-		await dispatch(
-			updateDiamondPrices({
-				updatedDiamondPrices: updatedPrices,
-				shapeId,
-				isLabDiamond,
-				isSideDiamond,
-			})
-		); // Wait for update to finish
+			await dispatch(
+				updateDiamondPrices({
+					updatedDiamondPrices: updatedPrices,
+					shapeId,
+					isLabDiamond,
+					isSideDiamond,
+				})
+			);
+		} catch (error) {
+			message.error(error?.data?.title || error?.detail);
+		} // Wait for update to finish
 		setEditedCells([]);
 		setIsEditing(false);
 		await dispatch(fetchPriceBoard({isLabDiamond, isSideDiamond, shapeId})); // Fetch updated board

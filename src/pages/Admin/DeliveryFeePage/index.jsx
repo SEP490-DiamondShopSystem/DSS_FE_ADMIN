@@ -83,7 +83,7 @@ const DeliveryFeePage = () => {
 				await dispatch(fetchDeliveryFees({isLocation: true}));
 				message.success('Delivery Fee updated successfully!');
 			} catch (error) {
-				message.error('Failed to update Delivery Fee!');
+				message.error(error?.data?.title || error?.detail);
 			}
 		} else {
 			try {
@@ -91,7 +91,7 @@ const DeliveryFeePage = () => {
 				await dispatch(fetchDeliveryFees({isLocation: true}));
 				message.success('Delivery Fee added successfully!');
 			} catch (error) {
-				message.error('Failed to add Delivery Fee!');
+				message.error(error?.data?.title || error?.detail);
 			}
 		}
 

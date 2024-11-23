@@ -27,7 +27,7 @@ const OrderDetail = () => {
 		if (id && !loading) {
 			dispatch(getOrderDetail(id));
 		}
-	}, [id]);
+	}, [id, statusOrder, paymentStatusOrder]);
 
 	useEffect(() => {
 		if (orderDetail && !loading) {

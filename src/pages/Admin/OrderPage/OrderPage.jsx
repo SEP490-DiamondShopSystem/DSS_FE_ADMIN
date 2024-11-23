@@ -19,7 +19,7 @@ const {Search} = Input;
 const {RangePicker} = DatePicker;
 
 const statusList = [
-	{name: 'All', value: ''},
+	{name: 'Tất Cả', value: ''},
 	{name: 'Pending', value: '1'},
 	{name: 'Processing', value: '2'},
 	{name: 'Rejected', value: '3'},
@@ -28,7 +28,6 @@ const statusList = [
 	{name: 'Delivering', value: '6'},
 	{name: 'Failed', value: '7'},
 	{name: 'Success', value: '8'},
-	{name: 'Refused', value: '9'},
 ];
 
 const delivererStatusList = [

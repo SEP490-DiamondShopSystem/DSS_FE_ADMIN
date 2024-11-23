@@ -145,7 +145,7 @@ const JewelryModelPage = () => {
 				}
 			})
 			.catch((error) => {
-				console.error('Error fetching jewelry models:', error); // Log any errors
+				message.error(error?.data?.title || error?.detail);
 			});
 	}, [dispatch, name, category, isRhodiumFinished, isEngravable, currentPage, pageSize]);
 	const metals = useSelector(getAllMetalsSelector); // Selector for getting metals from the store
@@ -356,7 +356,7 @@ const JewelryModelPage = () => {
 				console.log('Jewelry model created successfully:', formData);
 			})
 			.catch((error) => {
-				console.error('Error creating jewelry model:', error);
+				message.error(error?.data?.title || error?.detail);
 			});
 		dispatch(
 			fetchAllJewelryModels({
@@ -436,8 +436,6 @@ const JewelryModelPage = () => {
 								<option value="false">No</option>
 							</select>
 						</div>
-						{/* Pagination Controls */}
-						{/* Models List */}
 						{loading ? (
 							<p>Loading...</p>
 						) : error ? (
@@ -742,14 +740,15 @@ const JewelryModelPage = () => {
 																<option value="">
 																	Select Shape
 																</option>
-																{shapes.map((shape) => (
-																	<option
-																		key={shape.id}
-																		value={shape.Id}
-																	>
-																		{shape.ShapeName}
-																	</option>
-																))}
+																{Array.isArray(shapes) &&
+																	shapes.map((shape) => (
+																		<option
+																			key={shape.id}
+																			value={shape.Id}
+																		>
+																			{shape.ShapeName}
+																		</option>
+																	))}
 															</select>
 															<input
 																type="number"
@@ -840,11 +839,12 @@ const JewelryModelPage = () => {
 													className="form-input w-full p-2 border border-gray-300 rounded-md"
 												>
 													<option value="">Select Shape</option>
-													{shapes.map((shape) => (
-														<option key={shape.id} value={shape.Id}>
-															{shape.ShapeName}
-														</option>
-													))}
+													{Array.isArray(shapes) &&
+														shapes.map((shape) => (
+															<option key={shape.id} value={shape.Id}>
+																{shape.ShapeName}
+															</option>
+														))}
 												</select>
 
 												<select

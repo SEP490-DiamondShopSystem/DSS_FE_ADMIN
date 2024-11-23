@@ -134,6 +134,7 @@ const PromotionPage = ({promotionData}) => {
 
 				form.setFieldsValue({
 					name: fetchedPromotion.Name,
+					promoCode: fetchedPromotion.PromoCode,
 					description: fetchedPromotion.Description,
 					validDate: [startDate, endDate],
 					isActive: fetchedPromotion.IsActive,
@@ -155,17 +156,32 @@ const PromotionPage = ({promotionData}) => {
 							operator: req.Operator,
 							quantity: req.Quantity || 0,
 							amount: req.Amount || 0,
-							jewelryModelID: req.ModelId ,
+							jewelryModelId: req.JewelryModelId,
+							promotionId:req.PromotionId,
 							diamondRequirementSpec: {
-								origin: diamondSpec.Origin? getTextForEnum('Origin', diamondSpec.Origin): '',
+								origin: diamondSpec.Origin
+									? getTextForEnum('Origin', diamondSpec.Origin)
+									: '',
 								caratFrom: diamondSpec.CaratFrom ?? '',
 								caratTo: diamondSpec.CaratTo ?? '',
-								clarityFrom: diamondSpec.ClarityFrom? getTextForEnum('Clarity', diamondSpec.ClarityFrom): '',
-								clarityTo: diamondSpec.ClarityTo? getTextForEnum('Clarity', diamondSpec.ClarityTo): '',
-								cutFrom: diamondSpec.CutFrom? getTextForEnum('Cut', diamondSpec.CutFrom): '',
-								cutTo: diamondSpec.CutTo? getTextForEnum('Cut', diamondSpec.CutTo): '',
-								colorFrom: diamondSpec.ColorFrom? getTextForEnum('Color', diamondSpec.ColorFrom): '',
-								colorTo: diamondSpec.ColorTo? getTextForEnum('Color', diamondSpec.ColorTo): '',
+								clarityFrom: diamondSpec.ClarityFrom
+									? getTextForEnum('Clarity', diamondSpec.ClarityFrom)
+									: '',
+								clarityTo: diamondSpec.ClarityTo
+									? getTextForEnum('Clarity', diamondSpec.ClarityTo)
+									: '',
+								cutFrom: diamondSpec.CutFrom
+									? getTextForEnum('Cut', diamondSpec.CutFrom)
+									: '',
+								cutTo: diamondSpec.CutTo
+									? getTextForEnum('Cut', diamondSpec.CutTo)
+									: '',
+								colorFrom: diamondSpec.ColorFrom
+									? getTextForEnum('Color', diamondSpec.ColorFrom)
+									: '',
+								colorTo: diamondSpec.ColorTo
+									? getTextForEnum('Color', diamondSpec.ColorTo)
+									: '',
 								shapesIDs: diamondSpec.ShapesIDs || [],
 							},
 						};
@@ -183,23 +199,39 @@ const PromotionPage = ({promotionData}) => {
 							unitValue: gift.UnitValue || 0,
 							amount: gift.Amount || 0,
 							itemId: gift.ItemId || '',
+							promotionId:gift.PromotionId,
+
 							diamondRequirementSpec: {
-								origin: diamondSpec.Origin? getTextForEnum('Origin', diamondSpec.Origin): '',
+								origin: diamondSpec.Origin
+									? getTextForEnum('Origin', diamondSpec.Origin)
+									: '',
 								caratFrom: diamondSpec.CaratFrom ?? '',
-								caratTo: diamondSpec.CaratTo ?? '',
-								clarityFrom: diamondSpec.ClarityFrom? getTextForEnum('Clarity', diamondSpec.ClarityFrom): '',
-								clarityTo: diamondSpec.ClarityTo? getTextForEnum('Clarity', diamondSpec.ClarityTo): '',
-								cutFrom: diamondSpec.CutFrom? getTextForEnum('Cut', diamondSpec.CutFrom): '',
-								cutTo: diamondSpec.CutTo? getTextForEnum('Cut', diamondSpec.CutTo): '',
-								colorFrom: diamondSpec.ColorFrom? getTextForEnum('Color', diamondSpec.ColorFrom): '',
-								colorTo: diamondSpec.ColorTo? getTextForEnum('Color', diamondSpec.ColorTo): '',
+								caratTo: diamondSpec.CaratTo ?? '', 
+								clarityFrom: diamondSpec.ClarityFrom
+									? getTextForEnum('Clarity', diamondSpec.ClarityFrom)
+									: '',
+								clarityTo: diamondSpec.ClarityTo
+									? getTextForEnum('Clarity', diamondSpec.ClarityTo)
+									: '',
+								cutFrom: diamondSpec.CutFrom
+									? getTextForEnum('Cut', diamondSpec.CutFrom)
+									: '',
+								cutTo: diamondSpec.CutTo
+									? getTextForEnum('Cut', diamondSpec.CutTo)
+									: '',
+								colorFrom: diamondSpec.ColorFrom
+									? getTextForEnum('Color', diamondSpec.ColorFrom)
+									: '',
+								colorTo: diamondSpec.ColorTo
+									? getTextForEnum('Color', diamondSpec.ColorTo)
+									: '',
 								shapesIDs: gift.DiamondRequirementSpec?.ShapesIDs || [],
 							},
 						};
 					}),
 				});
 			} else {
-				message.error('Failed to fetch promotion details.');
+				message.error(error?.data?.title || error?.detail);
 			}
 		});
 	};
@@ -209,7 +241,7 @@ const PromotionPage = ({promotionData}) => {
 			await dispatch(cancelPromotion(id)); // Use your actual cancelPromotion logic
 			message.success(`Promotion with id: ${id} has been canceled.`);
 		} catch (error) {
-			message.error('Failed to cancel the promotion. Please try again.');
+			message.error(error?.data?.title || error?.detail);
 		}
 	};
 	const handleUpdate = async () => {
@@ -230,7 +262,7 @@ const PromotionPage = ({promotionData}) => {
 
 			// Ensure that promotionId (editingPromotionId) is available
 			if (!editingPromotionId) {
-				message.error('Promotion ID is missing!');
+				message.error(error?.data?.title || error?.detail);
 				return;
 			}
 
@@ -243,7 +275,7 @@ const PromotionPage = ({promotionData}) => {
 			message.success('Promotion updated successfully!');
 			await dispatch(fetchPromotions());
 		} catch (err) {
-			message.error('Please correct the form errors.');
+			message.error(error?.data?.title || error?.detail);
 		}
 	};
 
@@ -253,7 +285,7 @@ const PromotionPage = ({promotionData}) => {
 				message.success(`Deleted promotion with id: ${id}`);
 			})
 			.catch((error) => {
-				message.error(`Failed to delete promotion: ${error.message}`);
+				message.error(error?.data?.title || error?.detail);
 			});
 	};
 
@@ -284,6 +316,11 @@ const PromotionPage = ({promotionData}) => {
 			title: 'Khuyến Mãi',
 			dataIndex: 'Name',
 			key: 'name',
+		},
+		{
+			title: 'Mã Khuyến Mãi',
+			dataIndex: 'PromoCode',
+			key: 'promoCode',
 		},
 		{
 			title: 'Mô Tả',

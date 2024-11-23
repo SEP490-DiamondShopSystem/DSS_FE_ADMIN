@@ -372,7 +372,7 @@ const TimeLineOrder = ({
 				if (res.payload) {
 					message.success('Xác nhận kim cương cho yêu cầu thành công!');
 				} else {
-					message.error('Có lỗi xảy ra !');
+					message.error(error?.data?.title || error?.detail);
 				}
 			});
 		} else {
@@ -420,12 +420,11 @@ const TimeLineOrder = ({
 					if (res.payload) {
 						message.success('Kim cương đã được cập nhật thành công!');
 					} else {
-						message.error('Cập nhật kim cương thất bại. Vui lòng thử lại!');
+						message.error(error?.data?.title || error?.detail);
 					}
 				})
-				.catch((error) => {
-					console.error('Lỗi khi cập nhật kim cương:', error);
-					message.error('Đã xảy ra lỗi hệ thống. Vui lòng thử lại sau!');
+				.catch((error) =>{
+					message.error(error?.data?.title || error?.detail);
 				});
 		}
 	};
@@ -458,13 +457,11 @@ const TimeLineOrder = ({
 						message.warning('Đã xảy ra lỗi. Vui lòng kiểm tra thông tin và thử lại!');
 					}
 				} else {
-					message.error('Lỗi hệ thống. Không thể xử lý yêu cầu!');
+					message.error(error?.data?.title || error?.detail);
 				}
 			})
 			.catch((error) => {
-				// Xử lý lỗi xảy ra trong quá trình dispatch
-				console.error('Lỗi:', error);
-				message.error('Đã xảy ra lỗi khi gửi yêu cầu. Vui lòng thử lại sau!');
+				message.error(error?.data?.title || error?.detail);
 			});
 	};
 
@@ -488,7 +485,7 @@ const TimeLineOrder = ({
 				message.success('Hủy Đơn Yêu Cầu Thành Công!');
 				setIsModalVisible(false);
 			} else {
-				message.warning(res.error.message);
+				message.error(error?.data?.title || error?.detail);
 			}
 		});
 	};
@@ -499,8 +496,8 @@ const TimeLineOrder = ({
 
 		if (res.payload !== undefined) {
 			message.success('Từ chối thành công!');
-		} else if (res.payload.status === 400) {
-			message.error('Lỗi khi từ chối đơn thiết kế.');
+		} else {
+			message.error(error?.data?.title || error?.detail);
 		}
 
 		setIsCancelModalVisible(false);

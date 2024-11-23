@@ -386,14 +386,18 @@ const InformationOrder = ({
 	};
 
 	const handleChangeConfirm = (request) => {
-		console.log('request', request);
-		dispatch(
-			handleChangeDiamondCustomize({
-				diamondId: request?.DiamondId,
-				customizeRequestId: request?.CustomizeRequestId,
-				diamondRequestId: request?.DiamondRequestId,
-			})
-		);
+		try {
+			console.log('request', request);
+			dispatch(
+				handleChangeDiamondCustomize({
+					diamondId: request?.DiamondId,
+					customizeRequestId: request?.CustomizeRequestId,
+					diamondRequestId: request?.DiamondRequestId,
+				})
+			);
+		} catch (error) {
+			message.error(error?.data?.title || error?.detail);
+		}
 	};
 
 	const handleDelete = (request) => {
@@ -411,14 +415,18 @@ const InformationOrder = ({
 	};
 
 	const handleDeleteConfirm = (request) => {
-		console.log('request', request);
-		dispatch(
-			handleDeleteDiamondCustomize({
-				diamondId: request?.DiamondId,
-				customizeRequestId: request?.CustomizeRequestId,
-				diamondRequestId: request?.DiamondRequestId,
-			})
-		);
+		try {
+			console.log('request', request);
+			dispatch(
+				handleDeleteDiamondCustomize({
+					diamondId: request?.DiamondId,
+					customizeRequestId: request?.CustomizeRequestId,
+					diamondRequestId: request?.DiamondRequestId,
+				})
+			);
+		} catch (error) {
+			message.error(error?.data?.title || error?.detail);
+		}
 	};
 
 	console.log('orders', orders);

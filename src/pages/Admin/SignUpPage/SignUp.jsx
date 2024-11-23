@@ -31,16 +31,17 @@ const SignUpPage = () => {
 
 						navigate('/login');
 					} else {
-						message.error(`Đăng ký không thành công!`);
+						message.error(error?.data?.title || error?.detail);
 					}
 				})
 				.catch((error) => {
 					setIsLoading(false);
 					console.log(error);
-					message.error('Email hoặc mật khẩu không đúng!');
+
+					message.error(error?.data?.title || error?.detail);
 				});
 		} catch (error) {
-			message.error('Vui Lòng Kiểm Tra lại Thông Tin!');
+			message.error(error?.data?.title || error?.detail);
 		}
 	};
 
