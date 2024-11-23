@@ -74,7 +74,7 @@ const OrderPage = () => {
 
 	console.log('orderList', orderList);
 
-	const fetchDiamondData = debounce(() => {
+	useEffect(() => {
 		dispatch(
 			getAllOrder({
 				pageSize: pageSize,
@@ -85,13 +85,7 @@ const OrderPage = () => {
 				Email: searchText,
 			})
 		);
-	}, 1000);
-
-	useEffect(() => {
-		fetchDiamondData();
-
-		return () => fetchDiamondData.cancel();
-	}, [pageSize, current, activeStatus, startDate, endDate, searchText]);
+	}, [dispatch, pageSize, current, activeStatus, startDate, endDate, searchText]);
 
 	useEffect(() => {
 		if (userDetail?.Roles) {

@@ -152,6 +152,30 @@ export const handleOrderLogProcessing = createAsyncThunk(
 	}
 );
 
+export const handleOrderLogDeliver = createAsyncThunk(
+	'orderSlice/handleOrderLogDeliver',
+	async ({orderId, message, images}, {rejectWithValue}) => {
+		try {
+			const formData = new FormData();
+
+			images.forEach((file) => formData.append('images', file));
+
+			formData.append('message', message);
+
+			const data = await api.post(`/Order/Log/${orderId}/Delivering`, formData, {
+				headers: {
+					'Content-Type': 'multipart/form-data',
+				},
+			});
+
+			return data;
+		} catch (error) {
+			console.error(error);
+			return rejectWithValue(error);
+		}
+	}
+);
+
 export const getOrderLog = createAsyncThunk(
 	'orderSlice/getOrderLog',
 	async (orderId, {rejectWithValue}) => {
@@ -180,6 +204,19 @@ export const handleRedeliver = createAsyncThunk(
 	}
 );
 
+// export const getProcessingDetail = createAsyncThunk(
+// 	'orderSlice/getProcessingDetail',
+// 	async ({orderId, logId}, {rejectWithValue}) => {
+// 		try {
+// 			const response = await api.get(`/Order/Log/${orderId}/${logId}/Detail`);
+// 			return response;
+// 		} catch (error) {
+// 			console.log('Error: ', JSON.stringify(error));
+// 			return rejectWithValue(error);
+// 		}
+// 	}
+// );
+
 export const orderSlice = createSlice({
 	name: 'orderSlice',
 	initialState: {
@@ -193,6 +230,8 @@ export const orderSlice = createSlice({
 		orderStatusCustomizeDetail: null,
 		orderPaymentStatusCustomizeDetail: null,
 		orderLogsDetail: null,
+		orderChildLogDetail: null,
+		// orderChildLogList: null,
 		loading: false,
 		error: null,
 		orderLogs: null,
@@ -213,6 +252,7 @@ export const orderSlice = createSlice({
 			})
 			.addCase(getOrderDetail.pending, (state) => {
 				state.loading = true;
+				state.orderDetail = null;
 			})
 			.addCase(getOrderDetail.fulfilled, (state, action) => {
 				state.loading = false;
@@ -331,8 +371,22 @@ export const orderSlice = createSlice({
 				state.loading = false;
 				state.orderStatusDetail = action.payload.Status;
 				state.orderLogsDetail = action.payload.Logs;
+				state.orderChildLogDetail = action.payload;
 			})
 			.addCase(handleOrderLogProcessing.rejected, (state, action) => {
+				state.loading = false;
+				state.error = action.payload;
+			})
+			.addCase(handleOrderLogDeliver.pending, (state) => {
+				state.loading = true;
+			})
+			.addCase(handleOrderLogDeliver.fulfilled, (state, action) => {
+				state.loading = false;
+				state.orderStatusDetail = action.payload.Status;
+				state.orderLogsDetail = action.payload.Logs;
+				state.orderChildLogDetail = action.payload;
+			})
+			.addCase(handleOrderLogDeliver.rejected, (state, action) => {
 				state.loading = false;
 				state.error = action.payload;
 			});

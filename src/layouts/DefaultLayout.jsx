@@ -206,7 +206,6 @@ const DefaultLayout = () => {
 						{breadcrumbItems}
 					</Breadcrumb>
 					<div className="min-h-[790px] bg-white p-4 overflow-y-auto rounded-lg shadow-md">
-						{/* Render child routes */}
 						<Outlet />
 					</div>
 				</Content>

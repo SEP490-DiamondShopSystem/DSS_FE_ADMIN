@@ -1,52 +1,35 @@
-import React, {useEffect, useRef, useState} from 'react';
 import {CheckCircleOutlined, ClockCircleOutlined, CloseCircleOutlined} from '@ant-design/icons';
-import {Timeline} from 'antd';
+import {Button, Modal, Timeline} from 'antd';
+import React, {useEffect, useState} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
-import debounce from 'lodash/debounce';
-import {getOrderLog} from '../../../../../redux/slices/orderSlice';
-import {
-	getOrderDetailSelector,
-	getOrderLogsDetailSelector,
-	getOrderLogsSelector,
-} from '../../../../../redux/selectors';
-import {convertToVietnamDate} from '../../../../../utils';
-
-const OrderStatus = {
-	Pending: 1,
-	Cancelled: 2,
-	Processing: 3,
-	Prepared: 4,
-	Delivering: 5,
-	Delivery_Failed: 6,
-	Success: 7,
-	Rejected: 8,
-};
+import {getOrderChildLogListSelector, getOrderLogsSelector} from '../../../../../redux/selectors';
+import {getProcessingDetail} from '../../../../../redux/slices/logSlice';
 
 export const TimeLine = ({status, orders, loading, id}) => {
 	const dispatch = useDispatch();
-	const orderDetail = useSelector(getOrderDetailSelector);
 	const orderLogList = useSelector(getOrderLogsSelector);
+	const childLogList = useSelector(getOrderChildLogListSelector);
 
-	console.log('orderLogList', orderLogList);
-
+	const [log, setLog] = useState(null);
 	const [filteredSteps, setFilteredSteps] = useState([]);
+	const [modalVisible, setModalVisible] = useState(false); // Modal visibility state
+
+	console.log('log', log);
+	console.log('childLogList', childLogList);
 
 	useEffect(() => {
 		if (orders) {
 			const transformedSteps = orderLogList?.map((log, index) => {
 				const isLast = index === orderLogList?.length - 1;
 
-				// Kiểm tra nếu trạng thái là lỗi
 				const isErrorStatus = [3, 4, 7].includes(log.Status);
 
-				// Kiểm tra nếu trạng thái là thành công
 				const isSuccessStatus = log.Status === 8;
 
-				console.log('isLast', isLast);
-				console.log('isErrorStatus', isErrorStatus);
-				console.log('isSuccessStatus', isSuccessStatus);
+				const isStatus2 = log.Status === 2;
 
-				// Đặt biểu tượng dựa trên trạng thái
+				const isStatus6 = log.Status === 6;
+
 				let icon = isErrorStatus ? (
 					<CloseCircleOutlined style={{color: 'red'}} />
 				) : isSuccessStatus ? (
@@ -57,11 +40,23 @@ export const TimeLine = ({status, orders, loading, id}) => {
 
 				return {
 					dot: icon,
-					label: null, // Không sử dụng label để tránh hiển thị bên trái
+					label: null,
 					children: (
 						<div>
 							<div className="font-semibold">{log.CreatedDate}</div>
 							<div>{log.Message}</div>
+							{/* Hiển thị nút cho cả trạng thái 2 và 5 */}
+							{(isStatus2 || isStatus6) && (
+								<Button
+									type="link"
+									className="text-primary"
+									onClick={() => {
+										handleViewDetailProcessing(log);
+									}}
+								>
+									Xem chi tiết
+								</Button>
+							)}
 						</div>
 					),
 				};
@@ -71,9 +66,41 @@ export const TimeLine = ({status, orders, loading, id}) => {
 		}
 	}, [orderLogList]);
 
+	useEffect(() => {
+		if (log) {
+			dispatch(getProcessingDetail({orderId: log.OrderId, logId: log.Id}));
+		}
+	}, [log, dispatch]);
+
+	const handleViewDetailProcessing = (log) => {
+		setLog(log);
+		console.log('log ở đây', log);
+
+		setModalVisible(true);
+	};
+
+	const handleCloseModal = () => {
+		setModalVisible(false); // Close modal
+	};
+
 	return (
 		<div className="w-full my-10">
 			<Timeline reverse={true} items={filteredSteps} mode="left" />
+
+			<Modal
+				title="Chi tiết trạng thái"
+				visible={modalVisible}
+				onCancel={handleCloseModal}
+				footer={null}
+			>
+				{Array.isArray(childLogList?.ChildLogs) &&
+					[...childLogList.ChildLogs].reverse().map((log) => (
+						<div key={log?.Id}>
+							<div className="font-semibold">Ngày tạo: {log?.CreatedDate}</div>
+							<div>{log?.Message}</div>
+						</div>
+					))}
+			</Modal>
 		</div>
 	);
 };

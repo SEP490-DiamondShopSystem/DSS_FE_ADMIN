@@ -23,7 +23,10 @@ import {
 	getOrderStatusTag,
 } from '../../../../../utils';
 import {LoadingOrderSelector} from '../../../../../redux/selectors';
-import {handleOrderLogProcessing} from '../../../../../redux/slices/orderSlice';
+import {
+	handleOrderLogDeliver,
+	handleOrderLogProcessing,
+} from '../../../../../redux/slices/orderSlice';
 
 const {Title, Text} = Typography;
 
@@ -179,6 +182,30 @@ const InformationOrder = ({orders, statusOrder, paymentStatusOrder}) => {
 
 		dispatch(
 			handleOrderLogProcessing({
+				orderId: orders?.Id,
+				message: messageProcessing,
+				images: imageFiles,
+			})
+		)
+			.unwrap()
+			.then(() => {
+				message.success('Đã gửi thành công!');
+			})
+			.catch((error) => {
+				message.error(
+					error?.data?.title || error?.title || 'Đã xảy ra lỗi, vui lòng thử lại.'
+				);
+			});
+	};
+
+	const handleLogDeliver = () => {
+		if (!fileList || fileList.length === 0) {
+			message.error('Vui lòng chọn ít nhất một tệp hình ảnh!');
+			return;
+		}
+
+		dispatch(
+			handleOrderLogDeliver({
 				orderId: orders?.Id,
 				message: messageProcessing,
 				images: imageFiles,
@@ -358,8 +385,13 @@ const InformationOrder = ({orders, statusOrder, paymentStatusOrder}) => {
 								onPreview={handlePreview}
 								onChange={handleChange}
 								beforeUpload={(file) => {
-									setImageFiles((fileList) => [...fileList, file]);
+									setFileList((prevFileList) => [...prevFileList, file]);
 									return false;
+								}}
+								onRemove={(file) => {
+									setFileList((prevFileList) =>
+										prevFileList.filter((item) => item.uid !== file.uid)
+									);
 								}}
 								className="sm:w-full"
 							>
@@ -374,7 +406,64 @@ const InformationOrder = ({orders, statusOrder, paymentStatusOrder}) => {
 							</Upload>
 						</Col>
 					</div>
-					<Button type="primary" onClick={handleLogProcessing}>
+					<Button type="primary mt-5 w-1/2" onClick={handleLogProcessing}>
+						Gửi
+					</Button>
+					<Divider style={{borderColor: '#d9d9d9'}} />
+				</>
+			)}
+			{statusOrder === 6 && (
+				<>
+					<Row>
+						<Col span={24}>
+							<Title level={4}>Cập Nhật Giao Hàng</Title>
+						</Col>
+					</Row>
+					<div>
+						<Col span={12}>
+							<Text strong style={{fontSize: 18}}>
+								Mô Tả
+							</Text>
+							<br />
+							<Text className="">
+								<Input.TextArea onChange={handleDescription} />
+							</Text>
+						</Col>
+						<Col span={12} className="sm:w-full mt-5">
+							<Text strong style={{fontSize: 18}} className="sm:text-sm">
+								Hình Ảnh
+							</Text>
+							<br />
+							<Upload
+								multiple
+								action="/upload.do"
+								accept="image/*"
+								listType="picture-card"
+								fileList={fileList}
+								onPreview={handlePreview}
+								onChange={handleChange}
+								beforeUpload={(file) => {
+									setFileList((prevFileList) => [...prevFileList, file]);
+									return false;
+								}}
+								onRemove={(file) => {
+									setFileList((prevFileList) =>
+										prevFileList.filter((item) => item.uid !== file.uid)
+									);
+								}}
+							>
+								{fileList.length >= 3 ? null : (
+									<div>
+										<PlusOutlined />
+										<div style={{marginTop: 8}} className="text-sm">
+											Upload
+										</div>
+									</div>
+								)}
+							</Upload>
+						</Col>
+					</div>
+					<Button type="primary mt-5 w-1/2" onClick={handleLogDeliver}>
 						Gửi
 					</Button>
 					<Divider style={{borderColor: '#d9d9d9'}} />

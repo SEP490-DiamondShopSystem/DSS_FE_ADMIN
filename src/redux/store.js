@@ -25,6 +25,7 @@ import {locationSlice} from './slices/locationSlice';
 import {blogSlice} from './slices/blogSlice';
 import {dashboardSlice} from './slices/dashboard';
 import {fileSlice} from './slices/filesSlice';
+import {logSlice} from './slices/logSlice';
 
 const rootPersistConfig = {
 	key: 'root',
@@ -56,6 +57,7 @@ const rootReducer = combineReducers({
 	blogSlice: blogSlice.reducer,
 	dashboardSlice: dashboardSlice.reducer,
 	fileSlice: fileSlice.reducer,
+	logSlice: logSlice.reducer,
 });
 
 const persistedReducer = persistReducer(rootPersistConfig, rootReducer);

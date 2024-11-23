@@ -8,7 +8,6 @@ import Loading from '../../../../../components/Loading';
 import {
 	getAllDelivererSelector,
 	getAllDeliverySelector,
-	getAllUserSelector,
 	GetUserDetailSelector,
 } from '../../../../../redux/selectors';
 import {
@@ -45,10 +44,7 @@ const TimeLineOrder = ({orders, loading, statusOrder, paymentStatusOrder, id}) =
 	const userDetail = useSelector(GetUserDetailSelector);
 	const deliveryList = useSelector(getAllDeliverySelector);
 	const delivererList = useSelector(getAllDelivererSelector);
-	const userDeliverer = useSelector(getAllUserSelector);
-	// const orderLogList = useSelector(getOrderLogsDetailSelector);
 
-	// const [orderLogs, setOrderLogs] = useState([]);
 	const [currentStep, setCurrentStep] = useState(0);
 	const [status, setStatus] = useState();
 	const [userRoleManager, setUserRoleManager] = useState(false);
@@ -61,26 +57,8 @@ const TimeLineOrder = ({orders, loading, statusOrder, paymentStatusOrder, id}) =
 	const [deliverer, setDeliverer] = useState([]);
 
 	useEffect(() => {
-		dispatch(getAllUser({roleId: '44'}));
-	}, []);
-
-	useEffect(() => {
 		dispatch(getDelivererAccount());
-	}, []);
-
-	// useEffect(() => {
-	// 	if (orderLogList) {
-	// 		setOrderLogs(orderLogList);
-	// 	}
-	// }, [orderLogList]);
-
-	useEffect(() => {
-		if (orders?.Id) {
-			const savedIsAssigned =
-				JSON.parse(localStorage.getItem(`isAssigned_${orders.Id}`)) || false;
-			setIsAssigned(savedIsAssigned);
-		}
-	}, [orders]);
+	}, [dispatch]);
 
 	useEffect(() => {
 		if (userDetail?.Roles) {
@@ -93,19 +71,6 @@ const TimeLineOrder = ({orders, loading, statusOrder, paymentStatusOrder, id}) =
 			setUserRoleDeliverer(isDeliverer);
 		}
 	}, [userDetail]);
-
-	useEffect(() => {
-		if (deliveryList) {
-			setDeliveries(
-				deliveryList?.map((delivery) => ({
-					Id: delivery.Id,
-					DeliveryDate: convertToVietnamDate(delivery.DeliveryDate),
-					DelivererId: delivery.DelivererId,
-					DeliveryMethod: delivery.DeliveryMethod,
-				}))
-			);
-		}
-	}, [deliveryList]);
 
 	useEffect(() => {
 		if (delivererList) {
@@ -126,6 +91,7 @@ const TimeLineOrder = ({orders, loading, statusOrder, paymentStatusOrder, id}) =
 			content: 'Bạn có chắc chắn muốn tiếp tục?',
 			okText: 'Xác nhận',
 			cancelText: 'Hủy',
+			okType: 'primary',
 			onOk: handleAcceptStatus,
 		});
 	};
@@ -145,6 +111,7 @@ const TimeLineOrder = ({orders, loading, statusOrder, paymentStatusOrder, id}) =
 			content: 'Bạn có chắc chắn muốn tiếp tục?',
 			okText: 'Xác nhận',
 			cancelText: 'Hủy',
+			okType: 'primary',
 			onOk: handlePreparedStatus,
 		});
 	};
@@ -164,6 +131,7 @@ const TimeLineOrder = ({orders, loading, statusOrder, paymentStatusOrder, id}) =
 			content: 'Bạn có chắc chắn muốn tiếp tục?',
 			okText: 'Xác nhận',
 			cancelText: 'Hủy',
+			okType: 'primary',
 			onOk: handleAssignDelivererStatus,
 		});
 	};
@@ -187,6 +155,7 @@ const TimeLineOrder = ({orders, loading, statusOrder, paymentStatusOrder, id}) =
 			content: 'Bạn có chắc chắn muốn tiếp tục?',
 			okText: 'Xác Nhận',
 			cancelText: 'Hủy',
+			okType: 'primary',
 			onOk: handleDeliveringStatus,
 		});
 	};
@@ -205,6 +174,7 @@ const TimeLineOrder = ({orders, loading, statusOrder, paymentStatusOrder, id}) =
 			title: 'Xác nhận giao hàng thành công đơn đặt hàng này',
 			content: 'Bạn có chắc chắn muốn tiếp tục?',
 			okText: 'Xác nhận',
+			okType: 'primary',
 			cancelText: 'Hủy',
 			onOk: handleDeliveredStatus,
 		});
@@ -225,6 +195,7 @@ const TimeLineOrder = ({orders, loading, statusOrder, paymentStatusOrder, id}) =
 			content: 'Bạn có chắc chắn muốn tiếp tục?',
 			okText: 'Xác nhận',
 			cancelText: 'Hủy',
+			okType: 'danger',
 			onOk: handleFailedDeliveredStatus,
 		});
 	};
@@ -261,6 +232,7 @@ const TimeLineOrder = ({orders, loading, statusOrder, paymentStatusOrder, id}) =
 			content: 'Bạn có chắc chắn muốn tiếp tục?',
 			okText: 'Xác nhận',
 			cancelText: 'Hủy',
+			okType: 'primary',
 			onOk: handleRedeliverStatus,
 		});
 	};
