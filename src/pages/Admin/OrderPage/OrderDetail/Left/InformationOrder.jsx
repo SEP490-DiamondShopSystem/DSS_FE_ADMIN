@@ -30,10 +30,7 @@ const InformationOrder = ({orders, statusOrder, paymentStatusOrder}) => {
 	const [previewTitle, setPreviewTitle] = useState('');
 	const [fileList, setFileList] = useState([]);
 
-	console.log('fileList', fileList);
-	console.log('previewTitle', previewTitle);
-	console.log('previewImage', previewImage);
-	console.log('previewOpen', previewOpen);
+	console.log('orders', orders);
 
 	useEffect(() => {
 		if (orders) {
@@ -43,6 +40,7 @@ const InformationOrder = ({orders, statusOrder, paymentStatusOrder}) => {
 					orderCode: orders?.OrderCode,
 					orderTime: orders?.CreatedDate,
 					price: formatPrice(orders?.TotalPrice),
+					shippingPrice: formatPrice(orders?.ShippingFee),
 					status: getOrderStatus(orders?.Status),
 					paymentStatus: orders?.PaymentStatus,
 					products: orders?.Items?.map((item) => ({
@@ -51,9 +49,11 @@ const InformationOrder = ({orders, statusOrder, paymentStatusOrder}) => {
 						productName: item?.Jewelry?.Model?.Name || item?.Diamond?.Title,
 						productPrice: formatPrice(item?.PurchasedPrice),
 					})),
-					UserRankAmountSaved: formatPrice(orders?.UserRankAmountSaved),
+					UserRankAmountSaved: orders?.UserRankAmountSaved,
+					...orders,
 				},
 			];
+
 			setDataSource(newDataSource);
 		}
 	}, [orders]);
@@ -62,18 +62,36 @@ const InformationOrder = ({orders, statusOrder, paymentStatusOrder}) => {
 		{
 			title: 'Mã đơn hàng',
 			dataIndex: 'orderCode',
-			align: 'center',
+			// align: 'center',
 		},
 		{
 			title: 'Thời gian đặt hàng',
 			dataIndex: 'orderTime',
-			align: 'center',
+			// align: 'center',
 		},
 
 		{
-			title: 'Tổng Giá',
+			title: 'Phí phát sinh',
 			dataIndex: 'price',
-			align: 'center',
+			// align: 'center',
+			render: (_, record) => (
+				<div className="flex flex-col">
+					<div>Phí giao hàng: {record.shippingPrice}</div>
+					{record?.UserRankAmountSaved !== 0 && (
+						<div>Khách hàng thân thiết: -{formatPrice(record.UserRankAmountSaved)}</div>
+					)}
+				</div>
+			),
+		},
+		{
+			title: 'Tổng giá',
+			dataIndex: 'price',
+			// align: 'center',
+			render: (_, record) => (
+				<div className="flex flex-col">
+					<div className="">{record.price}</div>
+				</div>
+			),
 		},
 	];
 

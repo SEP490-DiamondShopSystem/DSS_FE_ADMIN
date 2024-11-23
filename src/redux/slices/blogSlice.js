@@ -12,8 +12,8 @@ export const createBlog = createAsyncThunk(
 			console.log(response);
 			return response;
 		} catch (error) {
-			console.error('Error Response:', error.response);
-			return rejectWithValue(error.response || 'Error creating blog');
+			console.error('Error Response:', error.data);
+			return rejectWithValue(error.data || 'Error creating blog');
 		}
 	}
 );
@@ -29,7 +29,7 @@ export const updateBlog = createAsyncThunk(
 			console.log(response);
 			return response;
 		} catch (error) {
-			return rejectWithValue(error.response || 'Error updating blog');
+			return rejectWithValue(error.data || 'Error updating blog');
 		}
 	}
 );
@@ -40,7 +40,7 @@ export const removeBlog = createAsyncThunk('blog/removeBlog', async (blogId, {re
 		const response = await api.post(`/Blog/Remove?BlogId=${blogId}`);
 		return blogId; // Return the blogId to remove from state
 	} catch (error) {
-		return rejectWithValue(error.response || 'Error removing blog');
+		return rejectWithValue(error.data || 'Error removing blog');
 	}
 });
 
@@ -55,7 +55,7 @@ export const fetchAllBlogs = createAsyncThunk(
 			console.log(response);
 			return response; // Adjust based on actual API response structure
 		} catch (error) {
-			const message = error.response?.message || 'Error fetching blogs';
+			const message = error.data || 'Error fetching blogs';
 			return rejectWithValue(message);
 		}
 	}
@@ -69,7 +69,7 @@ export const fetchBlogDetail = createAsyncThunk(
 			});
 			return response; // Adjust based on actual API response structure
 		} catch (error) {
-			const message = error.response?.message || 'Error fetching blog detail';
+			const message = error.data || 'Error fetching blog detail';
 			return rejectWithValue(message);
 		}
 	}

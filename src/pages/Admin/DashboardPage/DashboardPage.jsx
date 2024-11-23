@@ -88,7 +88,7 @@ const DashboardPage = () => {
 
 	useEffect(() => {
 		const now = dayjs();
-		const sevenDaysAgo = now.subtract(7, 'day');
+		const sevenDaysAgo = now.subtract(30, 'day');
 
 		setStartDate(sevenDaysAgo.format('DD-MM-YYYY HH:mm:ss'));
 		setEndDate(now.format('DD-MM-YYYY HH:mm:ss'));
@@ -135,11 +135,6 @@ const DashboardPage = () => {
 	}, [accountCount]);
 
 	console.log('dashboard', dashboard);
-	console.log('shapeSelling', shapeSelling);
-	console.log('customerCount', customerCount);
-	console.log('startDate', startDate);
-	console.log('endDate', endDate);
-	console.log('orders', orders);
 
 	const getStatusLabel = (statusId) => {
 		const statusMapping = {
@@ -286,21 +281,15 @@ const DashboardPage = () => {
 														Đến
 													</span>
 													<RangePicker
-														format="DD-MM-YYYY HH:mm:ss"
+														format="DD-MM-YYYY"
 														suffixIcon={<CalendarOutlined />}
 														style={{border: 'none', width: '100%'}}
 														value={[
 															startDate
-																? dayjs(
-																		startDate,
-																		'DD-MM-YYYY HH:mm:ss'
-																  )
+																? dayjs(startDate, 'DD-MM-YYYY')
 																: null,
 															endDate
-																? dayjs(
-																		endDate,
-																		'DD-MM-YYYY HH:mm:ss'
-																  )
+																? dayjs(endDate, 'DD-MM-YYYY')
 																: null,
 														]}
 														disabled
@@ -412,27 +401,28 @@ const DashboardPage = () => {
 													<Option value={true}>Kim Cương</Option>
 												</Select>
 											</div>
-											{bestSellingProducts.map((product) => (
-												<div
-													key={product.id}
-													className="flex justify-between items-center my-1"
-												>
-													<div className="flex items-center">
-														<Image
-															alt={product.name}
-															src={product.image}
-															style={{
-																height: 50,
-																width: 50,
-																objectFit: 'cover',
-															}}
-															className="rounded-lg"
-														/>
-														<p className="ml-3">{product.name}</p>
+											{dashboard &&
+												dashboard?.TopSellingJewelry?.map((product) => (
+													<div
+														key={product.id}
+														className="flex justify-between items-center my-1"
+													>
+														<div className="flex items-center">
+															<Image
+																alt={product.name}
+																src={product.image}
+																style={{
+																	height: 50,
+																	width: 50,
+																	objectFit: 'cover',
+																}}
+																className="rounded-lg"
+															/>
+															<p className="ml-3">{product.name}</p>
+														</div>
+														<span>Đã bán: {product.sold}</span>
 													</div>
-													<span>Đã bán: {product.sold}</span>
-												</div>
-											))}
+												))}
 										</Card>
 									) : (
 										<Card
@@ -466,7 +456,7 @@ const DashboardPage = () => {
 																	src={
 																		shape.image ||
 																		'/default-image.jpg'
-																	} // Default image if not available
+																	}
 																	style={{
 																		height: 50,
 																		width: 50,

@@ -486,7 +486,12 @@ export const AddModalDiamond = ({
 					</Form.Item>
 
 					<Form.Item name="priceOffset" label="Giá Offset" className="w-1/3">
-						<InputNumber min={0} placeholder="Nhập Giá Offset" className="w-full" />
+						<InputNumber
+							min={0}
+							placeholder="Nhập Giá Offset"
+							className="w-full"
+							step={0.0}
+						/>
 					</Form.Item>
 				</div>
 				<div>

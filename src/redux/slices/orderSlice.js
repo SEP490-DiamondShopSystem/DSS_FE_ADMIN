@@ -113,19 +113,6 @@ export const handleOrderReject = createAsyncThunk(
 	}
 );
 
-// export const handleOrderPreparing = createAsyncThunk(
-// 	'orderSlice/handleOrderPreparing',
-// 	async (id, {rejectWithValue}) => {
-// 		try {
-// 			const data = await api.put(`/Order/Preparing?orderId=${id}`);
-// 			return data;
-// 		} catch (error) {
-// 			console.error(error);
-// 			return rejectWithValue(error);
-// 		}
-// 	}
-// );
-
 export const handleOrderAssignDeliverer = createAsyncThunk(
 	'orderSlice/handleOrderAssignDeliverer',
 	async ({orderId, delivererId}, {rejectWithValue}) => {

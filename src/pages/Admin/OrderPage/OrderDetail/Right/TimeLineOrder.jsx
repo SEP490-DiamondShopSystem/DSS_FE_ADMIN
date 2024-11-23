@@ -328,7 +328,7 @@ const TimeLineOrder = ({orders, loading, statusOrder, paymentStatusOrder, id}) =
 										onClick={handleCancelOrder}
 										disabled={loading}
 									>
-										Hủy bỏ
+										Hủy đơn
 									</Button>
 								</div>
 							) : (
@@ -411,11 +411,19 @@ const TimeLineOrder = ({orders, loading, statusOrder, paymentStatusOrder, id}) =
 							<div className="flex justify-around">
 								<Button
 									type="text"
-									className="bg-primary font-semibold w-full rounded-full"
+									className="bg-primary font-semibold rounded-full"
 									onClick={handlePrepared}
 									disabled={loading}
 								>
 									Chuẩn bị hàng hoàn tất
+								</Button>
+								<Button
+									type="text"
+									className="bg-red font-semibold w-32 rounded-full"
+									onClick={handleCancelOrder}
+									disabled={loading}
+								>
+									Hủy đơn
 								</Button>
 							</div>
 						</div>

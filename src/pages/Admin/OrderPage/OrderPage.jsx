@@ -266,22 +266,23 @@ const OrderPage = () => {
 				handleStatusBtn={handleStatusChange}
 				active={activeStatus}
 			/>
-			<div className="flex items-center">
-				<Space wrap>
-					<div className="flex items-center my-5">
-						<p className="mr-3">Tìm theo ngày:</p>
+			<div className="flex flex-col sm:flex-row sm:items-center">
+				<Space wrap className="w-full">
+					<div className="flex items-center my-3 sm:my-5">
+						<p className="mr-3 text-sm sm:text-base">Tìm theo ngày:</p>
 					</div>
 					<div
-						className="pl-2 flex items-center"
+						className="flex items-center pl-2 py-1 my-3 sm:my-0"
 						style={{
 							border: '1px solid #d9d9d9',
 							borderRadius: '4px',
-							width: '400px',
+							width: '100%',
+							maxWidth: '400px',
 						}}
 					>
-						<span style={{marginRight: '10px', fontWeight: 'bold'}}>Từ</span>
-						<span style={{marginRight: '10px'}}>→</span>
-						<span style={{marginRight: '10px', fontWeight: 'bold'}}>Đến</span>
+						<span className="mr-3 font-bold text-sm sm:text-base">Từ</span>
+						<span className="mr-3">→</span>
+						<span className="mr-3 font-bold text-sm sm:text-base">Đến</span>
 						<RangePicker
 							format="DD/MM/YYYY"
 							suffixIcon={<CalendarOutlined />}
@@ -289,10 +290,11 @@ const OrderPage = () => {
 							onChange={handleDateChange}
 						/>
 					</div>
-					<div className="flex items-center my-5 ml-10">
-						<p className="mr-3">Tìm kiếm:</p>
+
+					<div className="flex items-center my-3 sm:my-5 sm:ml-10 w-full sm:w-auto">
+						<p className="mr-3 text-sm sm:text-base">Tìm kiếm:</p>
 						<Search
-							className="w-60"
+							className="w-full sm:w-60"
 							placeholder="Tìm theo email"
 							allowClear
 							onSearch={onSearch}
@@ -300,6 +302,7 @@ const OrderPage = () => {
 					</div>
 				</Space>
 			</div>
+
 			<div>
 				<Table
 					dataSource={orders}
