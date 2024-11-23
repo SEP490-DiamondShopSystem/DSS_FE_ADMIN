@@ -154,22 +154,6 @@ export const GiftForm = ({form, shapes, Option}) => {
 												</div>
 											</Col>
 											<Col span={12}>
-												<Form.Item
-													label="Quantity"
-													{...restField}
-													name={[name, 'quantity']}
-													fieldKey={[fieldKey, 'quantity']}
-													rules={[
-														{
-															required: true,
-															message: 'Quantity is required',
-														},
-													]}
-													labelCol={{span: 24}}
-													wrapperCol={{span: 24}}
-												>
-													<InputNumber min={1} className="w-full" />
-												</Form.Item>
 												{targetType === 1 && (
 													<Form.Item
 														label="Item ID"

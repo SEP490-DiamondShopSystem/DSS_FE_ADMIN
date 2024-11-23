@@ -66,33 +66,36 @@ const DiscountPage = ({discountData}) => {
 	};
 
 	const handleCreateDiscount = (values) => {
-		const {name, discountPercent, discountCode, requirements} = values;
-		const [startDateTime, endDateTime] = values.validDate;
+		try {
+			const {name, discountPercent, discountCode, requirements} = values;
+			const [startDateTime, endDateTime] = values.validDate;
 
-		// Create a new discount object with formatted dates
-		const newDiscount = {
-			...values,
-			key: discounts.length, // Assuming discounts is defined elsewhere
-			startDateTime: startDateTime.format('DD-MM-YYYY HH:mm:ss'),
-			endDateTime: endDateTime.format('DD-MM-YYYY HH:mm:ss'),
-		};
+			// Create a new discount object with formatted dates
+			const newDiscount = {
+				...values,
+				key: discounts.length, // Assuming discounts is defined elsewhere
+				startDateTime: startDateTime.format('DD-MM-YYYY HH:mm:ss'),
+				endDateTime: endDateTime.format('DD-MM-YYYY HH:mm:ss'),
+			};
 
-		// Constructing the command for creating the discount
-		const createDiscount = {
-			startDate: startDateTime.format('DD-MM-YYYY HH:mm:ss'),
-			endDate: endDateTime.format('DD-MM-YYYY HH:mm:ss'),
-			name: name,
-			discountPercent: discountPercent,
-			discountCode: discountCode,
-		};
+			// Constructing the command for creating the discount
+			const createDiscount = {
+				startDate: startDateTime.format('DD-MM-YYYY HH:mm:ss'),
+				endDate: endDateTime.format('DD-MM-YYYY HH:mm:ss'),
+				name: name,
+				discountPercent: discountPercent,
+				discountCode: discountCode,
+			};
 
-		dispatch(createFullDiscount({createDiscount, requirements})).then((res) => {
-			if (res.payload !== undefined) {
-				message.success('Discount created successfully!');
-				form.resetFields();
-			}
-		});
-
+			dispatch(createFullDiscount({createDiscount, requirements})).then((res) => {
+				if (res.payload !== undefined) {
+					message.success('Discount created successfully!');
+					form.resetFields();
+				}
+			});
+		} catch (error) {
+			message.error(error?.data?.title || error?.detail);
+		}
 		// setIsEditing(false);
 	};
 
@@ -217,8 +220,8 @@ const DiscountPage = ({discountData}) => {
 			await dispatch(fetchDiscounts());
 			setIsEditing(false);
 			setRemovedRequirements([]); // Reset removed requirements after update
-		} catch (err) {
-			message.error('Please correct the form errors.');
+		} catch (error) {
+			message.error(error?.data?.title || error?.detail);
 		}
 	};
 
@@ -228,7 +231,7 @@ const DiscountPage = ({discountData}) => {
 				message.success(`Deleted discount with id: ${id}`);
 			})
 			.catch((error) => {
-				message.error(`Failed to delete discount: ${error.message}`);
+				message.error(error?.data?.title || error?.detail);
 			});
 	};
 

@@ -148,7 +148,7 @@ const BlogPage = () => {
 			const result = await dispatch(isEditMode ? updateBlog(blogData) : createBlog(blogData));
 			// Log the data to the console before dispatching the API call
 			message.success(
-				isEditMode ? 'Blog updated successfully!' : 'Blog created successfully!'
+				isEditMode ? 'Cập nhật bài viết thành công!' : 'Tạo bài viết mới thành công!'
 			);
 
 			// Reset state

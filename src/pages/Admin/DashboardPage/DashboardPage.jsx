@@ -86,6 +86,8 @@ const DashboardPage = () => {
 	const [endDate, setEndDate] = useState(null);
 	const [orders, setOrders] = useState();
 
+	console.log('orders', orders);
+
 	useEffect(() => {
 		const now = dayjs();
 		const sevenDaysAgo = now.subtract(7, 'day');
@@ -135,11 +137,6 @@ const DashboardPage = () => {
 	}, [accountCount]);
 
 	console.log('dashboard', dashboard);
-	console.log('shapeSelling', shapeSelling);
-	console.log('customerCount', customerCount);
-	console.log('startDate', startDate);
-	console.log('endDate', endDate);
-	console.log('orders', orders);
 
 	const getStatusLabel = (statusId) => {
 		const statusMapping = {
@@ -156,50 +153,12 @@ const DashboardPage = () => {
 		return statusMapping[statusId] || 'Unknown';
 	};
 
-	// Fake data
-	const fakeData = {
-		users: {
-			players: {total_player: 5000},
-			stadiums: {total_stadium_account: 120},
-		},
-		blogs: {total_blog: 250},
-		premiums: {total_premium: 30},
-		matches: {
-			total_match: 80,
-			compare_last_month: 15.3,
-			match_by_time: [
-				{time: '10:00 AM', total_match: 10},
-				{time: '12:00 PM', total_match: 20},
-				{time: '2:00 PM', total_match: 30},
-			],
-		},
-		bookings: {
-			bookings: {
-				total_booking: 700,
-				booking_by_day_of_week: [
-					{day: 0, total: 100}, // Monday
-					{day: 1, total: 150}, // Tuesday
-					{day: 2, total: 200}, // Wednesday
-				],
-			},
-		},
-		revenues: {
-			income: {total_income: 5000000},
-			revenue: {total_revenue: 10000000},
-		},
-	};
-
 	const handleChange = () => {
 		setChange(!change);
 	};
 
 	const handleOrderChange = () => {
 		setChangeChart(!changeChart);
-	};
-
-	const handleDateChange = (dates, dateStrings) => {
-		setStartDate(dates[0]);
-		setEndDate(dates[1]);
 	};
 
 	return (
@@ -328,10 +287,17 @@ const DashboardPage = () => {
 												{
 													name: 'Tổng Giá',
 													data:
-														orders?.CompletedOrder?.filter(
-															(item) =>
-																item.CompleteDate && item.TotalPrice
-														)
+														orders?.CompletedOrder?.filter((item) => {
+															// Check if CompleteDate exists and is a valid date after parsing
+															return (
+																item.CompleteDate &&
+																dayjs(
+																	item.CompleteDate,
+																	'DD-MM-YYYY HH:mm:ss',
+																	true
+																).isValid()
+															);
+														})
 															?.sort(
 																(a, b) =>
 																	new Date(
@@ -347,8 +313,8 @@ const DashboardPage = () => {
 																	'DD-MM-YYYY HH:mm:ss'
 																)
 																	.toDate()
-																	.getTime(),
-																y: formatPrice(item.TotalPrice),
+																	.getTime(), // Convert to timestamp
+																y: formatPrice(item.TotalPrice), // Format price
 															})) || [],
 												},
 											]}
@@ -412,27 +378,28 @@ const DashboardPage = () => {
 													<Option value={true}>Kim Cương</Option>
 												</Select>
 											</div>
-											{bestSellingProducts.map((product) => (
-												<div
-													key={product.id}
-													className="flex justify-between items-center my-1"
-												>
-													<div className="flex items-center">
-														<Image
-															alt={product.name}
-															src={product.image}
-															style={{
-																height: 50,
-																width: 50,
-																objectFit: 'cover',
-															}}
-															className="rounded-lg"
-														/>
-														<p className="ml-3">{product.name}</p>
+											{dashboard &&
+												dashboard?.TopSellingJewelry?.map((product) => (
+													<div
+														key={product.id}
+														className="flex justify-between items-center my-1"
+													>
+														<div className="flex items-center">
+															<Image
+																alt={product.name}
+																src={product.image}
+																style={{
+																	height: 50,
+																	width: 50,
+																	objectFit: 'cover',
+																}}
+																className="rounded-lg"
+															/>
+															<p className="ml-3">{product.name}</p>
+														</div>
+														<span>Đã bán: {product.sold}</span>
 													</div>
-													<span>Đã bán: {product.sold}</span>
-												</div>
-											))}
+												))}
 										</Card>
 									) : (
 										<Card
@@ -466,7 +433,7 @@ const DashboardPage = () => {
 																	src={
 																		shape.image ||
 																		'/default-image.jpg'
-																	} // Default image if not available
+																	}
 																	style={{
 																		height: 50,
 																		width: 50,

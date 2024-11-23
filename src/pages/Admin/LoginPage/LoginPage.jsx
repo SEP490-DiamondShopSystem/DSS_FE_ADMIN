@@ -70,10 +70,8 @@ const LoginPage = () => {
 					form.resetFields();
 
 					navigate('/');
-				} else {
-					message.error(
-						'Đăng nhập không thành công. Vui lòng kiểm tra thông tin đăng nhập của bạn!'
-					);
+				} else 	{
+					message.error(error?.data?.title || error?.detail);
 				}
 			})
 			.catch((error) => {

@@ -1,4 +1,4 @@
-import background from './background.png';
+import background from './background.jpg';
 import logo from './logo-ex.png';
 import tinylogo from './logo-short-ex.png';
 

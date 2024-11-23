@@ -67,6 +67,8 @@ export const AddModalDiamond = ({
 			culet,
 		} = values;
 
+		console.log('priceOffset', priceOffset);
+
 		const diamond4c = {
 			cut,
 			color,
@@ -97,7 +99,7 @@ export const AddModalDiamond = ({
 			shapeId,
 			sku: generateRandomSKU(16),
 			certificate: 1,
-			priceOffset,
+			priceOffset: priceOffset === 0 ? 0.0 : priceOffset,
 		};
 
 		if (orders?.Status === 1) {
@@ -108,17 +110,16 @@ export const AddModalDiamond = ({
 					diamondRequestId: selectedRequest?.DiamondRequestId,
 					lockPrice: lockPrice || null,
 				})
-			).then((res) => {
-				console.log('res', res);
-
-				if (res.payload !== undefined) {
+			)
+				.unwrap()
+				.then((res) => {
 					message.success('Thêm Cương Kim Thành Công!');
 					setShowModal(false);
 					form.resetFields();
-				} else {
-					message.error('Kim tra lại thông số kim cương!');
-				}
-			});
+				})
+				.catch((error) => {
+					message.error(error?.data?.title || error?.detail);
+				});
 		} else {
 			const updatedChangeDiamond = filteredRequests?.reduce((acc, diamond) => {
 				if (diamond.DiamondRequestId === selectedRequest?.DiamondRequestId) {
@@ -486,7 +487,15 @@ export const AddModalDiamond = ({
 					</Form.Item>
 
 					<Form.Item name="priceOffset" label="Giá Offset" className="w-1/3">
-						<InputNumber min={0} placeholder="Nhập Giá Offset" className="w-full" />
+						<InputNumber
+							min={0.0}
+							step={0.1}
+							placeholder="Nhập Giá Offset"
+							className="w-full"
+							defaultValue={0.0}
+							formatter={(value) => `${Number(value || 0).toFixed(1)}`} // Hiển thị 1 chữ số sau dấu chấm
+							parser={(value) => parseFloat(value || 0)} // Phân tích giá trị đầu vào
+						/>
 					</Form.Item>
 				</div>
 				<div>

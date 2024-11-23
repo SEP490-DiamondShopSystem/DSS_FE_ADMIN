@@ -1,6 +1,7 @@
 import {MinusCircleFilled} from '@ant-design/icons';
-import {Button, Col, Form, Input, InputNumber, Row, Select, Space} from 'antd';
-import React from 'react';
+import {Button, Col, Form, Input, InputNumber, Row, Select, Space, Modal} from 'antd';
+import React, {useState} from 'react';
+import JewelryModelList from '../JewelryModelList';
 
 export const PromoReqForm = ({form, shapes, Option}) => {
 	const handleTargetTypeChange = (targetType, name, setFieldsValue) => {
@@ -15,6 +16,23 @@ export const PromoReqForm = ({form, shapes, Option}) => {
 			[`requirements[${name}].diamondRequirementSpec`]: isDiamond ? {} : undefined,
 			[`requirements[${name}].promotionId`]: isJewelryModel ? '' : undefined,
 		});
+	};
+	const handleFieldChange = (fieldName, value) => {
+		if (value) {
+			if (fieldName === 'moneyAmount') {
+				form.setFieldsValue({quantity: undefined});
+			} else if (fieldName === 'quantity') {
+				form.setFieldsValue({moneyAmount: undefined});
+			}
+		}
+	};
+	const [isPopupVisible, setIsPopupVisible] = useState(false);
+	const [selectedModel, setSelectedModel] = useState(null);
+
+	const handleSelectModel = (model) => {
+		console.log('Model Selected in Parent:', model);
+		setSelectedModel(model)
+		setIsPopupVisible(false);
 	};
 
 	return (
@@ -65,9 +83,7 @@ export const PromoReqForm = ({form, shapes, Option}) => {
 												</Form.Item>
 												<Form.Item
 													label="Amount"
-													{...restField}
-													name={[name, 'moneyAmount']}
-													fieldKey={[fieldKey, 'moneyAmount']}
+													name="moneyAmount"
 													rules={[
 														{
 															required: false,
@@ -80,6 +96,10 @@ export const PromoReqForm = ({form, shapes, Option}) => {
 													<InputNumber
 														className="w-full"
 														placeholder="Enter amount"
+														onChange={(value) =>
+															handleFieldChange('moneyAmount', value)
+														}
+														disabled={!!form.getFieldValue('quantity')}
 													/>
 												</Form.Item>
 												<Form.Item
@@ -111,6 +131,20 @@ export const PromoReqForm = ({form, shapes, Option}) => {
 														)}
 													</Select>
 												</Form.Item>
+												<Form.Item
+													label="Promotion ID"
+													{...restField}
+													name={[name, 'promotionId']}
+													fieldKey={[fieldKey, 'promotionId']}
+													rules={[
+														{
+															required: false,
+															message: 'Promotion ID is required',
+														},
+													]}
+												>
+													<Input />
+												</Form.Item>
 											</Col>
 											<Col span={12}>
 												{form.getFieldValue([
@@ -132,7 +166,16 @@ export const PromoReqForm = ({form, shapes, Option}) => {
 														labelCol={{span: 24}}
 														wrapperCol={{span: 24}}
 													>
-														<InputNumber min={1} className="w-full" />
+														<InputNumber
+															min={1}
+															className="w-full"
+															onChange={(value) =>
+																handleFieldChange('quantity', value)
+															}
+															disabled={
+																!!form.getFieldValue('moneyAmount')
+															}
+														/>
 													</Form.Item>
 												)}
 												{form.getFieldValue([
@@ -538,23 +581,47 @@ export const PromoReqForm = ({form, shapes, Option}) => {
 													name,
 													'targetType',
 												]) === 1 && (
-													<Form.Item
-														label="Promotion ID"
-														{...restField}
-														name={[name, 'promotionId']}
-														fieldKey={[fieldKey, 'promotionId']}
-														rules={[
-															{
-																required: false,
-																message: 'Promotion ID is required',
-															},
-														]}
-													>
-														<Input />
-													</Form.Item>
+													<>
+														<Form.Item
+															label="Jewelry Model ID"
+															name="jewelryModelId"
+															rules={[
+																{
+																	required: true,
+																	message:
+																		'Please select a Jewelry Model',
+																},
+															]}
+														>
+															<div className="flex items-center gap-2">
+																<Input
+																	readOnly
+																	value={selectedModel?.Id}
+																	placeholder={
+																		selectedModel?.Name
+																	}
+																/>
+																<Button
+																	onClick={() =>
+																		setIsPopupVisible(true)
+																	}
+																>
+																	Select Model
+																</Button>
+															</div>
+														</Form.Item>
+													</>
 												)}
 											</Col>
 										</Row>
+										<Modal
+											open={isPopupVisible}
+											onCancel={() => setIsPopupVisible(false)}
+											footer={null}
+											width="80%"
+										>
+											<JewelryModelList onSelectModel={handleSelectModel} />
+										</Modal>
 										<Button type="link" onClick={() => remove(name)}>
 											<MinusCircleFilled />
 										</Button>

@@ -88,7 +88,7 @@ export const DiamondUploadForm = ({diamondId, visible, onClose}) => {
 			handleImageUpload();
 			handleDeleteImages();
 		} else {
-			message.info('No changes detected, nothing to save');
+			message.error(error?.data?.title || error?.detail);
 		}
 		await dispatch(fetchDiamondFiles(diamondId)).then((response) => {
 			if (response.payload) {
@@ -127,7 +127,7 @@ export const DiamondUploadForm = ({diamondId, visible, onClose}) => {
 					message.success('Images deleted successfully');
 				})
 				.catch((err) => {
-					message.error('Failed to delete images');
+					message.error(error?.data?.title || error?.detail);
 				});
 		}
 	};
@@ -143,7 +143,7 @@ export const DiamondUploadForm = ({diamondId, visible, onClose}) => {
 			await dispatch(uploadDiamondThumbnail({diamondId, formFile: thumbnailFile}));
 			message.success('Thumbnail uploaded successfully');
 		} catch (err) {
-			message.error('Failed to upload thumbnail');
+			message.error(error?.data?.title || error?.detail);
 		}
 	};
 
@@ -162,7 +162,7 @@ export const DiamondUploadForm = ({diamondId, visible, onClose}) => {
 			}
 			message.success('Certificates uploaded successfully');
 		} catch (err) {
-			message.error('Failed to upload certificates');
+			message.error(error?.data?.title || error?.detail);
 		}
 	};
 
@@ -177,7 +177,7 @@ export const DiamondUploadForm = ({diamondId, visible, onClose}) => {
 			await dispatch(uploadDiamondImages({diamondId, formFiles: imageFiles}));
 			message.success('Diamond images uploaded successfully');
 		} catch (err) {
-			message.error('Failed to upload diamond images');
+			message.error(error?.data?.title || error?.detail);
 		}
 	};
 

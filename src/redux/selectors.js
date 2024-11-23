@@ -17,6 +17,10 @@ export const getOrderStatusDetailSelector = (state) => state.orderSlice.orderSta
 export const getPaymentStatusDetailSelector = (state) => state.orderSlice.orderPaymentStatusDetail;
 export const getOrderLogsDetailSelector = (state) => state.orderSlice.orderLogs;
 export const getOrderLogsSelector = (state) => state.orderSlice.orderLogsDetail;
+export const getOrderChildLogSelector = (state) => state.orderSlice.orderChildLogDetail;
+
+//LOG
+export const getOrderChildLogListSelector = (state) => state.logSlice.orderChildLogList;
 
 //CUSTOMIZE
 export const getAllOrderCustomizeSelector = (state) => state.customizeSlice.ordersCustomize;

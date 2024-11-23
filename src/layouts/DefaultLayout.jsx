@@ -99,8 +99,7 @@ const DefaultLayout = () => {
 		,
 		(managerRole || staffRole) && getItem('Quản Lí Khuyến Mãi', '/promotion', <GiftOutlined />),
 		(managerRole || staffRole) && getItem('Quản Lí Giảm Giá', '/discount', <TagOutlined />),
-		(managerRole || staffRole) &&
-			getItem('Quản Lí Vận Chuyển', '/deliveries', <DeliveredProcedureOutlined />),
+
 		(managerRole || staffRole) &&
 			getItem('Quản Lí Phí Vận Chuyển', '/delivery-fee', <DeliveredProcedureOutlined />),
 		(managerRole || staffRole) &&
@@ -148,7 +147,7 @@ const DefaultLayout = () => {
 		));
 
 	return (
-		<Layout style={{minHeight: '100vh'}}>
+		<Layout className="min-h-screen flex">
 			<Sider
 				collapsed={collapsed}
 				className="shadow-sm"
@@ -156,17 +155,13 @@ const DefaultLayout = () => {
 				theme="light"
 				onCollapse={toggleCollapsed}
 			>
-				<Link to="/dashboard" style={{display: 'block', height: '100px'}}>
+				<Link to="/dashboard" className="block h-24">
 					<img
 						src={collapsed ? imageExporter.tinylogo : imageExporter.logo}
 						alt="logo"
-						style={{
-							width: collapsed ? '80%' : '40%',
-							height: 'auto',
-							display: 'block',
-							margin: '10px auto',
-							objectFit: 'cover',
-						}}
+						className={`block mx-auto mt-2 ${
+							collapsed ? 'w-4/5' : 'w-2/5'
+						} h-auto object-cover`}
 					/>
 				</Link>
 				<Menu
@@ -176,13 +171,14 @@ const DefaultLayout = () => {
 					mode="vertical"
 					openKeys={openKeys}
 					onOpenChange={onOpenChange}
+					className="text-gray"
 				>
 					{items.map((item) =>
 						item.children ? (
 							<SubMenu key={item.key} icon={item.icon} title={item.label}>
 								{item.children.map((child) => (
 									<Menu.Item key={child.key}>
-										<Link to={child.key} style={{fontWeight: 'bold'}}>
+										<Link to={child.key} className="font-bold">
 											{child.label}
 										</Link>
 									</Menu.Item>
@@ -191,7 +187,7 @@ const DefaultLayout = () => {
 						) : (
 							item && (
 								<Menu.Item key={item.key} icon={item.icon}>
-									<Link to={item.key} style={{fontWeight: 'bold'}}>
+									<Link to={item.key} className="font-bold">
 										{item.label}
 									</Link>
 								</Menu.Item>
@@ -200,26 +196,16 @@ const DefaultLayout = () => {
 					)}
 				</Menu>
 			</Sider>
-			<Layout style={{backgroundColor: '#eaeaea', minHeight: '100vh'}}>
+			<Layout className="bg-gray-200 min-h-screen flex flex-col">
 				{showHeaderFooter && <TopNavbar />}
-				<Content style={{padding: '0 16px'}}>
-					<Breadcrumb style={{margin: '16px 0'}}>
+				<Content className="p-4 flex-1">
+					<Breadcrumb className="mb-4">
 						<Breadcrumb.Item>
 							<Link to="/dashboard">Home</Link>
 						</Breadcrumb.Item>
 						{breadcrumbItems}
 					</Breadcrumb>
-					<div
-						style={{
-							minHeight: 790,
-							backgroundColor: '#ffffff',
-							padding: '16px',
-
-							overflowy: 'auto',
-							borderRadius: '8px', // Optional: add some rounding for better appearance
-						}}
-					>
-						{/* Render child routes */}
+					<div className="min-h-[790px] bg-white p-4 overflow-y-auto rounded-lg shadow-md">
 						<Outlet />
 					</div>
 				</Content>

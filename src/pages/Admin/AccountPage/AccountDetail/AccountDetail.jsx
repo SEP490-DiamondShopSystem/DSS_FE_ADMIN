@@ -123,7 +123,7 @@ const AccountDetail = () => {
 				message.success('Xóa vai trò thành công!');
 				setIsModalRemoveRoleVisible(false);
 			} else {
-				message.error(res.payload.title);
+				message.error(error?.data?.title || error?.detail);
 			}
 		});
 		setIsModalVisible(false);
@@ -134,7 +134,7 @@ const AccountDetail = () => {
 			if (res.payload) {
 				message.message(`Cấm tài khoản ${userDetail.Id} thành công`);
 			} else {
-				message.error('Lỗi!');
+				message.error(error?.data?.title || error?.detail);
 			}
 		});
 	};

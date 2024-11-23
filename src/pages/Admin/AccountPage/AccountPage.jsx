@@ -160,7 +160,7 @@ const AccountPage = () => {
 				if (res.payload) {
 					message.success('Tạo thành công tài khoản giao hàng!');
 				} else {
-					message.error('Vui lòng kiểm tra lại thông tin!');
+					message.error(error?.data?.title || error?.detail);
 				}
 			});
 		} else if (role === 'manager') {
@@ -168,7 +168,7 @@ const AccountPage = () => {
 				if (res.payload) {
 					message.success('Tạo thành công tài khoản quản lí!');
 				} else {
-					message.error('Vui lòng kiểm tra lại thông tin!');
+					message.error(error?.data?.title || error?.detail);
 				}
 			});
 		} else if (role === 'staff') {
@@ -176,7 +176,7 @@ const AccountPage = () => {
 				if (res.payload) {
 					message.success('Tạo thành công tài khoản nhân viên!');
 				} else {
-					message.error('Vui lòng kiểm tra lại thông tin!');
+					message.error(error?.data?.title || error?.detail);
 				}
 			});
 		} else if (role === 'admin') {
@@ -184,7 +184,7 @@ const AccountPage = () => {
 				if (res.payload) {
 					message.success('Tạo thành công tài khoản admin!');
 				} else {
-					message.error('Vui lòng kiểm tra lại thông tin!');
+					message.error(error?.data?.title || error?.detail);
 				}
 			});
 		}
