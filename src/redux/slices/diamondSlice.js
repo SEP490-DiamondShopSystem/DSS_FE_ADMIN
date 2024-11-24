@@ -135,12 +135,27 @@ export const getDiamondFilter = createAsyncThunk(
 	}
 );
 
+export const handleLockDiamond = createAsyncThunk(
+	'diamondSlice/handleLockDiamond',
+	async (body, {rejectWithValue}) => {
+		try {
+			const response = await api.put(`/Diamond/Lock`, body);
+
+			return response;
+		} catch (error) {
+			console.log('Error: ', JSON.stringify(error));
+			return rejectWithValue(error);
+		}
+	}
+);
+
 export const diamondSlice = createSlice({
 	name: 'diamondSlice',
 	initialState: {
 		diamonds: null,
 		diamondDetail: null,
 		diamondShape: null,
+		addData: null,
 		loading: false,
 		error: null,
 		filterLimits: null,
@@ -190,7 +205,7 @@ export const diamondSlice = createSlice({
 			})
 			.addCase(handleAddDiamond.fulfilled, (state, action) => {
 				state.loading = false;
-				// state.diamonds.push(action.payload);
+				state.addData = action.payload;
 			})
 			.addCase(handleAddDiamond.rejected, (state, action) => {
 				state.loading = false;
@@ -206,14 +221,14 @@ export const diamondSlice = createSlice({
 				state.loading = false;
 				state.error = action.payload;
 			})
-			.addCase(getDiamondFilter.pending, (state) => {
+			.addCase(handleLockDiamond.pending, (state) => {
 				state.loading = true;
 			})
-			.addCase(getDiamondFilter.fulfilled, (state, action) => {
+			.addCase(handleLockDiamond.fulfilled, (state, action) => {
 				state.loading = false;
-				state.filterLimits = action.payload;
+				state.addData = action.payload;
 			})
-			.addCase(getDiamondFilter.rejected, (state, action) => {
+			.addCase(handleLockDiamond.rejected, (state, action) => {
 				state.loading = false;
 				state.error = action.payload;
 			});

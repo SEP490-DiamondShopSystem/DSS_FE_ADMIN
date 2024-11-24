@@ -188,7 +188,7 @@ const TimeLineOrder = ({orders, loading, statusOrder, paymentStatusOrder, id}) =
 				}
 			})
 			.catch((error) => {
-				message.error(error?.data?.title || error?.detail);
+				message.error(error?.data?.title || error?.title || error?.detail);
 			});
 	};
 
@@ -244,15 +244,34 @@ const TimeLineOrder = ({orders, loading, statusOrder, paymentStatusOrder, id}) =
 			});
 	};
 
-	const handleRefund = async () => {
-		const res = await dispatch(handleRefundOrder(orders.Id))
+	const handleRefund = () => {
+		Modal.confirm({
+			title: 'Xác nhận hoàn tiền đơn đặt hàng này',
+			// icon: <CheckCircleOutlined />,
+			content: 'Bạn có chắc chắn muốn tiếp tục?',
+			okText: 'Xác nhận',
+			cancelText: 'Hủy',
+			okType: 'danger',
+			onOk: handleRefundStatus,
+		});
+	};
+	const handleRefundSuccess = () => {
+		Modal.success({
+			title: 'Đã Hoàn Tiền Thành Công Đơn Đặt Hàng Này!',
+			icon: <CheckCircleOutlined />,
+			// content: 'Bạn có chắc chắn muốn tiếp tục?',
+			okText: 'Xác nhận',
+			okType: 'primary',
+			okCancel: false,
+			// footer: null,
+		});
+	};
+
+	const handleRefundStatus = async () => {
+		dispatch(handleRefundOrder(orders.Id))
 			.unwrap()
 			.then((res) => {
-				if (res.payload !== undefined) {
-					message.warning('Xác nhận hoàn tiền!');
-				} else {
-					message.error(error?.data?.title || error?.detail);
-				}
+				handleRefundSuccess();
 			})
 			.catch((error) => {
 				message.error(error?.data?.title || error?.detail);
@@ -312,8 +331,6 @@ const TimeLineOrder = ({orders, loading, statusOrder, paymentStatusOrder, id}) =
 
 		setIsCancelModalVisible(false);
 	};
-
-	console.log('orders', orders);
 
 	return (
 		<div>
@@ -546,7 +563,7 @@ const TimeLineOrder = ({orders, loading, statusOrder, paymentStatusOrder, id}) =
 								</p>
 							</div>
 							<div className="flex justify-around">
-								{userRoleDeliverer ? (
+								{userRoleDeliverer && (
 									<div className="flex items-center">
 										<Button
 											type="text"
@@ -563,8 +580,6 @@ const TimeLineOrder = ({orders, loading, statusOrder, paymentStatusOrder, id}) =
 											Hủy Giao Hàng
 										</Button>
 									</div>
-								) : (
-									<p className="font-bold text-primary">Đang Giao Hàng Bởi ???</p>
 								)}
 							</div>
 						</div>

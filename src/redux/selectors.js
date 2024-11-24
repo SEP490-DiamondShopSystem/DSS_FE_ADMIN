@@ -52,6 +52,7 @@ export const getAllShapeSelector = (state) => state.diamondSlice.diamondShape;
 export const getAllDiamondSelector = (state) => state.diamondSlice.diamonds;
 export const LoadingDiamondSelector = (state) => state.diamondSlice.loading;
 export const GetDiamondFilterSelector = (state) => state.diamondSlice.filterLimits;
+export const FetchDataSelector = (state) => state.diamondSlice.addData;
 
 // DIAMOND PRICE
 export const getPriceBoardSelector = (state) => state.diamondPriceSlice.priceBoard;

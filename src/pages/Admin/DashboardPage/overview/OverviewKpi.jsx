@@ -17,7 +17,7 @@ const useChartOptions = () => {
 			type: 'datetime',
 			tickAmount: 6, // Hiển thị 6 mốc thời gian
 			labels: {
-				format: 'dd MMM', // Định dạng ngày
+				format: 'dd MMM', // Hiển thị ngày dạng 'dd MMM' (ví dụ: '24 Nov')
 				style: {
 					colors: theme.palette.text.secondary,
 				},
@@ -28,6 +28,7 @@ const useChartOptions = () => {
 				style: {
 					colors: theme.palette.text.secondary,
 				},
+				formatter: (value) => new Intl.NumberFormat('vi-VN').format(value), // Định dạng tiền tệ
 			},
 		},
 		stroke: {width: 3},
@@ -44,7 +45,7 @@ export const OverviewKpi = (props) => {
 				height="350"
 				options={chartOptionsOverride || chartOptions}
 				series={chartSeries}
-				type="line" // Sử dụng loại biểu đồ line để hiển thị
+				type="line" // Biểu đồ dạng line
 			/>
 		</Card>
 	);
