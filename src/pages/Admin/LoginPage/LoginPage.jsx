@@ -59,6 +59,7 @@ const LoginPage = () => {
 
 		// }
 		dispatch(handleLogin(data))
+			.unwrap()
 			.then((res) => {
 				if (res.payload) {
 					const decodedData = jwtDecode(res.payload.accessToken);
@@ -70,16 +71,14 @@ const LoginPage = () => {
 					form.resetFields();
 
 					navigate('/');
-				} else 	{
+				} else {
 					message.error(error?.data?.title || error?.detail);
 				}
 			})
 			.catch((error) => {
-				console.log(error);
-				message.error('Email hoặc mật khẩu không đúng!');
+				message.error(error?.data?.title || error?.detail);
 			});
 	};
-
 	return (
 		<>
 			<Helmet>

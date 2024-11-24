@@ -177,23 +177,28 @@ const DeliveryPage = () => {
 	const onFinish = (values) => {
 		console.log('Form Values:', values);
 
-		dispatch(handleCreateDelivery(values)).then((res) => {
-			if (res.payload) {
-				message.success('Chuyển giao shipper thành công!');
-				setIsModalVisible(false);
-			}
-		});
+		dispatch(handleCreateDelivery(values))
+			.unwrap()
+			.then((res) => {
+				if (res.payload) {
+					message.success('Chuyển giao shipper thành công!');
+					setIsModalVisible(false);
+				}
+			})
+			.catch((error) => {
+				message.error(error?.data?.title || error?.detail);
+			});
 	};
 
 	const handleBeginDeliveryBtn = () => {
-		dispatch(handleBeginDelivery()).then((res) => {
-			if (res.payload) {
-				message.success('Giao hàng sớm');
-				// window.location.reload();
-			} else {
+		dispatch(handleBeginDelivery())
+			.unwrap()
+			.then((res) => {
+				message.success('Giao hàng sớm!');
+			})
+			.catch((error) => {
 				message.error(error?.data?.title || error?.detail);
-			}
-		});
+			});
 	};
 
 	const onSearch = (value) => {

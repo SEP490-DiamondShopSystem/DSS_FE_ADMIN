@@ -24,6 +24,7 @@ const SignUpPage = () => {
 		};
 		try {
 			dispatch(handleStaffRegister({...values, fullName, isManager: role}))
+				.unwrap()
 				.then((res) => {
 					if (res.payload) {
 						message.success('Đăng ký thành công!');

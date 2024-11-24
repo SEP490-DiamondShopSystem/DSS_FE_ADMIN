@@ -124,33 +124,25 @@ const BlogPage = () => {
 			if (!editorContent.trim()) {
 				return;
 			}
-
 			const blogData = new FormData();
-
 			if (isEditMode) {
-				blogData.append('BlogId', updatingId); // or use 'updatingId' if that's available
+				blogData.append('BlogId', updatingId);
 			}
 			blogData.append('Title', values.title);
-
-			// Check if tags are populated correctly
 			console.log('Tags:', tags);
 			tags.forEach((tag, index) => {
-				blogData.append(`BlogTags[${index}]`, tag); // Append each tag directly
+				blogData.append(`BlogTags[${index}]`, tag);
 			});
-
 			blogData.append('Content', editorContent);
 
-			// Ensure thumbnail is correctly handled
 			if (thumbnailFile) {
 				blogData.append('Thumbnail', thumbnailFile);
 			}
 
 			const result = await dispatch(isEditMode ? updateBlog(blogData) : createBlog(blogData));
-			// Log the data to the console before dispatching the API call
 			message.success(
 				isEditMode ? 'Cập nhật bài viết thành công!' : 'Tạo bài viết mới thành công!'
 			);
-
 			// Reset state
 			setIsModalVisible(false);
 			form.resetFields();
@@ -161,7 +153,7 @@ const BlogPage = () => {
 			setTags([]);
 			await dispatch(fetchAllBlogs({CurrentPage: currentPage, PageSize: pageSize}));
 		} catch (error) {
-			console.error('Error creating/updating blog:', error);
+			message.error(error?.data?.title || error?.detail);
 		}
 	};
 

@@ -156,37 +156,57 @@ const AccountPage = () => {
 			lastName,
 		};
 		if (role === 'deliverer') {
-			dispatch(handleRegisterDeliverer({...value, fullName})).then((res) => {
-				if (res.payload) {
-					message.success('Tạo thành công tài khoản giao hàng!');
-				} else {
+			dispatch(handleRegisterDeliverer({...value, fullName}))
+				.unwrap()
+				.then((res) => {
+					if (res.payload) {
+						message.success('Tạo thành công tài khoản giao hàng!');
+					} else {
+						message.error(error?.data?.title || error?.detail);
+					}
+				})
+				.catch((error) => {
 					message.error(error?.data?.title || error?.detail);
-				}
-			});
+				});
 		} else if (role === 'manager') {
-			dispatch(handleStaffRegister({...value, fullName, isManager: true})).then((res) => {
-				if (res.payload) {
-					message.success('Tạo thành công tài khoản quản lí!');
-				} else {
+			dispatch(handleStaffRegister({...value, fullName, isManager: true}))
+				.unwrap()
+				.then((res) => {
+					if (res.payload) {
+						message.success('Tạo thành công tài khoản quản lí!');
+					} else {
+						message.error(error?.data?.title || error?.detail);
+					}
+				})
+				.catch((error) => {
 					message.error(error?.data?.title || error?.detail);
-				}
-			});
+				});
 		} else if (role === 'staff') {
-			dispatch(handleStaffRegister({...value, fullName, isManager: false})).then((res) => {
-				if (res.payload) {
-					message.success('Tạo thành công tài khoản nhân viên!');
-				} else {
+			dispatch(handleStaffRegister({...value, fullName, isManager: false}))
+				.unwrap()
+				.then((res) => {
+					if (res.payload) {
+						message.success('Tạo thành công tài khoản nhân viên!');
+					} else {
+						message.error(error?.data?.title || error?.detail);
+					}
+				})
+				.catch((error) => {
 					message.error(error?.data?.title || error?.detail);
-				}
-			});
+				});
 		} else if (role === 'admin') {
-			dispatch(handleAdminRegister({...value, fullName})).then((res) => {
-				if (res.payload) {
-					message.success('Tạo thành công tài khoản admin!');
-				} else {
+			dispatch(handleAdminRegister({...value, fullName}))
+				.unwrap()
+				.then((res) => {
+					if (res.payload) {
+						message.success('Tạo thành công tài khoản admin!');
+					} else {
+						message.error(error?.data?.title || error?.detail);
+					}
+				})
+				.catch((error) => {
 					message.error(error?.data?.title || error?.detail);
-				}
-			});
+				});
 		}
 		form.resetFields();
 		setIsModalAddVisible(false);

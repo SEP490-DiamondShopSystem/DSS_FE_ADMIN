@@ -69,7 +69,14 @@ const SideDiamondPricePage = () => {
 				isLabDiamond,
 			};
 
-			await dispatch(deleteDiamondPrice(payload)); // Wait for delete to finish
+			dispatch(deleteDiamondPrice(payload))
+				.unwrap()
+				.then((res) => {
+					message.success('Xóa Giá Thành Công!');
+				})
+				.catch((error) => {
+					message.error(error?.data?.title || error?.detail);
+				}); // Wait for delete to finish
 		} catch (error) {
 			message.error(error?.data?.title || error?.detail);
 		}
@@ -87,7 +94,14 @@ const SideDiamondPricePage = () => {
 
 			if (listPrices.length === 0) return;
 
-			await dispatch(createDiamondPrice({listPrices, isLabDiamond, isSideDiamond, shapeId}));
+			await dispatch(createDiamondPrice({listPrices, isLabDiamond, isSideDiamond, shapeId}))
+				.unwrap()
+				.then((res) => {
+					message.success('Thêm Giá Thành Công!');
+				})
+				.catch((error) => {
+					message.error(error?.data?.title || error?.detail);
+				});
 		} catch (error) {
 			message.error(error?.data?.title || error?.detail);
 		}
@@ -110,7 +124,14 @@ const SideDiamondPricePage = () => {
 					isLabDiamond,
 					isSideDiamond,
 				})
-			);
+			)
+				.unwrap()
+				.then((res) => {
+					message.success('Cập Nhật Giá Thành Công!');
+				})
+				.catch((error) => {
+					message.error(error?.data?.title || error?.detail);
+				});
 		} catch (error) {
 			message.error(error?.data?.title || error?.detail);
 		} // Wait for update to finish

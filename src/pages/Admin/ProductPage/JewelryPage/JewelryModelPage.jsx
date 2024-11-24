@@ -352,6 +352,7 @@ const JewelryModelPage = () => {
 
 		// Dispatch the createJewelryModel action with formData
 		dispatch(createJewelryModel(formData))
+			.unwrap()
 			.then((formData) => {
 				console.log('Jewelry model created successfully:', formData);
 			})

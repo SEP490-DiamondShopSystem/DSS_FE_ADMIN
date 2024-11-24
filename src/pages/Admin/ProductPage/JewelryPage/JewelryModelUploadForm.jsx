@@ -44,24 +44,34 @@ export const JewelryModelUploadForm = ({jewelryModelId, visible, onClose}) => {
 
 	useEffect(() => {
 		if (jewelryModelId) {
-			dispatch(fetchJewelryModelFiles(jewelryModelId)).then((response) => {
-				if (response.payload) {
-					setJewelryModelFiles((prevState) => ({
-						...prevState,
-						...response.payload,
-					}));
-				}
-			});
+			dispatch(fetchJewelryModelFiles(jewelryModelId))
+				.unwrap()
+				.then((response) => {
+					if (response.payload) {
+						setJewelryModelFiles((prevState) => ({
+							...prevState,
+							...response.payload,
+						}));
+					}
+				})
+				.catch((error) => {
+					message.error(error?.data?.title || error?.detail);
+				});
 
-			dispatch(fetchJewelryModelDetail(jewelryModelId)).then((response) => {
-				if (response.payload) {
-					setJewelryModelFiles((prevState) => ({
-						...prevState,
-						SizeMetals: response.payload.SizeMetals,
-						SideDiamonds: response.payload.SideDiamonds,
-					}));
-				}
-			});
+			dispatch(fetchJewelryModelDetail(jewelryModelId))
+				.unwrap()
+				.then((response) => {
+					if (response.payload) {
+						setJewelryModelFiles((prevState) => ({
+							...prevState,
+							SizeMetals: response.payload.SizeMetals,
+							SideDiamonds: response.payload.SideDiamonds,
+						}));
+					}
+				})
+				.catch((error) => {
+					message.error(error?.data?.title || error?.detail);
+				});
 		}
 	}, [jewelryModelId, dispatch]);
 
@@ -130,11 +140,16 @@ export const JewelryModelUploadForm = ({jewelryModelId, visible, onClose}) => {
 		handleDeleteImages();
 
 		// Refresh the files
-		await dispatch(fetchJewelryModelFiles(jewelryModelId)).then((response) => {
-			if (response.payload) {
-				setJewelryModelFiles(response.payload);
-			}
-		});
+		await dispatch(fetchJewelryModelFiles(jewelryModelId))
+			.unwrap()
+			.then((response) => {
+				if (response.payload) {
+					setJewelryModelFiles(response.payload);
+				}
+			})
+			.catch((error) => {
+				message.error(error?.data?.title || error?.detail);
+			});
 
 		// Reset states after saving
 		resetFormState();
@@ -183,10 +198,11 @@ export const JewelryModelUploadForm = ({jewelryModelId, visible, onClose}) => {
 			console.log('Deleting images:', removedImagePaths);
 
 			dispatch(deleteJewelryModelImages({jewelryModelId, imagePaths: removedImagePaths}))
+				.unwrap()
 				.then(() => {
 					message.success('Images deleted successfully');
 				})
-				.catch((err) => {
+				.catch((error) => {
 					message.error(error?.data?.title || error?.detail);
 				});
 		}
@@ -199,12 +215,14 @@ export const JewelryModelUploadForm = ({jewelryModelId, visible, onClose}) => {
 
 		console.log('Uploading Thumbnail for Diamond ID:', jewelryModelId);
 
-		try {
-			await dispatch(uploadJewelryModelThumbnail({jewelryModelId, formFile: thumbnailFile}));
-			message.success('Thumbnail uploaded successfully');
-		} catch (err){
-			message.error(error?.data?.title || error?.detail);
-		}
+		await dispatch(uploadJewelryModelThumbnail({jewelryModelId, formFile: thumbnailFile}))
+			.unwrap()
+			.then((res) => {
+				message.success('Thumbnail uploaded successfully');
+			})
+			.catch((error) => {
+				message.error(error?.data?.title || error?.detail);
+			});
 	};
 	const handleUploadCategorizedImage = async () => {
 		if (!categorizedFile || !selectedSideDiamond || !selectedMetal) {
@@ -214,54 +232,63 @@ export const JewelryModelUploadForm = ({jewelryModelId, visible, onClose}) => {
 			return;
 		}
 
-		try {
-			await dispatch(
-				uploadCategorizedImage({
-					jewelryModelId,
-					imageFile: categorizedFile,
-					sideDiamondOptId: selectedSideDiamond,
-					metalId: selectedMetal,
-				})
-			);
-			message.success('Categorized image uploaded successfully');
-			dispatch(fetchJewelryModelFiles(jewelryModelId)); // Refresh the data
-			setCategorizedFile(null); // Reset the categorized file after upload
-		} catch (error) {
-			message.error(error?.data?.title || error?.detail);
-		}
+		await dispatch(
+			uploadCategorizedImage({
+				jewelryModelId,
+				imageFile: categorizedFile,
+				sideDiamondOptId: selectedSideDiamond,
+				metalId: selectedMetal,
+			})
+		)
+			.unwrap()
+			.then((res) => {
+				message.success('Categorized image uploaded successfully');
+			})
+			.catch((error) => {
+				message.error(error?.data?.title || error?.detail);
+			});
+
+		dispatch(fetchJewelryModelFiles(jewelryModelId)); // Refresh the data
+		setCategorizedFile(null); // Reset the categorized file after upload
 	};
 	const handleUploadSideDiamondImage = async () => {
 		console.log('sideDiamondFile:', sideDiamondFile);
 		console.log('selectedSideDiamond:', selectedSideDiamond);
 
-		try {
-			await dispatch(
-				uploadSideDiamondImage({
-					jewelryModelId,
-					image: sideDiamondFile, // Wrap the file in an array
-					sideDiamondOptionId: selectedSideDiamond,
-				})
-			);
-			message.success('Side Diamond image uploaded successfully');
-			setSideDiamondFile(null); // Reset the state after upload
-		} catch (err) {
-			message.error(error?.data?.title || error?.detail);
-		}
+		await dispatch(
+			uploadSideDiamondImage({
+				jewelryModelId,
+				image: sideDiamondFile, // Wrap the file in an array
+				sideDiamondOptionId: selectedSideDiamond,
+			})
+		)
+			.unwrap()
+			.then((res) => {
+				message.success('Side Diamond image uploaded successfully');
+			})
+			.catch((error) => {
+				message.error(error?.data?.title || error?.detail);
+			});
+
+		setSideDiamondFile(null); // Reset the state after upload
 	};
 
 	const handleUploadMetalImage = async () => {
 		console.log('MetalFile:', metalFile);
 		console.log('selectedMetal:', selectedMetal);
 
-		try {
-			await dispatch(
-				uploadMetalImages({jewelryModelId, formFiles: metalFile, metalId: selectedMetal})
-			);
-			message.success('Metal image uploaded successfully');
-			setMetalFile(null);
-		} catch (err) {
-			message.error(error?.data?.title || error?.detail);
-		}
+		await dispatch(
+			uploadMetalImages({jewelryModelId, formFiles: metalFile, metalId: selectedMetal})
+		)
+			.unwrap()
+			.then((res) => {
+				message.success('Metal image uploaded successfully');
+			})
+			.catch((error) => {
+				message.error(error?.data?.title || error?.detail);
+			});
+
+		setMetalFile(null);
 	};
 	const handleImageUpload = async () => {
 		if (imageFiles.length === 0 || imageFiles === initialFiles.images) {
@@ -270,12 +297,14 @@ export const JewelryModelUploadForm = ({jewelryModelId, visible, onClose}) => {
 
 		console.log('Uploading Diamond Images for Diamond ID:', jewelryModelId);
 
-		try {
-			await dispatch(uploadBaseImages({jewelryModelId, formFiles: imageFiles}));
-			message.success('Diamond images uploaded successfully');
-		} catch (err) {
-			message.error(error?.data?.title || error?.detail);
-		}
+		await dispatch(uploadBaseImages({jewelryModelId, formFiles: imageFiles}))
+			.unwrap()
+			.then((res) => {
+				message.success('Diamond images uploaded successfully');
+			})
+			.catch((error) => {
+				message.error(error?.data?.title || error?.detail);
+			});
 	};
 
 	const handleFileChange = (fileList, setState) => {

@@ -87,12 +87,17 @@ const DiscountPage = ({discountData}) => {
 				discountCode: discountCode,
 			};
 
-			dispatch(createFullDiscount({createDiscount, requirements})).then((res) => {
-				if (res.payload !== undefined) {
-					message.success('Discount created successfully!');
-					form.resetFields();
-				}
-			});
+			dispatch(createFullDiscount({createDiscount, requirements}))
+				.unwrap()
+				.then((res) => {
+					if (res.payload !== undefined) {
+						message.success('Tạo Giảm Giá Thành Công!');
+						form.resetFields();
+					}
+				})
+				.catch((error) => {
+					message.error(error?.data?.title || error?.detail);
+				});
 		} catch (error) {
 			message.error(error?.data?.title || error?.detail);
 		}
@@ -178,10 +183,16 @@ const DiscountPage = ({discountData}) => {
 
 	const handleCancel = async (id) => {
 		try {
-			await dispatch(cancelDiscount(id)); // Use your actual cancelDiscount logic
-			message.success(`Discount with id: ${id} has been canceled.`);
+			await dispatch(cancelDiscount(id))
+				.unwrap()
+				.then((res) => {
+					message.success(`Mã giảm giá với id: ${id} đã được bị hủy.`);
+				})
+				.catch((error) => {
+					message.error(error?.data?.title || error?.detail);
+				}); // Use your actual cancelDiscount logic
 		} catch (error) {
-			message.error('Failed to cancel the discount. Please try again.');
+			message.error(error?.data?.title || error?.detail);
 		}
 	};
 	const handleUpdate = async () => {
@@ -215,8 +226,15 @@ const DiscountPage = ({discountData}) => {
 				removedRequirements,
 			};
 
-			await dispatch(updateDiscount({discountId: editingDiscountId, discountData}));
-			message.success('Discount updated successfully!');
+			await dispatch(updateDiscount({discountId: editingDiscountId, discountData}))
+				.unwrap()
+				.then((res) => {
+					message.success('Cập giảm giá thành công!');
+				})
+				.catch((error) => {
+					message.error(error?.data?.title || error?.detail);
+				});
+			
 			await dispatch(fetchDiscounts());
 			setIsEditing(false);
 			setRemovedRequirements([]); // Reset removed requirements after update
@@ -227,8 +245,9 @@ const DiscountPage = ({discountData}) => {
 
 	const handleDelete = (id) => {
 		dispatch(deleteDiscount(id))
+		.unwrap()
 			.then(() => {
-				message.success(`Deleted discount with id: ${id}`);
+				message.success(`Đã xóa giảm giá có id: ${id}`);
 			})
 			.catch((error) => {
 				message.error(error?.data?.title || error?.detail);

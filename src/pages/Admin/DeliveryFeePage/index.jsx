@@ -54,9 +54,15 @@ const DeliveryFeePage = () => {
 	};
 
 	const handleDeleteDeliveryFee = async (id) => {
-		dispatch(deleteDeliveryFee(id));
-		message.success('Delivery Fee deleted successfully!');
-		await dispatch(updateDeliveryFee(updatePayload));
+		dispatch(deleteDeliveryFee(id))
+			.unwrap()
+			.then((res) => {
+				message.success('Delivery Fee deleted successfully!');
+				dispatch(updateDeliveryFee(updatePayload));
+			})
+			.catch((error) => {
+				message.error(error?.data?.title || error?.detail);
+			});
 	};
 
 	const handleSubmit = async (values) => {
@@ -79,17 +85,29 @@ const DeliveryFeePage = () => {
 			};
 
 			try {
-				await dispatch(updateDeliveryFee(updatePayload));
+				await dispatch(updateDeliveryFee(updatePayload))
+					.unwrap()
+					.then((res) => {
+						message.success('Delivery Fee updated successfully!');
+					})
+					.catch((error) => {
+						message.error(error?.data?.title || error?.detail);
+					});
 				await dispatch(fetchDeliveryFees({isLocation: true}));
-				message.success('Delivery Fee updated successfully!');
 			} catch (error) {
 				message.error(error?.data?.title || error?.detail);
 			}
 		} else {
 			try {
-				await dispatch(addDeliveryFee(payload));
+				await dispatch(addDeliveryFee(payload))
+					.unwrap()
+					.then((res) => {
+						message.success('Delivery Fee added successfully!');
+					})
+					.catch((error) => {
+						message.error(error?.data?.title || error?.detail);
+					});
 				await dispatch(fetchDeliveryFees({isLocation: true}));
-				message.success('Delivery Fee added successfully!');
 			} catch (error) {
 				message.error(error?.data?.title || error?.detail);
 			}

@@ -280,14 +280,19 @@ const DiamondPage = () => {
 
 	const handleDelete = () => {
 		console.log('Deleted successfully');
-		dispatch(handleDeleteDiamond(diamondId)).then((res) => {
-			console.log('res', res);
-			if (res.payload !== undefined) {
-				message.success('Xóa Kim Cương Thành Công!');
-			} else {
+		dispatch(handleDeleteDiamond(diamondId))
+			.unwrap()
+			.then((res) => {
+				console.log('res', res);
+				if (res.payload !== undefined) {
+					message.success('Xóa Kim Cương Thành Công!');
+				} else {
+					message.error(error?.data?.title || error?.detail);
+				}
+			})
+			.catch((error) => {
 				message.error(error?.data?.title || error?.detail);
-			}
-		});
+			});
 		setIsModalVisible(false);
 	};
 

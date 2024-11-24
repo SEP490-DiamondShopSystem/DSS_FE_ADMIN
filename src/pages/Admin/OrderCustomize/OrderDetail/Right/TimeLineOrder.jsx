@@ -368,13 +368,18 @@ const TimeLineOrder = ({
 					sideDiamondOptId: orders?.SideDiamondId,
 					diamondAssigning,
 				})
-			).then((res) => {
-				if (res.payload) {
-					message.success('Xác nhận kim cương cho yêu cầu thành công!');
-				} else {
+			)
+				.unwrap()
+				.then((res) => {
+					if (res.payload) {
+						message.success('Xác nhận kim cương cho yêu cầu thành công!');
+					} else {
+						message.error(error?.data?.title || error?.detail);
+					}
+				})
+				.catch((error) => {
 					message.error(error?.data?.title || error?.detail);
-				}
-			});
+				});
 		} else {
 			const diamondData = changeDiamond
 				? changeDiamond[selectedRequest?.DiamondRequestId]
@@ -416,6 +421,7 @@ const TimeLineOrder = ({
 					createDiamondCommand,
 				})
 			)
+				.unwrap()
 				.then((res) => {
 					if (res.payload) {
 						message.success('Kim cương đã được cập nhật thành công!');
@@ -423,7 +429,7 @@ const TimeLineOrder = ({
 						message.error(error?.data?.title || error?.detail);
 					}
 				})
-				.catch((error) =>{
+				.catch((error) => {
 					message.error(error?.data?.title || error?.detail);
 				});
 		}
@@ -446,6 +452,7 @@ const TimeLineOrder = ({
 
 	const handleAccepted = async () => {
 		dispatch(handleCustomizeOrder({requestId: orders?.Id}))
+			.unwrap()
 			.then((res) => {
 				console.log('res', res);
 
@@ -478,28 +485,34 @@ const TimeLineOrder = ({
 	const handleRejectStatus = async () => {
 		// console.log('diamondAssigning', diamondAssigning);
 
-		dispatch(handleRejectCustomize(id)).then((res) => {
-			console.log('res', res);
-
-			if (res.payload) {
-				message.success('Hủy Đơn Yêu Cầu Thành Công!');
-				setIsModalVisible(false);
-			} else {
+		dispatch(handleRejectCustomize(id))
+			.unwrap()
+			.then((res) => {
+				if (res.payload) {
+					message.success('Hủy Đơn Yêu Cầu Thành Công!');
+					setIsModalVisible(false);
+				} else {
+					message.error(error?.data?.title || error?.detail);
+				}
+			})
+			.catch((error) => {
 				message.error(error?.data?.title || error?.detail);
-			}
-		});
+			});
 	};
 
 	const submitCancelOrder = async (values) => {
-		const res = await dispatch(handleOrderReject({orderId: orders.Id, reason: values.reason}));
-		console.log('err', res.payload);
-
-		if (res.payload !== undefined) {
-			message.success('Từ chối thành công!');
-		} else {
-			message.error(error?.data?.title || error?.detail);
-		}
-
+		const res = await dispatch(handleOrderReject({orderId: orders.Id, reason: values.reason}))
+			.unwrap()
+			.then((res) => {
+				if (res.payload !== undefined) {
+					message.success('Từ chối thành công!');
+				} else {
+					message.error(error?.data?.title || error?.detail);
+				}
+			})
+			.catch((error) => {
+				message.error(error?.data?.title || error?.detail);
+			});
 		setIsCancelModalVisible(false);
 	};
 
