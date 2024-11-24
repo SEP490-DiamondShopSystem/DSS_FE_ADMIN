@@ -483,7 +483,7 @@ const TimeLineOrder = ({
 		const res = await dispatch(handleOrderReject({orderId: orders.Id, reason: values.reason}))
 			.unwrap()
 			.then(() => {
-					message.success('Từ chối thành công!');
+				message.success('Từ chối thành công!');
 			})
 			.catch((error) => {
 				message.error(error?.data?.title || error?.detail);
@@ -508,7 +508,7 @@ const TimeLineOrder = ({
 								</p>
 							</div>
 
-							{userRoleManager ? (
+							{userRoleStaff ? (
 								<div className="flex justify-around">
 									<Button
 										type="text"

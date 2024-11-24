@@ -141,16 +141,14 @@ const TimeLineOrder = ({orders, loading, statusOrder, paymentStatusOrder, id}) =
 	};
 
 	const handleAssignDelivererStatus = async () => {
-		const res = await dispatch(
-			handleOrderAssignDeliverer({orderId: orders.Id, delivererId: selectedShipper})
-		)
+		dispatch(handleOrderAssignDeliverer({orderId: orders.Id, delivererId: selectedShipper}))
 			.unwrap()
 			.then(() => {
-				message.success('Đã chuyển giao cho shipper!');
-				localStorage.setItem(`isAssigned_${orders.Id}`, JSON.stringify(true));
+				message.success('Đã chuyển giao cho nhân viên vận chuyển!');
+				// localStorage.setItem(`isAssigned_${orders.Id}`, JSON.stringify(true));
 			})
 			.catch((error) => {
-				message.error(error?.data?.title || error?.detail);
+				message.error(error?.data?.title || error?.title);
 			});
 	};
 
