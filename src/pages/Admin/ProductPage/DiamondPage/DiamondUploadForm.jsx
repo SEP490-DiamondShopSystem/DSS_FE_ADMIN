@@ -40,9 +40,7 @@ export const DiamondUploadForm = ({diamondId, visible, onClose}) => {
 			dispatch(fetchDiamondFiles(diamondId))
 				.unwrap()
 				.then((response) => {
-					if (response.payload) {
-						setDiamondFiles(response.payload);
-					}
+						setDiamondFiles(response);
 				})
 				.catch((error) => {
 					message.error(error?.data?.title || error?.detail);
@@ -98,8 +96,8 @@ export const DiamondUploadForm = ({diamondId, visible, onClose}) => {
 		await dispatch(fetchDiamondFiles(diamondId))
 			.unwrap()
 			.then((response) => {
-				if (response.payload) {
-					setDiamondFiles(response.payload);
+				if (response) {
+					setDiamondFiles(response);
 				}
 			})
 			.catch((error) => {
@@ -151,7 +149,7 @@ export const DiamondUploadForm = ({diamondId, visible, onClose}) => {
 		console.log('Uploading Thumbnail for Diamond ID:', diamondId);
 		await dispatch(uploadDiamondThumbnail({diamondId, formFile: thumbnailFile}))
 			.unwrap()
-			.then((res) => {
+			.then(() => {
 				message.success('Thumbnail uploaded successfully');
 			})
 			.catch((error) => {
@@ -171,7 +169,7 @@ export const DiamondUploadForm = ({diamondId, visible, onClose}) => {
 				uploadCertificates({diamondId, certificateCode: file.name, formFile: file})
 			)
 				.unwrap()
-				.then((res) => {
+				.then(() => {
 					message.success('Certificates uploaded successfully');
 				})
 				.catch((error) => {
@@ -189,7 +187,7 @@ export const DiamondUploadForm = ({diamondId, visible, onClose}) => {
 
 		await dispatch(uploadDiamondImages({diamondId, formFiles: imageFiles}))
 			.unwrap()
-			.then((res) => {
+			.then(() => {
 				message.success('Diamond images uploaded successfully');
 			})
 			.catch((error) => {

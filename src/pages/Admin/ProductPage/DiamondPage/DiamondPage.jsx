@@ -317,13 +317,8 @@ const DiamondPage = () => {
 		console.log('Deleted successfully');
 		dispatch(handleDeleteDiamond(diamondId))
 			.unwrap()
-			.then((res) => {
-				console.log('res', res);
-				if (res.payload !== undefined) {
+			.then(() => {
 					message.success('Xóa Kim Cương Thành Công!');
-				} else {
-					message.error(error?.data?.title || error?.detail);
-				}
 			})
 			.catch((error) => {
 				message.error(error?.data?.title || error?.detail);

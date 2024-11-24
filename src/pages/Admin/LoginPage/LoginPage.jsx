@@ -47,6 +47,7 @@ const LoginPage = () => {
 				message.error(error?.data?.title || error?.title);
 			});
 	};
+
 	return (
 		<>
 			<Helmet>

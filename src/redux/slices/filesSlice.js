@@ -18,6 +18,7 @@ export const fetchJewelryModelFiles = createAsyncThunk(
 	async (jewelryModelId, {rejectWithValue}) => {
 		try {
 			const response = await api.get(`/JewelryModelFiles/${jewelryModelId}/Files`);
+			console.log(response)
 			return response;
 		} catch (error) {
 			return rejectWithValue(error || error.message);

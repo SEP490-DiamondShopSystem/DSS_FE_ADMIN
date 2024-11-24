@@ -179,11 +179,11 @@ const DeliveryPage = () => {
 
 		dispatch(handleCreateDelivery(values))
 			.unwrap()
-			.then((res) => {
-				if (res.payload) {
+			.then((es) => {
+
 					message.success('Chuyển giao shipper thành công!');
 					setIsModalVisible(false);
-				}
+
 			})
 			.catch((error) => {
 				message.error(error?.data?.title || error?.detail);
@@ -193,7 +193,7 @@ const DeliveryPage = () => {
 	const handleBeginDeliveryBtn = () => {
 		dispatch(handleBeginDelivery())
 			.unwrap()
-			.then((res) => {
+			.then(() => {
 				message.success('Giao hàng sớm!');
 			})
 			.catch((error) => {

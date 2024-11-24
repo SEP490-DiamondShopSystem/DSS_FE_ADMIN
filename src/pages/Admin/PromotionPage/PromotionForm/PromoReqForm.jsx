@@ -47,14 +47,14 @@ export const PromoReqForm = ({form, shapes, Option}) => {
 										<Row gutter={[16, 16]}>
 											<Col span={12}>
 												<Form.Item
-													label="Name"
+													label="Tên"
 													{...restField}
 													name={[name, 'name']}
 													fieldKey={[fieldKey, 'name']}
 													rules={[
 														{
 															required: true,
-															message: 'Name is required',
+															message: 'Vui Lòng Nhập Tên',
 														},
 													]}
 													labelCol={{span: 24}}
@@ -62,7 +62,7 @@ export const PromoReqForm = ({form, shapes, Option}) => {
 												>
 													<Input
 														className="w-full"
-														placeholder="Enter name"
+														placeholder="Tên"
 													/>
 												</Form.Item>
 												<Form.Item
@@ -82,7 +82,7 @@ export const PromoReqForm = ({form, shapes, Option}) => {
 													/>
 												</Form.Item>
 												<Form.Item
-													label="Amount"
+													label="Giá Trị"
 													name="moneyAmount"
 													rules={[
 														{
@@ -103,7 +103,7 @@ export const PromoReqForm = ({form, shapes, Option}) => {
 													/>
 												</Form.Item>
 												<Form.Item
-													label="Target type"
+													label="Đối Tượng Áp Dụng"
 													{...restField}
 													name={[name, 'targetType']}
 													fieldKey={[fieldKey, 'targetType']}
@@ -123,15 +123,15 @@ export const PromoReqForm = ({form, shapes, Option}) => {
 														{Option && (
 															<>
 																<Option value={1}>
-																	Jewelry Model
+																	Trang Sức
 																</Option>
-																<Option value={2}>Diamond</Option>
-																<Option value={3}>Order</Option>
+																<Option value={2}>Kim Cương</Option>
+																<Option value={3}>Hóa Đơn</Option>
 															</>
 														)}
 													</Select>
 												</Form.Item>
-												<Form.Item
+												{/* <Form.Item
 													label="Promotion ID"
 													{...restField}
 													name={[name, 'promotionId']}
@@ -144,7 +144,7 @@ export const PromoReqForm = ({form, shapes, Option}) => {
 													]}
 												>
 													<Input />
-												</Form.Item>
+												</Form.Item> */}
 											</Col>
 											<Col span={12}>
 												{form.getFieldValue([
@@ -153,7 +153,7 @@ export const PromoReqForm = ({form, shapes, Option}) => {
 													'targetType',
 												]) !== 3 && (
 													<Form.Item
-														label="Quantity"
+														label="Số Lượng"
 														{...restField}
 														name={[name, 'quantity']}
 														fieldKey={[fieldKey, 'quantity']}
@@ -185,7 +185,7 @@ export const PromoReqForm = ({form, shapes, Option}) => {
 												]) === 2 && (
 													<div className="flex gap-5">
 														<Form.Item
-															label="Origin"
+															label="Nguồn Gốc"
 															{...restField}
 															name={[
 																name,
@@ -200,7 +200,7 @@ export const PromoReqForm = ({form, shapes, Option}) => {
 															rules={[
 																{
 																	required: false,
-																	message: 'Origin is required',
+																	message: 'Vui Lòng Chọn Nguồn Gốc',
 																},
 															]}
 															labelCol={{span: 24}}
@@ -210,20 +210,20 @@ export const PromoReqForm = ({form, shapes, Option}) => {
 																{Option ? (
 																	<>
 																		<Option value={1}>
-																			Natural
+																			Tự Nhiên
 																		</Option>
 																		<Option value={2}>
-																			Lab
+																			Nhân Tạo
 																		</Option>
 																		<Option value={3}>
-																			Both
+																			Cả hai
 																		</Option>
 																	</>
 																) : null}
 															</Select>
 														</Form.Item>
 														<Form.Item
-															label="Shape"
+															label="Hình Dáng"
 															{...restField}
 															name={[
 																name,
@@ -256,7 +256,7 @@ export const PromoReqForm = ({form, shapes, Option}) => {
 														</Form.Item>
 														<div className="p-4 border rounded-md bg-gray-50">
 															<Form.Item
-																label="Carat From"
+																label="Carat Từ"
 																{...restField}
 																name={[
 																	name,
@@ -282,7 +282,7 @@ export const PromoReqForm = ({form, shapes, Option}) => {
 																/>
 															</Form.Item>
 															<Form.Item
-																label="Carat To"
+																label="Carat Đến"
 																{...restField}
 																name={[
 																	name,
@@ -310,7 +310,7 @@ export const PromoReqForm = ({form, shapes, Option}) => {
 														</div>
 														<div className="p-4 border rounded-md bg-gray-50">
 															<Form.Item
-																label="Clarity From"
+																label="Clarity Từ"
 																{...restField}
 																name={[
 																	name,
@@ -362,7 +362,7 @@ export const PromoReqForm = ({form, shapes, Option}) => {
 																</Select>
 															</Form.Item>
 															<Form.Item
-																label="Clarity To"
+																label="Clarity Đến"
 																{...restField}
 																name={[
 																	name,
@@ -416,7 +416,7 @@ export const PromoReqForm = ({form, shapes, Option}) => {
 														</div>
 														<div className="p-4 border rounded-md bg-gray-50">
 															<Form.Item
-																label="Color From"
+																label="Color Từ"
 																{...restField}
 																name={[
 																	name,
@@ -461,7 +461,7 @@ export const PromoReqForm = ({form, shapes, Option}) => {
 																</Select>
 															</Form.Item>
 															<Form.Item
-																label="Color To"
+																label="Color Đến"
 																{...restField}
 																name={[
 																	name,
@@ -508,7 +508,7 @@ export const PromoReqForm = ({form, shapes, Option}) => {
 														</div>
 														<div className="p-4 border rounded-md bg-gray-50">
 															<Form.Item
-																label="Cut From"
+																label="Cut Từ"
 																{...restField}
 																name={[name, 'cutFrom']}
 																fieldKey={[fieldKey, 'cutFrom']}
@@ -537,7 +537,7 @@ export const PromoReqForm = ({form, shapes, Option}) => {
 																</Select>
 															</Form.Item>
 															<Form.Item
-																label="Cut To"
+																label="Cut Đến"
 																{...restField}
 																name={[
 																	name,
@@ -583,13 +583,13 @@ export const PromoReqForm = ({form, shapes, Option}) => {
 												]) === 1 && (
 													<>
 														<Form.Item
-															label="Jewelry Model ID"
+															label="Mẫu Trang Sức"
 															name="jewelryModelId"
 															rules={[
 																{
 																	required: true,
 																	message:
-																		'Please select a Jewelry Model',
+																		'Vui Lòng Chọn Mẫu Trang Sức',
 																},
 															]}
 														>
@@ -606,7 +606,7 @@ export const PromoReqForm = ({form, shapes, Option}) => {
 																		setIsPopupVisible(true)
 																	}
 																>
-																	Select Model
+																	Chọn Mẫu Trang Sức
 																</Button>
 															</div>
 														</Form.Item>

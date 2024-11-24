@@ -1,7 +1,7 @@
 import {MinusCircleOutlined} from '@ant-design/icons';
-import {Button, Col, Form, Input, InputNumber, Row, Select, Space} from 'antd';
-import React from 'react';
-
+import {Button, Col, Form, Input, InputNumber, Row, Select, Space, Modal} from 'antd';
+import React, {useState} from 'react';
+import JewelryModelList from '../../PromotionPage/JewelryModelList';
 export const DiscountReqForm = ({form, shapes, Option, removeRequirement}) => {
 	const handleTargetTypeChange = (targetType, name, setFieldsValue) => {
 		const isOrder = targetType === 3;
@@ -16,7 +16,13 @@ export const DiscountReqForm = ({form, shapes, Option, removeRequirement}) => {
 			[`requirements[${name}].discountId`]: isJewelryModel ? '' : undefined,
 		});
 	};
-
+	const [isPopupVisible, setIsPopupVisible] = useState(false);
+	const [selectedModel, setSelectedModel] = useState(null);
+	const handleSelectModel = (model) => {
+		console.log('Model Selected in Parent:', model);
+		setSelectedModel(model);
+		setIsPopupVisible(false);
+	};
 	return (
 		<div>
 			<Form.List name="requirements">
@@ -31,23 +37,20 @@ export const DiscountReqForm = ({form, shapes, Option, removeRequirement}) => {
 										<Row gutter={[16, 16]}>
 											<Col span={12}>
 												<Form.Item
-													label="Name"
+													label="Tên"
 													{...restField}
 													name={[name, 'name']}
 													fieldKey={[fieldKey, 'name']}
 													rules={[
 														{
 															required: true,
-															message: 'Name is required',
+															message: 'Vui Lòng Nhập Tên',
 														},
 													]}
 													labelCol={{span: 24}}
 													wrapperCol={{span: 24}}
 												>
-													<Input
-														className="w-full"
-														placeholder="Enter name"
-													/>
+													<Input className="w-full" placeholder="Tên" />
 												</Form.Item>
 												<Form.Item
 													label="Operator"
@@ -65,28 +68,8 @@ export const DiscountReqForm = ({form, shapes, Option, removeRequirement}) => {
 														disabled
 													/>
 												</Form.Item>
-
 												<Form.Item
-													label="Jewelry Model Id"
-													{...restField}
-													name={[name, 'jewelryModelID']}
-													fieldKey={[fieldKey, 'jewelryModelID']}
-													rules={[
-														{
-															required: false,
-															message: 'Model Id is required',
-														},
-													]}
-													labelCol={{span: 24}}
-													wrapperCol={{span: 24}}
-												>
-													<Input
-														className="w-full"
-														placeholder="Jewelry Model Id"
-													/>
-												</Form.Item>
-												<Form.Item
-													label="Target type"
+													label="Đối Tượng Áp Dụng"
 													{...restField}
 													name={[name, 'targetType']}
 													fieldKey={[fieldKey, 'targetType']}
@@ -105,10 +88,8 @@ export const DiscountReqForm = ({form, shapes, Option, removeRequirement}) => {
 													>
 														{Option && (
 															<>
-																<Option value={1}>
-																	Jewelry Model
-																</Option>
-																<Option value={2}>Diamond</Option>
+																<Option value={1}>Trang Sức</Option>
+																<Option value={2}>Kim Cương</Option>
 															</>
 														)}
 													</Select>
@@ -119,32 +100,10 @@ export const DiscountReqForm = ({form, shapes, Option, removeRequirement}) => {
 													'requirements',
 													name,
 													'targetType',
-												]) !== 3 && (
-													<Form.Item
-														label="Quantity"
-														{...restField}
-														name={[name, 'quantity']}
-														fieldKey={[fieldKey, 'quantity']}
-														rules={[
-															{
-																required: false,
-																message: 'Quantity is required',
-															},
-														]}
-														labelCol={{span: 24}}
-														wrapperCol={{span: 24}}
-													>
-														<InputNumber min={1} className="w-full" />
-													</Form.Item>
-												)}
-												{form.getFieldValue([
-													'requirements',
-													name,
-													'targetType',
 												]) === 2 && (
 													<div className="flex gap-5">
 														<Form.Item
-															label="Origin"
+															label="Nguồn Gốc"
 															{...restField}
 															name={[
 																name,
@@ -159,7 +118,8 @@ export const DiscountReqForm = ({form, shapes, Option, removeRequirement}) => {
 															rules={[
 																{
 																	required: false,
-																	message: 'Origin is required',
+																	message:
+																		'Vui lòng chọn nguồn gốc',
 																},
 															]}
 															labelCol={{span: 24}}
@@ -169,20 +129,20 @@ export const DiscountReqForm = ({form, shapes, Option, removeRequirement}) => {
 																{Option ? (
 																	<>
 																		<Option value={1}>
-																			Natural
+																			Tự Nhiên
 																		</Option>
 																		<Option value={2}>
-																			Lab
+																			Nhân Tạo
 																		</Option>
 																		<Option value={3}>
-																			Both
+																			Cả hai
 																		</Option>
 																	</>
 																) : null}
 															</Select>
 														</Form.Item>
 														<Form.Item
-															label="Shape"
+															label="Hình Dáng"
 															{...restField}
 															name={[
 																name,
@@ -198,7 +158,7 @@ export const DiscountReqForm = ({form, shapes, Option, removeRequirement}) => {
 																{
 																	required: false,
 																	message:
-																		'Shape IDs are required',
+																		'Vui Lòng Chọn Hình Dáng',
 																},
 															]}
 														>
@@ -215,7 +175,7 @@ export const DiscountReqForm = ({form, shapes, Option, removeRequirement}) => {
 														</Form.Item>
 														<div className="p-4 border rounded-md bg-gray-50">
 															<Form.Item
-																label="Carat From"
+																label="Carat Từ"
 																{...restField}
 																name={[
 																	name,
@@ -241,7 +201,7 @@ export const DiscountReqForm = ({form, shapes, Option, removeRequirement}) => {
 																/>
 															</Form.Item>
 															<Form.Item
-																label="Carat To"
+																label="Carat Đến"
 																{...restField}
 																name={[
 																	name,
@@ -269,7 +229,7 @@ export const DiscountReqForm = ({form, shapes, Option, removeRequirement}) => {
 														</div>
 														<div className="p-4 border rounded-md bg-gray-50">
 															<Form.Item
-																label="Clarity From"
+																label="Clarity Từ"
 																{...restField}
 																name={[
 																	name,
@@ -321,7 +281,7 @@ export const DiscountReqForm = ({form, shapes, Option, removeRequirement}) => {
 																</Select>
 															</Form.Item>
 															<Form.Item
-																label="Clarity To"
+																label="Clarity Đến"
 																{...restField}
 																name={[
 																	name,
@@ -375,7 +335,7 @@ export const DiscountReqForm = ({form, shapes, Option, removeRequirement}) => {
 														</div>
 														<div className="p-4 border rounded-md bg-gray-50">
 															<Form.Item
-																label="Color From"
+																label="Color Từ"
 																{...restField}
 																name={[
 																	name,
@@ -420,7 +380,7 @@ export const DiscountReqForm = ({form, shapes, Option, removeRequirement}) => {
 																</Select>
 															</Form.Item>
 															<Form.Item
-																label="Color To"
+																label="Color Đến"
 																{...restField}
 																name={[
 																	name,
@@ -467,7 +427,7 @@ export const DiscountReqForm = ({form, shapes, Option, removeRequirement}) => {
 														</div>
 														<div className="p-4 border rounded-md bg-gray-50">
 															<Form.Item
-																label="Cut From"
+																label="Cut Từ"
 																{...restField}
 																name={[name, 'cutFrom']}
 																fieldKey={[fieldKey, 'cutFrom']}
@@ -496,7 +456,7 @@ export const DiscountReqForm = ({form, shapes, Option, removeRequirement}) => {
 																</Select>
 															</Form.Item>
 															<Form.Item
-																label="Cut To"
+																label="Cut Đến"
 																{...restField}
 																name={[
 																	name,
@@ -541,22 +501,42 @@ export const DiscountReqForm = ({form, shapes, Option, removeRequirement}) => {
 													'targetType',
 												]) === 1 && (
 													<Form.Item
-														label="Discount ID"
-														{...restField}
-														name={[name, 'discountId']}
-														fieldKey={[fieldKey, 'discountId']}
+														label="Mẫu Trang Sức"
+														name="jewelryModelId"
 														rules={[
 															{
-																required: false,
-																message: 'Discount ID is required',
+																required: true,
+																message:
+																	'Please select a Jewelry Model',
 															},
 														]}
 													>
-														<Input />
+														<div className="flex items-center gap-2">
+															<Input
+																readOnly
+																value={selectedModel?.Id}
+																placeholder={selectedModel?.Name}
+															/>
+															<Button
+																onClick={() =>
+																	setIsPopupVisible(true)
+																}
+															>
+																Select Model
+															</Button>
+														</div>
 													</Form.Item>
 												)}
 											</Col>
 										</Row>
+										<Modal
+											open={isPopupVisible}
+											onCancel={() => setIsPopupVisible(false)}
+											footer={null}
+											width="80%"
+										>
+											<JewelryModelList onSelectModel={handleSelectModel} />
+										</Modal>
 										<Button
 											type="link"
 											onClick={() => {

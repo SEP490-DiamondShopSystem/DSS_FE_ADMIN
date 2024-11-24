@@ -103,11 +103,9 @@ const PromotionPage = ({promotionData}) => {
 
 		dispatch(createFullPromotion({createPromotionCommand, requirements, gifts: updatedGifts}))
 			.unwrap()
-			.then((res) => {
-				if (res.payload !== undefined) {
-					message.success('Promotion created successfully!');
-					form.resetFields();
-				}
+			.then(() => {
+				message.success('Promotion created successfully!');
+				form.resetFields();
 			})
 			.catch((error) => {
 				message.error(error?.data?.title || error?.detail);
@@ -288,7 +286,7 @@ const PromotionPage = ({promotionData}) => {
 
 	const handleDelete = (id) => {
 		dispatch(deletePromotion(id))
-		.unwrap()
+			.unwrap()
 			.then(() => {
 				message.success(`Deleted promotion with id: ${id}`);
 			})
@@ -369,7 +367,7 @@ const PromotionPage = ({promotionData}) => {
 			render: (_, record) =>
 				record.PromoReqs?.map((req, index) => (
 					<div key={index}>
-						<span>{req.Name}</span> - Quantity: {req.Quantity}
+						<span>{req.Name}</span> - Số Lượng: {req.Quantity}
 					</div>
 				)) || 'No Requirements',
 		},
@@ -379,7 +377,7 @@ const PromotionPage = ({promotionData}) => {
 			render: (_, record) =>
 				record.Gifts?.map((gift, index) => (
 					<div key={index}>
-						<span>{gift.Name}</span> - Carat From: {gift.CaratFrom}, Carat To:{' '}
+						<span>{gift.Name}</span> - Carat Từ: {gift.CaratFrom}, Carat đến:{' '}
 						{gift.CaratTo}
 					</div>
 				)) || 'No Gifts',
@@ -440,7 +438,7 @@ const PromotionPage = ({promotionData}) => {
 			{/* <PromoForm /> */}
 
 			{/* Display List of Promotions */}
-			<h2 className="text-2xl font-semibold mt-10 mb-6">Promotions List</h2>
+			<h2 className="text-2xl font-semibold mt-10 mb-6">Danh Sách Khuyến Mãi</h2>
 			<Table
 				columns={columns}
 				dataSource={promotions}

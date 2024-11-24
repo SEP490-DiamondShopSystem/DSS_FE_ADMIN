@@ -386,7 +386,7 @@ const InformationOrder = ({
 	};
 
 	const handleChangeConfirm = (request) => {
-		try {
+
 			console.log('request', request);
 			dispatch(
 				handleChangeDiamondCustomize({
@@ -396,15 +396,12 @@ const InformationOrder = ({
 				})
 			)
 				.unwrap()
-				.then((res) => {
+				.then(() => {
 					message.success(`Đã xác nhận yêu cầu!.`);
 				})
 				.catch((error) => {
 					message.error(error?.data?.title || error?.detail);
 				});
-		} catch (error) {
-			message.error(error?.data?.title || error?.detail);
-		}
 	};
 
 	const handleDelete = (request) => {

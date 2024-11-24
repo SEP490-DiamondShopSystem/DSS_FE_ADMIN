@@ -100,14 +100,15 @@ const AccountDetail = () => {
 			value: selectedOption,
 		};
 
-		dispatch(handleAddRole({accId, roleId})).then((res) => {
-			if (res.payload) {
+		dispatch(handleAddRole({accId, roleId}))
+			.unwrap()
+			.then(() => {
 				message.success('Thêm vai trò thành công!');
 				setIsModalVisible(false);
-			} else {
-				message.error(res.payload.title);
-			}
-		});
+			})
+			.catch((error) => {
+				message.error(error?.data?.title || error?.detail);
+			});
 	};
 	const handleRemove = () => {
 		const accId = {
@@ -118,25 +119,28 @@ const AccountDetail = () => {
 			value: selectedOption,
 		};
 
-		dispatch(handleRemoveRole({accId, roleId})).then((res) => {
-			if (res.payload) {
+		dispatch(handleRemoveRole({accId, roleId}))
+			.unwrap()
+			.then(() => {
 				message.success('Xóa vai trò thành công!');
 				setIsModalRemoveRoleVisible(false);
-			} else {
+			})
+			.catch((error) => {
 				message.error(error?.data?.title || error?.detail);
-			}
-		});
+			});
 		setIsModalVisible(false);
 	};
 
 	const handleBan = () => {
-		dispatch(handleBanAccount(userDetail?.IdentityId)).then((res) => {
-			if (res.payload) {
+		dispatch(handleBanAccount(userDetail?.IdentityId))
+			.unwrap()
+			.then(() => {
 				message.message(`Cấm tài khoản ${userDetail.Id} thành công`);
-			} else {
+				form.resetFields();
+			})
+			.catch((error) => {
 				message.error(error?.data?.title || error?.detail);
-			}
-		});
+			});
 	};
 
 	const handleCancel = () => {

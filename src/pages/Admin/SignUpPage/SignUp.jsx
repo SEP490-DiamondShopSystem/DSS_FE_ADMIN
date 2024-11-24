@@ -25,15 +25,11 @@ const SignUpPage = () => {
 		try {
 			dispatch(handleStaffRegister({...values, fullName, isManager: role}))
 				.unwrap()
-				.then((res) => {
-					if (res.payload) {
+				.then(() => {
 						message.success('Đăng ký thành công!');
 						form.resetFields();
-
 						navigate('/login');
-					} else {
-						message.error(error?.data?.title || error?.detail);
-					}
+
 				})
 				.catch((error) => {
 					setIsLoading(false);

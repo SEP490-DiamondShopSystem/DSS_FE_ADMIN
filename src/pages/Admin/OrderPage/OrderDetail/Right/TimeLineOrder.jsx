@@ -99,12 +99,8 @@ const TimeLineOrder = ({orders, loading, statusOrder, paymentStatusOrder, id}) =
 	const handleAcceptStatus = async () => {
 		const res = await dispatch(handleOrder(orders.Id))
 			.unwrap()
-			.then((res) => {
-				if (res.payload !== undefined) {
-					message.success('Xác nhận thành công!');
-				} else {
-					message.error(error?.data?.title || error?.detail);
-				}
+			.then(() => {
+				message.success('Xác nhận thành công!');
 			})
 			.catch((error) => {
 				message.error(error?.data?.title || error?.detail);
@@ -125,12 +121,8 @@ const TimeLineOrder = ({orders, loading, statusOrder, paymentStatusOrder, id}) =
 	const handlePreparedStatus = async () => {
 		const res = await dispatch(handleOrder(orders.Id))
 			.unwrap()
-			.then((res) => {
-				if (res.payload !== undefined) {
-					message.success('Chuẩn bị hàng hoàn tất!');
-				} else {
-					message.error(error?.data?.title || error?.detail);
-				}
+			.then(() => {
+				message.success('Chuẩn bị hàng hoàn tất!');
 			})
 			.catch((error) => {
 				message.error(error?.data?.title || error?.detail);
@@ -153,13 +145,9 @@ const TimeLineOrder = ({orders, loading, statusOrder, paymentStatusOrder, id}) =
 			handleOrderAssignDeliverer({orderId: orders.Id, delivererId: selectedShipper})
 		)
 			.unwrap()
-			.then((res) => {
-				if (res.payload !== undefined) {
-					message.success('Đã chuyển giao cho shipper!');
-					localStorage.setItem(`isAssigned_${orders.Id}`, JSON.stringify(true));
-				} else {
-					message.error(error?.data?.title || error?.detail);
-				}
+			.then(() => {
+				message.success('Đã chuyển giao cho shipper!');
+				localStorage.setItem(`isAssigned_${orders.Id}`, JSON.stringify(true));
 			})
 			.catch((error) => {
 				message.error(error?.data?.title || error?.detail);
@@ -180,12 +168,8 @@ const TimeLineOrder = ({orders, loading, statusOrder, paymentStatusOrder, id}) =
 	const handleDeliveringStatus = async () => {
 		const res = await dispatch(handleOrder(orders.Id))
 			.unwrap()
-			.then((res) => {
-				if (res.payload !== undefined) {
-					message.success('Xác nhận giao hàng!');
-				} else {
-					message.error(error?.data?.title || error?.detail);
-				}
+			.then(() => {
+				message.success('Xác nhận giao hàng!');
 			})
 			.catch((error) => {
 				message.error(error?.data?.title || error?.title || error?.detail);
@@ -207,11 +191,7 @@ const TimeLineOrder = ({orders, loading, statusOrder, paymentStatusOrder, id}) =
 		const res = await dispatch(handleOrder(orders.Id))
 			.unwrap()
 			.then((res) => {
-				if (res.payload !== undefined) {
-					message.success('Hoàn tất giao hàng!');
-				} else {
-					message.error(error?.data?.title || error?.detail);
-				}
+				message.success('Hoàn tất giao hàng!');
 			})
 			.catch((error) => {
 				message.error(error?.data?.title || error?.detail);
@@ -233,7 +213,7 @@ const TimeLineOrder = ({orders, loading, statusOrder, paymentStatusOrder, id}) =
 		const res = await dispatch(handleDeliveryFailed(orders.Id))
 			.unwrap()
 			.then((res) => {
-				if (res.payload !== undefined) {
+				if (res !== undefined) {
 					message.warning('Đơn hàng giao hàng không thành công!');
 				} else {
 					message.error(error?.data?.title || error?.detail);
@@ -301,7 +281,7 @@ const TimeLineOrder = ({orders, loading, statusOrder, paymentStatusOrder, id}) =
 		dispatch(handleRedeliver({orderId: orders.Id, delivererId: selectedShipper}))
 			.unwrap()
 			.then((res) => {
-				if (res.payload !== undefined) {
+				if (res !== undefined) {
 					message.success('Đã chuyển giao cho shipper!');
 					localStorage.setItem(`isAssigned_${orders.Id}`, JSON.stringify(true));
 				} else {
@@ -317,9 +297,9 @@ const TimeLineOrder = ({orders, loading, statusOrder, paymentStatusOrder, id}) =
 		const res = await dispatch(handleOrderReject({orderId: orders.Id, reason: values.reason}))
 			.unwrap()
 			.then((res) => {
-				console.log('err', res.payload);
+				console.log('err', res);
 
-				if (res.payload !== undefined) {
+				if (res !== undefined) {
 					message.success('Từ chối thành công!');
 				} else {
 					message.error(error?.data?.title || error?.detail);

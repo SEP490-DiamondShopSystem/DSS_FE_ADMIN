@@ -370,12 +370,8 @@ const TimeLineOrder = ({
 				})
 			)
 				.unwrap()
-				.then((res) => {
-					if (res.payload) {
-						message.success('Xác nhận kim cương cho yêu cầu thành công!');
-					} else {
-						message.error(error?.data?.title || error?.detail);
-					}
+				.then(() => {
+					message.success('Xác nhận kim cương cho yêu cầu thành công!');
 				})
 				.catch((error) => {
 					message.error(error?.data?.title || error?.detail);
@@ -422,12 +418,8 @@ const TimeLineOrder = ({
 				})
 			)
 				.unwrap()
-				.then((res) => {
-					if (res.payload) {
-						message.success('Kim cương đã được cập nhật thành công!');
-					} else {
-						message.error(error?.data?.title || error?.detail);
-					}
+				.then(() => {
+					message.success('Kim cương đã được cập nhật thành công!');
 				})
 				.catch((error) => {
 					message.error(error?.data?.title || error?.detail);
@@ -455,17 +447,8 @@ const TimeLineOrder = ({
 			.unwrap()
 			.then((res) => {
 				console.log('res', res);
-
-				if (res?.payload) {
-					if (res.payload) {
-						message.success('Chấp Nhận Đơn Thiết Kế Thành Công!');
-						setIsModalVisible(false);
-					} else {
-						message.warning('Đã xảy ra lỗi. Vui lòng kiểm tra thông tin và thử lại!');
-					}
-				} else {
-					message.error(error?.data?.title || error?.detail);
-				}
+				message.success('Chấp Nhận Đơn Thiết Kế Thành Công!');
+				setIsModalVisible(false);
 			})
 			.catch((error) => {
 				message.error(error?.data?.title || error?.detail);
@@ -487,13 +470,9 @@ const TimeLineOrder = ({
 
 		dispatch(handleRejectCustomize(id))
 			.unwrap()
-			.then((res) => {
-				if (res.payload) {
-					message.success('Hủy Đơn Yêu Cầu Thành Công!');
-					setIsModalVisible(false);
-				} else {
-					message.error(error?.data?.title || error?.detail);
-				}
+			.then(() => {
+				message.success('Hủy Đơn Yêu Cầu Thành Công!');
+				setIsModalVisible(false);
 			})
 			.catch((error) => {
 				message.error(error?.data?.title || error?.detail);
@@ -503,12 +482,8 @@ const TimeLineOrder = ({
 	const submitCancelOrder = async (values) => {
 		const res = await dispatch(handleOrderReject({orderId: orders.Id, reason: values.reason}))
 			.unwrap()
-			.then((res) => {
-				if (res.payload !== undefined) {
+			.then(() => {
 					message.success('Từ chối thành công!');
-				} else {
-					message.error(error?.data?.title || error?.detail);
-				}
 			})
 			.catch((error) => {
 				message.error(error?.data?.title || error?.detail);
