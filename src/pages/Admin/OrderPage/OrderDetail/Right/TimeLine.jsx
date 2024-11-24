@@ -12,7 +12,7 @@ export const TimeLine = ({status, orders, loading, id}) => {
 
 	const [log, setLog] = useState(null);
 	const [filteredSteps, setFilteredSteps] = useState([]);
-	const [modalVisible, setModalVisible] = useState(false); // Modal visibility state
+	const [modalVisible, setModalVisible] = useState(false);
 
 	console.log('log', log);
 
@@ -93,9 +93,9 @@ export const TimeLine = ({status, orders, loading, id}) => {
 			>
 				<Timeline mode="left">
 					{Array.isArray(childLogList?.ChildLogs) &&
-						[...childLogList.ChildLogs].reverse().map((log) => (
+						childLogList.ChildLogs.map((log) => (
 							<Timeline.Item key={log?.Id}>
-								<div className="font-semibold">Ngày tạo: {log?.CreatedDate}</div>
+								<div className="font-semibold">{log?.CreatedDate}</div>
 								<div>{log?.Message}</div>
 								{log?.LogImages?.map((image, index) => (
 									<Image
