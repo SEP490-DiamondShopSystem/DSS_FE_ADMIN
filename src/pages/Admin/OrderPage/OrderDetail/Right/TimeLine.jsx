@@ -91,16 +91,24 @@ export const TimeLine = ({status, orders, loading, id}) => {
 				onCancel={handleCloseModal}
 				footer={null}
 			>
-				{Array.isArray(childLogList?.ChildLogs) &&
-					[...childLogList.ChildLogs].reverse().map((log) => (
-						<div key={log?.Id} className="mb-5">
-							<div className="font-semibold">Ngày tạo: {log?.CreatedDate}</div>
-							<div>{log?.Message}</div>
-							{log?.LogImages?.map((image) => (
-								<Image src={image?.MediaPath} height={50} width={50} />
-							))}
-						</div>
-					))}
+				<Timeline mode="left">
+					{Array.isArray(childLogList?.ChildLogs) &&
+						[...childLogList.ChildLogs].reverse().map((log) => (
+							<Timeline.Item key={log?.Id}>
+								<div className="font-semibold">Ngày tạo: {log?.CreatedDate}</div>
+								<div>{log?.Message}</div>
+								{log?.LogImages?.map((image, index) => (
+									<Image
+										key={index}
+										src={image?.MediaPath}
+										height={50}
+										width={50}
+										style={{marginRight: 10, marginTop: 5}}
+									/>
+								))}
+							</Timeline.Item>
+						))}
+				</Timeline>
 			</Modal>
 		</div>
 	);
