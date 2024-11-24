@@ -119,50 +119,45 @@ const BlogPage = () => {
 	};
 
 	const handleCreateOrUpdate = async () => {
-		try {
-			const values = await form.validateFields();
-			if (!editorContent.trim()) {
-				return;
-			}
+		const values = await form.validateFields();
+		if (!editorContent.trim()) {
+			return;
+		}
+		const blogData = new FormData();
+		if (isEditMode) {
+			blogData.append('BlogId', updatingId);
+		}
+		blogData.append('Title', values.title);
+		console.log('Tags:', tags);
+		tags.forEach((tag, index) => {
+			blogData.append(`BlogTags[${index}]`, tag);
+		});
+		blogData.append('Content', editorContent);
 
-			const blogData = new FormData();
+		if (thumbnailFile) {
+			blogData.append('Thumbnail', thumbnailFile);
+		}
 
-			if (isEditMode) {
-				blogData.append('BlogId', updatingId); // or use 'updatingId' if that's available
-			}
-			blogData.append('Title', values.title);
-
-			// Check if tags are populated correctly
-			console.log('Tags:', tags);
-			tags.forEach((tag, index) => {
-				blogData.append(`BlogTags[${index}]`, tag); // Append each tag directly
+		const result = await dispatch(isEditMode ? updateBlog(blogData) : createBlog(blogData))
+			.unwrap()
+			.then(() => {
+				message.success(
+					isEditMode ? 'Cập nhật bài viết thành công!' : 'Tạo bài viết mới thành công!'
+				);
+			})
+			.catch((error) => {
+				message.error(error?.data?.title || error?.detail);
 			});
 
-			blogData.append('Content', editorContent);
-
-			// Ensure thumbnail is correctly handled
-			if (thumbnailFile) {
-				blogData.append('Thumbnail', thumbnailFile);
-			}
-
-			const result = await dispatch(isEditMode ? updateBlog(blogData) : createBlog(blogData));
-			// Log the data to the console before dispatching the API call
-			message.success(
-				isEditMode ? 'Cập nhật bài viết thành công!' : 'Tạo bài viết mới thành công!'
-			);
-
-			// Reset state
-			setIsModalVisible(false);
-			form.resetFields();
-			setThumbnailFile(null);
-			setIsEditMode(false);
-			setSelectedBlog(null);
-			setEditorContent('');
-			setTags([]);
-			await dispatch(fetchAllBlogs({CurrentPage: currentPage, PageSize: pageSize}));
-		} catch (error) {
-			console.error('Error creating/updating blog:', error);
-		}
+		// Reset state
+		setIsModalVisible(false);
+		form.resetFields();
+		setThumbnailFile(null);
+		setIsEditMode(false);
+		setSelectedBlog(null);
+		setEditorContent('');
+		setTags([]);
+		await dispatch(fetchAllBlogs({CurrentPage: currentPage, PageSize: pageSize}));
 	};
 
 	const handleEdit = async (blog) => {
@@ -246,12 +241,12 @@ const BlogPage = () => {
 			),
 		},
 		{
-			title: 'Title',
+			title: 'Tiêu Đề',
 			dataIndex: 'Title',
 			key: 'Title',
 		},
 		{
-			title: 'Tags',
+			title: 'Nhãn',
 			dataIndex: 'Tags',
 			key: 'Tags',
 			render: (tags) =>
@@ -275,14 +270,14 @@ const BlogPage = () => {
 						onClick={() => handleEdit(record)}
 						className="transition-all duration-300 ease-in-out hover:bg-blue-500"
 					>
-						Edit
+						Chỉnh Sửa
 					</Button>
 					<Button
 						danger
 						onClick={() => handleDelete(record.Id)}
 						className="transition-all duration-300 ease-in-out hover:bg-red-500"
 					>
-						Delete
+						Xóa
 					</Button>
 				</div>
 			),
@@ -292,14 +287,14 @@ const BlogPage = () => {
 	return (
 		<div className="w-4/5 mx-auto p-6">
 			<div className="flex justify-between items-center mb-4">
-				<h1 className="text-xl font-bold">Manage Blogs</h1>
+				<h1 className="text-xl font-bold">Quản Lý Bài Đăng</h1>
 				<Button
 					type="primary"
 					icon={<PlusOutlined />}
 					onClick={() => setIsModalVisible(true)}
 					className="transition-all duration-300 ease-in-out hover:bg-green-500"
 				>
-					Create Blog
+					Tạo Bài Đăng
 				</Button>
 			</div>
 
@@ -312,7 +307,7 @@ const BlogPage = () => {
 			/>
 
 			<Modal
-				title={isEditMode ? 'Edit Blog' : 'Create Blog'}
+				title={isEditMode ? 'Cập Nhật Bài Đăng' : 'Tạo Bài Đăng Mới'}
 				visible={isModalVisible}
 				onOk={handleCreateOrUpdate}
 				onCancel={onCancel}
@@ -322,8 +317,8 @@ const BlogPage = () => {
 				<Form layout="vertical" form={form} style={{width: '100%'}}>
 					<Form.Item
 						name="title"
-						label="Title"
-						rules={[{required: true, message: 'Please enter the blog title!'}]}
+						label="Tiêu Đề"
+						rules={[{required: true, message: 'Vui lòng nhập tiêu đề bài đăng!'}]}
 						className="mb-4"
 					>
 						<Input
@@ -332,7 +327,7 @@ const BlogPage = () => {
 						/>
 					</Form.Item>
 
-					<Form.Item name="tags" label="Tags" className="mb-4">
+					<Form.Item name="tags" label="Nhãn" className="mb-4">
 						<div>
 							<Input
 								value={tagsInput}
@@ -343,7 +338,7 @@ const BlogPage = () => {
 										setTagsInput('');
 									}
 								}}
-								placeholder="Press enter to add tags"
+								placeholder="Nhấn Enter để thêm nhãn"
 								className="p-3 rounded-lg border-gray-300 mb-2"
 							/>
 							<div>
@@ -385,7 +380,7 @@ const BlogPage = () => {
 									<UploadOutlined />
 								</p>
 								<p className="ant-upload-text">
-									Drag and drop a file here, or click to select one
+									Tải Hình Ảnh Lên
 								</p>
 								<p className="ant-upload-hint text-sm text-gray-500">
 									Supports single file upload. Ensure the file is an image.
@@ -411,7 +406,7 @@ const BlogPage = () => {
 									onClick={() => setThumbnailFile(null)}
 									className="mt-2"
 								>
-									Clear
+									Xóa Tất Cả
 								</Button>
 							</div>
 						)}
@@ -419,7 +414,7 @@ const BlogPage = () => {
 
 					<Form.Item
 						name="contents"
-						label="Content"
+						label="Nội Dung"
 						className="mb-6"
 						rules={[{required: true, message: 'Please enter blog content!'}]}
 					>
@@ -448,7 +443,7 @@ const BlogPage = () => {
 									onClick={handleCancelEditContent}
 									className="mt-4 bg-gray-200 hover:bg-gray-300 text-black"
 								>
-									Cancel Edit
+									Hủy
 								</Button>
 							</div>
 						) : (
@@ -460,7 +455,7 @@ const BlogPage = () => {
 									onClick={handleEditContent}
 									className="mt-4 bg-primary text-white"
 								>
-									Edit Content
+									Chỉnh Sửa Nội Dung
 								</Button>
 							</div>
 						)}

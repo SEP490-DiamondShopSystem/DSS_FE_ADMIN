@@ -368,13 +368,14 @@ const TimeLineOrder = ({
 					sideDiamondOptId: orders?.SideDiamondId,
 					diamondAssigning,
 				})
-			).then((res) => {
-				if (res.payload) {
+			)
+				.unwrap()
+				.then(() => {
 					message.success('Xác nhận kim cương cho yêu cầu thành công!');
-				} else {
+				})
+				.catch((error) => {
 					message.error(error?.data?.title || error?.detail);
-				}
-			});
+				});
 		} else {
 			const diamondData = changeDiamond
 				? changeDiamond[selectedRequest?.DiamondRequestId]
@@ -416,14 +417,11 @@ const TimeLineOrder = ({
 					createDiamondCommand,
 				})
 			)
-				.then((res) => {
-					if (res.payload) {
-						message.success('Kim cương đã được cập nhật thành công!');
-					} else {
-						message.error(error?.data?.title || error?.detail);
-					}
+				.unwrap()
+				.then(() => {
+					message.success('Kim cương đã được cập nhật thành công!');
 				})
-				.catch((error) =>{
+				.catch((error) => {
 					message.error(error?.data?.title || error?.detail);
 				});
 		}
@@ -446,19 +444,11 @@ const TimeLineOrder = ({
 
 	const handleAccepted = async () => {
 		dispatch(handleCustomizeOrder({requestId: orders?.Id}))
+			.unwrap()
 			.then((res) => {
 				console.log('res', res);
-
-				if (res?.payload) {
-					if (res.payload) {
-						message.success('Chấp Nhận Đơn Thiết Kế Thành Công!');
-						setIsModalVisible(false);
-					} else {
-						message.warning('Đã xảy ra lỗi. Vui lòng kiểm tra thông tin và thử lại!');
-					}
-				} else {
-					message.error(error?.data?.title || error?.detail);
-				}
+				message.success('Chấp Nhận Đơn Thiết Kế Thành Công!');
+				setIsModalVisible(false);
 			})
 			.catch((error) => {
 				message.error(error?.data?.title || error?.detail);
@@ -478,28 +468,26 @@ const TimeLineOrder = ({
 	const handleRejectStatus = async () => {
 		// console.log('diamondAssigning', diamondAssigning);
 
-		dispatch(handleRejectCustomize(id)).then((res) => {
-			console.log('res', res);
-
-			if (res.payload) {
+		dispatch(handleRejectCustomize(id))
+			.unwrap()
+			.then(() => {
 				message.success('Hủy Đơn Yêu Cầu Thành Công!');
 				setIsModalVisible(false);
-			} else {
+			})
+			.catch((error) => {
 				message.error(error?.data?.title || error?.detail);
-			}
-		});
+			});
 	};
 
 	const submitCancelOrder = async (values) => {
-		const res = await dispatch(handleOrderReject({orderId: orders.Id, reason: values.reason}));
-		console.log('err', res.payload);
-
-		if (res.payload !== undefined) {
-			message.success('Từ chối thành công!');
-		} else {
-			message.error(error?.data?.title || error?.detail);
-		}
-
+		const res = await dispatch(handleOrderReject({orderId: orders.Id, reason: values.reason}))
+			.unwrap()
+			.then(() => {
+					message.success('Từ chối thành công!');
+			})
+			.catch((error) => {
+				message.error(error?.data?.title || error?.detail);
+			});
 		setIsCancelModalVisible(false);
 	};
 

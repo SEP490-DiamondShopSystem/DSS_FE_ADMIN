@@ -97,12 +97,14 @@ const TimeLineOrder = ({orders, loading, statusOrder, paymentStatusOrder, id}) =
 	};
 
 	const handleAcceptStatus = async () => {
-		const res = await dispatch(handleOrder(orders.Id));
-		if (res.payload !== undefined) {
-			message.success('Xác nhận thành công!');
-		} else {
-			message.error(error?.data?.title || error?.detail);
-		}
+		const res = await dispatch(handleOrder(orders.Id))
+			.unwrap()
+			.then(() => {
+				message.success('Xác nhận thành công!');
+			})
+			.catch((error) => {
+				message.error(error?.data?.title || error?.detail);
+			});
 	};
 
 	const handlePrepared = () => {
@@ -117,12 +119,14 @@ const TimeLineOrder = ({orders, loading, statusOrder, paymentStatusOrder, id}) =
 	};
 
 	const handlePreparedStatus = async () => {
-		const res = await dispatch(handleOrder(orders.Id));
-		if (res.payload !== undefined) {
-			message.success('Chuẩn bị hàng hoàn tất!');
-		} else {
-			message.error(error?.data?.title || error?.detail);
-		}
+		const res = await dispatch(handleOrder(orders.Id))
+			.unwrap()
+			.then(() => {
+				message.success('Chuẩn bị hàng hoàn tất!');
+			})
+			.catch((error) => {
+				message.error(error?.data?.title || error?.detail);
+			});
 	};
 
 	const handleAssignDeliverer = () => {
@@ -139,14 +143,15 @@ const TimeLineOrder = ({orders, loading, statusOrder, paymentStatusOrder, id}) =
 	const handleAssignDelivererStatus = async () => {
 		const res = await dispatch(
 			handleOrderAssignDeliverer({orderId: orders.Id, delivererId: selectedShipper})
-		);
-
-		if (res.payload !== undefined) {
-			message.success('Đã chuyển giao cho shipper!');
-			localStorage.setItem(`isAssigned_${orders.Id}`, JSON.stringify(true));
-		} else {
-			message.error(error?.data?.title || error?.detail);
-		}
+		)
+			.unwrap()
+			.then(() => {
+				message.success('Đã chuyển giao cho shipper!');
+				localStorage.setItem(`isAssigned_${orders.Id}`, JSON.stringify(true));
+			})
+			.catch((error) => {
+				message.error(error?.data?.title || error?.detail);
+			});
 	};
 
 	const handleDelivering = () => {
@@ -161,12 +166,14 @@ const TimeLineOrder = ({orders, loading, statusOrder, paymentStatusOrder, id}) =
 	};
 
 	const handleDeliveringStatus = async () => {
-		const res = await dispatch(handleOrder(orders.Id));
-		if (res.payload !== undefined) {
-			message.success('Xác nhận giao hàng!');
-		} else {
-			message.error(error?.data?.title || error?.detail);
-		}
+		const res = await dispatch(handleOrder(orders.Id))
+			.unwrap()
+			.then(() => {
+				message.success('Xác nhận giao hàng!');
+			})
+			.catch((error) => {
+				message.error(error?.data?.title || error?.title || error?.detail);
+			});
 	};
 
 	const handleDelivered = () => {
@@ -181,12 +188,14 @@ const TimeLineOrder = ({orders, loading, statusOrder, paymentStatusOrder, id}) =
 	};
 
 	const handleDeliveredStatus = async () => {
-		const res = await dispatch(handleOrder(orders.Id));
-		if (res.payload !== undefined) {
-			message.success('Hoàn tất giao hàng!');
-		} else {
-			message.error(error?.data?.title || error?.detail);
-		}
+		const res = await dispatch(handleOrder(orders.Id))
+			.unwrap()
+			.then((res) => {
+				message.success('Hoàn tất giao hàng!');
+			})
+			.catch((error) => {
+				message.error(error?.data?.title || error?.detail);
+			});
 	};
 
 	const handleFailedDelivered = () => {
@@ -201,21 +210,52 @@ const TimeLineOrder = ({orders, loading, statusOrder, paymentStatusOrder, id}) =
 	};
 
 	const handleFailedDeliveredStatus = async () => {
-		const res = await dispatch(handleDeliveryFailed(orders.Id));
-		if (res.payload !== undefined) {
-			message.warning('Đơn hàng giao hàng không thành công!');
-		} else {
-			message.error(error?.data?.title || error?.detail);
-		}
+		const res = await dispatch(handleDeliveryFailed(orders.Id))
+			.unwrap()
+			.then((res) => {
+				if (res !== undefined) {
+					message.warning('Đơn hàng giao hàng không thành công!');
+				} else {
+					message.error(error?.data?.title || error?.detail);
+				}
+			})
+			.catch((error) => {
+				message.error(error?.data?.title || error?.detail);
+			});
 	};
 
-	const handleRefund = async () => {
-		const res = await dispatch(handleRefundOrder(orders.Id));
-		if (res.payload !== undefined) {
-			message.warning('Xác nhận hoàn tiền!');
-		} else {
-			message.error(error?.data?.title || error?.detail);
-		}
+	const handleRefund = () => {
+		Modal.confirm({
+			title: 'Xác nhận hoàn tiền đơn đặt hàng này',
+			// icon: <CheckCircleOutlined />,
+			content: 'Bạn có chắc chắn muốn tiếp tục?',
+			okText: 'Xác nhận',
+			cancelText: 'Hủy',
+			okType: 'danger',
+			onOk: handleRefundStatus,
+		});
+	};
+	const handleRefundSuccess = () => {
+		Modal.success({
+			title: 'Đã Hoàn Tiền Thành Công Đơn Đặt Hàng Này!',
+			icon: <CheckCircleOutlined />,
+			// content: 'Bạn có chắc chắn muốn tiếp tục?',
+			okText: 'Xác nhận',
+			okType: 'primary',
+			okCancel: false,
+			// footer: null,
+		});
+	};
+
+	const handleRefundStatus = async () => {
+		dispatch(handleRefundOrder(orders.Id))
+			.unwrap()
+			.then((res) => {
+				handleRefundSuccess();
+			})
+			.catch((error) => {
+				message.error(error?.data?.title || error?.detail);
+			});
 	};
 
 	const handleChange = (value) => {
@@ -238,31 +278,39 @@ const TimeLineOrder = ({orders, loading, statusOrder, paymentStatusOrder, id}) =
 	};
 
 	const handleRedeliverStatus = () => {
-		dispatch(handleRedeliver({orderId: orders.Id, delivererId: selectedShipper})).then(
-			(res) => {
-				if (res.payload !== undefined) {
+		dispatch(handleRedeliver({orderId: orders.Id, delivererId: selectedShipper}))
+			.unwrap()
+			.then((res) => {
+				if (res !== undefined) {
 					message.success('Đã chuyển giao cho shipper!');
 					localStorage.setItem(`isAssigned_${orders.Id}`, JSON.stringify(true));
 				} else {
 					message.error(error?.data?.title || error?.detail);
 				}
-			}
-		);
+			})
+			.catch((error) => {
+				message.error(error?.data?.title || error?.detail);
+			});
 	};
 
 	const submitCancelOrder = async (values) => {
-		const res = await dispatch(handleOrderReject({orderId: orders.Id, reason: values.reason}));
+		const res = await dispatch(handleOrderReject({orderId: orders.Id, reason: values.reason}))
+			.unwrap()
+			.then((res) => {
+				console.log('err', res);
 
-		if (res.payload !== undefined) {
-			message.success('Từ chối thành công!');
-		} else {
-			message.error(error?.data?.title || error?.detail);
-		}
+				if (res !== undefined) {
+					message.success('Từ chối thành công!');
+				} else {
+					message.error(error?.data?.title || error?.detail);
+				}
+			})
+			.catch((error) => {
+				message.error(error?.data?.title || error?.detail);
+			});
 
 		setIsCancelModalVisible(false);
 	};
-
-	console.log('orders', orders);
 
 	return (
 		<div>
@@ -495,7 +543,7 @@ const TimeLineOrder = ({orders, loading, statusOrder, paymentStatusOrder, id}) =
 								</p>
 							</div>
 							<div className="flex justify-around">
-								{userRoleDeliverer ? (
+								{userRoleDeliverer && (
 									<div className="flex items-center">
 										<Button
 											type="text"
@@ -512,8 +560,6 @@ const TimeLineOrder = ({orders, loading, statusOrder, paymentStatusOrder, id}) =
 											Hủy Giao Hàng
 										</Button>
 									</div>
-								) : (
-									<p className="font-bold text-primary">Đang Giao Hàng Bởi ???</p>
 								)}
 							</div>
 						</div>

@@ -24,15 +24,12 @@ const SignUpPage = () => {
 		};
 		try {
 			dispatch(handleStaffRegister({...values, fullName, isManager: role}))
-				.then((res) => {
-					if (res.payload) {
+				.unwrap()
+				.then(() => {
 						message.success('Đăng ký thành công!');
 						form.resetFields();
-
 						navigate('/login');
-					} else {
-						message.error(error?.data?.title || error?.detail);
-					}
+
 				})
 				.catch((error) => {
 					setIsLoading(false);

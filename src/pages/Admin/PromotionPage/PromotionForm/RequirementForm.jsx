@@ -49,9 +49,9 @@ export const RequirementForm = ({targetTypes, handleTargetTypeChange, shapes, Op
 																handleTargetTypeChange(index, value)
 															}
 														>
-															<Option value={1}>Jewelry Model</Option>
-															<Option value={2}>Diamond</Option>
-															<Option value={3}>Order</Option>
+															<Option value={1}>Trang Sức</Option>
+															<Option value={2}>Kim Cương</Option>
+															<Option value={3}>Hóa Đơn</Option>
 														</Select>
 													</Form.Item>
 
@@ -188,13 +188,13 @@ export const RequirementForm = ({targetTypes, handleTargetTypeChange, shapes, Op
 																>
 																	<Select>
 																		<Option value={1}>
-																			Natural
+																			Tự Nhiên
 																		</Option>
 																		<Option value={2}>
-																			Lab
+																			Nhân Tạo
 																		</Option>
 																		<Option value={3}>
-																			Both
+																			Cả hai
 																		</Option>
 																	</Select>
 																</Form.Item>

@@ -296,17 +296,16 @@ const JewelryCreateForm = ({onClose, isCreateFormOpen, setIsCreateFormOpen}) => 
 		console.log('attachedDiamonds:', attachedDiamonds);
 		console.log('Final data to be dispatched:', finalData);
 
-		dispatch(createJewelry(finalData)).then((res) => {
-			console.log('res', res);
-
-			if (res.payload) {
+		dispatch(createJewelry(finalData))
+			.unwrap()
+			.then((res) => {
 				message.success('Tạo trang sức thành công!');
 				form.resetFields();
 				onClose();
-			} else {
+			})
+			.catch((error) => {
 				message.error(error?.data?.title || error?.detail);
-			}
-		});
+			});
 	};
 
 	// Disable selecting more diamonds than the max allowed

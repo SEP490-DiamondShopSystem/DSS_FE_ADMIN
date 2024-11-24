@@ -1,10 +1,14 @@
-import React, {useEffect, useState} from 'react';
-import {DiamondUploadForm} from './DiamondUploadForm';
-import {DeleteFilled, PlusOutlined} from '@ant-design/icons';
+import {
+	DeleteFilled,
+	LockOutlined,
+	PlusOutlined,
+	UnlockFilled,
+	UploadOutlined,
+} from '@ant-design/icons';
 import {
 	Button,
 	Checkbox,
-	Image,
+	Form,
 	Input,
 	message,
 	Modal,
@@ -14,11 +18,14 @@ import {
 	Space,
 	Table,
 	Tag,
+	Tooltip,
 } from 'antd';
 import debounce from 'lodash/debounce';
+import React, {useEffect, useState} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
 import {useNavigate} from 'react-router-dom';
 import {
+	FetchDataSelector,
 	getAllDiamondSelector,
 	getAllShapeSelector,
 	GetDiamondFilterSelector,
@@ -29,10 +36,13 @@ import {
 	getDiamondFilter,
 	getDiamondShape,
 	handleDeleteDiamond,
+	handleLockDiamond,
 } from '../../../../redux/slices/diamondSlice';
 import {formatPrice} from '../../../../utils';
 import {marks, marksClarity, marksCut} from '../../../../utils/constant';
 import {AddModalDiamond} from './AddModalDiamond/AddModalDiamond';
+import {DiamondUploadForm} from './DiamondUploadForm';
+import {LockDiamondModal} from './LockDiamondModal/LockDiamondModal';
 
 const {Search} = Input;
 
@@ -40,15 +50,14 @@ const DiamondPage = () => {
 	const dispatch = useDispatch();
 	const navigate = useNavigate();
 
+	const [form] = Form.useForm();
 	const diamondList = useSelector(getAllDiamondSelector);
 	const loading = useSelector(LoadingDiamondSelector);
 	const shapes = useSelector(getAllShapeSelector);
 	const filterLimits = useSelector(GetDiamondFilterSelector);
+	const fetch = useSelector(FetchDataSelector);
 
-	const [active, setActive] = useState('all');
-	const [type, setType] = useState('');
-	const [shape, setShape] = useState('');
-	const [searchText, setSearchText] = useState('');
+	const [shape, setShape] = useState();
 	const [showModal, setShowModal] = useState(false);
 	const [isModalVisible, setIsModalVisible] = useState(false);
 	const [diamonds, setDiamonds] = useState([]);
@@ -58,9 +67,22 @@ const DiamondPage = () => {
 	const [start, setStart] = useState(0);
 	const [checked, setChecked] = useState(false);
 	const [checkedDiamondJewelry, setCheckedDiamondJewelry] = useState(false);
+	const [checkedStatus, setCheckedStatus] = useState(1);
+	const [isFormVisible, setIsFormVisible] = useState(false);
+	const [selectedDiamondId, setSelectedDiamondId] = useState(null);
+	const [isLockDiamondModalVisible, setIsLockDiamondModalVisible] = useState(false);
+	const [lockDiamondId, setLockDiamondId] = useState();
 
-	const [isFormVisible, setIsFormVisible] = useState(false); // for controlling the form visibility
-	const [selectedDiamondId, setSelectedDiamondId] = useState(null); // to store the selected diamondId
+	console.log('fetch', fetch);
+
+	const statusMapping = {
+		1: {label: 'Đang bán', color: 'green'},
+		2: {label: 'Đã bán', color: 'blue'},
+		3: {label: 'Đã khóa', color: 'volcano'},
+		4: {label: 'Hết hàng', color: 'red'},
+		5: {label: 'Khóa cho khách hàng', color: 'purple'},
+		6: {label: 'Đặt trước', color: 'geekblue'},
+	};
 
 	useEffect(() => {
 		dispatch(getDiamondFilter());
@@ -84,6 +106,9 @@ const DiamondPage = () => {
 			});
 		}
 	}, [filterLimits]);
+
+	console.log('diamonds', diamonds);
+	console.log('diamondList', diamondList);
 
 	const columns = [
 		{
@@ -134,19 +159,7 @@ const DiamondPage = () => {
 			dataIndex: 'CriteriaId',
 			align: 'center',
 		},
-		// {
-		// 	title: 'Status',
-		// 	key: 'status',
-		// 	dataIndex: 'status',
-		// 	align: 'center',
-		// 	render: (status) => {
-		// 		let color = status.length > 5 ? 'geekblue' : 'green';
-		// 		if (status === 'Expired') {
-		// 			color = 'volcano';
-		// 		}
-		// 		return <Tag color={color}>{status.toUpperCase()}</Tag>;
-		// 	},
-		// },
+
 		{
 			title: 'Giá',
 			key: 'TruePrice',
@@ -154,20 +167,36 @@ const DiamondPage = () => {
 			align: 'center',
 		},
 		{
+			title: 'Trạng Thái',
+			key: 'Status',
+			dataIndex: 'Status',
+			align: 'center',
+			render: (status) => {
+				const {label, color} = statusMapping[status] || {label: 'Unknown', color: 'gray'};
+				return <Tag color={color}>{label?.toUpperCase()}</Tag>;
+			},
+		},
+		{
 			title: '',
 			key: 'action',
 			align: 'center',
 			render: (_, record) => (
 				<Space size="middle">
-					<Button
-						type="primary"
-						onClick={() => handleView(record.Id)} // On click, open the form
-					>
-						View
-					</Button>
-					<Button danger onClick={() => showDeleteModal(record.Id)}>
-						<DeleteFilled />
-					</Button>
+					<Tooltip title="Thêm Ảnh">
+						<Button type="primary" onClick={() => handleView(record.Id)}>
+							<UploadOutlined />
+						</Button>
+					</Tooltip>
+					<Tooltip title="Khóa Kim Cương">
+						<Button type="default" onClick={() => handleLockDiamondView(record)}>
+							{record?.Status === 5 ? <UnlockFilled /> : <LockOutlined />}
+						</Button>
+					</Tooltip>
+					<Tooltip title="Xóa Kim Cương">
+						<Button danger onClick={() => showDeleteModal(record.Id)}>
+							<DeleteFilled />
+						</Button>
+					</Tooltip>
 				</Space>
 			),
 		},
@@ -193,6 +222,7 @@ const DiamondPage = () => {
 				caratTo: filters?.carat?.maxCarat,
 				isLab: checked,
 				includeJewelryDiamond: checkedDiamondJewelry,
+				diamondStatuses: checkedStatus,
 			})
 		);
 	}, 500);
@@ -201,7 +231,7 @@ const DiamondPage = () => {
 		fetchDiamondData();
 
 		return () => fetchDiamondData.cancel();
-	}, [dispatch, filters, shape, checked, checkedDiamondJewelry]);
+	}, [dispatch, filters, shape, checked, checkedDiamondJewelry, checkedStatus, fetch]);
 
 	useEffect(() => {
 		if (diamondList) {
@@ -228,6 +258,7 @@ const DiamondPage = () => {
 					Girdle: diamond?.Girdle,
 					Fluorescence: diamond?.Fluorescence,
 					Thumbnail: diamond?.Thumbnail,
+					Status: diamond?.Status,
 				}));
 			setDiamonds(diamondSetting);
 		}
@@ -278,16 +309,20 @@ const DiamondPage = () => {
 		setDiamondId(id);
 	};
 
+	const handleSelectStatusChange = (value) => {
+		setCheckedStatus(value);
+	};
+
 	const handleDelete = () => {
 		console.log('Deleted successfully');
-		dispatch(handleDeleteDiamond(diamondId)).then((res) => {
-			console.log('res', res);
-			if (res.payload !== undefined) {
-				message.success('Xóa Kim Cương Thành Công!');
-			} else {
+		dispatch(handleDeleteDiamond(diamondId))
+			.unwrap()
+			.then(() => {
+					message.success('Xóa Kim Cương Thành Công!');
+			})
+			.catch((error) => {
 				message.error(error?.data?.title || error?.detail);
-			}
-		});
+			});
 		setIsModalVisible(false);
 	};
 
@@ -296,8 +331,31 @@ const DiamondPage = () => {
 	};
 
 	const handleView = (diamondId) => {
-		setSelectedDiamondId(diamondId); // Set the selected diamondId
-		setIsFormVisible(true); // Show the form
+		setSelectedDiamondId(diamondId);
+		setIsFormVisible(true);
+	};
+
+	const handleLockDiamondView = (diamondId) => {
+		setIsLockDiamondModalVisible(true);
+		setLockDiamondId(diamondId);
+	};
+
+	const handleLockDiamondSubmit = (values) => {
+		console.log('Form values:', values);
+		dispatch(handleLockDiamond(values))
+			.unwrap()
+			.then((res) => {
+				setIsLockDiamondModalVisible(false);
+				message.success(`Khóa Kim Cương ${lockDiamondId?.CriteriaId} Thành Công`);
+				form.resetFields();
+			})
+			.catch((error) => {
+				message.error(error?.data?.title || error?.title);
+			});
+	};
+
+	const handleLockDiamondCancel = () => {
+		setIsLockDiamondModalVisible(false);
 	};
 
 	const text = <span>Lọc</span>;
@@ -308,7 +366,7 @@ const DiamondPage = () => {
 				<div className="ml-10 min-w-44">
 					<p>Hình Dạng</p>
 					<Select
-						defaultValue=""
+						defaultValue={shapes[0]?.ShapeName}
 						placeholder="Shape"
 						style={{width: 120}}
 						allowClear
@@ -396,6 +454,18 @@ const DiamondPage = () => {
 						Kim Cương Đã Đính
 					</Checkbox>
 				</div>
+				<div className="ml-10">
+					<label className="mr-5">Chọn trạng thái</label>
+					<Select onChange={handleSelectStatusChange} placeholder="" style={{width: 200}}>
+						<Option value={1}>Đang bán</Option>
+						<Option value={2}>Đã bán</Option>
+						<Option value={3}>Đã khóa</Option>
+						<Option value={4}>Hết hàng</Option>
+						<Option value={5}>Khóa cho khách hàng</Option>
+						<Option value={6}>Đặt trước</Option>
+					</Select>
+					{status && <p>Selected Status: {status}</p>}
+				</div>
 			</Space>
 		</div>
 	);
@@ -452,6 +522,13 @@ const DiamondPage = () => {
 			>
 				<p>Bạn có chắc chắn muốn xóa kim cương này không?</p>
 			</Modal>
+			<LockDiamondModal
+				isOpen={isLockDiamondModalVisible}
+				onCancel={handleLockDiamondCancel}
+				onSubmit={handleLockDiamondSubmit}
+				lockDiamondId={lockDiamondId}
+				form={form}
+			/>
 		</div>
 	);
 };

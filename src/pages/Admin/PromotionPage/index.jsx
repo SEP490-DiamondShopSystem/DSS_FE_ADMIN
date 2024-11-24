@@ -101,14 +101,15 @@ const PromotionPage = ({promotionData}) => {
 			priority: priority,
 		};
 
-		dispatch(
-			createFullPromotion({createPromotionCommand, requirements, gifts: updatedGifts})
-		).then((res) => {
-			if (res.payload !== undefined) {
+		dispatch(createFullPromotion({createPromotionCommand, requirements, gifts: updatedGifts}))
+			.unwrap()
+			.then(() => {
 				message.success('Promotion created successfully!');
 				form.resetFields();
-			}
-		});
+			})
+			.catch((error) => {
+				message.error(error?.data?.title || error?.detail);
+			});
 
 		// setIsEditing(false);
 	};
@@ -157,7 +158,7 @@ const PromotionPage = ({promotionData}) => {
 							quantity: req.Quantity || 0,
 							amount: req.Amount || 0,
 							jewelryModelId: req.JewelryModelId,
-							promotionId:req.PromotionId,
+							promotionId: req.PromotionId,
 							diamondRequirementSpec: {
 								origin: diamondSpec.Origin
 									? getTextForEnum('Origin', diamondSpec.Origin)
@@ -199,14 +200,14 @@ const PromotionPage = ({promotionData}) => {
 							unitValue: gift.UnitValue || 0,
 							amount: gift.Amount || 0,
 							itemId: gift.ItemId || '',
-							promotionId:gift.PromotionId,
+							promotionId: gift.PromotionId,
 
 							diamondRequirementSpec: {
 								origin: diamondSpec.Origin
 									? getTextForEnum('Origin', diamondSpec.Origin)
 									: '',
 								caratFrom: diamondSpec.CaratFrom ?? '',
-								caratTo: diamondSpec.CaratTo ?? '', 
+								caratTo: diamondSpec.CaratTo ?? '',
 								clarityFrom: diamondSpec.ClarityFrom
 									? getTextForEnum('Clarity', diamondSpec.ClarityFrom)
 									: '',
@@ -237,50 +238,55 @@ const PromotionPage = ({promotionData}) => {
 	};
 
 	const handleCancel = async (id) => {
-		try {
-			await dispatch(cancelPromotion(id)); // Use your actual cancelPromotion logic
-			message.success(`Promotion with id: ${id} has been canceled.`);
-		} catch (error) {
-			message.error(error?.data?.title || error?.detail);
-		}
+		await dispatch(cancelPromotion(id))
+			.unwrap()
+			.then(() => {
+				message.success(`Promotion with id: ${id} has been canceled.`);
+			})
+			.catch((error) => {
+				message.error(error?.data?.title || error?.detail);
+			});
 	};
 	const handleUpdate = async () => {
-		try {
-			// Validate the form fields
-			const row = await form.validateFields();
+		// Validate the form fields
+		const row = await form.validateFields();
 
-			// Format the valid date range (from the form input)
-			const formattedStartDate = row.validDate[0].format('DD-MM-YYYY');
-			const formattedEndDate = row.validDate[1].format('DD-MM-YYYY');
+		// Format the valid date range (from the form input)
+		const formattedStartDate = row.validDate[0].format('DD-MM-YYYY');
+		const formattedEndDate = row.validDate[1].format('DD-MM-YYYY');
 
-			// Prepare promotion data with separate start and end dates
-			const promotionData = {
-				...row,
-				startDate: formattedStartDate,
-				endDate: formattedEndDate,
-			};
+		// Prepare promotion data with separate start and end dates
+		const promotionData = {
+			...row,
+			startDate: formattedStartDate,
+			endDate: formattedEndDate,
+		};
 
-			// Ensure that promotionId (editingPromotionId) is available
-			if (!editingPromotionId) {
-				message.error(error?.data?.title || error?.detail);
-				return;
-			}
-
-			console.log('Updating promotion with ID:', editingPromotionId); // Check if it's defined
-			console.log('Promotion Data:', promotionData);
-
-			// Dispatch the update action
-			await dispatch(updatePromotion({promotionId: editingPromotionId, promotionData}));
-
-			message.success('Promotion updated successfully!');
-			await dispatch(fetchPromotions());
-		} catch (err) {
+		// Ensure that promotionId (editingPromotionId) is available
+		if (!editingPromotionId) {
 			message.error(error?.data?.title || error?.detail);
+			return;
 		}
+
+		console.log('Updating promotion with ID:', editingPromotionId); // Check if it's defined
+		console.log('Promotion Data:', promotionData);
+
+		// Dispatch the update action
+		await dispatch(updatePromotion({promotionId: editingPromotionId, promotionData}))
+			.unwrap()
+			.then(() => {
+				message.success('Promotion updated successfully!');
+			})
+			.catch((error) => {
+				message.error(error?.data?.title || error?.detail);
+			});
+
+		await dispatch(fetchPromotions());
 	};
 
 	const handleDelete = (id) => {
 		dispatch(deletePromotion(id))
+			.unwrap()
 			.then(() => {
 				message.success(`Deleted promotion with id: ${id}`);
 			})
@@ -361,7 +367,7 @@ const PromotionPage = ({promotionData}) => {
 			render: (_, record) =>
 				record.PromoReqs?.map((req, index) => (
 					<div key={index}>
-						<span>{req.Name}</span> - Quantity: {req.Quantity}
+						<span>{req.Name}</span> - Số Lượng: {req.Quantity}
 					</div>
 				)) || 'No Requirements',
 		},
@@ -371,7 +377,7 @@ const PromotionPage = ({promotionData}) => {
 			render: (_, record) =>
 				record.Gifts?.map((gift, index) => (
 					<div key={index}>
-						<span>{gift.Name}</span> - Carat From: {gift.CaratFrom}, Carat To:{' '}
+						<span>{gift.Name}</span> - Carat Từ: {gift.CaratFrom}, Carat đến:{' '}
 						{gift.CaratTo}
 					</div>
 				)) || 'No Gifts',
@@ -432,7 +438,7 @@ const PromotionPage = ({promotionData}) => {
 			{/* <PromoForm /> */}
 
 			{/* Display List of Promotions */}
-			<h2 className="text-2xl font-semibold mt-10 mb-6">Promotions List</h2>
+			<h2 className="text-2xl font-semibold mt-10 mb-6">Danh Sách Khuyến Mãi</h2>
 			<Table
 				columns={columns}
 				dataSource={promotions}

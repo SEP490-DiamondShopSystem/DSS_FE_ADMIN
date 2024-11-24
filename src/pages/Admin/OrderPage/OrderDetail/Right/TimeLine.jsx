@@ -1,5 +1,5 @@
 import {CheckCircleOutlined, ClockCircleOutlined, CloseCircleOutlined} from '@ant-design/icons';
-import {Button, Modal, Timeline} from 'antd';
+import {Button, Image, Modal, Timeline} from 'antd';
 import React, {useEffect, useState} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
 import {getOrderChildLogListSelector, getOrderLogsSelector} from '../../../../../redux/selectors';
@@ -13,6 +13,8 @@ export const TimeLine = ({status, orders, loading, id}) => {
 	const [log, setLog] = useState(null);
 	const [filteredSteps, setFilteredSteps] = useState([]);
 	const [modalVisible, setModalVisible] = useState(false); // Modal visibility state
+
+	console.log('log', log);
 
 	useEffect(() => {
 		if (orders) {
@@ -91,9 +93,12 @@ export const TimeLine = ({status, orders, loading, id}) => {
 			>
 				{Array.isArray(childLogList?.ChildLogs) &&
 					[...childLogList.ChildLogs].reverse().map((log) => (
-						<div key={log?.Id}>
+						<div key={log?.Id} className="mb-5">
 							<div className="font-semibold">Ngày tạo: {log?.CreatedDate}</div>
 							<div>{log?.Message}</div>
+							{log?.LogImages?.map((image) => (
+								<Image src={image?.MediaPath} height={50} width={50} />
+							))}
 						</div>
 					))}
 			</Modal>

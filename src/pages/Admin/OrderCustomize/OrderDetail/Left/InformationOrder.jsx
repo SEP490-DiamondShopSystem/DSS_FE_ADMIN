@@ -386,7 +386,7 @@ const InformationOrder = ({
 	};
 
 	const handleChangeConfirm = (request) => {
-		try {
+
 			console.log('request', request);
 			dispatch(
 				handleChangeDiamondCustomize({
@@ -394,10 +394,14 @@ const InformationOrder = ({
 					customizeRequestId: request?.CustomizeRequestId,
 					diamondRequestId: request?.DiamondRequestId,
 				})
-			);
-		} catch (error) {
-			message.error(error?.data?.title || error?.detail);
-		}
+			)
+				.unwrap()
+				.then(() => {
+					message.success(`Đã xác nhận yêu cầu!.`);
+				})
+				.catch((error) => {
+					message.error(error?.data?.title || error?.detail);
+				});
 	};
 
 	const handleDelete = (request) => {
@@ -423,7 +427,14 @@ const InformationOrder = ({
 					customizeRequestId: request?.CustomizeRequestId,
 					diamondRequestId: request?.DiamondRequestId,
 				})
-			);
+			)
+				.unwrap()
+				.then((res) => {
+					message.success(`Xóa yêu cầu thành công!.`);
+				})
+				.catch((error) => {
+					message.error(error?.data?.title || error?.detail);
+				});
 		} catch (error) {
 			message.error(error?.data?.title || error?.detail);
 		}

@@ -44,24 +44,30 @@ export const JewelryModelUploadForm = ({jewelryModelId, visible, onClose}) => {
 
 	useEffect(() => {
 		if (jewelryModelId) {
-			dispatch(fetchJewelryModelFiles(jewelryModelId)).then((response) => {
-				if (response.payload) {
+			dispatch(fetchJewelryModelFiles(jewelryModelId))
+				.unwrap()
+				.then((response) => {
 					setJewelryModelFiles((prevState) => ({
 						...prevState,
-						...response.payload,
+						...response,
 					}));
-				}
-			});
+				})
+				.catch((error) => {
+					message.error(error?.data?.title || error?.detail);
+				});
 
-			dispatch(fetchJewelryModelDetail(jewelryModelId)).then((response) => {
-				if (response.payload) {
+			dispatch(fetchJewelryModelDetail(jewelryModelId))
+				.unwrap()
+				.then((response) => {
 					setJewelryModelFiles((prevState) => ({
 						...prevState,
-						SizeMetals: response.payload.SizeMetals,
-						SideDiamonds: response.payload.SideDiamonds,
+						SizeMetals: response.SizeMetals,
+						SideDiamonds: response.SideDiamonds,
 					}));
-				}
-			});
+				})
+				.catch((error) => {
+					message.error(error?.data?.title || error?.detail);
+				});
 		}
 	}, [jewelryModelId, dispatch]);
 
@@ -130,11 +136,14 @@ export const JewelryModelUploadForm = ({jewelryModelId, visible, onClose}) => {
 		handleDeleteImages();
 
 		// Refresh the files
-		await dispatch(fetchJewelryModelFiles(jewelryModelId)).then((response) => {
-			if (response.payload) {
-				setJewelryModelFiles(response.payload);
-			}
-		});
+		await dispatch(fetchJewelryModelFiles(jewelryModelId))
+			.unwrap()
+			.then((response) => {
+				setJewelryModelFiles(response);
+			})
+			.catch((error) => {
+				message.error(error?.data?.title || error?.detail);
+			});
 
 		// Reset states after saving
 		resetFormState();
@@ -183,10 +192,11 @@ export const JewelryModelUploadForm = ({jewelryModelId, visible, onClose}) => {
 			console.log('Deleting images:', removedImagePaths);
 
 			dispatch(deleteJewelryModelImages({jewelryModelId, imagePaths: removedImagePaths}))
+				.unwrap()
 				.then(() => {
 					message.success('Images deleted successfully');
 				})
-				.catch((err) => {
+				.catch((error) => {
 					message.error(error?.data?.title || error?.detail);
 				});
 		}
@@ -199,12 +209,14 @@ export const JewelryModelUploadForm = ({jewelryModelId, visible, onClose}) => {
 
 		console.log('Uploading Thumbnail for Diamond ID:', jewelryModelId);
 
-		try {
-			await dispatch(uploadJewelryModelThumbnail({jewelryModelId, formFile: thumbnailFile}));
-			message.success('Thumbnail uploaded successfully');
-		} catch (err){
-			message.error(error?.data?.title || error?.detail);
-		}
+		await dispatch(uploadJewelryModelThumbnail({jewelryModelId, formFile: thumbnailFile}))
+			.unwrap()
+			.then(() => {
+				message.success('Thumbnail uploaded successfully');
+			})
+			.catch((error) => {
+				message.error(error?.data?.title || error?.detail);
+			});
 	};
 	const handleUploadCategorizedImage = async () => {
 		if (!categorizedFile || !selectedSideDiamond || !selectedMetal) {
@@ -214,54 +226,62 @@ export const JewelryModelUploadForm = ({jewelryModelId, visible, onClose}) => {
 			return;
 		}
 
-		try {
-			await dispatch(
-				uploadCategorizedImage({
-					jewelryModelId,
-					imageFile: categorizedFile,
-					sideDiamondOptId: selectedSideDiamond,
-					metalId: selectedMetal,
-				})
-			);
-			message.success('Categorized image uploaded successfully');
-			dispatch(fetchJewelryModelFiles(jewelryModelId)); // Refresh the data
-			setCategorizedFile(null); // Reset the categorized file after upload
-		} catch (error) {
-			message.error(error?.data?.title || error?.detail);
-		}
+		await dispatch(
+			uploadCategorizedImage({
+				jewelryModelId,
+				imageFile: categorizedFile,
+				sideDiamondOptId: selectedSideDiamond,
+				metalId: selectedMetal,
+			})
+		)
+			.unwrap()
+			.then(() => {
+				message.success('Categorized image uploaded successfully');
+			})
+			.catch((error) => {
+				message.error(error?.data?.title || error?.detail);
+			});
+		dispatch(fetchJewelryModelFiles(jewelryModelId)); // Refresh the data
+		setCategorizedFile(null); // Reset the categorized file after upload
 	};
 	const handleUploadSideDiamondImage = async () => {
 		console.log('sideDiamondFile:', sideDiamondFile);
 		console.log('selectedSideDiamond:', selectedSideDiamond);
 
-		try {
-			await dispatch(
-				uploadSideDiamondImage({
-					jewelryModelId,
-					image: sideDiamondFile, // Wrap the file in an array
-					sideDiamondOptionId: selectedSideDiamond,
-				})
-			);
-			message.success('Side Diamond image uploaded successfully');
-			setSideDiamondFile(null); // Reset the state after upload
-		} catch (err) {
-			message.error(error?.data?.title || error?.detail);
-		}
+		await dispatch(
+			uploadSideDiamondImage({
+				jewelryModelId,
+				image: sideDiamondFile, // Wrap the file in an array
+				sideDiamondOptionId: selectedSideDiamond,
+			})
+		)
+			.unwrap()
+			.then(() => {
+				message.success('Side Diamond image uploaded successfully');
+			})
+			.catch((error) => {
+				message.error(error?.data?.title || error?.detail);
+			});
+
+		setSideDiamondFile(null); // Reset the state after upload
 	};
 
 	const handleUploadMetalImage = async () => {
 		console.log('MetalFile:', metalFile);
 		console.log('selectedMetal:', selectedMetal);
 
-		try {
-			await dispatch(
-				uploadMetalImages({jewelryModelId, formFiles: metalFile, metalId: selectedMetal})
-			);
-			message.success('Metal image uploaded successfully');
-			setMetalFile(null);
-		} catch (err) {
-			message.error(error?.data?.title || error?.detail);
-		}
+		await dispatch(
+			uploadMetalImages({jewelryModelId, formFiles: metalFile, metalId: selectedMetal})
+		)
+			.unwrap()
+			.then((res) => {
+				message.success('Metal image uploaded successfully');
+			})
+			.catch((error) => {
+				message.error(error?.data?.title || error?.detail);
+			});
+
+		setMetalFile(null);
 	};
 	const handleImageUpload = async () => {
 		if (imageFiles.length === 0 || imageFiles === initialFiles.images) {
@@ -270,12 +290,14 @@ export const JewelryModelUploadForm = ({jewelryModelId, visible, onClose}) => {
 
 		console.log('Uploading Diamond Images for Diamond ID:', jewelryModelId);
 
-		try {
-			await dispatch(uploadBaseImages({jewelryModelId, formFiles: imageFiles}));
-			message.success('Diamond images uploaded successfully');
-		} catch (err) {
-			message.error(error?.data?.title || error?.detail);
-		}
+		await dispatch(uploadBaseImages({jewelryModelId, formFiles: imageFiles}))
+			.unwrap()
+			.then((res) => {
+				message.success('Diamond images uploaded successfully');
+			})
+			.catch((error) => {
+				message.error(error?.data?.title || error?.detail);
+			});
 	};
 
 	const handleFileChange = (fileList, setState) => {
@@ -299,7 +321,7 @@ export const JewelryModelUploadForm = ({jewelryModelId, visible, onClose}) => {
 								loading={loading}
 								onClick={handleSaveChanges}
 							>
-								Save Changes
+								Lưu Thay Đổi
 							</Button>,
 					  ]
 					: [
@@ -309,16 +331,16 @@ export const JewelryModelUploadForm = ({jewelryModelId, visible, onClose}) => {
 								icon={<EditOutlined />}
 								onClick={handleSwitchToEdit}
 							>
-								Switch to Edit Mode
+								Sửa Thông Tin
 							</Button>,
 					  ]
 			}
 		>
 			{isEditMode ? (
 				<Form layout="vertical">
-					<Form.Item label="Select Side Diamond">
+					<Form.Item label="Chọn Kim Cương Tấm">
 						<Select
-							placeholder="Select a side diamond option"
+							placeholder="Chọn một cài đặt kim cương tấm"
 							onChange={(value) => setSelectedSideDiamond(value)}
 						>
 							{jewelryModelFiles?.SideDiamonds?.length > 0 ? (
@@ -348,14 +370,14 @@ export const JewelryModelUploadForm = ({jewelryModelId, visible, onClose}) => {
 									</Option>
 								))
 							) : (
-								<Option disabled>No side diamonds available</Option>
+								<Option disabled>Không có kim cương tấm</Option>
 							)}
 						</Select>
 					</Form.Item>
 
-					<Form.Item label="Select Metal">
+					<Form.Item label="Chọn Kim Loại">
 						<Select
-							placeholder="Select a metal option"
+							placeholder="Chọn Kim Loại"
 							onChange={(value) => setSelectedMetal(value)}
 						>
 							{uniqueMetals?.map((metal) => (
@@ -366,7 +388,7 @@ export const JewelryModelUploadForm = ({jewelryModelId, visible, onClose}) => {
 						</Select>
 					</Form.Item>
 
-					<Form.Item label="Upload Image">
+					<Form.Item label="Tải Hình Ảnh Lên">
 						<Upload
 							accept="image/*"
 							beforeUpload={(file) => {
@@ -381,7 +403,7 @@ export const JewelryModelUploadForm = ({jewelryModelId, visible, onClose}) => {
 									setMetalFile(file);
 								} else {
 									message.warning(
-										'Please select a Side Diamond, Metal, or both before uploading an image.'
+										'Vui lòng chọn kim loại, kim cương tấm hoặc cả hai để tải hình ảnh lên'
 									);
 									return Upload.LIST_IGNORE; // Prevent file from being added to the upload list
 								}
@@ -389,7 +411,7 @@ export const JewelryModelUploadForm = ({jewelryModelId, visible, onClose}) => {
 							}}
 							showUploadList={false}
 						>
-							<Button icon={<UploadOutlined />}>Select Image</Button>
+							<Button icon={<UploadOutlined />}>Chọn Hình Ảnh</Button>
 						</Upload>
 						{/* Preview the file */}
 						{categorizedFile && selectedMetal && selectedSideDiamond && (
@@ -437,7 +459,7 @@ export const JewelryModelUploadForm = ({jewelryModelId, visible, onClose}) => {
 							}}
 							showUploadList={false}
 						>
-							<Button icon={<UploadOutlined />}>Select Thumbnail</Button>
+							<Button icon={<UploadOutlined />}>Chọn Thumbnail</Button>
 						</Upload>
 						{thumbnailFile && (
 							<img
@@ -454,7 +476,7 @@ export const JewelryModelUploadForm = ({jewelryModelId, visible, onClose}) => {
 					</Form.Item>
 
 					{/* Jewelry Model Images Upload */}
-					<Form.Item label="Jewelry Model Images">
+					<Form.Item label="Hình Ảnh Mẫu Trang Sức">
 						<Upload
 							multiple
 							accept="image/*"
@@ -477,7 +499,7 @@ export const JewelryModelUploadForm = ({jewelryModelId, visible, onClose}) => {
 							}))}
 						>
 							<Button icon={<FileImageOutlined />}>
-								Select Jewelry Model Images
+								Chọn hình ảnh cho trang sức
 							</Button>
 						</Upload>
 					</Form.Item>
@@ -503,7 +525,7 @@ export const JewelryModelUploadForm = ({jewelryModelId, visible, onClose}) => {
 										/>
 									) : (
 										<div className="flex justify-center items-center h-32 bg-gray-200 text-gray-500">
-											No Thumbnail Available
+											Không có Thumbnail
 										</div>
 									)
 								}
@@ -512,7 +534,7 @@ export const JewelryModelUploadForm = ({jewelryModelId, visible, onClose}) => {
 
 						{/* Images Section */}
 						<div className="space-y-2">
-							<h3 className="text-lg font-semibold">Images</h3>
+							<h3 className="text-lg font-semibold">Hình Ảnh</h3>
 							<Card bordered={false} className="shadow-md p-4">
 								<List
 									grid={{gutter: 16, column: 4}}
@@ -529,9 +551,7 @@ export const JewelryModelUploadForm = ({jewelryModelId, visible, onClose}) => {
 													className="transition-transform transform group-hover:scale-110"
 												/>
 												<div className="absolute inset-0 bg-black opacity-0 group-hover:opacity-50 flex justify-center items-center">
-													<span className="text-white text-lg">
-														Preview
-													</span>
+													<span className="text-white text-lg">Xem</span>
 												</div>
 											</div>
 										</List.Item>
@@ -544,9 +564,9 @@ export const JewelryModelUploadForm = ({jewelryModelId, visible, onClose}) => {
 					{/* Selection Form */}
 					<Form layout="vertical" className="space-y-4">
 						{/* Side Diamond Select */}
-						<Form.Item label="Select Side Diamond" className="mb-4">
+						<Form.Item label="Chọn Kim Cương Tấm" className="mb-4">
 							<Select
-								placeholder="Select a side diamond"
+								placeholder="Chọn Kim Cương Tấm"
 								onChange={setSelectedSideDiamond}
 								value={selectedSideDiamond}
 								className="w-full"
@@ -562,9 +582,9 @@ export const JewelryModelUploadForm = ({jewelryModelId, visible, onClose}) => {
 						</Form.Item>
 
 						{/* Metal Select */}
-						<Form.Item label="Select Metal" className="mb-4">
+						<Form.Item label="Chọn Kim Loại" className="mb-4">
 							<Select
-								placeholder="Select a metal option"
+								placeholder="Chọn Kim Loại"
 								onChange={(value) => setSelectedMetal(value)}
 								className="w-full"
 							>
@@ -575,7 +595,7 @@ export const JewelryModelUploadForm = ({jewelryModelId, visible, onClose}) => {
 										</Option>
 									))
 								) : (
-									<Option disabled>No metals available</Option>
+									<Option disabled>Không có kim loại</Option>
 								)}
 							</Select>
 						</Form.Item>
@@ -584,7 +604,7 @@ export const JewelryModelUploadForm = ({jewelryModelId, visible, onClose}) => {
 					{/* Display the image based on Metal and Side Diamond selection */}
 					{selectedMetal && selectedSideDiamond && (
 						<div className="space-y-2 mt-6">
-							<h3 className="text-lg font-semibold">Selected Jewelry Image</h3>
+							<h3 className="text-lg font-semibold">Chọn Hình Ảnh Cho Trang Sức</h3>
 							<div className="flex justify-center items-center">
 								{getImageForSelection(selectedMetal, selectedSideDiamond) ? (
 									<Image

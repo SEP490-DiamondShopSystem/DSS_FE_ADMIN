@@ -66,36 +66,35 @@ const DiscountPage = ({discountData}) => {
 	};
 
 	const handleCreateDiscount = (values) => {
-		try {
-			const {name, discountPercent, discountCode, requirements} = values;
-			const [startDateTime, endDateTime] = values.validDate;
+		const {name, discountPercent, discountCode, requirements} = values;
+		const [startDateTime, endDateTime] = values.validDate;
 
-			// Create a new discount object with formatted dates
-			const newDiscount = {
-				...values,
-				key: discounts.length, // Assuming discounts is defined elsewhere
-				startDateTime: startDateTime.format('DD-MM-YYYY HH:mm:ss'),
-				endDateTime: endDateTime.format('DD-MM-YYYY HH:mm:ss'),
-			};
+		// Create a new discount object with formatted dates
+		const newDiscount = {
+			...values,
+			key: discounts.length, // Assuming discounts is defined elsewhere
+			startDateTime: startDateTime.format('DD-MM-YYYY HH:mm:ss'),
+			endDateTime: endDateTime.format('DD-MM-YYYY HH:mm:ss'),
+		};
 
-			// Constructing the command for creating the discount
-			const createDiscount = {
-				startDate: startDateTime.format('DD-MM-YYYY HH:mm:ss'),
-				endDate: endDateTime.format('DD-MM-YYYY HH:mm:ss'),
-				name: name,
-				discountPercent: discountPercent,
-				discountCode: discountCode,
-			};
+		// Constructing the command for creating the discount
+		const createDiscount = {
+			startDate: startDateTime.format('DD-MM-YYYY HH:mm:ss'),
+			endDate: endDateTime.format('DD-MM-YYYY HH:mm:ss'),
+			name: name,
+			discountPercent: discountPercent,
+			discountCode: discountCode,
+		};
 
-			dispatch(createFullDiscount({createDiscount, requirements})).then((res) => {
-				if (res.payload !== undefined) {
-					message.success('Discount created successfully!');
-					form.resetFields();
-				}
+		dispatch(createFullDiscount({createDiscount, requirements}))
+			.unwrap()
+			.then(() => {
+				message.success('Tạo Giảm Giá Thành Công!');
+				form.resetFields();
+			})
+			.catch((error) => {
+				message.error(error?.data?.title || error?.detail);
 			});
-		} catch (error) {
-			message.error(error?.data?.title || error?.detail);
-		}
 		// setIsEditing(false);
 	};
 
@@ -108,9 +107,10 @@ const DiscountPage = ({discountData}) => {
 		setIsEditing(true);
 		setCurrentEditingIndex(index);
 
-		dispatch(fetchDiscountDetail(discountId)).then((res) => {
-			if (res.payload) {
-				const fetchedDiscount = res.payload;
+		dispatch(fetchDiscountDetail(discountId))
+			.unwrap()
+			.then((res) => {
+				const fetchedDiscount = res;
 				const startDate = fetchedDiscount.StartDate
 					? moment(fetchedDiscount.StartDate, 'DD-MM-YYYY HH:mm:ss')
 					: null;
@@ -170,65 +170,72 @@ const DiscountPage = ({discountData}) => {
 						};
 					}),
 				});
-			} else {
-				message.error('Failed to fetch discount details.');
-			}
-		});
+			})
+
+			.catch((error) => {
+				message.error(error?.data?.title || error?.detail);
+			});
 	};
 
 	const handleCancel = async (id) => {
-		try {
-			await dispatch(cancelDiscount(id)); // Use your actual cancelDiscount logic
-			message.success(`Discount with id: ${id} has been canceled.`);
-		} catch (error) {
-			message.error('Failed to cancel the discount. Please try again.');
-		}
+		await dispatch(cancelDiscount(id))
+			.unwrap()
+			.then(() => {
+				message.success(`Mã giảm giá với id: ${id} đã được bị hủy.`);
+			})
+			.catch((error) => {
+				message.error(error?.data?.title || error?.detail);
+			}); // Use your actual cancelDiscount logic
 	};
 	const handleUpdate = async () => {
-		try {
-			const row = await form.validateFields();
-			const formattedStartDate = row.validDate[0].format('DD-MM-YYYY');
-			const formattedEndDate = row.validDate[1].format('DD-MM-YYYY');
+		const row = await form.validateFields();
+		const formattedStartDate = row.validDate[0].format('DD-MM-YYYY');
+		const formattedEndDate = row.validDate[1].format('DD-MM-YYYY');
 
-			const addedRequirements = row.requirements.map((req) => ({
-				id: req.id,
-				name: req.name,
-				targetType: req.targetType,
-				operator: req.operator,
-				quantity: req.quantity || 1,
-				jewelryModelID: req.jewelryModelID,
-				promotionId: req.promotionId,
-				discountId: req.discountId,
-				diamondRequirementSpec: req.diamondRequirementSpec,
-			}));
+		const addedRequirements = row.requirements.map((req) => ({
+			id: req.id,
+			name: req.name,
+			targetType: req.targetType,
+			operator: req.operator,
+			quantity: req.quantity || 1,
+			jewelryModelID: req.jewelryModelID,
+			promotionId: req.promotionId,
+			discountId: req.discountId,
+			diamondRequirementSpec: req.diamondRequirementSpec,
+		}));
 
-			if (!editingDiscountId) {
-				message.error('Discount ID is missing!');
-				return;
-			}
-
-			const discountData = {
-				...row,
-				startDate: formattedStartDate,
-				endDate: formattedEndDate,
-				addedRequirements,
-				removedRequirements,
-			};
-
-			await dispatch(updateDiscount({discountId: editingDiscountId, discountData}));
-			message.success('Discount updated successfully!');
-			await dispatch(fetchDiscounts());
-			setIsEditing(false);
-			setRemovedRequirements([]); // Reset removed requirements after update
-		} catch (error) {
-			message.error(error?.data?.title || error?.detail);
+		if (!editingDiscountId) {
+			message.error('Discount ID is missing!');
+			return;
 		}
+
+		const discountData = {
+			...row,
+			startDate: formattedStartDate,
+			endDate: formattedEndDate,
+			addedRequirements,
+			removedRequirements,
+		};
+
+		await dispatch(updateDiscount({discountId: editingDiscountId, discountData}))
+			.unwrap()
+			.then(() => {
+				message.success('Cập giảm giá thành công!');
+			})
+			.catch((error) => {
+				message.error(error?.data?.title || error?.detail);
+			});
+
+		await dispatch(fetchDiscounts());
+		setIsEditing(false);
+		setRemovedRequirements([]); // Reset removed requirements after update
 	};
 
 	const handleDelete = (id) => {
 		dispatch(deleteDiscount(id))
+			.unwrap()
 			.then(() => {
-				message.success(`Deleted discount with id: ${id}`);
+				message.success(`Đã xóa giảm giá có id: ${id}`);
 			})
 			.catch((error) => {
 				message.error(error?.data?.title || error?.detail);

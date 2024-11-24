@@ -216,7 +216,7 @@ const DashboardPage = () => {
 									<Card bordered={false}>
 										<div className="flex justify-between items-center">
 											<h3 className="font-bold text-lg">
-												Đơn Đặt Hàng Trong Tháng
+												Đơn Đặt Hàng Trong Tuần
 											</h3>
 											<div className="flex ">
 												<div
@@ -285,10 +285,9 @@ const DashboardPage = () => {
 										<OverviewKpi
 											chartSeries={[
 												{
-													name: 'Tổng Giá',
-													data:
+													name: 'Tổng Đơn Hàng',
+													data: Object.entries(
 														orders?.CompletedOrder?.filter((item) => {
-															// Check if CompleteDate exists and is a valid date after parsing
 															return (
 																item.CompleteDate &&
 																dayjs(
@@ -297,25 +296,28 @@ const DashboardPage = () => {
 																	true
 																).isValid()
 															);
-														})
-															?.sort(
-																(a, b) =>
-																	new Date(
-																		a.CompleteDate
-																	).getTime() -
-																	new Date(
-																		b.CompleteDate
-																	).getTime()
+														})?.reduce((acc, item) => {
+															// Nhóm dữ liệu theo ngày
+															const dateKey = dayjs(
+																item.CompleteDate,
+																'DD-MM-YYYY HH:mm:ss'
 															)
-															?.map((item) => ({
-																x: dayjs(
-																	item.CompleteDate,
-																	'DD-MM-YYYY HH:mm:ss'
-																)
-																	.toDate()
-																	.getTime(), // Convert to timestamp
-																y: formatPrice(item.TotalPrice), // Format price
-															})) || [],
+																.startOf('day')
+																.format('YYYY-MM-DD');
+
+															// Tăng số lượng đơn hàng theo ngày
+															acc[dateKey] = (acc[dateKey] || 0) + 1;
+															return acc;
+														}, {}) || {}
+													)
+														// Chuyển object thành mảng { x, y } để dùng trong chart
+														.map(([date, count]) => ({
+															x: dayjs(date, 'YYYY-MM-DD')
+																.toDate()
+																.getTime(),
+															y: count,
+														}))
+														.sort((a, b) => a.x - b.x), // Sắp xếp theo ngày
 												},
 											]}
 										/>

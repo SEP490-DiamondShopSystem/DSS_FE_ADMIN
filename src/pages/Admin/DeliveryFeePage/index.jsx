@@ -54,9 +54,15 @@ const DeliveryFeePage = () => {
 	};
 
 	const handleDeleteDeliveryFee = async (id) => {
-		dispatch(deleteDeliveryFee(id));
-		message.success('Delivery Fee deleted successfully!');
-		await dispatch(updateDeliveryFee(updatePayload));
+		dispatch(deleteDeliveryFee(id))
+			.unwrap()
+			.then(() => {
+				message.success('Xóa giá vận chuyển thành công!');
+				dispatch(updateDeliveryFee(updatePayload));
+			})
+			.catch((error) => {
+				message.error(error?.data?.title || error?.detail);
+			});
 	};
 
 	const handleSubmit = async (values) => {
@@ -78,21 +84,25 @@ const DeliveryFeePage = () => {
 				setActive: true,
 			};
 
-			try {
-				await dispatch(updateDeliveryFee(updatePayload));
-				await dispatch(fetchDeliveryFees({isLocation: true}));
-				message.success('Delivery Fee updated successfully!');
-			} catch (error) {
-				message.error(error?.data?.title || error?.detail);
-			}
+			await dispatch(updateDeliveryFee(updatePayload))
+				.unwrap()
+				.then(() => {
+					message.success('Cập nhật giá vận chuyển thành công!');
+				})
+				.catch((error) => {
+					message.error(error?.data?.title || error?.detail);
+				});
+			await dispatch(fetchDeliveryFees({isLocation: true}));
 		} else {
-			try {
-				await dispatch(addDeliveryFee(payload));
-				await dispatch(fetchDeliveryFees({isLocation: true}));
-				message.success('Delivery Fee added successfully!');
-			} catch (error) {
-				message.error(error?.data?.title || error?.detail);
-			}
+			await dispatch(addDeliveryFee(payload))
+				.unwrap()
+				.then(() => {
+					message.success('Thêm giá vận chuyển thành công!');
+				})
+				.catch((error) => {
+					message.error(error?.data?.title || error?.detail);
+				});
+			await dispatch(fetchDeliveryFees({isLocation: true}));
 		}
 
 		setIsModalVisible(false);
