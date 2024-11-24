@@ -111,27 +111,26 @@ const SideDiamondPricePage = () => {
 	};
 
 	const handleSave = async () => {
+		const updatedPrices = editedCells.map((cell) => ({
+			diamondCriteriaId: cell.diamondCriteriaId,
+			price: Number(cell.price),
+		}));
 
-			const updatedPrices = editedCells.map((cell) => ({
-				diamondCriteriaId: cell.diamondCriteriaId,
-				price: Number(cell.price),
-			}));
-
-			await dispatch(
-				updateDiamondPrices({
-					updatedDiamondPrices: updatedPrices,
-					shapeId,
-					isLabDiamond,
-					isSideDiamond,
-				})
-			)
-				.unwrap()
-				.then(() => {
-					message.success('Cập Nhật Giá Thành Công!');
-				})
-				.catch((error) => {
-					message.error(error?.data?.title || error?.detail);
-				});
+		await dispatch(
+			updateDiamondPrices({
+				updatedDiamondPrices: updatedPrices,
+				shapeId,
+				isLabDiamond,
+				isSideDiamond,
+			})
+		)
+			.unwrap()
+			.then(() => {
+				message.success('Cập Nhật Giá Thành Công!');
+			})
+			.catch((error) => {
+				message.error(error?.data?.title || error?.detail);
+			});
 		setEditedCells([]);
 		setIsEditing(false);
 		await dispatch(fetchPriceBoard({isLabDiamond, isSideDiamond, shapeId})); // Fetch updated board
@@ -246,7 +245,7 @@ const SideDiamondPricePage = () => {
 	};
 
 	if (loading) {
-		return <div className="text-center text-lg font-semibold">Loading...</div>;
+		return <div className="text-center text-lg font-semibold">Đang Tải...</div>;
 	}
 
 	const renderPriceRows = (cellMatrix, colorRange, isCreating) => {
@@ -334,7 +333,7 @@ const SideDiamondPricePage = () => {
 		return (
 			<div className="container mx-auto p-6 bg-offWhite rounded-lg shadow-lg">
 				<h1 className="text-5xl font-bold mb-6 text-center text-blue-600">
-					Side Diamond Price Board
+					Bảng Giá Kim Cương Tấm
 				</h1>
 				<div className="flex flex-wrap gap-4 items-center justify-between p-4 ">
 					{/* Lab Diamond Checkbox */}
@@ -345,7 +344,7 @@ const SideDiamondPricePage = () => {
 							onChange={handleLabDiamondChange}
 							className="rounded focus:ring-blue-500"
 						/>
-						<label className="text-lg font-semibold">Lab Diamond</label>
+						<label className="text-lg font-semibold">Kim Cương Nhân Tạo</label>
 					</div>
 
 					{/* Clear Filters Button */}
@@ -354,12 +353,12 @@ const SideDiamondPricePage = () => {
 							onClick={clearFilters}
 							className="bg-red-500 text-black px-4 py-2 rounded hover:bg-red-600 hover:text-red-200 transition duration-200 font-semibold"
 						>
-							Clear Filters
+							Xóa bộ lọc
 						</button>
 					</div>
 				</div>
 				<div className="flex flex-wrap gap-4 items-center justify-between p-4">
-					No price data available.
+					Bảng giá không có sẵn
 				</div>
 			</div>
 		);
@@ -367,9 +366,7 @@ const SideDiamondPricePage = () => {
 
 	return (
 		<div className="container gap-4 mx-auto p-6 bg-white rounded-lg shadow-lg">
-			<h1 className="text-5xl font-bold text-center text-blue-600">
-				Side Diamond Price Board
-			</h1>
+			<h1 className="text-5xl font-bold text-center text-blue-600">Bảng Giá Kim Cương Tấm</h1>
 			<div className="flex flex-wrap gap-4 items-center justify-between p-4 bg-offWhite rounded-lg shadow-md">
 				{/* Lab Diamond Checkbox */}
 				<div className="flex items-center gap-2">
@@ -380,7 +377,9 @@ const SideDiamondPricePage = () => {
 						className="rounded text-blue focus:ring-blue-500 hover:ring-2 transition duration-200"
 						aria-label="Lab Diamond"
 					/>
-					<label className="text-lg font-semibold text-gray-800">Lab Diamond</label>
+					<label className="text-lg font-semibold text-gray-800">
+						Kim Cương Nhân Tạo
+					</label>
 				</div>
 
 				{/* Clear Filters Button */}
@@ -390,7 +389,7 @@ const SideDiamondPricePage = () => {
 						className="bg-red text-white px-4 py-2 rounded hover:bg-redLight transition duration-200 font-semibold shadow hover:scale-105"
 						aria-label="Clear Filters"
 					>
-						Clear Filters
+						Xóa bộ lọc
 					</button>
 				</div>
 			</div>
@@ -403,7 +402,7 @@ const SideDiamondPricePage = () => {
 							className="border-2 bg-primary text-black px-8 py-3 rounded-lg hover:bg-primaryLight transition duration-200 font-semibold shadow-md hover:scale-105 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
 							aria-label="Save Changes"
 						>
-							Save Changes
+							lưu
 						</button>
 					</div>
 				)}
@@ -416,7 +415,7 @@ const SideDiamondPricePage = () => {
 								: 'border-green bg-green text-black hover:bg-greenLight'
 						} font-semibold shadow-md`}
 					>
-						{isCreating ? 'Cancel Create Price' : 'Create Price'}
+						{isCreating ? 'Hủy' : 'Tạo Giá Mới'}
 					</button>
 				</div>
 				{isEditing && (
@@ -426,7 +425,7 @@ const SideDiamondPricePage = () => {
 							className="border-2 bg-red text-white px-8 py-3 rounded-lg hover:bg-redLight transition duration-200 font-semibold shadow-md hover:scale-105 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
 							aria-label="Delete Selected"
 						>
-							Delete Selected
+							Xóa những ô được chọn
 						</button>
 						{editedCells.length > 0 && (
 							<button
@@ -434,7 +433,7 @@ const SideDiamondPricePage = () => {
 								className="border-2 bg-primary text-black px-8 py-3 rounded-lg hover:bg-primaryLight transition duration-200 font-semibold shadow-md hover:scale-105 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
 								aria-label="Save Changes"
 							>
-								Save Changes
+								Lưu
 							</button>
 						)}
 					</div>
@@ -448,7 +447,7 @@ const SideDiamondPricePage = () => {
 					} font-semibold shadow-md`}
 					aria-label={isEditing ? 'Cancel Editing' : 'Edit Prices'}
 				>
-					{isEditing ? 'Cancel' : 'Edit Prices'}
+					{isEditing ? 'Hủy' : 'Cập Nhật Giá'}
 				</button>
 			</div>
 
@@ -456,20 +455,20 @@ const SideDiamondPricePage = () => {
 			{showDeleteConfirm && (
 				<div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
 					<div className="bg-white p-6 rounded shadow-lg">
-						<h2 className="text-xl font-semibold mb-4">Confirm Deletion</h2>
-						<p>Are you sure you want to delete the selected prices?</p>
+						<h2 className="text-xl font-semibold mb-4">Xác Nhận Xóa Giá Kim Cương</h2>
+						<p>Bạn có muốn xóa giá những ô được chọn?</p>
 						<div className="flex justify-between mt-6">
 							<button
 								onClick={confirmDelete}
 								className="bg-red text-white px-4 py-2 rounded hover:bg-red-600 transition duration-200"
 							>
-								Delete
+								Xóa
 							</button>
 							<button
 								onClick={cancelDelete}
 								className="bg-gray text-black px-4 py-2 rounded hover:bg-gray-400 transition duration-200"
 							>
-								Cancel
+								Hủy
 							</button>
 						</div>
 					</div>
@@ -523,14 +522,14 @@ const SideDiamondPricePage = () => {
 							onClick={handleSave}
 							className="border-2 bg-blue-500 text-black px-6 py-2 rounded hover:bg-blue-600 transition duration-200 font-semibold"
 						>
-							Save Changes
+							Lưu{' '}
 						</button>
 					) : (
 						<button
 							onClick={handleEditPriceToggle} // Replace with your cancel function
 							className="border-2 bg-red text-white px-6 py-2 rounded hover:bg-red-600 transition duration-200 font-semibold"
 						>
-							Cancel
+							Hủy
 						</button>
 					)}
 				</div>
@@ -542,14 +541,14 @@ const SideDiamondPricePage = () => {
 							onClick={savePrices}
 							className="border-2 bg-blue text-black px-6 py-2 rounded hover:bg-blue-600 transition duration-200 font-semibold"
 						>
-							Save Changes
+							Lưu{' '}
 						</button>
 					) : (
 						<button
 							onClick={handleAddPriceToggle} // Replace with your cancel function
 							className="border-2 bg-red text-white px-6 py-2 rounded hover:bg-red-600 transition duration-200 font-semibold"
 						>
-							Cancel
+							Hủy
 						</button>
 					)}
 				</div>

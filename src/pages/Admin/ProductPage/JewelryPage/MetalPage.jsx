@@ -36,22 +36,22 @@ const MetalPage = () => {
 			});
 	};
 
-	if (loading) return <p className="text-xl text-blue-500">Loading metals...</p>;
+	if (loading) return <p className="text-xl text-blue-500">Đang Tải Giá Kim Loại...</p>;
 
 	return (
 		<div className="p-6 bg-offWhite min-h-screen">
-			<h1 className="text-3xl font-semibold text-primary mb-6">Manage Metal Prices</h1>
+			<h1 className="text-3xl font-semibold text-primary mb-6">Quản Lý Giá Kim Loại</h1>
 
 			{/* Metal Prices Table */}
 			<table className="w-full border-collapse bg-white rounded-lg shadow-md border border-lightGray">
 				<thead>
 					<tr className="bg-gray-100">
-						<th className="border p-3 text-left text-sm text-gray-700">Name</th>
+						<th className="border p-3 text-left text-sm text-gray-700">Tên</th>
 						<th className="border p-3 text-left text-sm text-gray-700">
-							Current Price
+							Giá Hiện Tại
 						</th>
-						<th className="border p-3 text-left text-sm text-gray-700">New Price</th>
-						<th className="border p-3 text-left text-sm text-gray-700">Actions</th>
+						<th className="border p-3 text-left text-sm text-gray-700">Giá Mới</th>
+						<th className="border p-3 text-left text-sm text-gray-700">-</th>
 					</tr>
 				</thead>
 				<tbody>
@@ -76,7 +76,7 @@ const MetalPage = () => {
 									className="px-6 py-2 bg-primary text-white rounded-md hover:bg-primaryDark disabled:opacity-50 focus:outline-none focus:ring-2 focus:ring-primary"
 									disabled={!editPrice[metal.Id]}
 								>
-									Save
+									Lưu
 								</button>
 							</td>
 						</tr>

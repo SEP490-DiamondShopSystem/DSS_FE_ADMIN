@@ -96,15 +96,14 @@ const JewelryModelList = ({onSelectModel}) => {
 		}
 	};
 
-	if (loading) return <div>Loading...</div>;
-	if (error) return <div>Error: {error}</div>;
+	if (loading) return <div>Đang tải...</div>;
+	if (error) return <div>Lỗi: {error}</div>;
 	if (!models || !Array.isArray(models)) return <div>No models available</div>;
 
 	return (
 		<div className="p-4 bg-white max-w-6xl mx-auto">
-			<h1 className="text-2xl font-semibold mb-4">Jewelry Models</h1>
+			<h1 className="text-2xl font-semibold mb-4">Các Mẫu Trang Sức</h1>
 			<div className="p-4 mb-6 bg-offWhite rounded-lg shadow-md">
-				<h2 className="text-xl font-semibold text-primary mb-4">Models</h2>
 				{/* Filters */}
 				<div className="mb-4 flex flex-wrap gap-4">
 					<input
@@ -131,24 +130,24 @@ const JewelryModelList = ({onSelectModel}) => {
 						onChange={(e) => setIsRhodiumFinished(e.target.value === 'true')}
 						className="form-select p-2 border border-gray-300 rounded-md"
 					>
-						<option value="">Rhodium Finished?</option>
-						<option value="true">Yes</option>
-						<option value="false">No</option>
+						<option value="">Xi Rhodium?</option>
+						<option value="true">Có</option>
+						<option value="false">Không</option>
 					</select>
 					<select
 						value={isEngravable}
 						onChange={(e) => setIsEngravable(e.target.value === 'true')}
 						className="form-select p-2 border border-gray-300 rounded-md"
 					>
-						<option value="">Engravable?</option>
-						<option value="true">Yes</option>
-						<option value="false">No</option>
+						<option value="">Có Thể Khắc?</option>
+						<option value="true">Có</option>
+						<option value="false">Không</option>
 					</select>
 				</div>
 				{loading ? (
-					<p>Loading...</p>
+					<p>Đang Tải...</p>
 				) : error ? (
-					<p className="text-red-500">Error loading models: {error}</p>
+					<p className="text-red-500">Lỗi Tải Mẫu Trang Sức: {error}</p>
 				) : (
 					<ul>
 						{models.map((model) => (
@@ -166,7 +165,7 @@ const JewelryModelList = ({onSelectModel}) => {
 										/>
 									) : (
 										<div className="w-16 h-16 bg-gray-300 flex items-center justify-center rounded-full">
-											<span className="text-gray-600">No Image</span>{' '}
+											<span className="text-gray-600">Không có hình ảnh</span>{' '}
 											{/* Fallback when no thumbnail */}
 										</div>
 									)}
@@ -184,39 +183,38 @@ const JewelryModelList = ({onSelectModel}) => {
 
 									<div className="text-xs text-gray-500 mt-1 w-full flex">
 										<div className="p-3">
-											<span className="font-medium">Side Diamond: </span>
+											<span className="font-medium">Kim cương tấm: </span>
 											{model.SideDiamond ? 'Yes' : 'No'}
 										</div>
 										{model.IsEngravable && (
 											<div className="p-3">
-												<span className="font-medium">Engravable: </span>{' '}
-												Yes
+												<span className="font-medium">Có thể Khắc: </span>{' '}
+												Có
 											</div>
 										)}
 										{model.IsRhodiumFinish && (
 											<div className="p-3">
-												<span className="font-medium">
-													Rhodium Finish:{' '}
-												</span>{' '}
-												Yes
+												<span className="font-medium">Xi Rhodium: </span> Có
 											</div>
 										)}
 										{model.MainDiamondCount > 0 && (
 											<div className="p-3">
-												<span className="font-medium">Main Diamonds: </span>
+												<span className="font-medium">
+													Kim Cương Chính:{' '}
+												</span>
 												{model.MainDiamondCount}{' '}
 												{model.MainDiamondCount > 1 ? 'stones' : 'stone'}
 											</div>
 										)}
 										{model.MetalSupported?.length > 0 && (
 											<div className="p-3">
-												<span className="font-medium">Metals: </span>
+												<span className="font-medium">Kim Loại: </span>
 												{model.MetalSupported.join(', ')}
 											</div>
 										)}
 										{model.CraftmanFee > 0 && (
 											<div className="p-3">
-												<span className="font-medium">Craftman Fee: </span>$
+												<span className="font-medium">Phí Chế Tác: </span>$
 												{model.CraftmanFee}
 											</div>
 										)}
@@ -242,7 +240,7 @@ const JewelryModelList = ({onSelectModel}) => {
 						disabled={currentPage === 1}
 						className="px-4 py-2 bg-primary text-black rounded-lg hover:bg-primaryDark disabled:opacity-50"
 					>
-						Previous
+						Trước
 					</button>
 					<span className="text-lg">{`Page ${currentPage} of ${totalPage}`}</span>
 					<button
@@ -250,16 +248,16 @@ const JewelryModelList = ({onSelectModel}) => {
 						disabled={currentPage === totalPage}
 						className="px-4 py-2 bg-primary text-black rounded-lg hover:bg-primaryDark disabled:opacity-50"
 					>
-						Next
+						Sau
 					</button>
 					<select
 						value={pageSize}
 						onChange={(e) => setPageSize(Number(e.target.value), setCurrentPage(1))}
 						className="form-select p-2 border border-gray rounded-md"
 					>
-						<option value="5">5 per page</option>
-						<option value="10">10 per page</option>
-						<option value="20">20 per page</option>
+						<option value="5">5 mỗi trang</option>
+						<option value="10">10 mỗi trang</option>
+						<option value="20">20 mỗi trang</option>
 					</select>
 				</div>
 			</div>
@@ -267,7 +265,7 @@ const JewelryModelList = ({onSelectModel}) => {
 			{showModal && selectedModel && (
 				<div className="fixed inset-0 bg-gray-800 bg-opacity-50 flex justify-center items-center z-50">
 					<div className="bg-white p-6 rounded-lg shadow-lg w-11/12 max-w-lg">
-						<h2 className="text-2xl font-semibold mb-4">Model Details</h2>
+						<h2 className="text-2xl font-semibold mb-4">Chi Tiết Mẫu Trang Sức</h2>
 						<p>
 							<strong>Name:</strong> {selectedModel.Name}
 						</p>
@@ -278,7 +276,7 @@ const JewelryModelList = ({onSelectModel}) => {
 							<strong>Category:</strong> {selectedModel.Category?.Name}
 						</p>
 						<div className="mt-4 flex justify-end gap-4">
-							<Button onClick={handleCloseModal}>Close</Button>
+							<Button onClick={handleCloseModal}>Đóng</Button>
 							<Button type="primary" onClick={handleSelectModel}>
 								Chọn Mẫu Trang Sức Này
 							</Button>
@@ -290,32 +288,32 @@ const JewelryModelList = ({onSelectModel}) => {
 				<div className="fixed inset-0 bg-gray bg-opacity-50 flex justify-center items-center p-3 z-50">
 					<div className="bg-white p-4 rounded-lg shadow-lg w-11/12 md:w-1/2 lg:w-2/3">
 						<h2 className="text-3xl font-semibold text-primary mb-6 text-center">
-							Model Details
+							Chi Tiết Mẫu Trang Sức{' '}
 						</h2>
 
 						<div className="flex gap-8">
 							{/* Left Column */}
 							<div className="flex-1">
 								<p className="text-lg font-medium text-gray">
-									<strong>Name:</strong> {selectedModel.Name}
+									<strong>Tên:</strong> {selectedModel.Name}
 								</p>
 								<p className="text-lg font-medium text-gray">
-									<strong>Category:</strong> {selectedModel.Category.Name}
+									<strong>Phân Loại:</strong> {selectedModel.Category.Name}
 								</p>
 								<p className="text-lg font-medium text-gray">
-									<strong>Model Code:</strong> {selectedModel.ModelCode}
+									<strong>Mã Mẫu Trang Sức:</strong> {selectedModel.ModelCode}
 								</p>
 								<p className="text-lg font-medium text-gray">
-									<strong>Craftman Fee:</strong> {selectedModel.CraftmanFee} VND
+									<strong>Phí Chế Tác:</strong> {selectedModel.CraftmanFee} VND
 								</p>
 								<p className="text-lg font-medium text-gray">
-									<strong>Description:</strong> {selectedModel.Description}
+									<strong>Mô Tả:</strong> {selectedModel.Description}
 								</p>
 								<p className="text-lg font-medium text-gray">
-									<strong>Width:</strong> {selectedModel.Width} mm
+									<strong>Ngang:</strong> {selectedModel.Width} mm
 								</p>
 								<p className="text-lg font-medium text-gray">
-									<strong>Engravable:</strong>{' '}
+									<strong>Có Thể Khắc:</strong>{' '}
 									{selectedModel.IsEngravable ? 'Yes' : 'No'}
 								</p>
 							</div>
@@ -323,19 +321,19 @@ const JewelryModelList = ({onSelectModel}) => {
 							{/* Right Column */}
 							<div className="flex-1">
 								<p className="text-lg font-medium text-gray">
-									<strong>Main Diamond Count:</strong>{' '}
+									<strong>Số Lượng Kim Cương Chính:</strong>{' '}
 									{selectedModel.MainDiamondCount}
 								</p>
 								<p className="text-lg font-medium text-gray">
-									<strong>Side Diamond Option Count:</strong>{' '}
+									<strong>Số Lượng Kim Cương Tấm:</strong>{' '}
 									{selectedModel.SideDiamondOptionCount}
 								</p>
 								<p className="text-lg font-medium text-gray">
-									<strong>Rhodium Finish:</strong>{' '}
+									<strong>Xi Rhodium:</strong>{' '}
 									{selectedModel.IsRhodiumFinish ? 'Yes' : 'No'}
 								</p>
 								<p className="text-lg font-medium text-gray">
-									<strong>Metal Supported:</strong>{' '}
+									<strong>Hỗ Trợ các kim loại:</strong>{' '}
 									{selectedModel.MetalSupported.join(', ')}
 								</p>
 							</div>
@@ -347,7 +345,7 @@ const JewelryModelList = ({onSelectModel}) => {
 									className="text-xl font-semibold cursor-pointer"
 									onClick={() => setIsMainDiamondsOpen(!isMainDiamondsOpen)}
 								>
-									Main Diamonds {isMainDiamondsOpen ? '▲' : '▼'}
+									Kim Cương Chính {isMainDiamondsOpen ? '▲' : '▼'}
 								</h3>
 								{isMainDiamondsOpen && (
 									<ul className="space-y-4 mt-3 pl-4 max-h-24 overflow-y-auto border rounded-md">
@@ -356,19 +354,19 @@ const JewelryModelList = ({onSelectModel}) => {
 												<div className="flex justify-between px-5 py-2">
 													<div>
 														<p className="text-gray">
-															<strong>Setting Type:</strong>{' '}
+															<strong>Mẫu Thiết Kế:</strong>{' '}
 															{diamond.SettingType}
 														</p>
 													</div>
 													<div>
 														<p className="text-gray">
-															<strong>Quantity:</strong>{' '}
+															<strong>Só Lượng:</strong>{' '}
 															{diamond.Quantity}
 														</p>
 													</div>
 													<div>
 														<p className="text-gray">
-															<strong>Main Diamond Req ID:</strong>{' '}
+															<strong>ID Yêu Cầu Của Kim Cương Chính:</strong>{' '}
 															{diamond.MainDiamondReqId || 'N/A'}
 														</p>
 													</div>
@@ -382,7 +380,7 @@ const JewelryModelList = ({onSelectModel}) => {
 																		className="pl-4 gap-3 flex justify-between"
 																	>
 																		<p className="text-gray">
-																			<strong>Shape:</strong>{' '}
+																			<strong>Hình Dáng:</strong>{' '}
 																			{shape.Shape
 																				?.ShapeName ||
 																				'N/A'}
@@ -390,7 +388,7 @@ const JewelryModelList = ({onSelectModel}) => {
 
 																		<p className="text-gray">
 																			<strong>
-																				Carat Range:
+																				Khoảng Carat:
 																			</strong>{' '}
 																			{shape.CaratFrom} -{' '}
 																			{shape.CaratTo} carats
@@ -400,7 +398,7 @@ const JewelryModelList = ({onSelectModel}) => {
 															)
 														) : (
 															<p className="text-gray">
-																Shape: Not Available
+																 Không Có Hình Dáng
 															</p>
 														)}
 													</div>

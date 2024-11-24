@@ -240,7 +240,7 @@ const MainDiamondPricePage = () => {
 	};
 
 	if (loading) {
-		return <div className="text-center text-lg font-semibold">Loading...</div>;
+		return <div className="text-center text-lg font-semibold">Đang Tải...</div>;
 	}
 
 	const renderPriceRows = (cellMatrix, colorRange, isCreating) => {
@@ -327,19 +327,33 @@ const MainDiamondPricePage = () => {
 	if (!priceBoard || !priceBoard.PriceTables || priceBoard.PriceTables.length === 0) {
 		return (
 			<div className="container mx-auto p-6 bg-offWhite rounded-lg shadow-lg">
-				<h1 className="text-5xl font-bold mb-6 text-center text-blue-600">
-					Main Diamond Price Board
+				<h1 className="text-5xl font-bold text-center text-blue-600">
+					Bảng Giá Kim Cương Chính{' '}
 				</h1>
-				<div className="flex flex-wrap gap-4 items-center justify-between p-4 ">
+				<div className="flex flex-wrap gap-4 items-center justify-between p-4 bg-offWhite rounded-lg shadow-md">
 					{/* Shape Selection */}
 					<div className="flex sm:flex-row items-center gap-2">
-						<input
-							type="checkbox"
-							checked={shapeId}
+						<label htmlFor="cutSelect" className="text-lg font-semibold text-gray-800">
+							Hình Dáng:
+						</label>
+						<select
+							id="cutSelect"
+							value={shapeId}
 							onChange={handleShapeChange}
-							className="rounded focus:ring-blue-500"
-						/>
-						<label className="text-lg font-semibold">Fancy Shapes</label>
+							className="border border-gray-300 p-2 rounded shadow focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200 bg-white text-gray-700"
+							aria-label="Select Shape"
+						>
+							<option value="1">Round</option>
+							<option value="2">Princess</option>
+							<option value="3">Cushion</option>
+							<option value="4">Emerald</option>
+							<option value="5">Oval</option>
+							<option value="6">Radiant</option>
+							<option value="7">Asscher</option>
+							<option value="8">Marquise</option>
+							<option value="9">Heart</option>
+							<option value="10">Pear</option>
+						</select>
 					</div>
 
 					{/* Lab Diamond Checkbox */}
@@ -348,35 +362,41 @@ const MainDiamondPricePage = () => {
 							type="checkbox"
 							checked={isLabDiamond}
 							onChange={handleLabDiamondChange}
-							className="rounded focus:ring-blue-500"
+							className="rounded text-blue focus:ring-blue-500 hover:ring-2 transition duration-200"
+							aria-label="Lab Diamond"
 						/>
-						<label className="text-lg font-semibold">Lab Diamond</label>
+						<label className="text-lg font-semibold text-gray-800">
+							Kim Cương Nhân Tạo
+						</label>
 					</div>
 
 					{/* Cut Selection */}
 					<div className="flex sm:flex-row items-center gap-2">
-						<label htmlFor="cutSelect" className="text-lg font-semibold">
+						<label htmlFor="cutSelect" className="text-lg font-semibold text-gray-800">
 							Cut:
 						</label>
 						<select
 							id="cutSelect"
 							value={cut}
 							onChange={handleCutChange}
-							className="border border-gray-300 p-2 rounded shadow focus:outline-none focus:ring-2 focus:ring-blue-500"
+							className="border border-gray-300 p-2 rounded shadow focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200 bg-white text-gray-700"
+							aria-label="Select Cut"
 						>
 							<option value="1">Good</option>
 							<option value="2">Very Good</option>
 							<option value="3">Excellent</option>
 						</select>
 					</div>
+					{/* )} */}
 
 					{/* Clear Filters Button */}
 					<div>
 						<button
 							onClick={clearFilters}
-							className="bg-red-500 text-black px-4 py-2 rounded hover:bg-red-600 hover:text-red-200 transition duration-200 font-semibold"
+							className="bg-red text-white px-4 py-2 rounded hover:bg-redLight transition duration-200 font-semibold shadow hover:scale-105"
+							aria-label="Clear Filters"
 						>
-							Clear Filters
+							Xóa bộ lọc
 						</button>
 					</div>
 				</div>
@@ -390,13 +410,13 @@ const MainDiamondPricePage = () => {
 	return (
 		<div className="container gap-4 mx-auto p-6 bg-white rounded-lg shadow-lg">
 			<h1 className="text-5xl font-bold text-center text-blue-600">
-				Main Diamond Price Board
+				Bảng Giá Kim Cương Chính{' '}
 			</h1>
 			<div className="flex flex-wrap gap-4 items-center justify-between p-4 bg-offWhite rounded-lg shadow-md">
 				{/* Shape Selection */}
 				<div className="flex sm:flex-row items-center gap-2">
 					<label htmlFor="cutSelect" className="text-lg font-semibold text-gray-800">
-						Shape:
+						Hình Dáng:
 					</label>
 					<select
 						id="cutSelect"
@@ -427,7 +447,9 @@ const MainDiamondPricePage = () => {
 						className="rounded text-blue focus:ring-blue-500 hover:ring-2 transition duration-200"
 						aria-label="Lab Diamond"
 					/>
-					<label className="text-lg font-semibold text-gray-800">Lab Diamond</label>
+					<label className="text-lg font-semibold text-gray-800">
+						Kim Cương Nhân Tạo
+					</label>
 				</div>
 
 				{/* Cut Selection */}
@@ -456,7 +478,7 @@ const MainDiamondPricePage = () => {
 						className="bg-red text-white px-4 py-2 rounded hover:bg-redLight transition duration-200 font-semibold shadow hover:scale-105"
 						aria-label="Clear Filters"
 					>
-						Clear Filters
+						Xóa bộ lọc
 					</button>
 				</div>
 			</div>
@@ -469,7 +491,7 @@ const MainDiamondPricePage = () => {
 							className="border-2 bg-primary text-black px-8 py-3 rounded-lg hover:bg-primaryLight transition duration-200 font-semibold shadow-md hover:scale-105 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
 							aria-label="Save Changes"
 						>
-							Save Changes
+							Lưu
 						</button>
 					</div>
 				)}
@@ -482,7 +504,7 @@ const MainDiamondPricePage = () => {
 								: 'border-green bg-green text-black hover:bg-greenLight'
 						} font-semibold shadow-md`}
 					>
-						{isCreating ? 'Cancel Create Price' : 'Create Price'}
+						{isCreating ? 'Hủy' : 'Thêm Giá Mới'}
 					</button>
 				</div>
 				{isEditing && (
@@ -492,7 +514,7 @@ const MainDiamondPricePage = () => {
 							className="border-2 bg-red text-white px-8 py-3 rounded-lg hover:bg-redLight transition duration-200 font-semibold shadow-md hover:scale-105 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
 							aria-label="Delete Selected"
 						>
-							Delete Selected
+							Xóa Những Ô Được Chọn
 						</button>
 						{editedCells.length > 0 && (
 							<button
@@ -500,7 +522,7 @@ const MainDiamondPricePage = () => {
 								className="border-2 bg-primary text-black px-8 py-3 rounded-lg hover:bg-primaryLight transition duration-200 font-semibold shadow-md hover:scale-105 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
 								aria-label="Save Changes"
 							>
-								Save Changes
+								Lưu
 							</button>
 						)}
 					</div>
@@ -512,9 +534,9 @@ const MainDiamondPricePage = () => {
 							? 'border-red bg-red text-white hover:bg-redLight'
 							: 'border-green bg-green text-black hover:bg-greenLight'
 					} font-semibold shadow-md`}
-					aria-label={isEditing ? 'Cancel Editing' : 'Edit Prices'}
+					aria-label={isEditing ? 'Hủy' : 'Cập Nhật Giá'}
 				>
-					{isEditing ? 'Cancel' : 'Edit Prices'}
+					{isEditing ? 'Hủy' : 'Cập Nhật Giá'}
 				</button>
 			</div>
 
@@ -522,20 +544,20 @@ const MainDiamondPricePage = () => {
 			{showDeleteConfirm && (
 				<div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
 					<div className="bg-white p-6 rounded shadow-lg">
-						<h2 className="text-xl font-semibold mb-4">Confirm Deletion</h2>
-						<p>Are you sure you want to delete the selected prices?</p>
+						<h2 className="text-xl font-semibold mb-4">Xác Nhận Xóa Giá Kim Cương</h2>
+						<p>Bạn có muốn xóa giá của những ô này không?</p>
 						<div className="flex justify-between mt-6">
 							<button
 								onClick={confirmDelete}
 								className="bg-red text-white px-4 py-2 rounded hover:bg-red-600 transition duration-200"
 							>
-								Delete
+								Xóa
 							</button>
 							<button
 								onClick={cancelDelete}
 								className="bg-gray text-black px-4 py-2 rounded hover:bg-gray-400 transition duration-200"
 							>
-								Cancel
+								Hủy
 							</button>
 						</div>
 					</div>
@@ -589,14 +611,14 @@ const MainDiamondPricePage = () => {
 							onClick={handleSave}
 							className="border-2 bg-blue-500 text-black px-6 py-2 rounded hover:bg-blue-600 transition duration-200 font-semibold"
 						>
-							Save Changes
+							Lưu{' '}
 						</button>
 					) : (
 						<button
 							onClick={handleEditPriceToggle} // Replace with your cancel function
 							className="border-2 bg-red text-white px-6 py-2 rounded hover:bg-red-600 transition duration-200 font-semibold"
 						>
-							Cancel
+							Hủy
 						</button>
 					)}
 				</div>
@@ -608,14 +630,14 @@ const MainDiamondPricePage = () => {
 							onClick={savePrices}
 							className="border-2 bg-blue text-black px-6 py-2 rounded hover:bg-blue-600 transition duration-200 font-semibold"
 						>
-							Save Changes
+							Lưu
 						</button>
 					) : (
 						<button
 							onClick={handleAddPriceToggle} // Replace with your cancel function
 							className="border-2 bg-red text-white px-6 py-2 rounded hover:bg-red-600 transition duration-200 font-semibold"
 						>
-							Cancel
+							Hủy
 						</button>
 					)}
 				</div>

@@ -1,8 +1,16 @@
 import {MinusCircleFilled} from '@ant-design/icons';
-import {Button, Col, Form, Input, InputNumber, Row, Select, Space} from 'antd';
-import React from 'react';
+import {Button, Col, Form, Input, InputNumber, Row, Select, Space, Modal} from 'antd';
+import React, {useState} from 'react';
+import JewelryModelList from '../JewelryModelList';
 
 export const GiftForm = ({form, shapes, Option}) => {
+	const [isPopupVisible, setIsPopupVisible] = useState(false);
+	const [selectedModel, setSelectedModel] = useState(null);
+	const handleSelectModel = (model) => {
+		console.log('Model Selected in Parent:', model);
+		setSelectedModel(model);
+		setIsPopupVisible(false);
+	};
 	return (
 		<div>
 			<Form.List name="gifts">
@@ -18,7 +26,7 @@ export const GiftForm = ({form, shapes, Option}) => {
 										<Row gutter={[16, 16]}>
 											<Col span={12} className="flex flex-col">
 												<Form.Item
-													label="Name"
+													label="Tên"
 													{...restField}
 													name={[name, 'name']}
 													fieldKey={[fieldKey, 'name']}
@@ -38,7 +46,7 @@ export const GiftForm = ({form, shapes, Option}) => {
 												</Form.Item>
 												{targetType !== 3 && (
 													<Form.Item
-														label="Amount"
+														label="Giá Trị"
 														{...restField}
 														name={[name, 'amount']}
 														fieldKey={[fieldKey, 'amount']}
@@ -58,7 +66,7 @@ export const GiftForm = ({form, shapes, Option}) => {
 													</Form.Item>
 												)}
 												<Form.Item
-													label="Target type"
+													label="Đối Tượng Áp Dụng"
 													{...restField}
 													name={[name, 'targetType']}
 													fieldKey={[fieldKey, 'targetType']}
@@ -78,14 +86,14 @@ export const GiftForm = ({form, shapes, Option}) => {
 															});
 														}}
 													>
-														<Option value={1}>Jewelry Model</Option>
-														<Option value={2}>Diamond</Option>
-														<Option value={3}>Order</Option>
+														<Option value={1}>Trang Sức</Option>
+														<Option value={2}>Kim Cương</Option>
+														<Option value={3}>Hóa Đơn</Option>
 													</Select>
 												</Form.Item>
 												<div className="p-4 border rounded-md bg-gray-50">
 													<Form.Item
-														label="Unit type"
+														label="Loại Khuyến Mãi"
 														{...restField}
 														name={[name, 'unitType']}
 														fieldKey={[fieldKey, 'unitType']}
@@ -105,13 +113,12 @@ export const GiftForm = ({form, shapes, Option}) => {
 																});
 															}}
 														>
-															<Option value={1}>Percentage</Option>
-															<Option value={2}>Value</Option>
-															<Option value={3}>Free Product</Option>
+															<Option value={1}>Phần Trăm</Option>
+															<Option value={2}>Giá Trị</Option>
 														</Select>
 													</Form.Item>
 													<Form.Item
-														label="Unit Value"
+														label="Giá Trị Khuyến Mãi"
 														{...restField}
 														name={[name, 'unitValue']}
 														fieldKey={[fieldKey, 'unitValue']}
@@ -168,11 +175,28 @@ export const GiftForm = ({form, shapes, Option}) => {
 															},
 														]}
 													>
-														<Input />
+														<Input
+															readOnly
+															value={selectedModel?.Id}
+															placeholder={selectedModel?.Name}
+														/>
+														<Button
+															onClick={() => setIsPopupVisible(true)}
+														>
+															Select Model
+														</Button>
 													</Form.Item>
 												)}
 											</Col>
 										</Row>
+										<Modal
+											open={isPopupVisible}
+											onCancel={() => setIsPopupVisible(false)}
+											footer={null}
+											width="80%"
+										>
+											<JewelryModelList onSelectModel={handleSelectModel} />
+										</Modal>
 										{targetType === 2 && (
 											<Row span={12}>
 												<div className="flex gap-5">
@@ -203,13 +227,13 @@ export const GiftForm = ({form, shapes, Option}) => {
 																{Option ? (
 																	<>
 																		<Option value={1}>
-																			Natural
+																			Tự Nhiên
 																		</Option>
 																		<Option value={2}>
-																			Lab
+																			Nhân Tạo
 																		</Option>
 																		<Option value={3}>
-																			Both
+																			Cả Hai
 																		</Option>
 																	</>
 																) : null}
