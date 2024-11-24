@@ -228,6 +228,7 @@ const JewelryPage = () => {
 							onClick={() =>
 								dispatch(
 									fetchAllJewelry({
+										JewelryModelId: selectedModel?.Id,
 										CurrentPage: currentPage,
 										PageSize: pageSize,
 										filters,
