@@ -103,11 +103,9 @@ const PromotionPage = ({promotionData}) => {
 
 		dispatch(createFullPromotion({createPromotionCommand, requirements, gifts: updatedGifts}))
 			.unwrap()
-			.then((res) => {
-				if (res.payload !== undefined) {
-					message.success('Promotion created successfully!');
-					form.resetFields();
-				}
+			.then(() => {
+				message.success('Promotion created successfully!');
+				form.resetFields();
 			})
 			.catch((error) => {
 				message.error(error?.data?.title || error?.detail);
@@ -288,7 +286,7 @@ const PromotionPage = ({promotionData}) => {
 
 	const handleDelete = (id) => {
 		dispatch(deletePromotion(id))
-		.unwrap()
+			.unwrap()
 			.then(() => {
 				message.success(`Deleted promotion with id: ${id}`);
 			})

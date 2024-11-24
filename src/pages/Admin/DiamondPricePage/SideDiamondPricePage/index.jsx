@@ -111,7 +111,7 @@ const SideDiamondPricePage = () => {
 	};
 
 	const handleSave = async () => {
-		try {
+
 			const updatedPrices = editedCells.map((cell) => ({
 				diamondCriteriaId: cell.diamondCriteriaId,
 				price: Number(cell.price),
@@ -126,15 +126,12 @@ const SideDiamondPricePage = () => {
 				})
 			)
 				.unwrap()
-				.then((res) => {
+				.then(() => {
 					message.success('Cập Nhật Giá Thành Công!');
 				})
 				.catch((error) => {
 					message.error(error?.data?.title || error?.detail);
 				});
-		} catch (error) {
-			message.error(error?.data?.title || error?.detail);
-		} // Wait for update to finish
 		setEditedCells([]);
 		setIsEditing(false);
 		await dispatch(fetchPriceBoard({isLabDiamond, isSideDiamond, shapeId})); // Fetch updated board

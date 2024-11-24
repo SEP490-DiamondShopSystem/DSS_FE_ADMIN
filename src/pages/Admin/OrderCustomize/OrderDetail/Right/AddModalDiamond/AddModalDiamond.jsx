@@ -112,7 +112,7 @@ export const AddModalDiamond = ({
 				})
 			)
 				.unwrap()
-				.then((res) => {
+				.then(() => {
 					message.success('Thêm Cương Kim Thành Công!');
 					setShowModal(false);
 					form.resetFields();

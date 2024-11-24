@@ -119,42 +119,45 @@ const BlogPage = () => {
 	};
 
 	const handleCreateOrUpdate = async () => {
-		try {
-			const values = await form.validateFields();
-			if (!editorContent.trim()) {
-				return;
-			}
-			const blogData = new FormData();
-			if (isEditMode) {
-				blogData.append('BlogId', updatingId);
-			}
-			blogData.append('Title', values.title);
-			console.log('Tags:', tags);
-			tags.forEach((tag, index) => {
-				blogData.append(`BlogTags[${index}]`, tag);
-			});
-			blogData.append('Content', editorContent);
-
-			if (thumbnailFile) {
-				blogData.append('Thumbnail', thumbnailFile);
-			}
-
-			const result = await dispatch(isEditMode ? updateBlog(blogData) : createBlog(blogData));
-			message.success(
-				isEditMode ? 'Cập nhật bài viết thành công!' : 'Tạo bài viết mới thành công!'
-			);
-			// Reset state
-			setIsModalVisible(false);
-			form.resetFields();
-			setThumbnailFile(null);
-			setIsEditMode(false);
-			setSelectedBlog(null);
-			setEditorContent('');
-			setTags([]);
-			await dispatch(fetchAllBlogs({CurrentPage: currentPage, PageSize: pageSize}));
-		} catch (error) {
-			message.error(error?.data?.title || error?.detail);
+		const values = await form.validateFields();
+		if (!editorContent.trim()) {
+			return;
 		}
+		const blogData = new FormData();
+		if (isEditMode) {
+			blogData.append('BlogId', updatingId);
+		}
+		blogData.append('Title', values.title);
+		console.log('Tags:', tags);
+		tags.forEach((tag, index) => {
+			blogData.append(`BlogTags[${index}]`, tag);
+		});
+		blogData.append('Content', editorContent);
+
+		if (thumbnailFile) {
+			blogData.append('Thumbnail', thumbnailFile);
+		}
+
+		const result = await dispatch(isEditMode ? updateBlog(blogData) : createBlog(blogData))
+			.unwrap()
+			.then(() => {
+				message.success(
+					isEditMode ? 'Cập nhật bài viết thành công!' : 'Tạo bài viết mới thành công!'
+				);
+			})
+			.catch((error) => {
+				message.error(error?.data?.title || error?.detail);
+			});
+
+		// Reset state
+		setIsModalVisible(false);
+		form.resetFields();
+		setThumbnailFile(null);
+		setIsEditMode(false);
+		setSelectedBlog(null);
+		setEditorContent('');
+		setTags([]);
+		await dispatch(fetchAllBlogs({CurrentPage: currentPage, PageSize: pageSize}));
 	};
 
 	const handleEdit = async (blog) => {

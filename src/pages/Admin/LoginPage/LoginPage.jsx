@@ -29,56 +29,25 @@ const LoginPage = () => {
 			isExternalLogin: true,
 			isStaffLogin: role ? true : false,
 		};
-		// if (role) {
-		// 	dispatch(handleLoginStaff(data))
-		// 		.then((res) => {
-		// 			console.log(res.payload);
-
-		// 			if (res.payload) {
-		// 				const decodedData = jwtDecode(res.payload.accessToken);
-		// 				console.log(decodedData);
-		// 				setLocalStorage('user', JSON.stringify(decodedData));
-		// 				setLocalStorage('userId', decodedData.UserId);
-		// 				dispatch(setUser(decodedData));
-		// 				message.success('Đăng nhập thành công!');
-		// 				form.resetFields();
-
-		// 				navigate('/');
-		// 			} else {
-		// 				message.error(
-		// 					'Đăng nhập không thành công. Vui lòng kiểm tra thông tin đăng nhập của bạn!'
-		// 				);
-		// 			}
-		// 		})
-		// 		.catch((error) => {
-		// 			setIsLoading(false);
-		// 			console.log(error);
-		// 			message.error('Email hoặc mật khẩu không đúng!');
-		// 		});
-		// } else {
-
-		// }
+	
 		dispatch(handleLogin(data))
 			.unwrap()
 			.then((res) => {
-				if (res.payload) {
-					const decodedData = jwtDecode(res.payload.accessToken);
-					console.log(decodedData);
-					setLocalStorage('user', JSON.stringify(decodedData));
-					setLocalStorage('userId', decodedData.UserId);
-					dispatch(setUser(decodedData));
-					message.success('Đăng nhập thành công!');
-					form.resetFields();
+				const decodedData = jwtDecode(res.accessToken);
+				console.log(decodedData);
+				setLocalStorage('user', JSON.stringify(decodedData));
+				setLocalStorage('userId', decodedData.UserId);
+				dispatch(setUser(decodedData));
+				message.success('Đăng nhập thành công!');
+				form.resetFields();
 
-					navigate('/');
-				} else {
-					message.error(error?.data?.title || error?.detail);
-				}
+				navigate('/');
 			})
 			.catch((error) => {
 				message.error(error?.data?.title || error?.detail);
 			});
 	};
+
 	return (
 		<>
 			<Helmet>

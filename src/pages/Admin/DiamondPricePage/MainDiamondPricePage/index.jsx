@@ -80,49 +80,50 @@ const MainDiamondPricePage = () => {
 	};
 
 	const savePrices = async () => {
-		try {
-			const listPrices = editedCells.map((cell) => ({
-				diamondCriteriaId: cell.diamondCriteriaId,
-				price: Number(cell.price),
-			}));
+		const listPrices = editedCells.map((cell) => ({
+			diamondCriteriaId: cell.diamondCriteriaId,
+			price: Number(cell.price),
+		}));
 
-			if (listPrices.length === 0) return;
+		if (listPrices.length === 0) return;
 
-			await dispatch(createDiamondPrice({listPrices, shapeId, isLabDiamond}));
+		await dispatch(createDiamondPrice({listPrices, shapeId, isLabDiamond}))
+			.unwrap()
+			.then(() => {
+				message.success('Thêm giá kim cương thành công!');
+			})
+			.catch((error) => {
+				message.error(error?.data?.title || error?.detail);
+			});
 
-			setEditedCells([]);
-			setIsCreating(false);
+		setEditedCells([]);
+		setIsCreating(false);
 
-			await dispatch(fetchPriceBoard({shapeId, isLabDiamond, cut}));
-		} catch (error) {
-			message.error(error?.data?.title || error?.detail);
-
-			setIsCreating(false);
-		}
+		await dispatch(fetchPriceBoard({shapeId, isLabDiamond, cut}));
 	};
 
 	const handleSave = async () => {
-		try {
-			const updatedPrices = editedCells.map((cell) => ({
-				diamondCriteriaId: cell.diamondCriteriaId,
-				price: Number(cell.price),
-			}));
+		const updatedPrices = editedCells.map((cell) => ({
+			diamondCriteriaId: cell.diamondCriteriaId,
+			price: Number(cell.price),
+		}));
 
-			await dispatch(
-				updateDiamondPrices({
-					updatedDiamondPrices: updatedPrices,
-					shapeId,
-					isLabDiamond,
-				})
-			); // Wait for update to finish
-			setEditedCells([]);
-
-			await dispatch(fetchPriceBoard({shapeId, isLabDiamond, cut}));
-		} catch (error) {
-			message.error(error?.data?.title || error?.detail);
-
-			setIsCreating(false);
-		}
+		await dispatch(
+			updateDiamondPrices({
+				updatedDiamondPrices: updatedPrices,
+				shapeId,
+				isLabDiamond,
+			})
+		)
+			.unwrap()
+			.then(() => {
+				message.success('Cập nhật giá kim cương thành công!');
+			})
+			.catch((error) => {
+				message.error(error?.data?.title || error?.detail);
+			});
+		setEditedCells([]);
+		await dispatch(fetchPriceBoard({shapeId, isLabDiamond, cut}));
 	};
 
 	const cancelDelete = () => {
