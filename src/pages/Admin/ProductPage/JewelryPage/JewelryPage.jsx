@@ -21,10 +21,13 @@ import {
 	selectJewelryLoading,
 	selectJewelryError,
 	selectJewelryTotalPage,
+	getAllMetalsSelector,
+	getAllSizesSelector,
 } from '../../../../redux/selectors';
 import JewelryDetail from './JewelryDetail';
 import JewelryCreateForm from './JewelryCreateForm';
-
+import {fetchAllMetals} from '../../../../redux/slices/jewelry/metalSlice';
+import {fetchAllSizes} from '../../../../redux/slices/jewelry/sizeSlice';
 const JewelryPage = () => {
 	const dispatch = useDispatch();
 	const loading = useSelector(selectJewelryLoading);
@@ -60,7 +63,14 @@ const JewelryPage = () => {
 		const {name, value} = e.target;
 		setFilters({...filters, [name]: value});
 	};
-
+	const metals = useSelector(getAllMetalsSelector); // Selector for getting metals from the store
+	useEffect(() => {
+		dispatch(fetchAllMetals());
+	}, [dispatch]);
+	const sizes = useSelector(getAllSizesSelector); // Selector for getting metals from the store
+	useEffect(() => {
+		dispatch(fetchAllSizes());
+	}, [dispatch]);
 	const handleHasSideDiamondChange = (e) => {
 		setFilters({...filters, HasSideDiamond: e.target.checked});
 	};
@@ -133,7 +143,7 @@ const JewelryPage = () => {
 				]}
 			>
 				<div className="flex items-center gap-2">
-					<Input readOnly value={selectedModel?.Id} placeholder={selectedModel?.Name} />
+					<Input readOnly value={selectedModel?.Id} />
 					<Button onClick={() => setIsPopupVisible(true)}>Chọn Mẫu Trang Sức</Button>
 				</div>
 			</Form.Item>
@@ -149,21 +159,45 @@ const JewelryPage = () => {
 			<div className="filter-section mb-6">
 				<h2 className="text-2xl font-semibold text-primary mb-4">Filters</h2>
 				<Form layout="inline" className="space-y-4">
-					<Row gutter={[16, 16]}>
-						{['ModelName', 'SerialCode', 'MetalId', 'SizeId'].map((field) => (
-							<Col span={8} key={field}>
-								<Form.Item label={field.replace(/([A-Z])/g, ' $1').toUpperCase()}>
-									<Input
-										name={field}
-										value={filters[field]}
-										onChange={handleFilterChange}
-										placeholder={`Enter ${field}`}
-										className="w-full"
-									/>
-								</Form.Item>
-							</Col>
-						))}
-						<Col span={8}>
+					<Row gutter={[60, 16]}>
+						<Col span={12}>
+							<Form.Item label="Metal">
+								<Select
+									name="MetalId"
+									value={filters.MetalId}
+									onChange={(value) => setFilters({...filters, MetalId: value})}
+									className="w-full"
+									placeholder="Select Metal"
+									allowClear
+								>
+									{metals.map((metal) => (
+										<Select.Option key={metal.Id} value={metal.Id}>
+											{metal.Name}
+										</Select.Option>
+									))}
+								</Select>
+							</Form.Item>
+						</Col>
+						<Col span={12}>
+							<Form.Item label="Size">
+								<Select
+									name="SizeId"
+									value={filters.SizeId}
+									onChange={(value) => setFilters({...filters, SizeId: value})}
+									className="w-full"
+									placeholder="Select Size"
+									allowClear
+								>
+									{sizes.map((size) => (
+										<Select.Option key={size.Id} value={size.Id}>
+											{size.Value} {size.Unit}
+										</Select.Option>
+									))}
+								</Select>
+							</Form.Item>
+						</Col>
+
+						<Col span={12}>
 							<Form.Item label="Has Side Diamond">
 								<Checkbox
 									checked={filters.HasSideDiamond}
@@ -172,7 +206,7 @@ const JewelryPage = () => {
 								/>
 							</Form.Item>
 						</Col>
-						<Col span={8}>
+						<Col span={12}>
 							<Form.Item label="Status">
 								<Select
 									name="Status"
