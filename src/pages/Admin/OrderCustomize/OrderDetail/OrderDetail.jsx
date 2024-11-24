@@ -4,6 +4,7 @@ import {useDispatch, useSelector} from 'react-redux';
 import {useLocation, useParams} from 'react-router-dom';
 import {
 	ErrorCustomizeSelector,
+	GetDiamondUnAvailableSelector,
 	getOrderCustomizeDetailSelector,
 	getOrderStatusCustomizeDetailSelector,
 	getPaymentStatusCustomizeDetailSelector,
@@ -23,6 +24,7 @@ const OrderCustomizeDetail = () => {
 	const statusOrder = useSelector(getOrderStatusCustomizeDetailSelector);
 	const paymentStatusOrder = useSelector(getPaymentStatusCustomizeDetailSelector);
 	const error = useSelector(ErrorCustomizeSelector);
+	const diamondUnAvailable = useSelector(GetDiamondUnAvailableSelector);
 
 	const [orders, setOrders] = useState();
 	const [currentDiamondId, setCurrentDiamondId] = useState(null);
@@ -47,7 +49,8 @@ const OrderCustomizeDetail = () => {
 
 	useEffect(() => {
 		dispatch(getOrderCustomizeDetail({RequestId: id, AccountId: order?.AccountId}));
-	}, []);
+	}, [diamondUnAvailable, id, order]);
+
 	useEffect(() => {
 		if (orderDetail) {
 			setOrders(orderDetail);
@@ -64,11 +67,6 @@ const OrderCustomizeDetail = () => {
 	const showModalAdd = () => {
 		setIsModalAddVisible(true);
 	};
-
-	console.log('orderDetail', orderDetail);
-	console.log('statusOrder', statusOrder);
-	console.log('selectedDiamond', selectedDiamond);
-	console.log('error', error);
 
 	return (
 		<>

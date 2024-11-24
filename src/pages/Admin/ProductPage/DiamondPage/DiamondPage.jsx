@@ -3,6 +3,7 @@ import {
 	LockOutlined,
 	PlusOutlined,
 	UnlockFilled,
+	UnlockOutlined,
 	UploadOutlined,
 } from '@ant-design/icons';
 import {
@@ -155,8 +156,8 @@ const DiamondPage = () => {
 		},
 		{
 			title: 'SKU',
-			key: 'CriteriaId',
-			dataIndex: 'CriteriaId',
+			key: 'SerialCode',
+			dataIndex: 'SerialCode',
 			align: 'center',
 		},
 
@@ -189,7 +190,7 @@ const DiamondPage = () => {
 					</Tooltip>
 					<Tooltip title="Khóa Kim Cương">
 						<Button type="default" onClick={() => handleLockDiamondView(record)}>
-							{record?.Status === 5 ? <UnlockFilled /> : <LockOutlined />}
+							{record?.ProductLock === null ? <UnlockOutlined /> : <LockOutlined />}
 						</Button>
 					</Tooltip>
 					<Tooltip title="Xóa Kim Cương">
@@ -238,9 +239,10 @@ const DiamondPage = () => {
 			const diamondSetting =
 				diamondList &&
 				diamondList?.Values?.map((diamond) => ({
+					...diamond,
 					Id: diamond?.Id,
 					ShapeName: diamond?.DiamondShape?.ShapeName,
-					CriteriaId: diamond?.DiamondPrice?.CriteriaId,
+					SerialCode: diamond?.SerialCode,
 					Carat: diamond?.Carat,
 					Clarity: diamond?.Clarity,
 					Color: diamond?.Color,
@@ -318,7 +320,7 @@ const DiamondPage = () => {
 		dispatch(handleDeleteDiamond(diamondId))
 			.unwrap()
 			.then(() => {
-					message.success('Xóa Kim Cương Thành Công!');
+				message.success('Xóa Kim Cương Thành Công!');
 			})
 			.catch((error) => {
 				message.error(error?.data?.title || error?.detail);
@@ -346,7 +348,12 @@ const DiamondPage = () => {
 			.unwrap()
 			.then((res) => {
 				setIsLockDiamondModalVisible(false);
-				message.success(`Khóa Kim Cương ${lockDiamondId?.CriteriaId} Thành Công`);
+				if (values?.lockedPriceForCustomer !== null) {
+					message.success(`Khóa Kim Cương Thành Công`);
+				} else {
+					message.success(`Mở Khóa Kim Cương Thành Công`);
+				}
+
 				form.resetFields();
 			})
 			.catch((error) => {

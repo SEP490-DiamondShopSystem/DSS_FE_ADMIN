@@ -160,21 +160,12 @@ const InformationOrder = ({orders, statusOrder, paymentStatusOrder}) => {
 	};
 
 	const handleChange = ({fileList: newFileList}) => {
-		if (newFileList.length > 3) {
-			message.warning('Bạn chỉ có thể tải tối đa 3 hình ảnh!');
-			return;
-		}
 		setFileList(newFileList);
 	};
 
 	console.log('orders', orders);
 
 	const handleLogProcessing = () => {
-		if (!fileList || fileList.length === 0) {
-			message.error('Vui lòng chọn ít nhất một tệp hình ảnh!');
-			return;
-		}
-
 		dispatch(
 			handleOrderLogProcessing({
 				orderId: orders?.Id,
@@ -373,31 +364,24 @@ const InformationOrder = ({orders, statusOrder, paymentStatusOrder}) => {
 							<br />
 							<Upload
 								multiple
-								action="/upload.do" // URL tải lên hoặc để trống nếu xử lý tệp cục bộ
+								action="/upload.do"
 								accept="image/*"
 								listType="picture-card"
 								fileList={fileList}
 								onPreview={handlePreview}
 								onChange={handleChange}
 								beforeUpload={(file) => {
-									setFileList((prevFileList) => [...prevFileList, file]);
+									setImageFiles((fileList) => [...fileList, file]);
 									return false;
-								}}
-								onRemove={(file) => {
-									setFileList((prevFileList) =>
-										prevFileList.filter((item) => item.uid !== file.uid)
-									);
 								}}
 								className="sm:w-full"
 							>
-								{fileList.length >= 3 ? null : (
-									<div>
-										<PlusOutlined />
-										<div style={{marginTop: 8}} className="text-sm">
-											Upload
-										</div>
+								<div>
+									<PlusOutlined />
+									<div style={{marginTop: 8}} className="text-sm">
+										Upload
 									</div>
-								)}
+								</div>
 							</Upload>
 						</Col>
 					</div>
@@ -438,23 +422,16 @@ const InformationOrder = ({orders, statusOrder, paymentStatusOrder}) => {
 								onPreview={handlePreview}
 								onChange={handleChange}
 								beforeUpload={(file) => {
-									setFileList((prevFileList) => [...prevFileList, file]);
+									setImageFiles((fileList) => [...fileList, file]);
 									return false;
 								}}
-								onRemove={(file) => {
-									setFileList((prevFileList) =>
-										prevFileList.filter((item) => item.uid !== file.uid)
-									);
-								}}
 							>
-								{fileList.length >= 3 ? null : (
-									<div>
-										<PlusOutlined />
-										<div style={{marginTop: 8}} className="text-sm">
-											Upload
-										</div>
+								<div>
+									<PlusOutlined />
+									<div style={{marginTop: 8}} className="text-sm">
+										Upload
 									</div>
-								)}
+								</div>
 							</Upload>
 						</Col>
 					</div>
@@ -464,13 +441,13 @@ const InformationOrder = ({orders, statusOrder, paymentStatusOrder}) => {
 				</>
 			)}
 
-			<Row>
-				<Col span={24}>
-					<Title level={4}>Chi Tiết Giao Dịch</Title>
-				</Col>
-			</Row>
 			{orders?.Transactions?.map((transaction) => (
 				<>
+					<Row>
+						<Col span={24}>
+							<Title level={4}>Chi Tiết Giao Dịch</Title>
+						</Col>
+					</Row>
 					<Col span={24}>
 						<Title level={5}>Thông tin giao dịch</Title>
 					</Col>
