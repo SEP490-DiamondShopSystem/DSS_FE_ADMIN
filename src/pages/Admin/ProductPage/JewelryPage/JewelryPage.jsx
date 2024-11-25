@@ -28,6 +28,7 @@ import JewelryDetail from './JewelryDetail';
 import JewelryCreateForm from './JewelryCreateForm';
 import {fetchAllMetals} from '../../../../redux/slices/jewelry/metalSlice';
 import {fetchAllSizes} from '../../../../redux/slices/jewelry/sizeSlice';
+import {formatPrice} from '../../../../utils';
 const JewelryPage = () => {
 	const dispatch = useDispatch();
 	const loading = useSelector(selectJewelryLoading);
@@ -84,16 +85,23 @@ const JewelryPage = () => {
 					filters,
 					JewelryModelId: selectedModel?.Id,
 				})
-			).catch((error) => {
-				notification.error({
-					message: 'Error',
-					description:
-						error?.data?.title || error?.detail || 'Failed to load jewelry items',
-					duration: 3,
+			)
+				.unwrap()
+				.then((res) => {
+					console.log('res', res);
+				})
+				.catch((error) => {
+					notification.error({
+						message: 'Error',
+						description:
+							error?.data?.title || error?.detail || 'Failed to load jewelry items',
+						duration: 3,
+					});
 				});
-			});
 		}
 	}, [dispatch, selectedModel?.Id, currentPage, pageSize, filters]);
+
+	console.log('jewelryList', jewelryList);
 
 	useEffect(() => {
 		if (error) {
@@ -131,7 +139,7 @@ const JewelryPage = () => {
 
 	return (
 		<div className="container mx-auto px-4">
-			<h1 className="text-4xl font-semibold text-primary mb-6">Jewelry Collection</h1>
+			<h1 className="text-4xl font-semibold text-primary mb-10">Danh Sách Trang Sức</h1>
 			<Form.Item
 				label="Mẫu Trang Sức"
 				name="jewelryModelId"
@@ -157,7 +165,7 @@ const JewelryPage = () => {
 			</Modal>
 			{/* Filter Section */}
 			<div className="filter-section mb-6">
-				<h2 className="text-2xl font-semibold text-primary mb-4">Filters</h2>
+				<h2 className="text-2xl font-semibold text-primary mb-4">Lọc Theo Tiêu Chí</h2>
 				<Form layout="inline" className="space-y-4">
 					<Row gutter={[60, 16]}>
 						<Col span={12}>
@@ -170,11 +178,12 @@ const JewelryPage = () => {
 									placeholder="Select Metal"
 									allowClear
 								>
-									{metals.map((metal) => (
-										<Select.Option key={metal.Id} value={metal.Id}>
-											{metal.Name}
-										</Select.Option>
-									))}
+									{Array.isArray(metals) &&
+										metals.map((metal) => (
+											<Select.Option key={metal.Id} value={metal.Id}>
+												{metal.Name}
+											</Select.Option>
+										))}
 								</Select>
 							</Form.Item>
 						</Col>
@@ -188,11 +197,12 @@ const JewelryPage = () => {
 									placeholder="Select Size"
 									allowClear
 								>
-									{sizes.map((size) => (
-										<Select.Option key={size.Id} value={size.Id}>
-											{size.Value} {size.Unit}
-										</Select.Option>
-									))}
+									{Array.isArray(sizes) &&
+										sizes.map((size) => (
+											<Select.Option key={size.Id} value={size.Id}>
+												{size.Value} {size.Unit}
+											</Select.Option>
+										))}
 								</Select>
 							</Form.Item>
 						</Col>
@@ -237,7 +247,7 @@ const JewelryPage = () => {
 							}
 							className="bg-primary text-black hover:bg-primaryDark"
 						>
-							Apply Filters
+							Lọc
 						</Button>
 					</Form.Item>
 				</Form>
@@ -257,8 +267,8 @@ const JewelryPage = () => {
 
 			{/* Loading, Error and Jewelry List */}
 			{loading && <Spin tip="Loading..." className="flex justify-center mt-5" />}
-			{error && <p className="text-red-500 text-center">{error}</p>}
-			{!loading && !error && (
+			{/* {error && <p className="text-red-500 text-center">{error}</p>} */}
+			{!loading && (
 				<div className="jewelry-list grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
 					{Array.isArray(jewelryList) &&
 						jewelryList.map((jewelry) => (
@@ -297,37 +307,35 @@ const JewelryPage = () => {
 											}
 											description={
 												<div className="space-y-2">
-													<p className="text-sm text-gray-500 flex items-center">
+													<p className="text-lg text-gray-500 flex items-center">
 														<span className="icon-category mr-2">
 															📦
 														</span>
-														Category:{' '}
-														{jewelry.Model?.CategoryId || 'N/A'}
+														Loại: {jewelry.Model?.CategoryId || 'N/A'}
 													</p>
-													<p className="text-sm text-gray-500 flex items-center">
+													<p className="text-lg text-gray-500 flex items-center">
 														<span className="icon-metal mr-2">🛠️</span>
-														Metal: {jewelry.Metal?.Name || 'N/A'}
+														Vật Liệu: {jewelry?.Metal?.Name || 'N/A'}
 													</p>
-													<p className="text-sm text-gray-500 flex items-center">
+													<p className="text-lg text-gray-500 flex items-center">
 														<span className="icon-price mr-2">💰</span>
-														Price:{' '}
+														Giá:{' '}
 														{jewelry.TotalPrice > 0
-															? jewelry.TotalPrice.toLocaleString()
-															: 'Contact for price'}{' '}
-														VND
+															? formatPrice(jewelry?.TotalPrice)
+															: 'Liên Hệ'}{' '}
 													</p>
-													<p className="text-sm text-gray-500">
-														Size: {jewelry.Size?.Value}{' '}
+													<p className="text-lg text-gray-500">
+														Kích thước: {jewelry.Size?.Value}{' '}
 														{jewelry.Size?.Unit}
 													</p>
-													<p className="text-sm text-gray-500">
-														Weight: {jewelry.Weight}{' '}
+													<p className="text-lg text-gray-500">
+														Trọng lượng: {jewelry.Weight}{' '}
 														{jewelry.Size?.Unit}
 													</p>
 													{jewelry.Diamonds &&
 														jewelry.Diamonds.length > 0 && (
-															<p className="text-sm text-gray-500">
-																Diamonds: {jewelry.Diamonds.length}{' '}
+															<p className="text-lg text-gray-500">
+																Kim Cương: {jewelry.Diamonds.length}{' '}
 																Diamond
 																{jewelry.Diamonds.length > 1
 																	? 's'
@@ -336,18 +344,17 @@ const JewelryPage = () => {
 														)}
 													{jewelry.EngravedText && (
 														<p className="text-sm text-gray-500">
-															Engraving: {jewelry.EngravedText}
+															Chữ Khắc: {jewelry.EngravedText}
 														</p>
 													)}
 													<p className="text-lg font-semibold text-darkGreen mt-4">
-														Total Price:{' '}
+														Tổng Giá:{' '}
 														{jewelry.TotalPrice > 0
-															? jewelry.TotalPrice.toLocaleString()
-															: 'Contact for price'}{' '}
-														VND
+															? formatPrice(jewelry.TotalPrice)
+															: 'Liên Hệ'}{' '}
 													</p>
 													<button className="mt-4 py-2 px-4 bg-primary text-white rounded-lg hover:bg-primary-dark">
-														View Details
+														Xem Chi Tiết
 													</button>
 												</div>
 											}
