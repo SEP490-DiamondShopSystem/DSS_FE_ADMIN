@@ -31,6 +31,8 @@ const PromotionForm = ({
 	addRequirement,
 	addGift,
 	shapes,
+	removeRequirement,
+	removeGift, // Receive removeRequirement as a prop
 }) => {
 	return (
 		<div>
@@ -99,23 +101,22 @@ const PromotionForm = ({
 
 				<Form.Item label="Additional Settings" className="mb-0">
 					<Row gutter={16}>
-						{false && (
-							<Col span={8}>
-								<Form.Item
-									name="redemptionMode"
-									label="Redemption Mode"
-									initialValue={1} // Always set to 1
-									className="mb-0"
-								>
-									<InputNumber
-										min={1}
-										className="border border-gray-300 rounded-md"
-										placeholder="1"
-										disabled
-									/>
-								</Form.Item>
-							</Col>
-						)}
+						<Col span={8}>
+							<Form.Item
+								name="redemptionMode"
+								label="Redemption Mode"
+								initialValue={1} // Always set to 1
+								className="mb-0"
+							>
+								<InputNumber
+									min={1}
+									className="border border-gray-300 rounded-md"
+									placeholder="1"
+									disabled
+								/>
+							</Form.Item>
+						</Col>
+
 						<Col span={8}>
 							<Form.Item
 								name="isExcludeQualifierProduct"
@@ -127,23 +128,22 @@ const PromotionForm = ({
 								<Switch className="text-blue-600" />
 							</Form.Item>
 						</Col>
-						{false && (
-							<Col span={8}>
-								<Form.Item
-									name="priority"
-									label="Priority"
-									initialValue={1} // Always set to 1
-									className="mb-0"
-								>
-									<InputNumber
-										min={1}
-										className="border border-gray-300 rounded-md"
-										placeholder="1"
-										disabled
-									/>
-								</Form.Item>
-							</Col>
-						)}
+
+						<Col span={8}>
+							<Form.Item
+								name="priority"
+								label="Priority"
+								initialValue={1} // Always set to 1
+								className="mb-0"
+							>
+								<InputNumber
+									min={1}
+									className="border border-gray-300 rounded-md"
+									placeholder="1"
+									disabled
+								/>
+							</Form.Item>
+						</Col>
 					</Row>
 				</Form.Item>
 
@@ -156,7 +156,12 @@ const PromotionForm = ({
 				</div>
 
 				{/* Dynamic Requirement List */}
-				<PromoReqForm form={form} shapes={shapes} Option={Option} />
+				<PromoReqForm
+					form={form}
+					shapes={shapes}
+					Option={Option}
+					removeRequirement={removeRequirement}
+				/>
 
 				{/* Gift Section */}
 				<h3 className="text-lg font-semibold mt-6">Quà Tặng</h3>
@@ -167,7 +172,7 @@ const PromotionForm = ({
 				</div>
 
 				{/* Dynamic Gift List */}
-				<GiftForm form={form} shapes={shapes} Option={Option} />
+				<GiftForm form={form} shapes={shapes} Option={Option} removeGift={removeGift} />
 				{/* Submit Button */}
 				<Form.Item>
 					<div className="flex justify-end space-x-4">

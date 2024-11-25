@@ -239,10 +239,17 @@ export const enums = {
 };
 
 export const enumMappings = {
+	Status: {
+		1:'Đã Lên Lịch',
+		2:'Đang Hoạt Động',
+		3:'Hết Hạn',
+		4:'Đã Tạm Dừng',
+		5:'Đã Hủy',
+	},
 	Origin: {
 		1: 'Tự Nhiên',
 		2: 'Nhân Tạo',
-		3: 'Cả hai',
+		3: 'Cả Hai',
 	},
 	Operator: {
 		1: 'Equal or Larger',
@@ -278,6 +285,7 @@ export const enumMappings = {
 		8: 'Pearl',
 		9: 'Bracelet Catch',
 	},
+	
 	SettingType: {
 		0: 'Prong',
 		1: 'Bezel',
