@@ -319,6 +319,7 @@ export const orderSlice = createSlice({
 			})
 			.addCase(handleOrderAssignDeliverer.fulfilled, (state, action) => {
 				state.loading = false;
+				state.orderDetail = action.payload;
 				state.orderStatusDetail = action.payload.Status;
 				state.orderLogsDetail = action.payload.Logs;
 			})

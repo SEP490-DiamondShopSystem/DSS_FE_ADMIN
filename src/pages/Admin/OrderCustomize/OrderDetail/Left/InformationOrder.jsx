@@ -17,12 +17,12 @@ import {
 	getOrderCustomizeStatus,
 	getOrderStatusTag,
 } from '../../../../../utils';
-import {enums} from '../../../../../utils/constant';
 import TimeLineOrder from '../Right/TimeLineOrder';
 import {
 	handleChangeDiamondCustomize,
 	handleDeleteDiamondCustomize,
 } from '../../../../../redux/slices/customizeSlice';
+import {enums} from '../../../../../utils/constant';
 
 const {Title, Text} = Typography;
 
@@ -50,11 +50,8 @@ const InformationOrder = ({
 }) => {
 	const navigate = useNavigate();
 	const dispatch = useDispatch();
-
-	const loading = useSelector(LoadingOrderSelector);
-
-	const orderStatus = getOrderStatusTag(paymentStatusOrder);
 	const status = getOrderCustomizeStatus(statusOrder);
+
 	const [expandedRowKeys, setExpandedRowKeys] = useState([]);
 
 	const reverseEnum = (enumObj) => {
@@ -331,6 +328,13 @@ const InformationOrder = ({
 			key: 'IsLabGrown',
 			render: (shape) => (shape ? 'Nhân Tạo' : 'Tự Nhiên'),
 		},
+		// {
+		// 	title: 'Trạng Thái',
+		// 	dataIndex: 'productStatus',
+		// 	key: 'productStatus',
+		// 	align: 'center',
+		// 	render: (productStatus) => getOrderItemStatusTag(productStatus),
+		// },
 	];
 
 	const handleExpand = (expanded, record) => {
@@ -371,38 +375,37 @@ const InformationOrder = ({
 		/>
 	);
 
-	const handleChange = (request) => {
-		Modal.confirm({
-			title: 'Xác nhận xóa',
-			content: 'Bạn có chắc chắn muốn xóa kim cương đã thêm trong yêu cầu này?',
-			okText: 'Xóa',
-			okType: 'danger',
-			cancelText: 'Hủy',
-			onOk: () => handleChangeConfirm(request),
-			onCancel: () => {
-				console.log('Cancel deletion');
-			},
-		});
-	};
+	// const handleChange = (request) => {
+	// 	Modal.confirm({
+	// 		title: 'Xác nhận xóa',
+	// 		content: 'Bạn có chắc chắn muốn xóa kim cương đã thêm trong yêu cầu này?',
+	// 		okText: 'Xóa',
+	// 		okType: 'danger',
+	// 		cancelText: 'Hủy',
+	// 		onOk: () => handleChangeConfirm(request),
+	// 		onCancel: () => {
+	// 			console.log('Cancel deletion');
+	// 		},
+	// 	});
+	// };
 
-	const handleChangeConfirm = (request) => {
-
-			console.log('request', request);
-			dispatch(
-				handleChangeDiamondCustomize({
-					diamondId: request?.DiamondId,
-					customizeRequestId: request?.CustomizeRequestId,
-					diamondRequestId: request?.DiamondRequestId,
-				})
-			)
-				.unwrap()
-				.then(() => {
-					message.success(`Đã xác nhận yêu cầu!.`);
-				})
-				.catch((error) => {
-					message.error(error?.data?.title || error?.detail);
-				});
-	};
+	// const handleChangeConfirm = (request) => {
+	// 	console.log('request', request);
+	// 	dispatch(
+	// 		handleChangeDiamondCustomize({
+	// 			diamondId: request?.DiamondId,
+	// 			customizeRequestId: request?.CustomizeRequestId,
+	// 			diamondRequestId: request?.DiamondRequestId,
+	// 		})
+	// 	)
+	// 		.unwrap()
+	// 		.then(() => {
+	// 			message.success(`Đã xác nhận yêu cầu!.`);
+	// 		})
+	// 		.catch((error) => {
+	// 			message.error(error?.data?.title || error?.detail);
+	// 		});
+	// };
 
 	const handleDelete = (request) => {
 		Modal.confirm({
@@ -412,9 +415,6 @@ const InformationOrder = ({
 			okType: 'danger',
 			cancelText: 'Hủy',
 			onOk: () => handleDeleteConfirm(request),
-			onCancel: () => {
-				console.log('Cancel deletion');
-			},
 		});
 	};
 
@@ -556,7 +556,17 @@ const InformationOrder = ({
 					)}
 					{status === 'Shop_Rejected' && (
 						<p className=" text-red font-semibold bg-white p-2 rounded-full">
-							<CloseCircleOutlined /> Đơn Thiết Kế Đã Bị Từ Chối
+							<CloseCircleOutlined /> Đơn Thiết Kế Đã Bị Shop Từ Chối
+						</p>
+					)}
+					{status === 'Customer_Rejected' && (
+						<p className=" text-red font-semibold bg-white p-2 rounded-full">
+							<CloseCircleOutlined /> Đơn Thiết Kế Đã Bị Khách Hàng Từ Chối
+						</p>
+					)}
+					{status === 'Customer_Cancelled' && (
+						<p className=" text-red font-semibold bg-white p-2 rounded-full">
+							<CloseCircleOutlined /> Đơn Thiết Kế Đã Bị Khách Hàng Hủy
 						</p>
 					)}
 				</Col>

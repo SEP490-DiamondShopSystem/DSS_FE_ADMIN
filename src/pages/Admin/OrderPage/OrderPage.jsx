@@ -68,7 +68,7 @@ const OrderPage = () => {
 	const [activeStatus, setActiveStatus] = useState('');
 	const [searchText, setSearchText] = useState('');
 	const [orders, setOrders] = useState([]);
-	const [pageSize, setPageSize] = useState(100);
+	const [pageSize, setPageSize] = useState(5);
 	const [current, setCurrent] = useState(1);
 	const [delivererRole, setDelivererRole] = useState(false);
 
@@ -300,8 +300,14 @@ const OrderPage = () => {
 				<Table
 					dataSource={orders}
 					columns={columns}
-					className="custom-table-header"
-					pagination={{pageSize: 5}}
+					pagination={{
+						current: current,
+						total: orderList?.TotalPage * pageSize,
+						pageSize: pageSize,
+						onChange: (page) => setCurrent(page),
+						showSizeChanger: false,
+						onShowSizeChange: (current, size) => setPageSize(size),
+					}}
 					loading={loading}
 				/>
 			</div>
