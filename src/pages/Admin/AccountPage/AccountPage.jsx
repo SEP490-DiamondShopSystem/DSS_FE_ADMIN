@@ -16,6 +16,8 @@ import {
 } from '../../../redux/slices/userLoginSlice';
 import {getAllUser} from '../../../redux/slices/userSlice';
 
+const {Search} = Input;
+
 const AccountPage = () => {
 	const [form] = Form.useForm();
 	const dispatch = useDispatch();
@@ -29,20 +31,11 @@ const AccountPage = () => {
 	const [current, setCurrent] = useState(0);
 	const [users, setUsers] = useState();
 	const [isModalAddVisible, setIsModalAddVisible] = useState(false);
-	const [active, setActive] = useState('all');
 	const [isManager, setIsManager] = useState();
 	const [role, setRole] = useState();
-
-	console.log('userDetail', userDetail);
-	console.log('isManager', isManager);
+	const [searchText, setSearchText] = useState('');
 
 	const columns = [
-		// {
-		// 	title: 'ID',
-		// 	dataIndex: 'Id',
-		// 	key: 'Id',
-		// 	align: 'center',
-		// },
 		{
 			title: 'Họ',
 			dataIndex: 'FirstName',
@@ -60,7 +53,6 @@ const AccountPage = () => {
 			dataIndex: 'Email',
 			key: 'Email',
 			align: 'center',
-			// render: (text) => <Image src={text} alt="product" style={{width: 50, height: 50}} />,
 		},
 
 		{
@@ -127,8 +119,8 @@ const AccountPage = () => {
 	];
 
 	useEffect(() => {
-		dispatch(getAllUser({current, size: pageSize, roleId: role}));
-	}, [current, pageSize, role]);
+		dispatch(getAllUser({current, size: pageSize, roleId: role, emailStr: searchText}));
+	}, [current, pageSize, role, searchText]);
 
 	useEffect(() => {
 		if (userDetail) {
@@ -210,13 +202,19 @@ const AccountPage = () => {
 		console.log('role', value);
 	};
 
+	const onSearch = (value) => {
+		setSearchText(value);
+	};
+
 	return (
 		<div className="mx-20 my-10">
 			{/* <Filter filter={filter} handleStatusBtn={handleStatusBtn} active={active} /> */}
 			<div>
 				<div className="flex items-center justify-between">
 					<div className="flex items-center my-5">
-						<p className="mr-3 font-semibold">Tìm kiếm</p>
+						<div className="flex items-center my-3 sm:my-5 ml-5">
+							<p className="mr-3 text-sm sm:text-base">Tìm kiếm vai trò:</p>
+						</div>
 
 						<Space wrap className="">
 							<Select
@@ -236,6 +234,15 @@ const AccountPage = () => {
 									{value: '22', label: 'Quản Lý'},
 									{value: '33', label: 'Admin'},
 								]}
+							/>
+							<div className="flex items-center my-3 sm:my-5 ml-5">
+								<p className="mr-3 text-sm sm:text-base">Tìm kiếm email:</p>
+							</div>
+							<Search
+								className="w-full sm:w-60"
+								placeholder="Tìm theo email"
+								allowClear
+								onSearch={onSearch}
 							/>
 						</Space>
 					</div>

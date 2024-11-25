@@ -2642,3 +2642,10 @@ video {
 .w-3\/5 {
 	width: 60%;
 }
+
+@media (min-width: 768px) {
+	.md\:px-5 {
+		padding-left: 1.25rem /* 20px */;
+		padding-right: 1.25rem /* 20px */;
+	}
+}

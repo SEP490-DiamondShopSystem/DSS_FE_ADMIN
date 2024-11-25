@@ -3,7 +3,7 @@ import {api} from '../../services/api';
 
 export const getAllUser = createAsyncThunk('userSlice/getAllUser', async (params) => {
 	try {
-		const {current, size, roleId} = params;
+		const {current, size, roleId, emailStr} = params;
 		let url = '/Account/Paging';
 
 		const queryParams = new URLSearchParams();
@@ -11,6 +11,7 @@ export const getAllUser = createAsyncThunk('userSlice/getAllUser', async (params
 		if (current) queryParams.append('current', current);
 		if (size) queryParams.append('size', size);
 		if (roleId) queryParams.append('roleIds', roleId);
+		if (emailStr) queryParams.append('emailStr', emailStr);
 
 		if (queryParams.toString()) {
 			url += `?${queryParams.toString()}`;
