@@ -23,8 +23,8 @@ const OrderCustomizeDetail = () => {
 	const loading = useSelector(LoadingOrderSelector);
 	const statusOrder = useSelector(getOrderStatusCustomizeDetailSelector);
 	const paymentStatusOrder = useSelector(getPaymentStatusCustomizeDetailSelector);
-	const error = useSelector(ErrorCustomizeSelector);
 	const diamondUnAvailable = useSelector(GetDiamondUnAvailableSelector);
+	const error = useSelector(ErrorCustomizeSelector);
 
 	const [orders, setOrders] = useState();
 	const [currentDiamondId, setCurrentDiamondId] = useState(null);
@@ -67,6 +67,10 @@ const OrderCustomizeDetail = () => {
 	const showModalAdd = () => {
 		setIsModalAddVisible(true);
 	};
+
+	console.log('orderDetail', orderDetail);
+	console.log('statusOrder', statusOrder);
+	console.log('selectedDiamond', selectedDiamond);
 
 	return (
 		<>

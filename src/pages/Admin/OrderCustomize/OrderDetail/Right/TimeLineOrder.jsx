@@ -26,7 +26,8 @@ const ORDER_STATUS_TEXTS = {
 	Pending: 'Chờ Thêm Kim Cương Yêu Cầu',
 	Priced: 'Đã Thêm Kim Cương Yêu Cầu',
 	Shop_Rejected: 'Shop Đã Từ Chối',
-	Customer_Rejected: 'Đã Hủy Đơn',
+	Customer_Rejected: 'Đã Từ Chối Đơn',
+	Customer_Cancelled: 'Đã Hủy Đơn',
 	Requesting: 'Chờ Shop Xác Nhận Đơn Yêu Cầu',
 	Accepted: 'Đã Chấp Nhận Đơn Thiết Kế',
 };
@@ -140,8 +141,6 @@ const TimeLineOrder = ({
 			});
 		}
 	}, [selectedRequest]);
-
-	console.log('selectedRequest', selectedRequest);
 
 	useEffect(() => {
 		if (diamondList) {
@@ -294,7 +293,9 @@ const TimeLineOrder = ({
 
 	const handleAddDiamond = () => {
 		Modal.confirm({
-			title: 'Xác nhận thêm các kim cương vào đơn thiết kế này',
+			title: `Xác nhận ${
+				orders?.Status === 1 ? 'thêm  các' : 'cập nhật'
+			} kim cương vào đơn thiết kế này`,
 			content: 'Bạn có chắc chắn muốn tiếp tục?',
 			okText: 'Xác nhận',
 			cancelText: 'Hủy',
@@ -372,6 +373,7 @@ const TimeLineOrder = ({
 				.unwrap()
 				.then(() => {
 					message.success('Xác nhận kim cương cho yêu cầu thành công!');
+					setIsModalVisible(!isModalVisible);
 				})
 				.catch((error) => {
 					message.error(error?.data?.title || error?.detail);
@@ -420,6 +422,8 @@ const TimeLineOrder = ({
 				.unwrap()
 				.then(() => {
 					message.success('Kim cương đã được cập nhật thành công!');
+					setIsModalVisible(!isModalVisible);
+					setChangeDiamond(null);
 				})
 				.catch((error) => {
 					message.error(error?.data?.title || error?.detail);
@@ -584,16 +588,17 @@ const TimeLineOrder = ({
 									<CloseCircleOutlined /> {ORDER_STATUS_TEXTS.Customer_Rejected}
 								</p>
 							</div>
-							{/* <div className="flex justify-around">
-								<Button
-									type="text"
-									className="bg-primary font-semibold w-full rounded-full"
-									onClick={handleRefund}
-									disabled={loading}
-								>
-									Xác nhận hoàn tiền
-								</Button>
-							</div> */}
+						</div>
+					)}
+
+					{status === 'Customer_Cancelled' && (
+						<div className="border rounded-lg border-primary bg-tintWhite p-5 mb-5">
+							<div className="flex items-center" style={{fontSize: 16}}>
+								<p className="font-semibold">Trạng thái đơn thiết kế:</p>
+								<p className="ml-5 text-red font-semibold">
+									<CloseCircleOutlined /> {ORDER_STATUS_TEXTS.Customer_Cancelled}
+								</p>
+							</div>
 						</div>
 					)}
 
