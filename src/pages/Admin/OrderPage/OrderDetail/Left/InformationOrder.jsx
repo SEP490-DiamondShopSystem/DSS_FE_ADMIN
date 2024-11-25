@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from 'react';
 
-import {ArrowLeftOutlined, PlusOutlined, UploadOutlined} from '@ant-design/icons';
+import {ArrowLeftOutlined, PlusOutlined} from '@ant-design/icons';
 import {
 	Button,
 	Col,
@@ -16,17 +16,17 @@ import {
 } from 'antd';
 import {useDispatch, useSelector} from 'react-redux';
 import {useNavigate} from 'react-router-dom';
-import {
-	convertToVietnamDate,
-	formatPrice,
-	getOrderStatus,
-	getOrderStatusTag,
-} from '../../../../../utils';
 import {LoadingOrderSelector} from '../../../../../redux/selectors';
 import {
 	handleOrderLogDeliver,
 	handleOrderLogProcessing,
 } from '../../../../../redux/slices/orderSlice';
+import {
+	formatPrice,
+	getOrderItemStatusTag,
+	getOrderStatus,
+	getOrderStatusTag,
+} from '../../../../../utils';
 
 const {Title, Text} = Typography;
 
@@ -65,6 +65,7 @@ const InformationOrder = ({orders, statusOrder, paymentStatusOrder}) => {
 						productId: item?.Id,
 						productCode: item?.Diamond?.SerialCode || item?.Jewelry?.SerialCode,
 						productName: item?.Jewelry?.Model?.Name || item?.Diamond?.Title,
+						productStatus: item?.Status,
 						productPrice: formatPrice(item?.PurchasedPrice),
 					})),
 					UserRankAmountSaved: orders?.UserRankAmountSaved,
@@ -131,6 +132,13 @@ const InformationOrder = ({orders, statusOrder, paymentStatusOrder}) => {
 			dataIndex: 'productPrice',
 			key: 'productPrice',
 			align: 'center',
+		},
+		{
+			title: 'Trạng Thái',
+			dataIndex: 'productStatus',
+			key: 'productStatus',
+			align: 'center',
+			render: (productStatus) => getOrderItemStatusTag(productStatus),
 		},
 	];
 

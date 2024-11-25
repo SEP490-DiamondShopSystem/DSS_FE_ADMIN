@@ -24,14 +24,7 @@ const statusList = [
 	{name: 'Accepted', value: '4'},
 	{name: 'Shop Rejected', value: '5'},
 	{name: 'Customer Rejected', value: '6'},
-];
-
-const paymentStatusList = [
-	{name: 'PaidAll', value: '1'},
-	{name: 'Deposited', value: '2'},
-	{name: 'Refunding', value: '3'},
-	{name: 'Refunded', value: '4'},
-	{name: 'Pending', value: '5'},
+	{name: 'Customer Cancelled', value: '7'},
 ];
 
 const getEnumKey = (enumObj, value) => {
@@ -73,7 +66,7 @@ const OrderCustomizePage = () => {
 	const [activeStatus, setActiveStatus] = useState('');
 	const [searchText, setSearchText] = useState('');
 	const [orders, setOrders] = useState([]);
-	const [pageSize, setPageSize] = useState(100);
+	const [pageSize, setPageSize] = useState(5);
 	const [current, setCurrent] = useState(1);
 	const [delivererRole, setDelivererRole] = useState(false);
 
@@ -140,6 +133,7 @@ const OrderCustomizePage = () => {
 			render: (status) => {
 				const foundStatus = statusList.find((item) => item.name === status);
 				console.log('foundStatus', foundStatus);
+				console.log('status', status);
 
 				let color = 'green';
 
@@ -147,7 +141,7 @@ const OrderCustomizePage = () => {
 				if (
 					status === 'Shop Rejected' ||
 					status === 'Customer Rejected' ||
-					status === 'Refused' ||
+					status === 'Customer Cancelled' ||
 					status === 'Rejected'
 				) {
 					color = 'red';
@@ -170,7 +164,7 @@ const OrderCustomizePage = () => {
 
 				return (
 					<Tag color={color}>
-						{foundStatus ? foundStatus.name.toUpperCase() : status.toUpperCase()}
+						{foundStatus ? foundStatus?.name?.toUpperCase() : status.toUpperCase()}
 					</Tag>
 				);
 			},
@@ -210,9 +204,6 @@ const OrderCustomizePage = () => {
 		setSearchText(value);
 		console.log(value);
 	};
-
-	console.log('orderList', orderList);
-	console.log('orders', orders);
 
 	return (
 		<div className="mx-20 my-10">
@@ -260,8 +251,15 @@ const OrderCustomizePage = () => {
 				<Table
 					dataSource={orders}
 					columns={columns}
-					className="custom-table-header"
-					pagination={{pageSize: 5}}
+					className=""
+					pagination={{
+						current: current,
+						total: orderList?.TotalPage * pageSize,
+						pageSize: pageSize,
+						onChange: (page) => setCurrent(page),
+						// showSizeChanger: true,
+						onShowSizeChange: (current, size) => setPageSize(size),
+					}}
 					loading={loading}
 				/>
 			</div>

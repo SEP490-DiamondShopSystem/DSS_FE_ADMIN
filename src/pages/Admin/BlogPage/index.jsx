@@ -121,8 +121,10 @@ const BlogPage = () => {
 	const handleCreateOrUpdate = async () => {
 		const values = await form.validateFields();
 		if (!editorContent.trim()) {
+			message.error('Nội dung bài viết không được để trống!');
 			return;
 		}
+
 		const blogData = new FormData();
 		if (isEditMode) {
 			blogData.append('BlogId', updatingId);
@@ -379,9 +381,7 @@ const BlogPage = () => {
 								<p className="ant-upload-drag-icon">
 									<UploadOutlined />
 								</p>
-								<p className="ant-upload-text">
-									Tải Hình Ảnh Lên
-								</p>
+								<p className="ant-upload-text">Tải Hình Ảnh Lên</p>
 								<p className="ant-upload-hint text-sm text-gray-500">
 									Supports single file upload. Ensure the file is an image.
 								</p>
@@ -416,7 +416,19 @@ const BlogPage = () => {
 						name="contents"
 						label="Nội Dung"
 						className="mb-6"
-						rules={[{required: true, message: 'Please enter blog content!'}]}
+						rules={[
+							{
+								required: true,
+								validator: (_, value) => {
+									if (!editorContent.trim()) {
+										return Promise.reject(
+											'Nội dung bài viết không được để trống!'
+										);
+									}
+									return Promise.resolve();
+								},
+							},
+						]}
 					>
 						{isEditingContent ? (
 							<div>

@@ -80,8 +80,6 @@ export const handleAddDiamondCustomize = createAsyncThunk(
 
 		try {
 			const response = await api.post(`/Diamond/Unavailble`, params);
-			;
-
 			return response;
 		} catch (error) {
 			console.log('Error: ', JSON.stringify(error));
@@ -103,8 +101,6 @@ export const handleDeleteDiamondCustomize = createAsyncThunk(
 				},
 				data: params,
 			});
-			;
-
 			return response;
 		} catch (error) {
 			console.log('Error: ', JSON.stringify(error));
@@ -120,8 +116,6 @@ export const handleChangeDiamondCustomize = createAsyncThunk(
 
 		try {
 			const response = await api.put(`/CustomizeRequest/Staff/ChangeDiamond`, params);
-			;
-
 			return response;
 		} catch (error) {
 			console.log('Error: ', JSON.stringify(error));
@@ -211,6 +205,7 @@ export const customizeSlice = createSlice({
 			})
 			.addCase(handleDeleteDiamondCustomize.fulfilled, (state, action) => {
 				state.loading = false;
+				state.diamondUnAvailable = action.payload;
 			})
 			.addCase(handleDeleteDiamondCustomize.rejected, (state, action) => {
 				state.loading = false;
@@ -221,6 +216,7 @@ export const customizeSlice = createSlice({
 			})
 			.addCase(handleChangeDiamondCustomize.fulfilled, (state, action) => {
 				state.loading = false;
+				state.diamondUnAvailable = action.payload;
 			})
 			.addCase(handleChangeDiamondCustomize.rejected, (state, action) => {
 				state.loading = false;

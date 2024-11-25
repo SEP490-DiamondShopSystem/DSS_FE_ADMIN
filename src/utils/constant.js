@@ -200,6 +200,7 @@ export const enums = {
 		Accepted: 4,
 		Shop_Rejected: 5,
 		Customer_Rejected: 6,
+		Customer_Cancelled: 7,
 	},
 	AccountRoleType: {
 		Customer: 0,
@@ -218,13 +219,19 @@ export const enums = {
 		Princess: 2,
 		Pear: 10,
 	},
+	OrderItemStatus: {
+		Pending: 0,
+		Prepared: 1,
+		Done: 2,
+		Removed: 3,
+	},
 };
 
 export const enumMappings = {
 	Origin: {
-		1: 'Natural',
-		2: 'Lab',
-		3: 'Both',
+		1: 'Tự Nhiên',
+		2: 'Nhân Tạo',
+		3: 'Cả hai',
 	},
 	Operator: {
 		1: 'Equal or Larger',
@@ -302,7 +309,6 @@ export const enumMappings = {
 		1: 'Good',
 		2: 'Very Good',
 		3: 'Excellent',
-		4: 'No Cut',
 	},
 	Fluorescence: {
 		1: 'None',
