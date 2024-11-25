@@ -1,4 +1,4 @@
-import {CloseOutlined, DeleteFilled, EditFilled} from '@ant-design/icons';
+import {CloseOutlined, DeleteFilled, EditFilled, PauseOutlined} from '@ant-design/icons';
 import {Button, Form, message, Popconfirm, Space, Table, Tooltip} from 'antd';
 import moment from 'moment';
 import React, {useEffect, useState} from 'react';
@@ -10,6 +10,7 @@ import {
 	deleteDiscount,
 	fetchDiscounts,
 	fetchDiscountDetail,
+	pauseDiscount,
 	updateDiscount,
 } from '../../../redux/slices/discountSlice';
 import {enumMappings} from '../../../utils/constant';
@@ -138,7 +139,7 @@ const DiscountPage = ({discountData}) => {
 							targetType: req.TargetType,
 							operator: req.Operator,
 							quantity: req.Quantity || 0,
-							jewelryModelID: req.JewelryModelID,
+							jewelryModelId: req.jewelryModelId,
 							promotionId: req.PromotionId,
 							discountId: req.DiscountId,
 							diamondRequirementSpec: {
@@ -176,7 +177,17 @@ const DiscountPage = ({discountData}) => {
 				message.error(error?.data?.title || error?.detail);
 			});
 	};
-
+	const handlePause = async (id) => {
+		await dispatch(pauseDiscount(id))
+			.unwrap()
+			.then(() => {
+				message.success(`Mã giảm giá với id: ${id} đã được bị hủy.`);
+			})
+			.catch((error) => {
+				message.error(error?.data?.title || error?.detail);
+			}); // Use your actual cancelDiscount logic
+		await dispatch(fetchDiscounts());
+	};
 	const handleCancel = async (id) => {
 		await dispatch(cancelDiscount(id))
 			.unwrap()
@@ -186,35 +197,56 @@ const DiscountPage = ({discountData}) => {
 			.catch((error) => {
 				message.error(error?.data?.title || error?.detail);
 			}); // Use your actual cancelDiscount logic
+		await dispatch(fetchDiscounts());
 	};
 	const handleUpdate = async () => {
 		const row = await form.validateFields();
-		const formattedStartDate = row.validDate[0].format('DD-MM-YYYY');
-		const formattedEndDate = row.validDate[1].format('DD-MM-YYYY');
+		const formattedStartDate = row.validDate[0].format('DD-MM-YYYY HH:mm:ss');
+		const formattedEndDate = row.validDate[1].format('DD-MM-YYYY HH:mm:ss');
 
-		const addedRequirements = row.requirements.map((req) => ({
-			id: req.id,
-			name: req.name,
-			targetType: req.targetType,
-			operator: req.operator,
-			quantity: req.quantity || 1,
-			jewelryModelID: req.jewelryModelID,
-			promotionId: req.promotionId,
-			discountId: req.discountId,
-			diamondRequirementSpec: req.diamondRequirementSpec,
-		}));
+		const addedRequirements = row.requirements
+			.filter((req) => !req.id) // Only include requirements without an id
+			.map((req) => ({
+				name: req.name,
+				targetType: req.targetType,
+				operator: req.operator,
+				quantity: req.quantity || 1,
+				jewelryModelId: req.jewelryModelId,
+				promotionId: req.promotionId,
+				diamondRequirementSpec: req.diamondRequirementSpec,
+			}));
 
 		if (!editingDiscountId) {
 			message.error('Discount ID is missing!');
 			return;
 		}
+		// Remove fields without values
+		const removeEmptyFields = (obj) => {
+			return Object.fromEntries(
+				Object.entries(obj).filter(
+					([_, value]) =>
+						value !== undefined &&
+						value !== null &&
+						(Array.isArray(value) ? value.length > 0 : true) &&
+						(typeof value === 'object' && !Array.isArray(value)
+							? Object.keys(removeEmptyFields(value)).length > 0
+							: true)
+				)
+			);
+		};
+
+		// Filter out existing requirements and gifts with IDs
+		const filteredRequirements = (row.requirements || []).filter((req) => !req.id);
+		// Clean the row data and include only new requirements and gifts
+		const cleanedRow = removeEmptyFields({
+			...row,
+			requirements: filteredRequirements,
+		});
 
 		const discountData = {
-			...row,
-			startDate: formattedStartDate,
-			endDate: formattedEndDate,
-			addedRequirements,
-			removedRequirements,
+			...cleanedRow,
+			updateStartEndDate: {startDate: formattedStartDate, endDate: formattedEndDate},
+			...(removedRequirements.length > 0 && {removedRequirements}), // Include only if not empty
 		};
 
 		await dispatch(updateDiscount({discountId: editingDiscountId, discountData}))
@@ -231,7 +263,7 @@ const DiscountPage = ({discountData}) => {
 		setRemovedRequirements([]); // Reset removed requirements after update
 	};
 
-	const handleDelete = (id) => {
+	const handleDelete = async (id) => {
 		dispatch(deleteDiscount(id))
 			.unwrap()
 			.then(() => {
@@ -240,6 +272,7 @@ const DiscountPage = ({discountData}) => {
 			.catch((error) => {
 				message.error(error?.data?.title || error?.detail);
 			});
+		await dispatch(fetchDiscounts());
 	};
 
 	const handleCancelEdit = () => {
@@ -284,9 +317,9 @@ const DiscountPage = ({discountData}) => {
 		},
 		{
 			title: 'Trạng Thái',
-			dataIndex: 'IsActive',
+			dataIndex: 'Status',
 			key: 'status',
-			render: (isActive) => (isActive ? 'Active' : 'Inactive'),
+			render: (text) => getTextForEnum('Status', text),
 		},
 		{
 			title: 'Giá Trị Giảm',
@@ -311,32 +344,66 @@ const DiscountPage = ({discountData}) => {
 		{
 			title: '',
 			key: 'action',
-			render: (_, record, index) => (
-				<Space size="middle">
-					<Tooltip title="Sửa">
-						<Button type="link" onClick={() => handleEdit(record, index)}>
-							<EditFilled />
-						</Button>
-					</Tooltip>
-					<Popconfirm title="Xác Nhận Xóa?" onConfirm={() => handleDelete(record.Id)}>
-						<Tooltip title="Xóa">
-							<Button type="link" danger>
-								<DeleteFilled />
+			render: (_, record) => {
+				const status = record.Status;
+				const isActive = status === 1 || status === 3; // Active status
+				const canPause = status === 2; // Pause status
+				const canCancel = status === 1 || status === 3; // Cancel status
+				const canDelete = status === 5 || status === 4; // Delete status
+
+				return (
+					<Space size="middle">
+						{/* Edit Button */}
+						<Tooltip title="Sửa">
+							<Button type="link" onClick={() => handleEdit(record)}>
+								<EditFilled />
 							</Button>
 						</Tooltip>
-					</Popconfirm>
-					<Popconfirm
-						title="Are you sure you want to cancel this discount?"
-						onConfirm={() => handleCancel(record.Id)}
-					>
-						<Tooltip title="Ngừng Khuyến Mãi">
-							<Button type="link" danger>
-								<CloseOutlined />
-							</Button>
-						</Tooltip>
-					</Popconfirm>
-				</Space>
-			),
+
+						{/* Pause Button (only if Status is 2) */}
+						{canPause && (
+							<Popconfirm
+								title="Bạn có chắc tạm ngưng khuyến mãi này không?"
+								onConfirm={() => handlePause(record.Id)}
+							>
+								<Tooltip title="Tạm Ngưng Khuyến Mãi">
+									<Button type="link" danger>
+										<PauseOutlined />
+									</Button>
+								</Tooltip>
+							</Popconfirm>
+						)}
+
+						{/* Cancel Button (only if Status is 1 or 3) */}
+						{canCancel && (
+							<Popconfirm
+								title="Bạn có chắc hủy khuyến mãi này không?"
+								onConfirm={() => handleCancel(record.Id)}
+							>
+								<Tooltip title="Hủy Khuyến Mãi">
+									<Button type="link" danger>
+										<CloseOutlined />
+									</Button>
+								</Tooltip>
+							</Popconfirm>
+						)}
+
+						{/* Delete Button (only if Status is 5 or 4) */}
+						{canDelete && (
+							<Popconfirm
+								title="Xác Nhận Xóa?"
+								onConfirm={() => handleDelete(record.Id)}
+							>
+								<Tooltip title="Xóa">
+									<Button type="link" danger>
+										<DeleteFilled />
+									</Button>
+								</Tooltip>
+							</Popconfirm>
+						)}
+					</Space>
+				);
+			},
 		},
 	];
 

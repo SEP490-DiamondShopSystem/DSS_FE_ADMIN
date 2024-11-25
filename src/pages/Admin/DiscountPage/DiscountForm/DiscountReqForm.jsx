@@ -3,6 +3,9 @@ import {Button, Col, Form, Input, InputNumber, Row, Select, Space, Modal} from '
 import React, {useState} from 'react';
 import JewelryModelList from '../../PromotionPage/JewelryModelList';
 export const DiscountReqForm = ({form, shapes, Option, removeRequirement}) => {
+	const [isPopupVisible, setIsPopupVisible] = useState(false);
+	const [selectedModel, setSelectedModel] = useState(null);
+
 	const handleTargetTypeChange = (targetType, name, setFieldsValue) => {
 		const isOrder = targetType === 3;
 		const isDiamond = targetType === 2;
@@ -16,11 +19,15 @@ export const DiscountReqForm = ({form, shapes, Option, removeRequirement}) => {
 			[`requirements[${name}].discountId`]: isJewelryModel ? '' : undefined,
 		});
 	};
-	const [isPopupVisible, setIsPopupVisible] = useState(false);
-	const [selectedModel, setSelectedModel] = useState(null);
-	const handleSelectModel = (model) => {
-		console.log('Model Selected in Parent:', model);
-		setSelectedModel(model);
+	const handleSelectModel = (model, fieldKey) => {
+		setSelectedModel(model?.Id);
+		form.setFieldsValue({
+			requirements: form
+				.getFieldValue('requirements')
+				.map((req, index) =>
+					index === fieldKey ? {...req, jewelryModelId: model?.Id} : req
+				),
+		});
 		setIsPopupVisible(false);
 	};
 	return (
@@ -500,32 +507,35 @@ export const DiscountReqForm = ({form, shapes, Option, removeRequirement}) => {
 													name,
 													'targetType',
 												]) === 1 && (
-													<Form.Item
-														label="Mẫu Trang Sức"
-														name="jewelryModelId"
-														rules={[
-															{
-																required: true,
-																message:
-																	'Please select a Jewelry Model',
-															},
-														]}
-													>
-														<div className="flex items-center gap-2">
+													<>
+														<Form.Item
+															{...restField}
+															label="Mẫu Trang Sức"
+															name={[name, 'jewelryModelId']}
+															fieldKey={[fieldKey, 'jewelryModelId']}
+															rules={[
+																{
+																	required: true,
+																	message:
+																		'Vui lòng chọn mẫu trang sức',
+																},
+															]}
+														>
 															<Input
 																readOnly
-																value={selectedModel?.Id}
-																placeholder={selectedModel?.Name}
+																value={form.getFieldValue([
+																	'requirements',
+																	name,
+																	'jewelryModelId',
+																])}
 															/>
-															<Button
-																onClick={() =>
-																	setIsPopupVisible(true)
-																}
-															>
-																Select Model
-															</Button>
-														</div>
-													</Form.Item>
+														</Form.Item>
+														<Button
+															onClick={() => setIsPopupVisible(true)}
+														>
+															Chọn Mẫu Trang Sức
+														</Button>
+													</>
 												)}
 											</Col>
 										</Row>
@@ -535,7 +545,11 @@ export const DiscountReqForm = ({form, shapes, Option, removeRequirement}) => {
 											footer={null}
 											width="80%"
 										>
-											<JewelryModelList onSelectModel={handleSelectModel} />
+											<JewelryModelList
+												onSelectModel={(model) =>
+													handleSelectModel(model, name)
+												}
+											/>
 										</Modal>
 										<Button
 											type="link"
