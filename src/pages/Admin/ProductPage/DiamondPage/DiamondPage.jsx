@@ -20,6 +20,7 @@ import {
 	Table,
 	Tag,
 	Tooltip,
+	Typography,
 } from 'antd';
 import debounce from 'lodash/debounce';
 import React, {useEffect, useState} from 'react';
@@ -44,8 +45,29 @@ import {marks, marksClarity, marksCut} from '../../../../utils/constant';
 import {AddModalDiamond} from './AddModalDiamond/AddModalDiamond';
 import {DiamondUploadForm} from './DiamondUploadForm';
 import {LockDiamondModal} from './LockDiamondModal/LockDiamondModal';
+import {Filter} from '../../../../components/Filter';
 
 const {Search} = Input;
+const {Title} = Typography;
+
+const statusList = [
+	{name: 'Tất Cả', value: ''},
+	{name: 'Đang bán', value: '1'},
+	{name: 'Đã bán', value: '2'},
+	{name: 'Đã khóa', value: '3'},
+	{name: 'Hết hàng', value: '4'},
+	{name: 'Khóa cho khách hàng', value: '5'},
+	{name: 'Đặt trước', value: '6'},
+];
+
+const statusMapping = {
+	1: {label: 'Đang bán', color: 'green'},
+	2: {label: 'Đã bán', color: 'blue'},
+	3: {label: 'Đã khóa', color: 'volcano'},
+	4: {label: 'Hết hàng', color: 'red'},
+	5: {label: 'Khóa cho khách hàng', color: 'purple'},
+	6: {label: 'Đặt trước', color: 'geekblue'},
+};
 
 const DiamondPage = () => {
 	const dispatch = useDispatch();
@@ -68,22 +90,12 @@ const DiamondPage = () => {
 	const [start, setStart] = useState(0);
 	const [checked, setChecked] = useState(false);
 	const [checkedDiamondJewelry, setCheckedDiamondJewelry] = useState(false);
-	const [checkedStatus, setCheckedStatus] = useState(1);
 	const [isFormVisible, setIsFormVisible] = useState(false);
 	const [selectedDiamondId, setSelectedDiamondId] = useState(null);
 	const [isLockDiamondModalVisible, setIsLockDiamondModalVisible] = useState(false);
 	const [lockDiamondId, setLockDiamondId] = useState();
-
-	console.log('fetch', fetch);
-
-	const statusMapping = {
-		1: {label: 'Đang bán', color: 'green'},
-		2: {label: 'Đã bán', color: 'blue'},
-		3: {label: 'Đã khóa', color: 'volcano'},
-		4: {label: 'Hết hàng', color: 'red'},
-		5: {label: 'Khóa cho khách hàng', color: 'purple'},
-		6: {label: 'Đặt trước', color: 'geekblue'},
-	};
+	const [activeStatus, setActiveStatus] = useState('');
+	const [searchText, setSearchText] = useState('');
 
 	useEffect(() => {
 		dispatch(getDiamondFilter());
@@ -173,6 +185,8 @@ const DiamondPage = () => {
 			dataIndex: 'Status',
 			align: 'center',
 			render: (status) => {
+				console.log('status', status);
+
 				const {label, color} = statusMapping[status] || {label: 'Unknown', color: 'gray'};
 				return <Tag color={color}>{label?.toUpperCase()}</Tag>;
 			},
@@ -223,7 +237,8 @@ const DiamondPage = () => {
 				caratTo: filters?.carat?.maxCarat,
 				isLab: checked,
 				includeJewelryDiamond: checkedDiamondJewelry,
-				diamondStatuses: checkedStatus,
+				diamondStatuses: activeStatus,
+				sku: searchText,
 			})
 		);
 	}, 500);
@@ -232,7 +247,7 @@ const DiamondPage = () => {
 		fetchDiamondData();
 
 		return () => fetchDiamondData.cancel();
-	}, [dispatch, filters, shape, checked, checkedDiamondJewelry, checkedStatus, fetch]);
+	}, [dispatch, filters, shape, checked, checkedDiamondJewelry, activeStatus, fetch, searchText]);
 
 	useEffect(() => {
 		if (diamondList) {
@@ -311,10 +326,6 @@ const DiamondPage = () => {
 		setDiamondId(id);
 	};
 
-	const handleSelectStatusChange = (value) => {
-		setCheckedStatus(value);
-	};
-
 	const handleDelete = () => {
 		console.log('Deleted successfully');
 		dispatch(handleDeleteDiamond(diamondId))
@@ -365,6 +376,14 @@ const DiamondPage = () => {
 		setIsLockDiamondModalVisible(false);
 	};
 
+	const handleStatusChange = (value) => {
+		setActiveStatus(value);
+	};
+
+	const onSearch = (value) => {
+		setSearchText(value);
+	};
+
 	const text = <span>Lọc</span>;
 
 	const content = (
@@ -373,8 +392,7 @@ const DiamondPage = () => {
 				<div className="ml-10 min-w-44">
 					<p>Hình Dạng</p>
 					<Select
-						defaultValue={shapes[0]?.ShapeName}
-						placeholder="Shape"
+						placeholder="Hình Dạng"
 						style={{width: 120}}
 						allowClear
 						onChange={handleShapeChange}
@@ -461,38 +479,43 @@ const DiamondPage = () => {
 						Kim Cương Đã Đính
 					</Checkbox>
 				</div>
-				<div className="ml-10">
-					<label className="mr-5">Chọn trạng thái</label>
-					<Select onChange={handleSelectStatusChange} placeholder="" style={{width: 200}}>
-						<Option value={1}>Đang bán</Option>
-						<Option value={2}>Đã bán</Option>
-						<Option value={3}>Đã khóa</Option>
-						<Option value={4}>Hết hàng</Option>
-						<Option value={5}>Khóa cho khách hàng</Option>
-						<Option value={6}>Đặt trước</Option>
-					</Select>
-					{status && <p>Selected Status: {status}</p>}
-				</div>
 			</Space>
 		</div>
 	);
 	// if (diamondList === null || diamondList === undefined) <Loading />;
 	return (
 		<div className="mx-20 my-10">
-			{/* <Filter filter={filter} handleStatusBtn={handleStatusBtn} active={active} /> */}
-
+			<Title level={3}>Danh Sách Kim Cương</Title>
+			<Filter
+				filter={statusList}
+				handleStatusBtn={handleStatusChange}
+				active={activeStatus}
+			/>
 			<div>
 				<div className="flex items-center justify-between">
-					<div className="flex items-center my-5">
-						<Popover
-							placement="bottomLeft"
-							title={text}
-							content={content}
-							trigger={'click'}
-						>
-							<Button>Lọc Theo Tiêu Chí</Button>
-						</Popover>
-					</div>
+					<Space className="flex items-center my-5">
+						<div>
+							<Popover
+								placement="bottomLeft"
+								title={text}
+								content={content}
+								trigger={'hover'}
+							>
+								<Button>Lọc Theo Tiêu Chí</Button>
+							</Popover>
+						</div>
+						<div className="flex items-center">
+							<span className="ml-3 mr-2">Tìm Kiếm SKU:</span>
+							<div>
+								<Search
+									className="w-full sm:w-60"
+									placeholder="Tìm theo email"
+									allowClear
+									onSearch={onSearch}
+								/>
+							</div>
+						</div>
+					</Space>
 					<div>
 						<Button
 							type="text"

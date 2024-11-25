@@ -149,19 +149,20 @@ const DefaultLayout = () => {
 	return (
 		<Layout className="min-h-screen flex">
 			<Sider
+				width={240}
 				collapsed={collapsed}
 				className="shadow-sm"
 				collapsible
 				theme="light"
 				onCollapse={toggleCollapsed}
 			>
-				<Link to="/dashboard" className="block h-24">
+				<Link to="/dashboard" className="block h-24 mb-10">
 					<img
 						src={collapsed ? imageExporter.tinylogo : imageExporter.logo}
 						alt="logo"
 						className={`block mx-auto mt-2 ${
 							collapsed ? 'w-4/5' : 'w-2/5'
-						} h-auto object-cover`}
+						} h-auto object-cover `}
 					/>
 				</Link>
 				<Menu

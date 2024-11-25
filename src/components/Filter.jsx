@@ -10,7 +10,7 @@ export const Filter = ({filter, active, handleStatusBtn}) => {
 						type="text"
 						className={` ${
 							active === status.value ? 'bg-primary' : 'bg-lightGray'
-						} py-2 px-4 md:px-10 md:w-auto text-sm md:text-base`}
+						} py-2 px-4 md:px-5 md:w-auto text-sm md:text-base`}
 						value={status.value}
 						onClick={() => handleStatusBtn(status.value)}
 					>

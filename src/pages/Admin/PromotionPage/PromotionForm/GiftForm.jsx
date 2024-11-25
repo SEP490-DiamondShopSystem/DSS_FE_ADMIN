@@ -1,22 +1,30 @@
-import {MinusCircleFilled} from '@ant-design/icons';
+import {MinusCircleOutlined} from '@ant-design/icons';
 import {Button, Col, Form, Input, InputNumber, Row, Select, Space, Modal} from 'antd';
 import React, {useState} from 'react';
 import JewelryModelList from '../JewelryModelList';
 
-export const GiftForm = ({form, shapes, Option}) => {
+export const GiftForm = ({form, shapes, Option, removeGift}) => {
+
 	const [isPopupVisible, setIsPopupVisible] = useState(false);
 	const [selectedModel, setSelectedModel] = useState(null);
-	const handleSelectModel = (model) => {
-		console.log('Model Selected in Parent:', model);
-		setSelectedModel(model);
+
+	const handleSelectModel = (model, fieldKey) => {
+		setSelectedModel(model?.Id);
+		form.setFieldsValue({ 
+		  gifts: form.getFieldValue('gifts').map((gift, index) => 
+			index === fieldKey ? { ...gift, itemId: model?.Id } : gift
+		  ),
+		});
 		setIsPopupVisible(false);
-	};
+	  };
+
 	return (
 		<div>
 			<Form.List name="gifts">
 				{(fields, {add, remove}) => (
 					<>
 						{fields.map(({key, name, fieldKey, ...restField}) => {
+							const gift = form.getFieldValue(['gifts', name]);
 							const unitType = form.getFieldValue(['gifts', name, 'unitType']);
 							const targetType = form.getFieldValue(['gifts', name, 'targetType']);
 
@@ -162,30 +170,35 @@ export const GiftForm = ({form, shapes, Option}) => {
 											</Col>
 											<Col span={12}>
 												{targetType === 1 && (
-													<Form.Item
-														label="Item ID"
-														{...restField}
-														name={[name, 'itemId']}
-														fieldKey={[fieldKey, 'itemId']}
-														rules={[
-															{
-																required: targetType === 1,
-																message:
-																	'Item ID is required for Jewelry Model',
-															},
-														]}
-													>
-														<Input
-															readOnly
-															value={selectedModel?.Id}
-															placeholder={selectedModel?.Name}
-														/>
+													<>
+														<Form.Item
+															{...restField}
+															label="Mẫu Trang Sức"
+															name={[name, 'itemId']}
+															fieldKey={[fieldKey, 'itemId']}
+															rules={[
+																{
+																	required: true,
+																	message:
+																		'Vui lòng chọn mẫu trang sức',
+																},
+															]}
+														>
+															<Input
+																readOnly
+																value={form.getFieldValue([
+																	'gifts',
+																	name,
+																	'itemId',
+																])}
+															/>
+														</Form.Item>
 														<Button
 															onClick={() => setIsPopupVisible(true)}
 														>
-															Select Model
+															Chọn Mẫu Trang Sức
 														</Button>
-													</Form.Item>
+													</>
 												)}
 											</Col>
 										</Row>
@@ -195,7 +208,7 @@ export const GiftForm = ({form, shapes, Option}) => {
 											footer={null}
 											width="80%"
 										>
-											<JewelryModelList onSelectModel={handleSelectModel} />
+											<JewelryModelList onSelectModel={(model) => handleSelectModel(model, name)} />
 										</Modal>
 										{targetType === 2 && (
 											<Row span={12}>
@@ -495,8 +508,16 @@ export const GiftForm = ({form, shapes, Option}) => {
 														<Form.Item
 															label="Cut From"
 															{...restField}
-															name={[name, 'cutFrom']}
-															fieldKey={[fieldKey, 'cutFrom']}
+															name={[
+																name,
+																'diamondRequirementSpec',
+																'cutFrom',
+															]}
+															fieldKey={[
+																fieldKey,
+																'diamondRequirementSpec',
+																'cutFrom',
+															]}
 															rules={[
 																{
 																	required: false,
@@ -560,8 +581,14 @@ export const GiftForm = ({form, shapes, Option}) => {
 												</div>
 											</Row>
 										)}
-										<Button type="link" onClick={() => remove(name)}>
-											<MinusCircleFilled />
+										<Button
+											type="link"
+											onClick={() => {
+												remove(name);
+												removeGift(gift?.id); // Pass the actual requirement ID
+											}}
+										>
+											<MinusCircleOutlined /> Remove
 										</Button>
 									</div>
 								</Space>

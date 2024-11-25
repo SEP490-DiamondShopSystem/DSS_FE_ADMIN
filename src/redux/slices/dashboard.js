@@ -26,6 +26,18 @@ export const getDashboard = createAsyncThunk(
 		}
 	}
 );
+export const getTopSellingJewelry = createAsyncThunk(
+	'dashboardSlice/getTopSellingJewelry',
+	async (_, {rejectWithValue}) => {
+		try {
+			const data = await api.get(`/Dashboard/Jewelry/TopSelling`);
+			return data;
+		} catch (error) {
+			console.error(error);
+			return rejectWithValue(error);
+		}
+	}
+);
 
 export const getOrderCompleted = createAsyncThunk(
 	'dashboardSlice/getOrderCompleted',
@@ -64,6 +76,7 @@ export const dashboardSlice = createSlice({
 		dashboard: null,
 		orderCompletedCount: null,
 		accountCustomerCount: null,
+		topSellingJewelry: null,
 		loading: false,
 		error: null,
 	},
@@ -111,6 +124,17 @@ export const dashboardSlice = createSlice({
 				state.accountCustomerCount = action.payload;
 			})
 			.addCase(getAccountCount.rejected, (state, action) => {
+				state.loading = false;
+				state.error = action.payload;
+			})
+			.addCase(getTopSellingJewelry.pending, (state) => {
+				state.loading = true;
+			})
+			.addCase(getTopSellingJewelry.fulfilled, (state, action) => {
+				state.loading = false;
+				state.topSellingJewelry = action.payload;
+			})
+			.addCase(getTopSellingJewelry.rejected, (state, action) => {
 				state.loading = false;
 				state.error = action.payload;
 			});

@@ -1,4 +1,4 @@
-import {CloseOutlined, DeleteFilled, EditFilled} from '@ant-design/icons';
+import {CloseOutlined, DeleteFilled, EditFilled, PauseOutlined} from '@ant-design/icons';
 import {Button, Form, message, Popconfirm, Space, Table, Tooltip} from 'antd';
 import moment from 'moment';
 import React, {useEffect, useState} from 'react';
@@ -11,6 +11,7 @@ import {
 	fetchPromotions,
 	fetchPromotionDetail,
 	updatePromotion,
+	pausePromotion,
 } from '../../../redux/slices/promotionSlice';
 import {enumMappings} from '../../../utils/constant';
 import PromotionForm from './PromotionForm/PromotionForm';
@@ -29,6 +30,8 @@ const PromotionPage = ({promotionData}) => {
 	const [targetTypes, setTargetTypes] = useState({});
 	const [giftType, setGiftType] = useState({});
 	const [currentEditingIndex, setCurrentEditingIndex] = useState(null);
+	const [removedRequirements, setRemovedRequirements] = useState([]);
+	const [removedGifts, setRemovedGifts] = useState([]);
 
 	useEffect(() => {
 		dispatch(fetchPromotions());
@@ -62,6 +65,23 @@ const PromotionPage = ({promotionData}) => {
 	const handleTargetTypeChange = (index, value) => {
 		setTargetTypes((prev) => ({...prev, [index]: value}));
 	};
+	const removeRequirement = (requirementId) => {
+		if (!requirementId) return;
+		setRemovedRequirements((prev) => [...prev, requirementId]);
+		const updatedRequirements = form
+			.getFieldValue('requirements')
+			.filter((req) => req.id !== requirementId);
+
+		form.setFieldsValue({requirements: updatedRequirements});
+	};
+
+	const removeGift = (giftId) => {
+		if (!giftId) return;
+		setRemovedGifts((prev) => [...prev, giftId]);
+		const updatedGifts = form.getFieldValue('gifts').filter((gift) => gift.id !== giftId);
+
+		form.setFieldsValue({gifts: updatedGifts});
+	};
 
 	const handleCreatePromotion = (values) => {
 		const {
@@ -69,6 +89,7 @@ const PromotionPage = ({promotionData}) => {
 			description,
 			redemptionMode,
 			isExcludeQualifierProduct,
+			promoCode,
 			priority,
 			requirements,
 			gifts,
@@ -96,6 +117,7 @@ const PromotionPage = ({promotionData}) => {
 			endDateTime: endDateTime.format('DD-MM-YYYY HH:mm:ss'),
 			name: name,
 			description: description,
+			promoCode: promoCode,
 			redemptionMode: redemptionMode,
 			isExcludeQualifierProduct: isExcludeQualifierProduct,
 			priority: priority,
@@ -123,9 +145,10 @@ const PromotionPage = ({promotionData}) => {
 		setIsEditing(true);
 		setCurrentEditingIndex(index);
 
-		dispatch(fetchPromotionDetail(promotionId)).then((res) => {
-			if (res.payload) {
-				const fetchedPromotion = res.payload;
+		dispatch(fetchPromotionDetail(promotionId))
+			.unwrap()
+			.then((res) => {
+				const fetchedPromotion = res;
 				const startDate = fetchedPromotion.StartDate
 					? moment(fetchedPromotion.StartDate, 'DD-MM-YYYY HH:mm:ss')
 					: null;
@@ -157,7 +180,7 @@ const PromotionPage = ({promotionData}) => {
 							operator: req.Operator,
 							quantity: req.Quantity || 0,
 							amount: req.Amount || 0,
-							jewelryModelId: req.JewelryModelId,
+							jewelryModelID: req.jewelryModelID,
 							promotionId: req.PromotionId,
 							diamondRequirementSpec: {
 								origin: diamondSpec.Origin
@@ -231,10 +254,10 @@ const PromotionPage = ({promotionData}) => {
 						};
 					}),
 				});
-			} else {
+			})
+			.catch((error) => {
 				message.error(error?.data?.title || error?.detail);
-			}
-		});
+			});
 	};
 
 	const handleCancel = async (id) => {
@@ -247,29 +270,63 @@ const PromotionPage = ({promotionData}) => {
 				message.error(error?.data?.title || error?.detail);
 			});
 	};
+	const handlePause = async (id) => {
+		await dispatch(pausePromotion(id))
+			.unwrap()
+			.then(() => {
+				message.success(`Promotion with id: ${id} has been paused.`);
+			})
+			.catch((error) => {
+				message.error(error?.data?.title || error?.detail);
+			});
+	};
 	const handleUpdate = async () => {
 		// Validate the form fields
 		const row = await form.validateFields();
+		const formattedStartDate = row.validDate?.[0]?.format('DD-MM-YYYY HH:mm:ss');
+		const formattedEndDate = row.validDate?.[1]?.format('DD-MM-YYYY HH:mm:ss');
 
-		// Format the valid date range (from the form input)
-		const formattedStartDate = row.validDate[0].format('DD-MM-YYYY');
-		const formattedEndDate = row.validDate[1].format('DD-MM-YYYY');
-
-		// Prepare promotion data with separate start and end dates
-		const promotionData = {
-			...row,
-			startDate: formattedStartDate,
-			endDate: formattedEndDate,
-		};
-
-		// Ensure that promotionId (editingPromotionId) is available
 		if (!editingPromotionId) {
-			message.error(error?.data?.title || error?.detail);
+			message.error('No promotion selected for editing.');
 			return;
 		}
 
-		console.log('Updating promotion with ID:', editingPromotionId); // Check if it's defined
-		console.log('Promotion Data:', promotionData);
+		// Remove fields without values
+		const removeEmptyFields = (obj) => {
+			return Object.fromEntries(
+				Object.entries(obj).filter(
+					([_, value]) =>
+						value !== undefined &&
+						value !== null &&
+						(Array.isArray(value) ? value.length > 0 : true) &&
+						(typeof value === 'object' && !Array.isArray(value)
+							? Object.keys(removeEmptyFields(value)).length > 0
+							: true)
+				)
+			);
+		};
+
+		// Filter out existing requirements and gifts with IDs
+		const filteredRequirements = (row.requirements || []).filter((req) => !req.id);
+		const filteredGifts = (row.gifts || []).filter((gift) => !gift.id);
+
+		// Clean the row data and include only new requirements and gifts
+		const cleanedRow = removeEmptyFields({
+			...row,
+			requirements: filteredRequirements,
+			gifts: filteredGifts,
+		});
+
+		// Construct the final promotion data
+		const promotionData = {
+			...cleanedRow,
+			updateStartEndDate: {startDate: formattedStartDate, endDate: formattedEndDate},
+			...(removedRequirements.length > 0 && {removedRequirements}), // Include only if not empty
+			...(removedGifts.length > 0 && {removedGifts}), // Include only if not empty
+		};
+
+		console.log('Updating promotion with ID:', editingPromotionId); // Debugging log
+		console.log('Filtered Promotion Data:', promotionData);
 
 		// Dispatch the update action
 		await dispatch(updatePromotion({promotionId: editingPromotionId, promotionData}))
@@ -280,7 +337,10 @@ const PromotionPage = ({promotionData}) => {
 			.catch((error) => {
 				message.error(error?.data?.title || error?.detail);
 			});
-
+		setIsEditing(false);
+		setEditingKey('');
+		setEditingPromotionId(null); // Reset editing ID
+		form.resetFields(); // Clear all fields
 		await dispatch(fetchPromotions());
 	};
 
@@ -347,9 +407,9 @@ const PromotionPage = ({promotionData}) => {
 		},
 		{
 			title: 'Trạng Thái',
-			dataIndex: 'IsActive',
+			dataIndex: 'Status',
 			key: 'status',
-			render: (isActive) => (isActive ? 'Active' : 'Inactive'),
+			render: (text) => getTextForEnum('Status', text),
 		},
 		{
 			title: 'Priority',
@@ -385,32 +445,66 @@ const PromotionPage = ({promotionData}) => {
 		{
 			title: '',
 			key: 'action',
-			render: (_, record, index) => (
-				<Space size="middle">
-					<Tooltip title="Sửa">
-						<Button type="link" onClick={() => handleEdit(record, index)}>
-							<EditFilled />
-						</Button>
-					</Tooltip>
-					<Popconfirm title="Xác Nhận Xóa?" onConfirm={() => handleDelete(record.Id)}>
-						<Tooltip title="Xóa">
-							<Button type="link" danger>
-								<DeleteFilled />
+			render: (_, record) => {
+				const status = record.Status;
+				const isActive = status === 1 || status === 3; // Active status
+				const canPause = status === 2; // Pause status
+				const canCancel = status === 1 || status === 3; // Cancel status
+				const canDelete = status === 5 || status === 4; // Delete status
+
+				return (
+					<Space size="middle">
+						{/* Edit Button */}
+						<Tooltip title="Sửa">
+							<Button type="link" onClick={() => handleEdit(record)}>
+								<EditFilled />
 							</Button>
 						</Tooltip>
-					</Popconfirm>
-					<Popconfirm
-						title="Are you sure you want to cancel this promotion?"
-						onConfirm={() => handleCancel(record.Id)}
-					>
-						<Tooltip title="Ngừng Khuyến Mãi">
-							<Button type="link" danger>
-								<CloseOutlined />
-							</Button>
-						</Tooltip>
-					</Popconfirm>
-				</Space>
-			),
+
+						{/* Pause Button (only if Status is 2) */}
+						{canPause && (
+							<Popconfirm
+								title="Bạn có chắc tạm ngưng khuyến mãi này không?"
+								onConfirm={() => handlePause(record.Id)}
+							>
+								<Tooltip title="Tạm Ngưng Khuyến Mãi">
+									<Button type="link" danger>
+										<PauseOutlined />
+									</Button>
+								</Tooltip>
+							</Popconfirm>
+						)}
+
+						{/* Cancel Button (only if Status is 1 or 3) */}
+						{canCancel && (
+							<Popconfirm
+								title="Bạn có chắc hủy khuyến mãi này không?"
+								onConfirm={() => handleCancel(record.Id)}
+							>
+								<Tooltip title="Hủy Khuyến Mãi">
+									<Button type="link" danger>
+										<CloseOutlined />
+									</Button>
+								</Tooltip>
+							</Popconfirm>
+						)}
+
+						{/* Delete Button (only if Status is 5 or 4) */}
+						{canDelete && (
+							<Popconfirm
+								title="Xác Nhận Xóa?"
+								onConfirm={() => handleDelete(record.Id)}
+							>
+								<Tooltip title="Xóa">
+									<Button type="link" danger>
+										<DeleteFilled />
+									</Button>
+								</Tooltip>
+							</Popconfirm>
+						)}
+					</Space>
+				);
+			},
 		},
 	];
 
@@ -433,6 +527,8 @@ const PromotionPage = ({promotionData}) => {
 				shapes={shapes}
 				giftType={giftType}
 				currentEditingIndex={currentEditingIndex}
+				removeRequirement={removeRequirement}
+				removeGift={removeGift}
 			/>
 
 			{/* <PromoForm /> */}

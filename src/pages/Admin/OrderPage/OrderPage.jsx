@@ -1,7 +1,7 @@
 import React, {useEffect, useState} from 'react';
 
 import {CalendarOutlined, EditFilled} from '@ant-design/icons';
-import {Button, DatePicker, Input, Space, Table, Tag} from 'antd';
+import {Button, DatePicker, Input, Select, Space, Table, Tag, Typography} from 'antd';
 import debounce from 'lodash/debounce';
 import {useDispatch, useSelector} from 'react-redux';
 import {Link, useNavigate} from 'react-router-dom';
@@ -17,18 +17,38 @@ import {enums} from '../../../utils/constant';
 
 const {Search} = Input;
 const {RangePicker} = DatePicker;
+const {Title} = Typography;
 
 const statusList = [
 	{name: 'Tất Cả', value: ''},
-	{name: 'Pending', value: '1'},
-	{name: 'Processing', value: '2'},
-	{name: 'Rejected', value: '3'},
-	{name: 'Cancelled', value: '4'},
-	{name: 'Prepared', value: '5'},
-	{name: 'Delivering', value: '6'},
-	{name: 'Failed', value: '7'},
-	{name: 'Success', value: '8'},
+	{name: 'Chờ Xử Lý', value: '1'},
+	{name: 'Đang Xử Lý', value: '2'},
+	{name: 'Từ Chối', value: '3'},
+	{name: 'Hủy Đơn', value: '4'},
+	{name: 'Đã Chuẩn Bị', value: '5'},
+	{name: 'Đang Vận Chuyển', value: '6'},
+	{name: 'Vận Chuyển Thất Bại', value: '7'},
+	{name: 'Thành Công', value: '8'},
 ];
+
+const statusMapping = {
+	1: {label: 'Chờ Xử Lý', color: 'green'},
+	2: {label: 'Đang Xử Lý', color: 'blue'},
+	3: {label: 'Từ Chối', color: 'red'},
+	4: {label: 'Hủy Đơn', color: 'red'},
+	5: {label: 'Đã Chuẩn Bị', color: 'purple'},
+	6: {label: 'Đang Vận Chuyển', color: 'orange'},
+	7: {label: 'Vận Chuyển Thất Bại', color: 'volcano'},
+	8: {label: 'Thành Công', color: 'geekblue'},
+};
+
+const statusPaymentMapping = {
+	1: {label: 'Trả Hết', color: 'geekblue'},
+	2: {label: 'Trả Trước', color: 'blue'},
+	3: {label: 'Chờ Hoàn Tiền', color: 'orange'},
+	4: {label: 'Đã Hoàn Tiền', color: 'volcano'},
+	5: {label: 'Chờ Xử Lý', color: 'green'},
+};
 
 const delivererStatusList = [
 	{name: 'All', value: ''},
@@ -38,22 +58,6 @@ const delivererStatusList = [
 	{name: 'Success', value: '8'},
 	// {name: 'Refused', value: '9'},
 ];
-
-const paymentStatusList = [
-	{name: 'PaidAll', value: '1'},
-	{name: 'Deposited', value: '2'},
-	{name: 'Refunding', value: '3'},
-	{name: 'Refunded', value: '4'},
-	{name: 'Pending', value: '5'},
-];
-
-const getEnumKey = (enumObj, value) => {
-	return enumObj
-		? Object.keys(enumObj)
-				.find((key) => enumObj[key] === value)
-				?.replace('_', ' ')
-		: '';
-};
 
 const OrderPage = () => {
 	const navigate = useNavigate();
@@ -67,6 +71,7 @@ const OrderPage = () => {
 	const [endDate, setEndDate] = useState(null);
 	const [activeStatus, setActiveStatus] = useState('');
 	const [searchText, setSearchText] = useState('');
+	const [selectOrder, setSelectOrder] = useState('');
 	const [orders, setOrders] = useState([]);
 	const [pageSize, setPageSize] = useState(5);
 	const [current, setCurrent] = useState(1);
@@ -83,9 +88,10 @@ const OrderPage = () => {
 				CreatedDate: startDate,
 				ExpectedDate: endDate,
 				Email: searchText,
+				IsCustomize: selectOrder,
 			})
 		);
-	}, [dispatch, pageSize, current, activeStatus, startDate, endDate, searchText]);
+	}, [dispatch, pageSize, current, activeStatus, startDate, endDate, searchText, selectOrder]);
 
 	useEffect(() => {
 		if (userDetail?.Roles) {
@@ -100,11 +106,11 @@ const OrderPage = () => {
 			const mapAttributes = (data, attributes) => ({
 				id: data?.Id,
 				orderTime: data?.CreatedDate,
-				status: getEnumKey(attributes?.OrderStatus, data?.Status),
+				Status: data?.Status,
 				email: data?.Account?.Email,
 				totalAmount: formatPrice(data?.TotalPrice),
 				customer: null,
-				paymentMethod: getEnumKey(attributes?.PaymentStatus, data?.PaymentStatus),
+				paymentMethod: data?.PaymentStatus,
 				OrderCode: data?.OrderCode,
 				CustomizeRequestId: data?.CustomizeRequestId,
 			});
@@ -153,74 +159,26 @@ const OrderPage = () => {
 			dataIndex: 'paymentMethod',
 			align: 'center',
 			render: (status) => {
-				const foundStatus = paymentStatusList.find((item) => item.name === status);
+				console.log('status', status);
 
-				let color = 'green';
-
-				// Determine color based on status
-				if (status === 'Refunding' || status === 'Refunded') {
-					// 'canceled', 'rejected', 'shipFailed'
-					color = 'red';
-				} else if (status === 'Pending') {
-					// 'refunded'
-					color = 'orange';
-				} else if (status === 'Deposited') {
-					// 'deposited'
-					color = 'blue';
-				} else if (status === 'PaidAll') {
-					// 'paidAll'
-					color = 'cyan';
-				}
-
-				return (
-					<Tag color={color}>
-						{foundStatus ? foundStatus.name.toUpperCase() : status.toUpperCase()}
-					</Tag>
-				);
+				const {label, color} = statusPaymentMapping[status] || {
+					label: 'Unknown',
+					color: 'gray',
+				};
+				return <Tag color={color}>{label?.toUpperCase()}</Tag>;
 			},
 		},
 
 		{
 			title: 'Trạng Thái',
-			key: 'status',
-			dataIndex: 'status',
+			key: 'Status',
+			dataIndex: 'Status',
 			align: 'center',
 			render: (status) => {
-				const foundStatus = statusList.find((item) => item.name === status);
+				console.log('status', status);
 
-				let color = 'green';
-
-				// Determine color based on status
-				if (
-					status === 'Cancelled' ||
-					status === 'Delivery Failed' ||
-					status === 'Refused' ||
-					status === 'Rejected'
-				) {
-					// 'canceled', 'rejected', 'shipFailed'
-					color = 'red';
-				} else if (status === 'Pending') {
-					// 'refunded'
-					color = 'orange';
-				} else if (status === 'Processing') {
-					// 'deposited'
-					color = 'blue';
-				} else if (status === 'Delivering') {
-					// 'paidAll'
-					color = 'cyan';
-				} else if (status === 'Prepared') {
-					// 'pending'
-					color = 'purple';
-				} else if (status === 'Success') {
-					// 'refunding'
-					color = 'green';
-				}
-
-				return (
-					<Tag color={color}>
-						{foundStatus ? foundStatus.name.toUpperCase() : status.toUpperCase()}
-					</Tag>
-				);
+				const {label, color} = statusMapping[status] || {label: 'Unknown', color: 'gray'};
+				return <Tag color={color}>{label?.toUpperCase()}</Tag>;
 			},
 		},
 		{
@@ -252,8 +210,15 @@ const OrderPage = () => {
 		setSearchText(value);
 	};
 
+	const handleOrderChange = (value) => {
+		console.log(value);
+
+		setSelectOrder(value);
+	};
+
 	return (
 		<div className="mx-20 my-10">
+			<Title level={3}>Danh Sách Đơn Đặt Hàng</Title>
 			<Filter
 				filter={delivererRole ? delivererStatusList : statusList}
 				handleStatusBtn={handleStatusChange}
@@ -265,7 +230,7 @@ const OrderPage = () => {
 						<p className="mr-3 text-sm sm:text-base">Tìm theo ngày:</p>
 					</div>
 					<div
-						className="flex items-center pl-2 py-1 my-3 sm:my-0"
+						className="flex items-center pl-2 sm:my-0"
 						style={{
 							border: '1px solid #d9d9d9',
 							borderRadius: '4px',
@@ -293,6 +258,13 @@ const OrderPage = () => {
 						allowClear
 						onSearch={onSearch}
 					/>
+					<div className="flex items-center my-3 sm:my-5 ml-5">
+						<p className="mr-3 text-sm sm:text-base">Chọn loại đơn:</p>
+					</div>
+					<Select className="w-32" onChange={handleOrderChange} allowClear>
+						<Option value={false}>Đơn Thường</Option>
+						<Option value={true}>Đơn Thiết Kế</Option>
+					</Select>
 				</Space>
 			</div>
 

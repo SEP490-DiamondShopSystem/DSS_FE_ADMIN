@@ -1,3 +1,14 @@
+import round from '../assets/images/diamondShapes/round.png';
+import princess from '../assets/images/diamondShapes/princess.png';
+import pear from '../assets/images/diamondShapes/pear.png';
+import cushion from '../assets/images/diamondShapes/cushionSquare.png';
+import emerald from '../assets/images/diamondShapes/emerald.png';
+import oval from '../assets/images/diamondShapes/oval.png';
+import radiant from '../assets/images/diamondShapes/radiant.png';
+import asscher from '../assets/images/diamondShapes/asscher.png';
+import marquise from '../assets/images/diamondShapes/marquise.png';
+import heart from '../assets/images/diamondShapes/heart.png';
+
 export const enums = {
 	BlobDirectoryType: {
 		Public: 0,
@@ -228,10 +239,17 @@ export const enums = {
 };
 
 export const enumMappings = {
+	Status: {
+		1:'Đã Lên Lịch',
+		2:'Đang Hoạt Động',
+		3:'Hết Hạn',
+		4:'Đã Tạm Dừng',
+		5:'Đã Hủy',
+	},
 	Origin: {
 		1: 'Tự Nhiên',
 		2: 'Nhân Tạo',
-		3: 'Cả hai',
+		3: 'Cả Hai',
 	},
 	Operator: {
 		1: 'Equal or Larger',
@@ -267,6 +285,7 @@ export const enumMappings = {
 		8: 'Pearl',
 		9: 'Bracelet Catch',
 	},
+	
 	SettingType: {
 		0: 'Prong',
 		1: 'Bezel',
@@ -406,3 +425,26 @@ export const ShapeName = {
 	Heart: '9',
 	Cushion: '3',
 };
+
+export const shapeItems = [
+	{
+		id: 1,
+		image: round,
+		value: 1,
+		shape: 'Round',
+	},
+	{
+		id: 2,
+		image: cushion,
+		shape: 'Cushion',
+		value: 3,
+	},
+	{id: 3, image: emerald, shape: 'Emerald', value: 4},
+	{id: 4, image: oval, shape: 'Oval', value: 5},
+	{id: 5, image: radiant, shape: 'Radiant', value: 6},
+	{id: 6, image: asscher, shape: 'Asscher', value: 7},
+	{id: 7, image: marquise, shape: 'Marquise', value: 8},
+	{id: 8, image: heart, shape: 'Heart', value: 9},
+	{id: 9, image: princess, shape: 'Princess', value: 2},
+	{id: 9, image: pear, shape: 'Pear', value: 10},
+];

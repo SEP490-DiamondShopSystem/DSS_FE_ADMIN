@@ -19,7 +19,6 @@ const DiscountForm = ({
 	addGift,
 	shapes,
 	removeRequirement, // Receive removeRequirement as a prop
-
 }) => {
 	return (
 		<div>
@@ -94,9 +93,11 @@ const DiscountForm = ({
 				</div>
 
 				{/* Dynamic Requirement List */}
-				<DiscountReqForm form={form} shapes={shapes} Option={Option} 
-									removeRequirement={removeRequirement} // Passing the function as a prop
-
+				<DiscountReqForm
+					form={form}
+					shapes={shapes}
+					Option={Option}
+					removeRequirement={removeRequirement} // Passing the function as a prop
 				/>
 
 				{/* Submit Button */}

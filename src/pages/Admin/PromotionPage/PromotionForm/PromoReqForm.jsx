@@ -1,9 +1,20 @@
-import {MinusCircleFilled} from '@ant-design/icons';
+import {MinusCircleOutlined} from '@ant-design/icons';
 import {Button, Col, Form, Input, InputNumber, Row, Select, Space, Modal} from 'antd';
 import React, {useState} from 'react';
 import JewelryModelList from '../JewelryModelList';
 
-export const PromoReqForm = ({form, shapes, Option}) => {
+export const PromoReqForm = ({form, shapes, Option, removeRequirement}) => {
+	const [isPopupVisible, setIsPopupVisible] = useState(false);
+	const [selectedModel, setSelectedModel] = useState(null);
+
+	const [moneyAmount, setMoneyAmount] = useState(null);
+	const handleAmountChange = (value) => {
+		setMoneyAmount(value);
+	};
+	const [quantity, setQuantity] = useState(null);
+	const handleQuantityChange = (value) => {
+		setQuantity(value);
+	};
 	const handleTargetTypeChange = (targetType, name, setFieldsValue) => {
 		const isOrder = targetType === 3;
 		const isDiamond = targetType === 2;
@@ -17,21 +28,15 @@ export const PromoReqForm = ({form, shapes, Option}) => {
 			[`requirements[${name}].promotionId`]: isJewelryModel ? '' : undefined,
 		});
 	};
-	const handleFieldChange = (fieldName, value) => {
-		if (value) {
-			if (fieldName === 'moneyAmount') {
-				form.setFieldsValue({quantity: undefined});
-			} else if (fieldName === 'quantity') {
-				form.setFieldsValue({moneyAmount: undefined});
-			}
-		}
-	};
-	const [isPopupVisible, setIsPopupVisible] = useState(false);
-	const [selectedModel, setSelectedModel] = useState(null);
-
-	const handleSelectModel = (model) => {
-		console.log('Model Selected in Parent:', model);
-		setSelectedModel(model)
+	const handleSelectModel = (model, fieldKey) => {
+		setSelectedModel(model?.Id);
+		form.setFieldsValue({
+			requirements: form
+				.getFieldValue('requirements')
+				.map((req, index) =>
+					index === fieldKey ? {...req, jewelryModelID: model?.Id} : req
+				),
+		});
 		setIsPopupVisible(false);
 	};
 
@@ -41,6 +46,8 @@ export const PromoReqForm = ({form, shapes, Option}) => {
 				{(fields, {add, remove}) => (
 					<>
 						{fields.map(({key, name, fieldKey, ...restField}) => {
+							const requirement = form.getFieldValue(['requirements', name]);
+
 							return (
 								<Space key={key} className="flex mb-4 space-x-4" align="baseline">
 									<div className="p-6 gap-x-10 flex justify-between bg-white rounded-lg shadow-lg">
@@ -60,10 +67,7 @@ export const PromoReqForm = ({form, shapes, Option}) => {
 													labelCol={{span: 24}}
 													wrapperCol={{span: 24}}
 												>
-													<Input
-														className="w-full"
-														placeholder="Tên"
-													/>
+													<Input className="w-full" placeholder="Tên" />
 												</Form.Item>
 												<Form.Item
 													label="Operator"
@@ -83,7 +87,9 @@ export const PromoReqForm = ({form, shapes, Option}) => {
 												</Form.Item>
 												<Form.Item
 													label="Giá Trị"
-													name="moneyAmount"
+													{...restField}
+													name={[name, 'moneyAmount']}
+													fieldKey={[fieldKey, 'moneyAmount']}
 													rules={[
 														{
 															required: false,
@@ -95,11 +101,11 @@ export const PromoReqForm = ({form, shapes, Option}) => {
 												>
 													<InputNumber
 														className="w-full"
-														placeholder="Enter amount"
+														placeholder="Enter Money amount"
 														onChange={(value) =>
-															handleFieldChange('moneyAmount', value)
+															handleAmountChange(value)
 														}
-														disabled={!!form.getFieldValue('quantity')}
+														disabled={quantity !== null} // Disable if quantity is filled
 													/>
 												</Form.Item>
 												<Form.Item
@@ -122,62 +128,39 @@ export const PromoReqForm = ({form, shapes, Option}) => {
 													>
 														{Option && (
 															<>
-																<Option value={1}>
-																	Trang Sức
-																</Option>
+																<Option value={1}>Trang Sức</Option>
 																<Option value={2}>Kim Cương</Option>
 																<Option value={3}>Hóa Đơn</Option>
 															</>
 														)}
 													</Select>
 												</Form.Item>
-												{/* <Form.Item
-													label="Promotion ID"
+											</Col>
+											<Col span={12}>
+												<Form.Item
+													label="Số Lượng"
 													{...restField}
-													name={[name, 'promotionId']}
-													fieldKey={[fieldKey, 'promotionId']}
+													name={[name, 'quantity']}
+													fieldKey={[fieldKey, 'quantity']}
 													rules={[
 														{
 															required: false,
-															message: 'Promotion ID is required',
+															message: 'Quantity is required',
 														},
 													]}
+													labelCol={{span: 24}}
+													wrapperCol={{span: 24}}
 												>
-													<Input />
-												</Form.Item> */}
-											</Col>
-											<Col span={12}>
-												{form.getFieldValue([
-													'requirements',
-													name,
-													'targetType',
-												]) !== 3 && (
-													<Form.Item
-														label="Số Lượng"
-														{...restField}
-														name={[name, 'quantity']}
-														fieldKey={[fieldKey, 'quantity']}
-														rules={[
-															{
-																required: false,
-																message: 'Quantity is required',
-															},
-														]}
-														labelCol={{span: 24}}
-														wrapperCol={{span: 24}}
-													>
-														<InputNumber
-															min={1}
-															className="w-full"
-															onChange={(value) =>
-																handleFieldChange('quantity', value)
-															}
-															disabled={
-																!!form.getFieldValue('moneyAmount')
-															}
-														/>
-													</Form.Item>
-												)}
+													<InputNumber
+														min={1}
+														className="w-full"
+														onChange={(value) =>
+															handleQuantityChange(value)
+														}
+														disabled={moneyAmount !== null} // Disable if moneyAmount is filled
+													/>
+												</Form.Item>
+
 												{form.getFieldValue([
 													'requirements',
 													name,
@@ -200,7 +183,8 @@ export const PromoReqForm = ({form, shapes, Option}) => {
 															rules={[
 																{
 																	required: false,
-																	message: 'Vui Lòng Chọn Nguồn Gốc',
+																	message:
+																		'Vui Lòng Chọn Nguồn Gốc',
 																},
 															]}
 															labelCol={{span: 24}}
@@ -510,8 +494,16 @@ export const PromoReqForm = ({form, shapes, Option}) => {
 															<Form.Item
 																label="Cut Từ"
 																{...restField}
-																name={[name, 'cutFrom']}
-																fieldKey={[fieldKey, 'cutFrom']}
+																name={[
+																	name,
+																	'diamondRequirementSpec',
+																	'cutFrom',
+																]}
+																fieldKey={[
+																	fieldKey,
+																	'diamondRequirementSpec',
+																	'cutFrom',
+																]}
 																rules={[
 																	{
 																		required: false,
@@ -583,33 +575,32 @@ export const PromoReqForm = ({form, shapes, Option}) => {
 												]) === 1 && (
 													<>
 														<Form.Item
+															{...restField}
 															label="Mẫu Trang Sức"
-															name="jewelryModelId"
+															name={[name, 'jewelryModelID']}
+															fieldKey={[fieldKey, 'jewelryModelID']}
 															rules={[
 																{
 																	required: true,
 																	message:
-																		'Vui Lòng Chọn Mẫu Trang Sức',
+																		'Vui lòng chọn mẫu trang sức',
 																},
 															]}
 														>
-															<div className="flex items-center gap-2">
-																<Input
-																	readOnly
-																	value={selectedModel?.Id}
-																	placeholder={
-																		selectedModel?.Name
-																	}
-																/>
-																<Button
-																	onClick={() =>
-																		setIsPopupVisible(true)
-																	}
-																>
-																	Chọn Mẫu Trang Sức
-																</Button>
-															</div>
+															<Input
+																readOnly
+																value={form.getFieldValue([
+																	'requirements',
+																	name,
+																	'jewelryModelID',
+																])}
+															/>
 														</Form.Item>
+														<Button
+															onClick={() => setIsPopupVisible(true)}
+														>
+															Chọn Mẫu Trang Sức
+														</Button>
 													</>
 												)}
 											</Col>
@@ -620,10 +611,20 @@ export const PromoReqForm = ({form, shapes, Option}) => {
 											footer={null}
 											width="80%"
 										>
-											<JewelryModelList onSelectModel={handleSelectModel} />
+											<JewelryModelList
+												onSelectModel={(model) =>
+													handleSelectModel(model, name)
+												}
+											/>
 										</Modal>
-										<Button type="link" onClick={() => remove(name)}>
-											<MinusCircleFilled />
+										<Button
+											type="link"
+											onClick={() => {
+												remove(name);
+												removeRequirement(requirement?.id);
+											}}
+										>
+											<MinusCircleOutlined /> Remove
 										</Button>
 									</div>
 								</Space>

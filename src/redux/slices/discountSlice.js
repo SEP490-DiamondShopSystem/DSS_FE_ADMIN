@@ -6,30 +6,22 @@ export const fetchDiscounts = createAsyncThunk(
 	'discounts/fetchDiscounts',
 	async (_, {rejectWithValue}) => {
 		console.log('Fetching discounts...');
-		try {
-			const response = await api.get('/Discount');
-			return response;
-		} catch (error) {
-			console.error('Failed to fetch discounts:', error || error.message);
-			return rejectWithValue(error || 'Failed to fetch discounts');
-		}
+
+		const response = await api.get('/Discount');
+		return response;
 	}
 );
 export const fetchDiscountDetail = createAsyncThunk(
 	'discounts/fetchDiscountDetail',
 	async (discountId, {rejectWithValue}) => {
 		console.log('Fetching discounts...');
-		try {
-			const response = await api.get(`/Discount/${discountId}`);
 
-			// Log the fetched data here
-			console.log('Fetched discount details:', response);
+		const response = await api.get(`/Discount/${discountId}`);
 
-			return response;
-		} catch (error) {
-			console.error('Failed to fetch discounts:', error || error.message);
-			return rejectWithValue(error || 'Failed to fetch discounts');
-		}
+		// Log the fetched data here
+		console.log('Fetched discount details:', response);
+
+		return response;
 	}
 );
 
@@ -37,13 +29,9 @@ export const fetchDiscountDetail = createAsyncThunk(
 export const createDiscount = createAsyncThunk(
 	'discounts/createDiscount',
 	async (newDiscount, {rejectWithValue}) => {
-		try {
-			const response = await api.post('/Discount', newDiscount);
+		const response = await api.post('/Discount', newDiscount);
 
-			return response;
-		} catch (error) {
-			return rejectWithValue(error.response.data || 'Failed to create discount');
-		}
+		return response;
 	}
 );
 
@@ -51,14 +39,9 @@ export const createDiscount = createAsyncThunk(
 export const createFullDiscount = createAsyncThunk(
 	'discounts/createFullDiscount',
 	async (fullDiscount, {rejectWithValue}) => {
-		try {
-			const response = await api.post('/Discount/Full', fullDiscount);
-			console.log('Creating discount with data:', fullDiscount);
-			return response;
-		} catch (error) {
-			console.log('Creating discount with data:', JSON.stringify(fullDiscount, null, 2));
-			return rejectWithValue(error.response.data || 'Failed to create full discount');
-		}
+		const response = await api.post('/Discount/Full', fullDiscount);
+		console.log('Creating discount with data:', fullDiscount);
+		return response;
 	}
 );
 
@@ -66,47 +49,22 @@ export const createFullDiscount = createAsyncThunk(
 export const updateDiscountRequirements = createAsyncThunk(
 	'discounts/updateDiscountRequirements',
 	async ({discountId, requirements}, {rejectWithValue}) => {
-		try {
-			const response = await api.put(`/Discount/${discountId}/Requirement`, requirements);
-			return response.data;
-		} catch (error) {
-			if (error.response) {
-				// Handle 400 and 500 status codes
-				if (error.response.status === 400) {
-					return rejectWithValue({status: 400, errors: error.response.data.errors});
-				} else if (error.response.status === 500) {
-					return rejectWithValue({status: 500, detail: error.response.data.detail});
-				}
-			}
-			return rejectWithValue({status: 'unknown', detail: 'An unexpected error occurred.'});
-		}
+		const response = await api.put(`/Discount/${discountId}/Requirement`, requirements);
+		return response;
 	}
 );
-
 
 // Update a specific discount
 export const updateDiscount = createAsyncThunk(
 	'discounts/updateDiscount',
 	async ({discountId, discountData}, {rejectWithValue}) => {
-		try {
-			console.log(`Updating discount with ID ${discountId} and data:`, discountData);
-			const response = await api.put(`/Discount/${discountId}`, discountData, {
-				headers: {
-					'Content-Type': 'application/json', // Ensure JSON content type is set
-				},
-			});
-			return response.data;
-		} catch (error) {
-			if (error.response) {
-				// Handle 400 and 500 status codes
-				if (error.response.status === 400) {
-					return rejectWithValue({status: 400, errors: error.response.data.errors});
-				} else if (error.response.status === 500) {
-					return rejectWithValue({status: 500, detail: error.response.data.detail});
-				}
-			}
-			return rejectWithValue({status: 'unknown', detail: 'An unexpected error occurred.'});
-		}
+		console.log(`Updating discount with ID ${discountId} and data:`, discountData);
+		const response = await api.put(`/Discount/${discountId}`, discountData, {
+			headers: {
+				'Content-Type': 'application/json', // Ensure JSON content type is set
+			},
+		});
+		return response;
 	}
 );
 
@@ -114,22 +72,10 @@ export const updateDiscount = createAsyncThunk(
 export const deleteDiscount = createAsyncThunk(
 	'discounts/deleteDiscount',
 	async (discountId, {rejectWithValue}) => {
-		try {
-			await api.delete(`/Discount/${discountId}`);
-			console.log(`Deleting discount with ID ${discountId}`);
+		await api.delete(`/Discount/${discountId}`);
+		console.log(`Deleting discount with ID ${discountId}`);
 
-			return discountId;
-		} catch (error) {
-			if (error.response) {
-				// Handle 400 and 500 status codes
-				if (error.response.status === 400) {
-					return rejectWithValue({status: 400, errors: error.response.data.errors});
-				} else if (error.response.status === 500) {
-					return rejectWithValue({status: 500, detail: error.response.data.detail});
-				}
-			}
-			return rejectWithValue({status: 'unknown', detail: 'An unexpected error occurred.'});
-		}
+		return response;
 	}
 );
 
@@ -137,20 +83,8 @@ export const deleteDiscount = createAsyncThunk(
 export const pauseDiscount = createAsyncThunk(
 	'discounts/pauseDiscount',
 	async (discountId, {rejectWithValue}) => {
-		try {
-			const response = await api.patch(`/Discount/${discountId}/Pause`);
-			return response.data;
-		} catch (error) {
-			if (error.response) {
-				// Handle 400 and 500 status codes
-				if (error.response.status === 400) {
-					return rejectWithValue({status: 400, errors: error.response.data.errors});
-				} else if (error.response.status === 500) {
-					return rejectWithValue({status: 500, detail: error.response.data.detail});
-				}
-			}
-			return rejectWithValue({status: 'unknown', detail: 'An unexpected error occurred.'});
-		}
+		const response = await api.patch(`/Discount/${discountId}/Pause`);
+		return response;
 	}
 );
 
@@ -158,20 +92,8 @@ export const pauseDiscount = createAsyncThunk(
 export const cancelDiscount = createAsyncThunk(
 	'discounts/cancelDiscount',
 	async (discountId, {rejectWithValue}) => {
-		try {
-			const response = await api.patch(`/Discount/${discountId}/Cancel`);
-			return response.data;
-		} catch (error) {
-			if (error.response) {
-				// Handle 400 and 500 status codes
-				if (error.response.status === 400) {
-					return rejectWithValue({status: 400, errors: error.response.data.errors});
-				} else if (error.response.status === 500) {
-					return rejectWithValue({status: 500, detail: error.response.data.detail});
-				}
-			}
-			return rejectWithValue({status: 'unknown', detail: 'An unexpected error occurred.'});
-		}
+		const response = await api.patch(`/Discount/${discountId}/Cancel`);
+		return response;
 	}
 );
 
@@ -179,20 +101,8 @@ export const cancelDiscount = createAsyncThunk(
 export const updateDiscountThumbnail = createAsyncThunk(
 	'discounts/updateDiscountThumbnail',
 	async ({discountId, thumbnailData}, {rejectWithValue}) => {
-		try {
-			const response = await api.put(`/Discount/${discountId}/Thumbnail`, thumbnailData);
-			return response.data;
-		} catch (error) {
-			if (error.response) {
-				// Handle 400 and 500 status codes
-				if (error.response.status === 400) {
-					return rejectWithValue({status: 400, errors: error.response.data.errors});
-				} else if (error.response.status === 500) {
-					return rejectWithValue({status: 500, detail: error.response.data.detail});
-				}
-			}
-			return rejectWithValue({status: 'unknown', detail: 'An unexpected error occurred.'});
-		}
+		const response = await api.put(`/Discount/${discountId}/Thumbnail`, thumbnailData);
+		return response;
 	}
 );
 // Thunk to upload discount thumbnail
@@ -202,24 +112,12 @@ export const uploadDiscountThumbnail = createAsyncThunk(
 		const formData = new FormData();
 		formData.append('imageFile', imageFile);
 
-		try {
-			const response = await axios.put(`/api/Discount/${discountId}/Thumbnail`, formData, {
-				headers: {
-					'Content-Type': 'multipart/form-data',
-				},
-			});
-			return response.data;
-		} catch (error) {
-			if (error.response) {
-				// Handle 400 and 500 status codes
-				if (error.response.status === 400) {
-					return rejectWithValue({status: 400, errors: error.response.data.errors});
-				} else if (error.response.status === 500) {
-					return rejectWithValue({status: 500, detail: error.response.data.detail});
-				}
-			}
-			return rejectWithValue({status: 'unknown', detail: 'An unexpected error occurred.'});
-		}
+		const response = await axios.put(`/api/Discount/${discountId}/Thumbnail`, formData, {
+			headers: {
+				'Content-Type': 'multipart/form-data',
+			},
+		});
+		return response;
 	}
 );
 export const discountSlice = createSlice({

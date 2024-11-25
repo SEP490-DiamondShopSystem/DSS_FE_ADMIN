@@ -1,6 +1,6 @@
 import {useEffect, useState} from 'react';
 
-import {Card, Col, DatePicker, Form, Image, Layout, Row, Select} from 'antd';
+import {Card, Col, DatePicker, Form, Image, Layout, Row, Select, Typography} from 'antd';
 import {Helmet} from 'react-helmet';
 import ReactLoading from 'react-loading';
 import {OverviewDonutKpi, OverviewKpi} from './overview/OverviewKpi';
@@ -11,59 +11,24 @@ import {
 	getAllTopSellingShape,
 	getDashboard,
 	getOrderCompleted,
+	getTopSellingJewelry,
 } from '../../../redux/slices/dashboard';
 import {
 	GetAccountCountSelector,
 	GetAllDashboardSelector,
+	GetAllSellingJewelrySelector,
 	GetAllTopSellingDiamondSelector,
 	GetOrderCompletedCountSelector,
 } from '../../../redux/selectors';
 import {formatPrice} from '../../../utils';
 import {CalendarOutlined} from '@ant-design/icons';
 import dayjs from 'dayjs';
+import {shapeItems} from '../../../utils/constant';
 
 const {Content} = Layout;
 const {Option} = Select;
 const {RangePicker} = DatePicker;
-
-const bestSellingProducts = [
-	{
-		id: 1,
-		name: 'Product 1',
-		sold: 20,
-		image: 'https://via.placeholder.com/80',
-	},
-	{
-		id: 2,
-		name: 'Product 2',
-		sold: 15,
-		image: 'https://via.placeholder.com/80',
-	},
-	{
-		id: 3,
-		name: 'Product 3',
-		sold: 30,
-		image: 'https://via.placeholder.com/80',
-	},
-	{
-		id: 4,
-		name: 'Product 4',
-		sold: 10,
-		image: 'https://via.placeholder.com/80',
-	},
-	{
-		id: 5,
-		name: 'Product 5',
-		sold: 25,
-		image: 'https://via.placeholder.com/80',
-	},
-	{
-		id: 6,
-		name: 'Product 6',
-		sold: 12,
-		image: 'https://via.placeholder.com/80',
-	},
-];
+const {Text, Title} = Typography;
 
 const DashboardPage = () => {
 	// const currentDate = new Date();
@@ -75,6 +40,7 @@ const DashboardPage = () => {
 	const diamondShapeSelling = useSelector(GetAllTopSellingDiamondSelector);
 	const accountCount = useSelector(GetAccountCountSelector);
 	const orderCompleted = useSelector(GetOrderCompletedCountSelector);
+	const jewelrySelling = useSelector(GetAllSellingJewelrySelector);
 
 	const [change, setChange] = useState(false);
 	const [changeChart, setChangeChart] = useState(false);
@@ -85,8 +51,7 @@ const DashboardPage = () => {
 	const [startDate, setStartDate] = useState(null);
 	const [endDate, setEndDate] = useState(null);
 	const [orders, setOrders] = useState();
-
-	console.log('orders', orders);
+	const [jewelry, setJewelry] = useState();
 
 	useEffect(() => {
 		const now = dayjs();
@@ -136,22 +101,15 @@ const DashboardPage = () => {
 		}
 	}, [accountCount]);
 
-	console.log('dashboard', dashboard);
+	useEffect(() => {
+		dispatch(getTopSellingJewelry());
+	}, []);
 
-	const getStatusLabel = (statusId) => {
-		const statusMapping = {
-			1: 'Pending',
-			2: 'Processing',
-			3: 'Rejected',
-			4: 'Cancelled',
-			5: 'Prepared',
-			6: 'Delivering',
-			7: 'Delivery Failed',
-			8: 'Success',
-			9: 'Refused',
-		};
-		return statusMapping[statusId] || 'Unknown';
-	};
+	useEffect(() => {
+		if (jewelrySelling) {
+			setJewelry(jewelrySelling);
+		}
+	}, [jewelrySelling]);
 
 	const handleChange = () => {
 		setChange(!change);
@@ -275,8 +233,8 @@ const DashboardPage = () => {
 												</Select>
 											</div>
 										</div>
-										<Row gutter={[16, 16]}></Row>
-										<Col span={6}>
+
+										<Col span={6} className="my-5">
 											<OverviewSummary
 												label="TỔNG ĐƠN ĐẶT HÀNG"
 												value={orders?.TotalOrder}
@@ -324,7 +282,7 @@ const DashboardPage = () => {
 									</Card>
 								</Col>
 							</Row>
-							<Row gutter={[16, 16]}>
+							<Row gutter={[16, 16]} className="m-5">
 								<Col span={8}>
 									<Card
 										title="Đơn Đặt Hàng"
@@ -367,7 +325,7 @@ const DashboardPage = () => {
 									{!change ? (
 										<Card
 											bordered={false}
-											style={{height: 420, overflowY: 'auto'}}
+											style={{height: '100%', overflowY: 'auto'}}
 										>
 											<div className="flex justify-between items-center">
 												<h3 className="font-bold text-lg">Bán Chạy</h3>
@@ -380,26 +338,28 @@ const DashboardPage = () => {
 													<Option value={true}>Kim Cương</Option>
 												</Select>
 											</div>
-											{dashboard &&
-												dashboard?.TopSellingJewelry?.map((product) => (
+											{Array.isArray(jewelry) &&
+												jewelry?.map((product, i) => (
 													<div
-														key={product.id}
+														key={i}
 														className="flex justify-between items-center my-1"
 													>
-														<div className="flex items-center">
-															<Image
-																alt={product.name}
-																src={product.image}
-																style={{
-																	height: 50,
-																	width: 50,
-																	objectFit: 'cover',
-																}}
-																className="rounded-lg"
-															/>
-															<p className="ml-3">{product.name}</p>
+														<div className="flex flex-col my-2">
+															<Text type className="ml-3">
+																{product.ModelName}
+															</Text>
+															<Text type="secondary" className="ml-3">
+																{product.MetalName}
+															</Text>
 														</div>
-														<span>Đã bán: {product.sold}</span>
+														<div className="flex flex-col items-end">
+															<Text type className="ml-3">
+																Tổng Doanh Thu
+															</Text>
+															<Text className="ml-3 font-semibold">
+																{formatPrice(product.Revenue)}
+															</Text>
+														</div>
 													</div>
 												))}
 										</Card>
@@ -423,38 +383,52 @@ const DashboardPage = () => {
 												shapeSelling?.DiamondBestSellingShapes
 											) &&
 												shapeSelling?.DiamondBestSellingShapes.map(
-													(shape) => (
-														<div
-															key={shape.Shape?.Id}
-															className="flex justify-between items-center my-1"
-														>
-															<div className="flex items-center">
-																{/* Replace shape.image with the actual image URL if available */}
-																<Image
-																	alt={shape?.Shape?.ShapeName}
-																	src={
-																		shape.image ||
-																		'/default-image.jpg'
-																	}
-																	style={{
-																		height: 50,
-																		width: 50,
-																		objectFit: 'cover',
-																	}}
-																	className="rounded-lg"
-																/>
-																<p className="ml-3">
-																	{shape?.Shape?.ShapeName}
-																</p>
+													(shape) => {
+														// Find the matching item in shapeItems based on ShapeName
+														const matchedShape = shapeItems?.find(
+															(item) =>
+																item.shape.toLowerCase() ===
+																shape?.Shape?.ShapeName?.toLowerCase()
+														);
+
+														return (
+															<div
+																key={shape.Shape?.Id}
+																className="flex justify-between items-center my-1"
+															>
+																<div className="flex items-center my-2">
+																	<Image
+																		alt={
+																			shape?.Shape?.ShapeName
+																		}
+																		src={
+																			matchedShape?.image ||
+																			'/default-image.jpg'
+																		}
+																		style={{
+																			height: '100%',
+																			width: 30,
+																			objectFit: 'cover',
+																		}}
+																		className="rounded-lg"
+																	/>
+																	<p className="ml-3">
+																		{shape?.Shape?.ShapeName}
+																	</p>
+																</div>
+																<div className="flex flex-col items-end">
+																	<Text type className="ml-3">
+																		Tổng Doanh Thu:
+																	</Text>
+																	<Text className="ml-3 font-semibold">
+																		{formatPrice(
+																			shape.TotalRevenueForThisShape
+																		)}
+																	</Text>
+																</div>
 															</div>
-															<span>
-																Tổng Doanh Thu:{' '}
-																{formatPrice(
-																	shape.TotalRevenueForThisShape
-																)}
-															</span>
-														</div>
-													)
+														);
+													}
 												)}
 										</Card>
 									)}
