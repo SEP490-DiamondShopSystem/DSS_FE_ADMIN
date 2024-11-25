@@ -1,5 +1,5 @@
 import {InfoCircleOutlined} from '@ant-design/icons';
-import {Form, Input, InputNumber, message, Modal, Popover, Select, Switch} from 'antd';
+import {Form, Input, InputNumber, message, Modal, Popover, Select, Switch, Tooltip} from 'antd';
 import React, {useEffect} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
 import {getAllShapeSelector} from '../../../../../../redux/selectors';
@@ -178,7 +178,17 @@ export const AddModalDiamond = ({
 				{/* Diamond 4C Row */}
 				<label className="font-semibold">Thêm 4C</label>
 				<div className="flex flex-wrap gap-4">
-					<Form.Item name="cut" label="Cut" className="w-1/5">
+					<Form.Item
+						name="cut"
+						label="Cut"
+						className="w-1/5"
+						rules={[
+							{
+								required: true,
+								message: 'Vui lòng chọn Cut!',
+							},
+						]}
+					>
 						<Select placeholder="Chọn Cut">
 							{[
 								{value: 1, label: 'Good'},
@@ -198,7 +208,17 @@ export const AddModalDiamond = ({
 						</Select>
 					</Form.Item>
 
-					<Form.Item name="color" label="Color" className="w-1/5">
+					<Form.Item
+						name="color"
+						label="Color"
+						className="w-1/5"
+						rules={[
+							{
+								required: true,
+								message: 'Vui lòng chọn Color!',
+							},
+						]}
+					>
 						<Select placeholder="Chọn Color">
 							{[
 								{value: 8, label: 'D'},
@@ -223,7 +243,17 @@ export const AddModalDiamond = ({
 						</Select>
 					</Form.Item>
 
-					<Form.Item name="clarity" label="Clarity" className="w-1/5">
+					<Form.Item
+						name="clarity"
+						label="Clarity"
+						className="w-1/5"
+						rules={[
+							{
+								required: true,
+								message: 'Vui lòng chọn Clarity!',
+							},
+						]}
+					>
 						<Select placeholder="Chọn Clarity">
 							{[
 								{value: 8, label: 'FL'},
@@ -248,13 +278,46 @@ export const AddModalDiamond = ({
 						</Select>
 					</Form.Item>
 
-					<Form.Item name="carat" label="Carat" className="w-1/5">
+					<Form.Item
+						name="carat"
+						label="Carat"
+						className="w-1/5"
+						rules={[
+							{
+								required: true,
+								message: 'Vui lòng nhập giá trị Carat!',
+							},
+							({getFieldValue}) => ({
+								validator(_, value) {
+									if (
+										!value ||
+										(value >= selectedRequest?.CaratFrom &&
+											value <= selectedRequest?.CaratTo)
+									) {
+										return Promise.resolve();
+									}
+									return Promise.reject(
+										new Error(
+											`Giá trị phải nằm trong khoảng ${selectedRequest?.CaratFrom} đến ${selectedRequest?.CaratTo}!`
+										)
+									);
+								},
+							}),
+						]}
+					>
 						<InputNumber
 							step={0.01}
 							placeholder="Chọn Carat Weight"
 							className="w-full"
 							min={selectedRequest?.CaratFrom}
 							max={selectedRequest?.CaratTo}
+							addonBefore={
+								<Tooltip
+									title={`Nhập giá trị từ ${selectedRequest?.CaratFrom} đến ${selectedRequest?.CaratTo}`}
+								>
+									<InfoCircleOutlined style={{color: '#1890ff'}} />
+								</Tooltip>
+							}
 						/>
 					</Form.Item>
 				</div>
@@ -262,7 +325,17 @@ export const AddModalDiamond = ({
 				{/* Details Row */}
 				<label className="font-semibold">Thêm Nâng Cao</label>
 				<div className="flex flex-wrap gap-4">
-					<Form.Item name="polish" label="Polish" className="w-1/4">
+					<Form.Item
+						name="polish"
+						label="Polish"
+						className="w-1/4"
+						rules={[
+							{
+								required: true,
+								message: 'Vui lòng chọn Polish!',
+							},
+						]}
+					>
 						<Select placeholder="Chọn Polish">
 							{[
 								{value: 1, label: 'Poor'},
@@ -272,7 +345,6 @@ export const AddModalDiamond = ({
 								{value: 5, label: 'Excellent'},
 							]
 								.filter((option) => {
-									// If Polish is an array, use includes; if it's a single value, check directly
 									if (Array.isArray(selectedRequest?.Polish)) {
 										return (
 											!selectedRequest?.Polish ||
@@ -293,7 +365,17 @@ export const AddModalDiamond = ({
 						</Select>
 					</Form.Item>
 
-					<Form.Item name="symmetry" label="Symmetry" className="w-1/4">
+					<Form.Item
+						name="symmetry"
+						label="Symmetry"
+						className="w-1/4"
+						rules={[
+							{
+								required: true,
+								message: 'Vui lòng chọn Symmetry!',
+							},
+						]}
+					>
 						<Select placeholder="Chọn Symmetry">
 							{[
 								{value: 1, label: 'Poor'},
@@ -303,7 +385,6 @@ export const AddModalDiamond = ({
 								{value: 5, label: 'Excellent'},
 							]
 								.filter((option) => {
-									// If Symmetry is an array, use includes; if it's a single value, compare directly
 									if (Array.isArray(selectedRequest?.Symmetry)) {
 										return (
 											!selectedRequest?.Symmetry ||
@@ -324,12 +405,33 @@ export const AddModalDiamond = ({
 						</Select>
 					</Form.Item>
 
-					<Form.Item name="measurement" label="Measurement" className="w-1/4">
-						<Input placeholder="Chọn Measurement" className="w-full" />
+					<Form.Item
+						name="measurement"
+						label="Measurement"
+						className="w-1/4"
+						rules={[
+							{
+								required: true,
+								message: 'Vui lòng nhập Measurement!',
+							},
+						]}
+					>
+						<Input placeholder="Nhập Measurement" className="w-full" />
 					</Form.Item>
 				</div>
+
 				<div className="flex flex-wrap gap-4">
-					<Form.Item name="girdle" label="Girdle" className="w-1/4">
+					<Form.Item
+						name="girdle"
+						label="Girdle"
+						className="w-1/4"
+						rules={[
+							{
+								required: true,
+								message: 'Vui lòng chọn Girdle!',
+							},
+						]}
+					>
 						<Select placeholder="Chọn Girdle">
 							{[
 								{value: 1, label: 'Extremely Thin'},
@@ -342,7 +444,6 @@ export const AddModalDiamond = ({
 								{value: 8, label: 'Extremely Thick'},
 							]
 								.filter((option) => {
-									// Check if Girdle is an array or a single value
 									if (Array.isArray(selectedRequest?.Girdle)) {
 										return (
 											!selectedRequest?.Girdle ||
@@ -363,7 +464,17 @@ export const AddModalDiamond = ({
 						</Select>
 					</Form.Item>
 
-					<Form.Item name="fluorescence" label="Fluorescence" className="w-1/4">
+					<Form.Item
+						name="fluorescence"
+						label="Fluorescence"
+						className="w-1/4"
+						rules={[
+							{
+								required: true,
+								message: 'Vui lòng chọn Fluorescence!',
+							},
+						]}
+					>
 						<Select placeholder="Chọn Fluorescence">
 							<Option value={1}>None</Option>
 							<Option value={2}>Faint</Option>
@@ -372,7 +483,17 @@ export const AddModalDiamond = ({
 						</Select>
 					</Form.Item>
 
-					<Form.Item name="culet" label="Culet" className="w-1/4">
+					<Form.Item
+						name="culet"
+						label="Culet"
+						className="w-1/4"
+						rules={[
+							{
+								required: true,
+								message: 'Vui lòng chọn Culet!',
+							},
+						]}
+					>
 						<Select placeholder="Chọn Culet">
 							{[
 								{value: 1, label: 'None'},
@@ -385,7 +506,6 @@ export const AddModalDiamond = ({
 								{value: 8, label: 'Extremely Large'},
 							]
 								.filter((option) => {
-									// Check if Culet is an array or a single value
 									if (Array.isArray(selectedRequest?.Culet)) {
 										return (
 											!selectedRequest?.Culet ||
@@ -460,7 +580,17 @@ export const AddModalDiamond = ({
 
 				{/* Full-width Fields */}
 				<div className="flex flex-wrap gap-4">
-					<Form.Item name="shapeId" label="Hình Dạng" className="w-1/3">
+					<Form.Item
+						name="shapeId"
+						label="Hình Dạng"
+						className="w-1/3"
+						rules={[
+							{
+								required: true,
+								message: 'Vui lòng chọn hình dạng!',
+							},
+						]}
+					>
 						<Select placeholder="Chọn Hình Dạng">
 							{shapes &&
 								shapes

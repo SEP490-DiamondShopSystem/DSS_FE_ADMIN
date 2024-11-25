@@ -200,6 +200,7 @@ export const enums = {
 		Accepted: 4,
 		Shop_Rejected: 5,
 		Customer_Rejected: 6,
+		Customer_Cancelled: 7,
 	},
 	AccountRoleType: {
 		Customer: 0,
@@ -217,6 +218,12 @@ export const enums = {
 		Heart: 9,
 		Princess: 2,
 		Pear: 10,
+	},
+	OrderItemStatus: {
+		Pending: 0,
+		Prepared: 1,
+		Done: 2,
+		Removed: 3,
 	},
 };
 

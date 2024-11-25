@@ -1,4 +1,5 @@
-import {Rate} from 'antd';
+import {Rate, Tag} from 'antd';
+import {enums} from './constant';
 
 export const StarRating = ({rating}) => {
 	return (
@@ -80,6 +81,8 @@ export const getOrderCustomizeStatus = (status) => {
 			return 'Shop_Rejected';
 		case 6:
 			return 'Customer_Rejected';
+		case 7:
+			return 'Customer_Cancelled';
 
 		default:
 			return 'Unknown';
@@ -124,4 +127,19 @@ export const getStepFromStatus = (status) => {
 		default:
 			return 0;
 	}
+};
+
+export const getOrderItemStatusTag = (status) => {
+	const statusMap = {
+		[enums.OrderItemStatus.Pending]: {label: 'Chờ xử lý', color: 'blue'},
+		[enums.OrderItemStatus.Prepared]: {label: 'Đã chuẩn bị', color: 'gold'},
+		[enums.OrderItemStatus.Done]: {label: 'Hoàn thành', color: 'green'},
+		[enums.OrderItemStatus.Removed]: {label: 'Đã xóa', color: 'red'},
+	};
+
+	const statusInfo = statusMap[status];
+	if (statusInfo) {
+		return <Tag color={statusInfo.color}>{statusInfo.label}</Tag>;
+	}
+	return <Tag color="default">Không xác định</Tag>;
 };
