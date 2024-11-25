@@ -1,5 +1,5 @@
 import {CalendarOutlined, EditFilled} from '@ant-design/icons';
-import {Button, DatePicker, Input, Space, Table, Tag} from 'antd';
+import {Button, DatePicker, Input, Space, Table, Tag, Typography} from 'antd';
 import React, {useEffect, useState} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
 import {useNavigate} from 'react-router-dom';
@@ -15,17 +15,28 @@ import {enums} from '../../../utils/constant';
 
 const {Search} = Input;
 const {RangePicker} = DatePicker;
+const {Title} = Typography;
 
 const statusList = [
-	{name: 'All', value: ''},
-	{name: 'Pending', value: '1'},
-	{name: 'Priced', value: '2'},
-	{name: 'Requesting', value: '3'},
-	{name: 'Accepted', value: '4'},
-	{name: 'Shop Rejected', value: '5'},
-	{name: 'Customer Rejected', value: '6'},
-	{name: 'Customer Cancelled', value: '7'},
+	{name: 'Tất Cả', value: ''},
+	{name: 'Chờ Xử Lý', value: '1'},
+	{name: 'Đã Có Giá', value: '2'},
+	{name: 'Đang Yêu Cầu', value: '3'},
+	{name: 'Đã Chấp Nhận', value: '4'},
+	{name: 'Shop Từ Chối', value: '5'},
+	{name: 'Khách Hàng Từ Chối', value: '6'},
+	{name: 'Khách Hàng Hủy Đơn', value: '7'},
 ];
+
+const statusMapping = {
+	1: {label: 'Chờ Xử Lý', color: 'green'},
+	2: {label: 'Đã Có Giá', color: 'blue'},
+	3: {label: 'Đang Yêu Cầu', color: 'orange'},
+	4: {label: 'Đã Chấp Nhận', color: 'geekblue'},
+	5: {label: 'Shop Từ Chối', color: 'red'},
+	6: {label: 'Khách Từ Chối', color: 'volcano'},
+	7: {label: 'Khách Hủy Đơn', color: 'volcano'},
+};
 
 const getEnumKey = (enumObj, value) => {
 	return enumObj
@@ -44,7 +55,7 @@ const mapAttributes = (data, attributes) => {
 		SizeId: data?.SizeId,
 		orderTime: data?.CreatedDate,
 		expiredTime: data?.ExpiredDate,
-		status: getEnumKey(attributes?.CustomizeRequestStatus, data?.Status),
+		status: data?.Status,
 		email: data?.Account?.Email,
 		totalAmount: formatPrice(data?.TotalPrice),
 		customer: null,
@@ -131,42 +142,10 @@ const OrderCustomizePage = () => {
 			dataIndex: 'status',
 			align: 'center',
 			render: (status) => {
-				const foundStatus = statusList.find((item) => item.name === status);
-				console.log('foundStatus', foundStatus);
 				console.log('status', status);
 
-				let color = 'green';
-
-				// Determine color based on status
-				if (
-					status === 'Shop Rejected' ||
-					status === 'Customer Rejected' ||
-					status === 'Customer Cancelled' ||
-					status === 'Rejected'
-				) {
-					color = 'red';
-				} else if (status === 'Pending') {
-					// 'refunded'
-					color = 'orange';
-				} else if (status === 'Requesting') {
-					// 'deposited'
-					color = 'blue';
-				} else if (status === 'Priced') {
-					// 'paidAll'
-					color = 'cyan';
-				} else if (status === 'Prepared') {
-					// 'pending'
-					color = 'purple';
-				} else if (status === 'Accepted') {
-					// 'refunding'
-					color = 'green';
-				}
-
-				return (
-					<Tag color={color}>
-						{foundStatus ? foundStatus?.name?.toUpperCase() : status.toUpperCase()}
-					</Tag>
-				);
+				const {label, color} = statusMapping[status] || {label: 'Unknown', color: 'gray'};
+				return <Tag color={color}>{label?.toUpperCase()}</Tag>;
 			},
 		},
 		{
@@ -207,27 +186,29 @@ const OrderCustomizePage = () => {
 
 	return (
 		<div className="mx-20 my-10">
+			<Title level={3}>Danh Sách Đơn Thiết Kế</Title>
 			<Filter
 				filter={statusList}
 				handleStatusBtn={handleStatusChange}
 				active={activeStatus}
 			/>
-			<div className="flex items-center">
-				<Space wrap>
-					<div className="flex items-center my-5">
-						<p className="mr-3">Tìm theo ngày:</p>
+			<div className="flex flex-col sm:flex-row sm:items-center">
+				<Space wrap className="w-full my-5">
+					<div className="flex items-center my-3 sm:my-5">
+						<p className="mr-3 text-sm sm:text-base">Tìm theo ngày:</p>
 					</div>
 					<div
-						className="pl-2 flex items-center"
+						className="flex items-center pl-2 sm:my-0"
 						style={{
 							border: '1px solid #d9d9d9',
 							borderRadius: '4px',
-							width: '400px',
+							width: '100%',
+							maxWidth: '400px',
 						}}
 					>
-						<span style={{marginRight: '10px', fontWeight: 'bold'}}>Từ</span>
-						<span style={{marginRight: '10px'}}>→</span>
-						<span style={{marginRight: '10px', fontWeight: 'bold'}}>Đến</span>
+						<span className="mr-3 font-bold text-sm sm:text-base">Từ</span>
+						<span className="mr-3">→</span>
+						<span className="mr-3 font-bold text-sm sm:text-base">Đến</span>
 						<RangePicker
 							format="DD/MM/YYYY"
 							suffixIcon={<CalendarOutlined />}
@@ -252,6 +233,7 @@ const OrderCustomizePage = () => {
 					dataSource={orders}
 					columns={columns}
 					className=""
+					size="large"
 					pagination={{
 						current: current,
 						total: orderList?.TotalPage * pageSize,

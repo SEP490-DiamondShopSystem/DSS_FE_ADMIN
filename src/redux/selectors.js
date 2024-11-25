@@ -134,3 +134,4 @@ export const GetAllDashboardSelector = (state) => state.dashboardSlice.dashboard
 export const LoadingDashboardSelector = (state) => state.dashboardSlice.loading;
 export const GetAccountCountSelector = (state) => state.dashboardSlice.accountCustomerCount;
 export const GetOrderCompletedCountSelector = (state) => state.dashboardSlice.orderCompletedCount;
+export const GetAllSellingJewelrySelector = (state) => state.dashboardSlice.topSellingJewelry;
