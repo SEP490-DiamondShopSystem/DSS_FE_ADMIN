@@ -229,9 +229,9 @@ export const enums = {
 
 export const enumMappings = {
 	Origin: {
-		1: 'Natural',
-		2: 'Lab',
-		3: 'Both',
+		1: 'Tự Nhiên',
+		2: 'Nhân Tạo',
+		3: 'Cả hai',
 	},
 	Operator: {
 		1: 'Equal or Larger',
@@ -309,7 +309,6 @@ export const enumMappings = {
 		1: 'Good',
 		2: 'Very Good',
 		3: 'Excellent',
-		4: 'No Cut',
 	},
 	Fluorescence: {
 		1: 'None',
