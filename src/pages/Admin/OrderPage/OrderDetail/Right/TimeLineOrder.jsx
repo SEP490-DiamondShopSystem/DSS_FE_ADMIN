@@ -455,25 +455,27 @@ const TimeLineOrder = ({orders, loading, statusOrder, paymentStatusOrder, id}) =
 													value={user?.Account?.Id}
 													disabled={!user?.IsFree}
 												>
-													<div>
-														<div className="flex items-center">
-															<Space className="font-semibold">
-																{user?.Account?.FirstName}
-																{user?.Account?.LastName} •{' '}
-															</Space>
-															{user?.Account?.Email}{' '}
-															<div className="ml-3">
-																<CircleIcon
-																	style={{
-																		color: user?.IsFree
-																			? 'green'
-																			: 'red',
-																		fontSize: '16px',
-																	}}
-																/>
-															</div>
+													<div className="flex ">
+														<div className="mr-3">
+															<CircleIcon
+																style={{
+																	color: user?.IsFree
+																		? 'green'
+																		: 'red',
+																	fontSize: '16px',
+																}}
+															/>
 														</div>
-														{user?.BusyMessage}
+														<div>
+															<div className="flex items-center">
+																<Space className="font-semibold">
+																	{user?.Account?.FirstName}
+																	{user?.Account?.LastName} •{' '}
+																</Space>
+																{user?.Account?.Email}{' '}
+															</div>
+															{user?.BusyMessage}
+														</div>
 													</div>
 												</Option>
 											))}
