@@ -42,18 +42,14 @@ const TimeLineOrder = ({orders, loading, statusOrder, paymentStatusOrder, id}) =
 	const dispatch = useDispatch();
 
 	const userDetail = useSelector(GetUserDetailSelector);
-	const deliveryList = useSelector(getAllDeliverySelector);
 	const delivererList = useSelector(getAllDelivererSelector);
 
-	const [currentStep, setCurrentStep] = useState(0);
 	const [status, setStatus] = useState();
 	const [userRoleManager, setUserRoleManager] = useState(false);
-	const [deliveries, setDeliveries] = useState([]);
 	const [isCancelModalVisible, setIsCancelModalVisible] = useState(false);
 	const [userRoleStaff, setUserRoleStaff] = useState(false);
 	const [userRoleDeliverer, setUserRoleDeliverer] = useState(false);
 	const [selectedShipper, setSelectedShipper] = useState();
-	const [isAssigned, setIsAssigned] = useState(false);
 	const [deliverer, setDeliverer] = useState([]);
 
 	useEffect(() => {
@@ -497,14 +493,6 @@ const TimeLineOrder = ({orders, loading, statusOrder, paymentStatusOrder, id}) =
 									</p>
 								</div>
 							)}
-
-							{/* {userRoleDeliverer ||
-								userRoleStaff ||
-								(!userRoleManager && (
-									<p className="mt-3 text-center">
-										Chờ Manager Chọn Chuyển Giao Đơn Hàng
-									</p>
-								))} */}
 						</div>
 					)}
 
@@ -634,34 +622,6 @@ const TimeLineOrder = ({orders, loading, statusOrder, paymentStatusOrder, id}) =
 								<p className="ml-5 text-darkGreen font-semibold text-lg">
 									<CheckCircleOutlined /> Đã Giao Hàng
 								</p>
-							</div>
-							{/* <div className="flex justify-around">
-						<Button
-							type="text"
-							className="bg-primary font-semibold w-full rounded-full"
-							onClick={handleErrorStatus}
-						>
-							Tiếp tục
-						</Button>
-					</div> */}
-						</div>
-					)}
-
-					{/* Bị báo cáo */}
-					{currentStep === 7 && (
-						<div className="border rounded-lg border-primary bg-tintWhite p-5 mb-5">
-							<div className="flex items-center mb-5" style={{fontSize: 16}}>
-								<p className="font-semibold">Trạng thái đơn hàng:</p>
-								<p className="ml-5 text-red">Bị báo cáo</p>
-							</div>
-							<div className="flex justify-around">
-								<Button
-									type="text"
-									className="bg-primary font-semibold w-full rounded-full"
-									onClick={() => setCurrentStep(0)}
-								>
-									Tiếp tục
-								</Button>
 							</div>
 						</div>
 					)}

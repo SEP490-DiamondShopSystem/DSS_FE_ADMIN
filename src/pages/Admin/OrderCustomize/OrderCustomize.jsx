@@ -10,8 +10,9 @@ import {
 	LoadingOrderSelector,
 } from '../../../redux/selectors';
 import {getAllOrderCustomize} from '../../../redux/slices/customizeSlice';
-import {convertToVietnamDate, formatPrice} from '../../../utils';
+import {formatPrice} from '../../../utils';
 import {enums} from '../../../utils/constant';
+import {Helmet} from 'react-helmet';
 
 const {Search} = Input;
 const {RangePicker} = DatePicker;
@@ -186,6 +187,9 @@ const OrderCustomizePage = () => {
 
 	return (
 		<div className="mx-20 my-10">
+			<Helmet>
+				<title>Danh Sách Đơn Thiết Kế</title>
+			</Helmet>
 			<Title level={3}>Danh Sách Đơn Thiết Kế</Title>
 			<Filter
 				filter={statusList}

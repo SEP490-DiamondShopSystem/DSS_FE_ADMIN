@@ -83,6 +83,8 @@ export const getAllDiamond = createAsyncThunk(
 				isLab,
 				diamondStatuses,
 				sku,
+				priceStart,
+				priceEnd,
 			} = params;
 			let url = '/Diamond/Page';
 			const queryParams = new URLSearchParams();
@@ -104,6 +106,8 @@ export const getAllDiamond = createAsyncThunk(
 			if (fluorescence) queryParams.append('diamond_Details.Fluorescence', fluorescence);
 			if (culet) queryParams.append('diamond_Details.Culet', culet);
 			if (sku) queryParams.append('GetDiamond_ManagerQuery.sku', sku);
+			if (priceStart) queryParams.append('priceStart', priceStart);
+			if (priceEnd) queryParams.append('priceEnd', priceEnd);
 			if (diamondStatuses)
 				queryParams.append('GetDiamond_ManagerQuery.diamondStatuses', diamondStatuses);
 			if (includeJewelryDiamond !== null && includeJewelryDiamond !== undefined)
