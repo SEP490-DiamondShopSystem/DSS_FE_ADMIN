@@ -164,7 +164,7 @@ const DashboardPage = () => {
 									<Card bordered={false}>
 										<div className="flex justify-between items-center">
 											<h3 className="font-bold text-lg">
-												Đơn Đặt Hàng Trong Tuần
+												Đơn Đặt Hàng Thành Công Trong Tuần
 											</h3>
 											<div className="flex ">
 												<div

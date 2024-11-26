@@ -159,8 +159,8 @@ const TimeLineOrder = ({orders, loading, statusOrder, paymentStatusOrder, id}) =
 		});
 	};
 
-	const handleDeliveringStatus = async () => {
-		const res = await dispatch(handleOrder(orders.Id))
+	const handleDeliveringStatus = () => {
+		dispatch(handleOrder(orders.Id))
 			.unwrap()
 			.then(() => {
 				message.success('Xác nhận giao hàng!');
@@ -181,8 +181,8 @@ const TimeLineOrder = ({orders, loading, statusOrder, paymentStatusOrder, id}) =
 		});
 	};
 
-	const handleDeliveredStatus = async () => {
-		const res = await dispatch(handleOrder(orders.Id))
+	const handleDeliveredStatus = () => {
+		dispatch(handleOrder(orders.Id))
 			.unwrap()
 			.then((res) => {
 				message.success('Hoàn tất giao hàng!');
@@ -203,15 +203,11 @@ const TimeLineOrder = ({orders, loading, statusOrder, paymentStatusOrder, id}) =
 		});
 	};
 
-	const handleFailedDeliveredStatus = async () => {
-		const res = await dispatch(handleDeliveryFailed(orders.Id))
+	const handleFailedDeliveredStatus = () => {
+		dispatch(handleDeliveryFailed(orders.Id))
 			.unwrap()
 			.then((res) => {
-				if (res !== undefined) {
-					message.warning('Đơn hàng giao hàng không thành công!');
-				} else {
-					message.error(error?.data?.title || error?.detail);
-				}
+				message.warning('Giao hàng không thành công!');
 			})
 			.catch((error) => {
 				message.error(error?.data?.title || error?.detail);
@@ -276,8 +272,7 @@ const TimeLineOrder = ({orders, loading, statusOrder, paymentStatusOrder, id}) =
 			.unwrap()
 			.then((res) => {
 				if (res !== undefined) {
-					message.success('Đã chuyển giao cho shipper!');
-					localStorage.setItem(`isAssigned_${orders.Id}`, JSON.stringify(true));
+					message.success('Đã chuyển giao cho nhân viên vận chuyển!');
 				} else {
 					message.error(error?.data?.title || error?.detail);
 				}
@@ -287,8 +282,8 @@ const TimeLineOrder = ({orders, loading, statusOrder, paymentStatusOrder, id}) =
 			});
 	};
 
-	const submitCancelOrder = async (values) => {
-		const res = await dispatch(handleOrderReject({orderId: orders.Id, reason: values.reason}))
+	const submitCancelOrder = (values) => {
+		dispatch(handleOrderReject({orderId: orders.Id, reason: values.reason}))
 			.unwrap()
 			.then((res) => {
 				console.log('err', res);
@@ -306,6 +301,8 @@ const TimeLineOrder = ({orders, loading, statusOrder, paymentStatusOrder, id}) =
 		setIsCancelModalVisible(false);
 	};
 
+	console.log('deliverer', deliverer);
+
 	return (
 		<div>
 			{loading ? (
@@ -320,30 +317,25 @@ const TimeLineOrder = ({orders, loading, statusOrder, paymentStatusOrder, id}) =
 									<ClockCircleOutlined /> {ORDER_STATUS_TEXTS.Pending}
 								</p>
 							</div>
-							{userRoleManager || userRoleManager ? (
-								<div className="flex justify-around">
-									<Button
-										type="text"
-										className="bg-primary font-semibold w-32 rounded-full"
-										onClick={handleAccept}
-										disabled={loading}
-									>
-										Xác nhận
-									</Button>
-									<Button
-										type="text"
-										className="bg-red font-semibold w-32 rounded-full"
-										onClick={handleCancelOrder}
-										disabled={loading}
-									>
-										Hủy đơn
-									</Button>
-								</div>
-							) : (
-								<div className="flex justify-around text-primary font-semibold">
-									Vui lòng chờ Manager xác nhận
-								</div>
-							)}
+
+							<div className="flex justify-around">
+								<Button
+									type="text"
+									className="bg-primary font-semibold w-32 rounded-full"
+									onClick={handleAccept}
+									disabled={loading}
+								>
+									Xác nhận
+								</Button>
+								<Button
+									type="text"
+									className="bg-red font-semibold w-32 rounded-full"
+									onClick={handleCancelOrder}
+									disabled={loading}
+								>
+									Hủy đơn
+								</Button>
+							</div>
 						</div>
 					)}
 
@@ -457,11 +449,14 @@ const TimeLineOrder = ({orders, loading, statusOrder, paymentStatusOrder, id}) =
 										onChange={handleChange}
 									>
 										{deliverer &&
-											deliverer?.map((user) => (
-												<Option key={user?.Account?.Id}>
-													<Space>
-														{user?.Account?.Email}{' '}
-														<div>
+											deliverer.map((user) => (
+												<Option
+													key={user?.Account?.Id}
+													value={user?.Account?.Id}
+													disabled={!user?.IsFree}
+												>
+													<div className="flex ">
+														<div className="mr-3">
 															<CircleIcon
 																style={{
 																	color: user?.IsFree
@@ -471,11 +466,21 @@ const TimeLineOrder = ({orders, loading, statusOrder, paymentStatusOrder, id}) =
 																}}
 															/>
 														</div>
-														{user?.BusyMessage}
-													</Space>
+														<div>
+															<div className="flex items-center">
+																<Space className="font-semibold">
+																	{user?.Account?.FirstName}
+																	{user?.Account?.LastName} •{' '}
+																</Space>
+																{user?.Account?.Email}{' '}
+															</div>
+															{user?.BusyMessage}
+														</div>
+													</div>
 												</Option>
 											))}
 									</Select>
+
 									<div className="flex justify-around">
 										<Button
 											type="text"
