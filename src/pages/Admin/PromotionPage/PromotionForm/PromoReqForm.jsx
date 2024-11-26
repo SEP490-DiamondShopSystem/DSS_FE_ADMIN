@@ -34,7 +34,7 @@ export const PromoReqForm = ({form, shapes, Option, removeRequirement}) => {
 			requirements: form
 				.getFieldValue('requirements')
 				.map((req, index) =>
-					index === fieldKey ? {...req, jewelryModelID: model?.Id} : req
+					index === fieldKey ? {...req, jewelryModelId: model?.Id} : req
 				),
 		});
 		setIsPopupVisible(false);
@@ -93,7 +93,7 @@ export const PromoReqForm = ({form, shapes, Option, removeRequirement}) => {
 													rules={[
 														{
 															required: false,
-															message: 'Amount is required',
+															message: 'Money Amount is required',
 														},
 													]}
 													labelCol={{span: 24}}
@@ -101,7 +101,7 @@ export const PromoReqForm = ({form, shapes, Option, removeRequirement}) => {
 												>
 													<InputNumber
 														className="w-full"
-														placeholder="Enter Money amount"
+														placeholder="Enter Money moneyAmount"
 														onChange={(value) =>
 															handleAmountChange(value)
 														}
@@ -135,8 +135,6 @@ export const PromoReqForm = ({form, shapes, Option, removeRequirement}) => {
 														)}
 													</Select>
 												</Form.Item>
-											</Col>
-											<Col span={12}>
 												<Form.Item
 													label="Số Lượng"
 													{...restField}
@@ -160,411 +158,418 @@ export const PromoReqForm = ({form, shapes, Option, removeRequirement}) => {
 														disabled={moneyAmount !== null} // Disable if moneyAmount is filled
 													/>
 												</Form.Item>
-
+											</Col>
+											<Col span={12}>
 												{form.getFieldValue([
 													'requirements',
 													name,
 													'targetType',
 												]) === 2 && (
-													<div className="flex gap-5">
-														<Form.Item
-															label="Nguồn Gốc"
-															{...restField}
-															name={[
-																name,
-																'diamondRequirementSpec',
-																'origin',
-															]}
-															fieldKey={[
-																fieldKey,
-																'diamondRequirementSpec',
-																'origin',
-															]}
-															rules={[
-																{
-																	required: false,
-																	message:
-																		'Vui Lòng Chọn Nguồn Gốc',
-																},
-															]}
-															labelCol={{span: 24}}
-															wrapperCol={{span: 24}}
-														>
-															<Select className="w-full">
-																{Option ? (
-																	<>
-																		<Option value={1}>
-																			Tự Nhiên
-																		</Option>
-																		<Option value={2}>
-																			Nhân Tạo
-																		</Option>
-																		<Option value={3}>
-																			Cả hai
-																		</Option>
-																	</>
-																) : null}
-															</Select>
-														</Form.Item>
-														<Form.Item
-															label="Hình Dáng"
-															{...restField}
-															name={[
-																name,
-																'diamondRequirementSpec',
-																'shapesIDs',
-															]}
-															fieldKey={[
-																fieldKey,
-																'diamondRequirementSpec',
-																'shapesIDs',
-															]}
-															rules={[
-																{
-																	required: false,
-																	message:
-																		'Shape IDs are required',
-																},
-															]}
-														>
-															<Select mode="multiple">
-																{shapes?.map((shape) => (
-																	<Option
-																		key={shape.Id}
-																		value={shape.Id}
-																	>
-																		{shape.ShapeName}
-																	</Option>
-																))}
-															</Select>
-														</Form.Item>
-														<div className="p-4 border rounded-md bg-gray-50">
+													<div className="flex gap-5 flex-col">
+														<div className="flex gap-5 w-full">
 															<Form.Item
-																label="Carat Từ"
+																className="w-full"
+																label="Nguồn Gốc"
 																{...restField}
 																name={[
 																	name,
 																	'diamondRequirementSpec',
-																	'caratFrom',
+																	'origin',
 																]}
 																fieldKey={[
 																	fieldKey,
 																	'diamondRequirementSpec',
-																	'caratFrom',
+																	'origin',
 																]}
 																rules={[
 																	{
 																		required: false,
 																		message:
-																			'Carat From is required',
+																			'Vui Lòng Chọn Nguồn Gốc',
 																	},
 																]}
-															>
-																<InputNumber
-																	className="w-full"
-																	min={0}
-																/>
-															</Form.Item>
-															<Form.Item
-																label="Carat Đến"
-																{...restField}
-																name={[
-																	name,
-																	'diamondRequirementSpec',
-																	'caratTo',
-																]}
-																fieldKey={[
-																	fieldKey,
-																	'diamondRequirementSpec',
-																	'caratTo',
-																]}
-																rules={[
-																	{
-																		required: false,
-																		message:
-																			'Carat To is required',
-																	},
-																]}
-															>
-																<InputNumber
-																	className="w-full"
-																	min={0}
-																/>
-															</Form.Item>
-														</div>
-														<div className="p-4 border rounded-md bg-gray-50">
-															<Form.Item
-																label="Clarity Từ"
-																{...restField}
-																name={[
-																	name,
-																	'diamondRequirementSpec',
-																	'clarityFrom',
-																]}
-																fieldKey={[
-																	fieldKey,
-																	'diamondRequirementSpec',
-																	'clarityFrom',
-																]}
-																rules={[
-																	{
-																		required: false,
-																		message:
-																			'Clarity From is required',
-																	},
-																]}
+																labelCol={{span: 24}}
+																wrapperCol={{span: 24}}
 															>
 																<Select className="w-full">
 																	{Option ? (
 																		<>
 																			<Option value={1}>
-																				S12
+																				Tự Nhiên
 																			</Option>
 																			<Option value={2}>
-																				S11
+																				Nhân Tạo
 																			</Option>
 																			<Option value={3}>
-																				VS2
-																			</Option>
-																			<Option value={4}>
-																				VS1
-																			</Option>
-																			<Option value={5}>
-																				VVS2
-																			</Option>
-																			<Option value={6}>
-																				VVS1
-																			</Option>
-																			<Option value={7}>
-																				IF
-																			</Option>
-																			<Option value={8}>
-																				FL
+																				Cả hai
 																			</Option>
 																		</>
 																	) : null}
 																</Select>
 															</Form.Item>
 															<Form.Item
-																label="Clarity Đến"
+																className="w-full"
+																label="Hình Dáng"
 																{...restField}
 																name={[
 																	name,
 																	'diamondRequirementSpec',
-																	'clarityTo',
+																	'shapesIDs',
 																]}
 																fieldKey={[
 																	fieldKey,
 																	'diamondRequirementSpec',
-																	'clarityTo',
+																	'shapesIDs',
 																]}
 																rules={[
 																	{
 																		required: false,
 																		message:
-																			'Clarity To is required',
+																			'Shape IDs are required',
 																	},
 																]}
 															>
-																<Select className="w-full">
-																	{Option ? (
-																		<>
-																			<Option value={1}>
-																				S12
-																			</Option>
-																			<Option value={2}>
-																				S11
-																			</Option>
-																			<Option value={3}>
-																				VS2
-																			</Option>
-																			<Option value={4}>
-																				VS1
-																			</Option>
-																			<Option value={5}>
-																				VVS2
-																			</Option>
-																			<Option value={6}>
-																				VVS1
-																			</Option>
-																			<Option value={7}>
-																				IF
-																			</Option>
-																			<Option value={8}>
-																				FL
-																			</Option>
-																		</>
-																	) : null}
+																<Select mode="multiple">
+																	{shapes?.map((shape) => (
+																		<Option
+																			key={shape.Id}
+																			value={shape.Id}
+																		>
+																			{shape.ShapeName}
+																		</Option>
+																	))}
 																</Select>
 															</Form.Item>
 														</div>
-														<div className="p-4 border rounded-md bg-gray-50">
-															<Form.Item
-																label="Color Từ"
-																{...restField}
-																name={[
-																	name,
-																	'diamondRequirementSpec',
-																	'colorFrom',
-																]}
-																fieldKey={[
-																	fieldKey,
-																	'diamondRequirementSpec',
-																	'colorFrom',
-																]}
-															>
-																<Select>
-																	{Option ? (
-																		<>
-																			<Option value={1}>
-																				K
-																			</Option>
-																			<Option value={2}>
-																				J
-																			</Option>
-																			<Option value={3}>
-																				I
-																			</Option>
-																			<Option value={4}>
-																				H
-																			</Option>
-																			<Option value={5}>
-																				G
-																			</Option>
-																			<Option value={6}>
-																				F
-																			</Option>
-																			<Option value={7}>
-																				E
-																			</Option>
-																			<Option value={8}>
-																				D
-																			</Option>
-																		</>
-																	) : null}
-																</Select>
-															</Form.Item>
-															<Form.Item
-																label="Color Đến"
-																{...restField}
-																name={[
-																	name,
-																	'diamondRequirementSpec',
-																	'colorTo',
-																]}
-																fieldKey={[
-																	fieldKey,
-																	'diamondRequirementSpec',
-																	'colorTo',
-																]}
-															>
-																<Select>
-																	{Option ? (
-																		<>
-																			<Option value={1}>
-																				K
-																			</Option>
-																			<Option value={2}>
-																				J
-																			</Option>
-																			<Option value={3}>
-																				I
-																			</Option>
-																			<Option value={4}>
-																				H
-																			</Option>
-																			<Option value={5}>
-																				G
-																			</Option>
-																			<Option value={6}>
-																				F
-																			</Option>
-																			<Option value={7}>
-																				E
-																			</Option>
-																			<Option value={8}>
-																				D
-																			</Option>
-																		</>
-																	) : null}
-																</Select>
-															</Form.Item>
-														</div>
-														<div className="p-4 border rounded-md bg-gray-50">
-															<Form.Item
-																label="Cut Từ"
-																{...restField}
-																name={[
-																	name,
-																	'diamondRequirementSpec',
-																	'cutFrom',
-																]}
-																fieldKey={[
-																	fieldKey,
-																	'diamondRequirementSpec',
-																	'cutFrom',
-																]}
-																rules={[
-																	{
-																		required: false,
-																		message:
-																			'Cut From is required',
-																	},
-																]}
-															>
-																<Select className="w-full">
-																	{Option ? (
-																		<>
-																			<Option value={1}>
-																				Good
-																			</Option>
-																			<Option value={2}>
-																				Very Good
-																			</Option>
-																			<Option value={3}>
-																				Excellent
-																			</Option>
-																		</>
-																	) : null}
-																</Select>
-															</Form.Item>
-															<Form.Item
-																label="Cut Đến"
-																{...restField}
-																name={[
-																	name,
-																	'diamondRequirementSpec',
-																	'cutTo',
-																]}
-																fieldKey={[
-																	fieldKey,
-																	'diamondRequirementSpec',
-																	'cutTo',
-																]}
-																rules={[
-																	{
-																		required: false,
-																		message:
-																			'Cut To is required',
-																	},
-																]}
-															>
-																<Select className="w-full">
-																	{Option ? (
-																		<>
-																			<Option value={1}>
-																				Good
-																			</Option>
-																			<Option value={2}>
-																				Very Good
-																			</Option>
-																			<Option value={3}>
-																				Excellent
-																			</Option>
-																		</>
-																	) : null}
-																</Select>
-															</Form.Item>
+														<div className="flex gap-5">
+															<div className="p-4 border rounded-md bg-gray-50">
+																<Form.Item
+																	label="Carat Từ"
+																	{...restField}
+																	name={[
+																		name,
+																		'diamondRequirementSpec',
+																		'caratFrom',
+																	]}
+																	fieldKey={[
+																		fieldKey,
+																		'diamondRequirementSpec',
+																		'caratFrom',
+																	]}
+																	rules={[
+																		{
+																			required: false,
+																			message:
+																				'Carat From is required',
+																		},
+																	]}
+																>
+																	<InputNumber
+																		className="w-full"
+																		min={0}
+																	/>
+																</Form.Item>
+																<Form.Item
+																	label="Carat Đến"
+																	{...restField}
+																	name={[
+																		name,
+																		'diamondRequirementSpec',
+																		'caratTo',
+																	]}
+																	fieldKey={[
+																		fieldKey,
+																		'diamondRequirementSpec',
+																		'caratTo',
+																	]}
+																	rules={[
+																		{
+																			required: false,
+																			message:
+																				'Carat To is required',
+																		},
+																	]}
+																>
+																	<InputNumber
+																		className="w-full"
+																		min={0}
+																	/>
+																</Form.Item>
+															</div>
+															<div className="p-4 border rounded-md bg-gray-50">
+																<Form.Item
+																	label="Clarity Từ"
+																	{...restField}
+																	name={[
+																		name,
+																		'diamondRequirementSpec',
+																		'clarityFrom',
+																	]}
+																	fieldKey={[
+																		fieldKey,
+																		'diamondRequirementSpec',
+																		'clarityFrom',
+																	]}
+																	rules={[
+																		{
+																			required: false,
+																			message:
+																				'Clarity From is required',
+																		},
+																	]}
+																>
+																	<Select className="w-full">
+																		{Option ? (
+																			<>
+																				<Option value={1}>
+																					S12
+																				</Option>
+																				<Option value={2}>
+																					S11
+																				</Option>
+																				<Option value={3}>
+																					VS2
+																				</Option>
+																				<Option value={4}>
+																					VS1
+																				</Option>
+																				<Option value={5}>
+																					VVS2
+																				</Option>
+																				<Option value={6}>
+																					VVS1
+																				</Option>
+																				<Option value={7}>
+																					IF
+																				</Option>
+																				<Option value={8}>
+																					FL
+																				</Option>
+																			</>
+																		) : null}
+																	</Select>
+																</Form.Item>
+																<Form.Item
+																	label="Clarity Đến"
+																	{...restField}
+																	name={[
+																		name,
+																		'diamondRequirementSpec',
+																		'clarityTo',
+																	]}
+																	fieldKey={[
+																		fieldKey,
+																		'diamondRequirementSpec',
+																		'clarityTo',
+																	]}
+																	rules={[
+																		{
+																			required: false,
+																			message:
+																				'Clarity To is required',
+																		},
+																	]}
+																>
+																	<Select className="w-full">
+																		{Option ? (
+																			<>
+																				<Option value={1}>
+																					S12
+																				</Option>
+																				<Option value={2}>
+																					S11
+																				</Option>
+																				<Option value={3}>
+																					VS2
+																				</Option>
+																				<Option value={4}>
+																					VS1
+																				</Option>
+																				<Option value={5}>
+																					VVS2
+																				</Option>
+																				<Option value={6}>
+																					VVS1
+																				</Option>
+																				<Option value={7}>
+																					IF
+																				</Option>
+																				<Option value={8}>
+																					FL
+																				</Option>
+																			</>
+																		) : null}
+																	</Select>
+																</Form.Item>
+															</div>
+															<div className="p-4 border rounded-md bg-gray-50">
+																<Form.Item
+																	label="Color Từ"
+																	{...restField}
+																	name={[
+																		name,
+																		'diamondRequirementSpec',
+																		'colorFrom',
+																	]}
+																	fieldKey={[
+																		fieldKey,
+																		'diamondRequirementSpec',
+																		'colorFrom',
+																	]}
+																>
+																	<Select>
+																		{Option ? (
+																			<>
+																				<Option value={1}>
+																					K
+																				</Option>
+																				<Option value={2}>
+																					J
+																				</Option>
+																				<Option value={3}>
+																					I
+																				</Option>
+																				<Option value={4}>
+																					H
+																				</Option>
+																				<Option value={5}>
+																					G
+																				</Option>
+																				<Option value={6}>
+																					F
+																				</Option>
+																				<Option value={7}>
+																					E
+																				</Option>
+																				<Option value={8}>
+																					D
+																				</Option>
+																			</>
+																		) : null}
+																	</Select>
+																</Form.Item>
+																<Form.Item
+																	label="Color Đến"
+																	{...restField}
+																	name={[
+																		name,
+																		'diamondRequirementSpec',
+																		'colorTo',
+																	]}
+																	fieldKey={[
+																		fieldKey,
+																		'diamondRequirementSpec',
+																		'colorTo',
+																	]}
+																>
+																	<Select>
+																		{Option ? (
+																			<>
+																				<Option value={1}>
+																					K
+																				</Option>
+																				<Option value={2}>
+																					J
+																				</Option>
+																				<Option value={3}>
+																					I
+																				</Option>
+																				<Option value={4}>
+																					H
+																				</Option>
+																				<Option value={5}>
+																					G
+																				</Option>
+																				<Option value={6}>
+																					F
+																				</Option>
+																				<Option value={7}>
+																					E
+																				</Option>
+																				<Option value={8}>
+																					D
+																				</Option>
+																			</>
+																		) : null}
+																	</Select>
+																</Form.Item>
+															</div>
+															<div className="p-4 border rounded-md bg-gray-50">
+																<Form.Item
+																	label="Cut Từ"
+																	{...restField}
+																	name={[
+																		name,
+																		'diamondRequirementSpec',
+																		'cutFrom',
+																	]}
+																	fieldKey={[
+																		fieldKey,
+																		'diamondRequirementSpec',
+																		'cutFrom',
+																	]}
+																	rules={[
+																		{
+																			required: false,
+																			message:
+																				'Cut From is required',
+																		},
+																	]}
+																>
+																	<Select className="w-full">
+																		{Option ? (
+																			<>
+																				<Option value={1}>
+																					Good
+																				</Option>
+																				<Option value={2}>
+																					Very Good
+																				</Option>
+																				<Option value={3}>
+																					Excellent
+																				</Option>
+																			</>
+																		) : null}
+																	</Select>
+																</Form.Item>
+																<Form.Item
+																	label="Cut Đến"
+																	{...restField}
+																	name={[
+																		name,
+																		'diamondRequirementSpec',
+																		'cutTo',
+																	]}
+																	fieldKey={[
+																		fieldKey,
+																		'diamondRequirementSpec',
+																		'cutTo',
+																	]}
+																	rules={[
+																		{
+																			required: false,
+																			message:
+																				'Cut To is required',
+																		},
+																	]}
+																>
+																	<Select className="w-full">
+																		{Option ? (
+																			<>
+																				<Option value={1}>
+																					Good
+																				</Option>
+																				<Option value={2}>
+																					Very Good
+																				</Option>
+																				<Option value={3}>
+																					Excellent
+																				</Option>
+																			</>
+																		) : null}
+																	</Select>
+																</Form.Item>
+															</div>
 														</div>
 													</div>
 												)}
@@ -577,8 +582,8 @@ export const PromoReqForm = ({form, shapes, Option, removeRequirement}) => {
 														<Form.Item
 															{...restField}
 															label="Mẫu Trang Sức"
-															name={[name, 'jewelryModelID']}
-															fieldKey={[fieldKey, 'jewelryModelID']}
+															name={[name, 'jewelryModelId']}
+															fieldKey={[fieldKey, 'jewelryModelId']}
 															rules={[
 																{
 																	required: true,
@@ -592,7 +597,7 @@ export const PromoReqForm = ({form, shapes, Option, removeRequirement}) => {
 																value={form.getFieldValue([
 																	'requirements',
 																	name,
-																	'jewelryModelID',
+																	'jewelryModelId',
 																])}
 															/>
 														</Form.Item>
