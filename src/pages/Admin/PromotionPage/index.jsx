@@ -179,8 +179,8 @@ const PromotionPage = ({promotionData}) => {
 							targetType: req.TargetType,
 							operator: req.Operator,
 							quantity: req.Quantity || 0,
-							amount: req.Amount || 0,
-							jewelryModelID: req.jewelryModelID,
+							moneyAmount: req.Amount || 0,
+							jewelryModelId: req.JewelryModelId,
 							promotionId: req.PromotionId,
 							diamondRequirementSpec: {
 								origin: diamondSpec.Origin

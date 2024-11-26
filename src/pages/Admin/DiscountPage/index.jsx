@@ -70,15 +70,6 @@ const DiscountPage = ({discountData}) => {
 		const {name, discountPercent, discountCode, requirements} = values;
 		const [startDateTime, endDateTime] = values.validDate;
 
-		// Create a new discount object with formatted dates
-		const newDiscount = {
-			...values,
-			key: discounts.length, // Assuming discounts is defined elsewhere
-			startDateTime: startDateTime.format('DD-MM-YYYY HH:mm:ss'),
-			endDateTime: endDateTime.format('DD-MM-YYYY HH:mm:ss'),
-		};
-
-		// Constructing the command for creating the discount
 		const createDiscount = {
 			startDate: startDateTime.format('DD-MM-YYYY HH:mm:ss'),
 			endDate: endDateTime.format('DD-MM-YYYY HH:mm:ss'),
@@ -96,7 +87,6 @@ const DiscountPage = ({discountData}) => {
 			.catch((error) => {
 				message.error(error?.data?.title || error?.detail);
 			});
-		// setIsEditing(false);
 	};
 
 	const getTextForEnum = (enumType, value) => {
@@ -201,9 +191,20 @@ const DiscountPage = ({discountData}) => {
 	};
 	const handleUpdate = async () => {
 		const row = await form.validateFields();
-		const formattedStartDate = row.validDate[0].format('DD-MM-YYYY HH:mm:ss');
-		const formattedEndDate = row.validDate[1].format('DD-MM-YYYY HH:mm:ss');
-
+	
+		// Get the original startDate and endDate from the editing discount
+		const originalStartDate = form.getFieldValue('validDate')?.[0]?.format('DD-MM-YYYY HH:mm:ss');
+		const originalEndDate = form.getFieldValue('validDate')?.[1]?.format('DD-MM-YYYY HH:mm:ss');
+	
+		// Get the new startDate and endDate
+		const newStartDate = row.validDate[0].format('DD-MM-YYYY HH:mm:ss');
+		const newEndDate = row.validDate[1].format('DD-MM-YYYY HH:mm:ss');
+	
+		// Determine if dates have changed
+		const hasDateChanged =
+			newStartDate !== originalStartDate || newEndDate !== originalEndDate;
+	
+		// Prepare additional requirements to be added
 		const addedRequirements = row.requirements
 			.filter((req) => !req.id) // Only include requirements without an id
 			.map((req) => ({
@@ -215,11 +216,12 @@ const DiscountPage = ({discountData}) => {
 				promotionId: req.promotionId,
 				diamondRequirementSpec: req.diamondRequirementSpec,
 			}));
-
+	
 		if (!editingDiscountId) {
 			message.error('Discount ID is missing!');
 			return;
 		}
+	
 		// Remove fields without values
 		const removeEmptyFields = (obj) => {
 			return Object.fromEntries(
@@ -234,34 +236,44 @@ const DiscountPage = ({discountData}) => {
 				)
 			);
 		};
-
-		// Filter out existing requirements and gifts with IDs
-		const filteredRequirements = (row.requirements || []).filter((req) => !req.id);
-		// Clean the row data and include only new requirements and gifts
+	
+		// Clean the row data
 		const cleanedRow = removeEmptyFields({
 			...row,
-			requirements: filteredRequirements,
+			requirements: addedRequirements, // Only include new requirements
 		});
-
+	
+		// Prepare the discount data for updating
 		const discountData = {
 			...cleanedRow,
-			updateStartEndDate: {startDate: formattedStartDate, endDate: formattedEndDate},
-			...(removedRequirements.length > 0 && {removedRequirements}), // Include only if not empty
+			...(hasDateChanged && { // Include updateStartEndDate only if the dates have changed
+				updateStartEndDate: {
+					startDate: newStartDate,
+					endDate: newEndDate,
+				},
+			}),
+			...(removedRequirements.length > 0 && { removedRequirements }), // Include only if not empty
 		};
-
-		await dispatch(updateDiscount({discountId: editingDiscountId, discountData}))
+	
+		// Dispatch the update action
+		await dispatch(updateDiscount({ discountId: editingDiscountId, discountData }))
 			.unwrap()
 			.then(() => {
 				message.success('Cập giảm giá thành công!');
+				form.resetFields(); // Clear all fields in the form
+
 			})
 			.catch((error) => {
 				message.error(error?.data?.title || error?.detail);
 			});
-
+	
+		// Refresh the discount list and reset states
+		
 		await dispatch(fetchDiscounts());
 		setIsEditing(false);
 		setRemovedRequirements([]); // Reset removed requirements after update
 	};
+	
 
 	const handleDelete = async (id) => {
 		dispatch(deleteDiscount(id))

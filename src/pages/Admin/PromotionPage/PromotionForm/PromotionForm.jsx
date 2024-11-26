@@ -81,22 +81,21 @@ const PromotionForm = ({
 								<RangePicker
 									showTime
 									format="DD-MM-YYYY HH:mm"
-									className="w-full border border-gray-300 rounded-md focus:border-blue-500"
+									className="w-full border border-gray-300 rounded-md p-2 focus:border-blue-500"
+								/>
+							</Form.Item>
+							<Form.Item
+								name="description"
+								label="Description"
+								rules={[{required: true, message: 'Please enter a description'}]}
+							>
+								<Input
+									className="border border-gray-300 rounded-md p-2 focus:border-blue-500"
+									placeholder="Enter description"
 								/>
 							</Form.Item>
 						</Col>
 					</Row>
-				</Form.Item>
-
-				<Form.Item
-					name="description"
-					label="Description"
-					rules={[{required: true, message: 'Please enter a description'}]}
-				>
-					<Input
-						className="border border-gray-300 rounded-md p-2 focus:border-blue-500"
-						placeholder="Enter description"
-					/>
 				</Form.Item>
 
 				<Form.Item label="Additional Settings" className="mb-0">
