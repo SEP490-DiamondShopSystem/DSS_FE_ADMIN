@@ -1068,16 +1068,17 @@ const JewelryModelPage = () => {
 													className="form-input w-full p-2 border border-gray text-black rounded-md"
 												>
 													<option value="">Chọn kim loại</option>
-													{metals.map((metal) => (
-														<option
-															className="text-black"
-															key={metal.id}
-															value={metal.Id}
-														>
-															{metal.Name}{' '}
-															{/* Display the metal name */}
-														</option>
-													))}
+													{Array.isArray(metals) &&
+														metals.map((metal) => (
+															<option
+																className="text-black"
+																key={metal.id}
+																value={metal.Id}
+															>
+																{metal.Name}{' '}
+																{/* Display the metal name */}
+															</option>
+														))}
 												</select>
 
 												<select
@@ -1095,16 +1096,17 @@ const JewelryModelPage = () => {
 												>
 													{' '}
 													<option value="">Chọn size</option>
-													{sizes.map((size) => (
-														<option
-															className="text-black"
-															key={size.id}
-															value={size.id}
-														>
-															{size.Value}{' '}
-															{/* Display the metal name */}
-														</option>
-													))}
+													{Array.isArray(sizes) &&
+														sizes.map((size) => (
+															<option
+																className="text-black"
+																key={size.id}
+																value={size.id}
+															>
+																{size.Value}{' '}
+																{/* Display the metal name */}
+															</option>
+														))}
 												</select>
 
 												<input
@@ -1173,8 +1175,7 @@ const JewelryModelPage = () => {
 									<strong>Mã Mẫu:</strong> {selectedModel.ModelCode}
 								</p>
 								<p className="text-lg font-medium text-gray">
-									<strong>Phí Chế Tác:</strong> {selectedModel.CraftmanFee}{' '}
-									VND
+									<strong>Phí Chế Tác:</strong> {selectedModel.CraftmanFee} VND
 								</p>
 								<p className="text-lg font-medium text-gray">
 									<strong>Mô Tả:</strong> {selectedModel.Description}
