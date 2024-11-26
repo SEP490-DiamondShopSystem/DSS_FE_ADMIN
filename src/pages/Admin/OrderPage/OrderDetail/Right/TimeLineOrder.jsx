@@ -301,6 +301,8 @@ const TimeLineOrder = ({orders, loading, statusOrder, paymentStatusOrder, id}) =
 		setIsCancelModalVisible(false);
 	};
 
+	console.log('deliverer', deliverer);
+
 	return (
 		<div>
 			{loading ? (
@@ -447,25 +449,36 @@ const TimeLineOrder = ({orders, loading, statusOrder, paymentStatusOrder, id}) =
 										onChange={handleChange}
 									>
 										{deliverer &&
-											deliverer?.map((user) => (
-												<Option key={user?.Account?.Id}>
-													<Space>
-														{user?.Account?.Email}{' '}
-														<div>
-															<CircleIcon
-																style={{
-																	color: user?.IsFree
-																		? 'green'
-																		: 'red',
-																	fontSize: '16px',
-																}}
-															/>
+											deliverer.map((user) => (
+												<Option
+													key={user?.Account?.Id}
+													value={user?.Account?.Id}
+													disabled={!user?.IsFree}
+												>
+													<div>
+														<div className="flex items-center">
+															<Space className="font-semibold">
+																{user?.Account?.FirstName}
+																{user?.Account?.LastName} •{' '}
+															</Space>
+															{user?.Account?.Email}{' '}
+															<div className="ml-3">
+																<CircleIcon
+																	style={{
+																		color: user?.IsFree
+																			? 'green'
+																			: 'red',
+																		fontSize: '16px',
+																	}}
+																/>
+															</div>
 														</div>
 														{user?.BusyMessage}
-													</Space>
+													</div>
 												</Option>
 											))}
 									</Select>
+
 									<div className="flex justify-around">
 										<Button
 											type="text"
