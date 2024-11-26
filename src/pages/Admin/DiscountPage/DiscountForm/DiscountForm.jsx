@@ -44,6 +44,16 @@ const DiscountForm = ({
 									placeholder="Enter discount name"
 								/>
 							</Form.Item>
+							<Form.Item
+								name="discountCode"
+								label="DiscountCode"
+								rules={[{required: true, message: 'Please enter a discountCode'}]}
+							>
+								<Input
+									className="border border-gray-300 rounded-md p-2 focus:border-blue-500"
+									placeholder="Enter discountCode"
+								/>
+							</Form.Item>
 						</Col>
 						<Col span={12}>
 							<Form.Item
@@ -56,34 +66,25 @@ const DiscountForm = ({
 								<RangePicker
 									showTime
 									format="DD-MM-YYYY HH:mm"
-									className="w-full border border-gray-300 rounded-md focus:border-blue-500"
+									className="w-full border border-gray-300 rounded-md p-2 focus:border-blue-500"
+								/>
+							</Form.Item>
+							<Form.Item
+								name="discountPercent"
+								label="DiscountPercent"
+								rules={[
+									{required: true, message: 'Please enter a DiscountPercent'},
+								]}
+							>
+								<Input
+									className="border border-gray-300 rounded-md p-2 focus:border-blue-500"
+									placeholder="Enter discountCode"
 								/>
 							</Form.Item>
 						</Col>
 					</Row>
 				</Form.Item>
 
-				<Form.Item
-					name="discountCode"
-					label="DiscountCode"
-					rules={[{required: true, message: 'Please enter a discountCode'}]}
-				>
-					<Input
-						className="border border-gray-300 rounded-md p-2 focus:border-blue-500"
-						placeholder="Enter discountCode"
-					/>
-				</Form.Item>
-
-				<Form.Item
-					name="discountPercent"
-					label="DiscountPercent"
-					rules={[{required: true, message: 'Please enter a DiscountPercent'}]}
-				>
-					<Input
-						className="border border-gray-300 rounded-md p-2 focus:border-blue-500"
-						placeholder="Enter discountCode"
-					/>
-				</Form.Item>
 				{/* Requirement Section */}
 				<h3 className="text-xl font-semibold mt-6">Các Yêu Cầu</h3>
 				<div className="flex space-x-4 mb-4">

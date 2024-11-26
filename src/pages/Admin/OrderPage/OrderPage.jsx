@@ -14,6 +14,7 @@ import {
 import {getAllOrder} from '../../../redux/slices/orderSlice';
 import {formatPrice} from '../../../utils';
 import {enums} from '../../../utils/constant';
+import {Helmet} from 'react-helmet';
 
 const {Search} = Input;
 const {RangePicker} = DatePicker;
@@ -51,11 +52,11 @@ const statusPaymentMapping = {
 };
 
 const delivererStatusList = [
-	{name: 'All', value: ''},
-	{name: 'Prepared', value: '5'},
-	{name: 'Delivering', value: '6'},
-	{name: 'Failed', value: '7'},
-	{name: 'Success', value: '8'},
+	{name: 'Tất Cả', value: ''},
+	{name: 'Đã Chuẩn Bị', value: '5'},
+	{name: 'Đang Vận Chuyển', value: '6'},
+	{name: 'Vận Chuyển Thất Bại', value: '7'},
+	{name: 'Thành Công', value: '8'},
 	// {name: 'Refused', value: '9'},
 ];
 
@@ -218,6 +219,9 @@ const OrderPage = () => {
 
 	return (
 		<div className="mx-20 my-10">
+			<Helmet>
+				<title>Danh Sách Đơn Đặt Hàng</title>
+			</Helmet>
 			<Title level={3}>Danh Sách Đơn Đặt Hàng</Title>
 			<Filter
 				filter={delivererRole ? delivererStatusList : statusList}
