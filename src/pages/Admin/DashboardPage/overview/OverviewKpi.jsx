@@ -24,14 +24,26 @@ const useChartOptions = () => {
 			},
 		},
 		yaxis: {
+			tickAmount: 5, // Số dòng trên trục y
+			min: 0, // Giá trị nhỏ nhất
 			labels: {
 				style: {
 					colors: theme.palette.text.secondary,
 				},
-				formatter: (value) => new Intl.NumberFormat('vi-VN').format(value), // Định dạng tiền tệ
+				formatter: (value) => {
+					// Làm tròn giá trị
+					return Math.round(value).toString();
+				},
 			},
 		},
 		stroke: {width: 3},
+		grid: {
+			yaxis: {
+				lines: {
+					show: true, // Hiển thị các đường kẻ dọc theo trục y
+				},
+			},
+		},
 	};
 };
 

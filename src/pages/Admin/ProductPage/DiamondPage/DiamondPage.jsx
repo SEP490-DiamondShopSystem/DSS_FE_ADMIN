@@ -226,6 +226,8 @@ const DiamondPage = () => {
 			getAllDiamond({
 				pageSize,
 				start,
+				priceStart: filters?.price?.minPrice,
+				priceEnd: filters?.price?.maxPrice,
 				shapeId: shape,
 				cutFrom: filters?.cut?.minCut,
 				cutTo: filters?.cut?.maxCut,
@@ -409,6 +411,39 @@ const DiamondPage = () => {
 					<p className="mb-4">Giá:</p>
 					<Slider
 						range
+						marks={{
+							[filterLimits?.Price?.Min]: `${formatPrice(filterLimits?.Price?.Min)}`, // Mốc đầu
+							[filterLimits?.Price?.Min +
+							(filterLimits?.Price?.Max - filterLimits?.Price?.Min) * 0.25]: {
+								style: {color: '#000', marginTop: '-30px'},
+								label: `${formatPrice(
+									Math.floor(
+										filterLimits?.Price?.Min +
+											(filterLimits?.Price?.Max - filterLimits?.Price?.Min) *
+												0.25
+									)
+								)}`,
+							}, // 25%
+							[(filterLimits?.Price?.Max + filterLimits?.Price?.Min) / 2]: {
+								label: `${formatPrice(
+									Math.floor(
+										(filterLimits?.Price?.Max + filterLimits?.Price?.Min) / 2
+									)
+								)}`,
+							},
+							[filterLimits?.Price?.Min +
+							(filterLimits?.Price?.Max - filterLimits?.Price?.Min) * 0.75]: {
+								style: {color: '#000', marginTop: '-30px'},
+								label: `${formatPrice(
+									Math.floor(
+										filterLimits?.Price?.Min +
+											(filterLimits?.Price?.Max - filterLimits?.Price?.Min) *
+												0.75
+									)
+								)}`,
+							}, // 75%
+							[filterLimits?.Price?.Max]: `${formatPrice(filterLimits?.Price?.Max)}`, // Mốc cuối
+						}}
 						value={[filters?.price?.minPrice, filters?.price?.maxPrice]}
 						min={filterLimits?.Price?.Min}
 						max={filterLimits?.Price?.Max}
