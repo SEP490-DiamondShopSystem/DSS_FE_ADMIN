@@ -1,6 +1,5 @@
 import React, {useEffect, useState} from 'react';
 
-import Loading from 'react-loading';
 import {useDispatch, useSelector} from 'react-redux';
 import {useParams} from 'react-router-dom';
 import {
@@ -13,6 +12,8 @@ import {
 import {getOrderDetail, getOrderLog} from '../../../../redux/slices/orderSlice';
 import InformationOrder from './Left/InformationOrder';
 import TimeLineOrder from './Right/TimeLineOrder';
+import Loading from '../../../../components/Loading';
+import {Helmet} from 'react-helmet';
 
 const OrderDetail = () => {
 	const {id} = useParams();
@@ -49,6 +50,9 @@ const OrderDetail = () => {
 				<Loading />
 			) : (
 				<div className="w-full flex">
+					<Helmet>
+						<title>Dashboard</title>
+					</Helmet>
 					<div className="md:w-2/3">
 						<InformationOrder
 							orders={orderDetail}

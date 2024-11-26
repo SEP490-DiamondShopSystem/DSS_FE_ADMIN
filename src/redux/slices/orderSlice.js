@@ -18,7 +18,7 @@ export const getAllOrder = createAsyncThunk(
 			if (ExpectedDate) queryParams.append('ExpectedDate', ExpectedDate);
 			if (Email) queryParams.append('Email', Email);
 			if (IsCustomize !== null || IsCustomize !== undefined)
-				queryParams.append('IsCustomize ', IsCustomize);
+				queryParams.append('IsCustomize', IsCustomize);
 
 			if (queryParams.toString()) {
 				url += `?${queryParams.toString()}`;

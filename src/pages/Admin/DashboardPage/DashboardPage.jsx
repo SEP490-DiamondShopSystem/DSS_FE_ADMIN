@@ -19,11 +19,13 @@ import {
 	GetAllSellingJewelrySelector,
 	GetAllTopSellingDiamondSelector,
 	GetOrderCompletedCountSelector,
+	LoadingDashboardSelector,
 } from '../../../redux/selectors';
 import {formatPrice} from '../../../utils';
 import {CalendarOutlined} from '@ant-design/icons';
 import dayjs from 'dayjs';
 import {shapeItems} from '../../../utils/constant';
+import Loading from '../../../components/Loading';
 
 const {Content} = Layout;
 const {Option} = Select;
@@ -31,9 +33,6 @@ const {RangePicker} = DatePicker;
 const {Text, Title} = Typography;
 
 const DashboardPage = () => {
-	// const currentDate = new Date();
-	// const currentMonth = currentDate.getMonth() + 1;
-	// const currentYear = currentDate.getFullYear();
 	const dispatch = useDispatch();
 
 	const dashboardDetail = useSelector(GetAllDashboardSelector);
@@ -41,10 +40,10 @@ const DashboardPage = () => {
 	const accountCount = useSelector(GetAccountCountSelector);
 	const orderCompleted = useSelector(GetOrderCompletedCountSelector);
 	const jewelrySelling = useSelector(GetAllSellingJewelrySelector);
+	const loading = useSelector(LoadingDashboardSelector);
 
 	const [change, setChange] = useState(false);
 	const [changeChart, setChangeChart] = useState(false);
-	const [loading, setLoading] = useState(false);
 	const [dashboard, setDashboard] = useState();
 	const [shapeSelling, setShapeSelling] = useState();
 	const [customerCount, setCustomerCount] = useState(0);
@@ -127,16 +126,7 @@ const DashboardPage = () => {
 			<Layout style={{padding: '24px'}}>
 				<Content>
 					{loading ? (
-						<div
-							style={{
-								display: 'flex',
-								justifyContent: 'center',
-								alignItems: 'center',
-								height: '100vh',
-							}}
-						>
-							<ReactLoading type="spinningBubbles" color="#4878db" />
-						</div>
+						<Loading />
 					) : (
 						<div>
 							<div
