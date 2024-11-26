@@ -51,69 +51,55 @@ const LoginPage = () => {
 	return (
 		<>
 			<Helmet>
-				<title>Đăng Nhập | Diamond Shop Admin</title>
+				<title>Login | Diamond Shop Admin</title>
 			</Helmet>
-			<div className={styles.loginPageContainer}>
-				<div className={styles.leftSide}>
-					<div className={styles.loginHeader}>
-						<h1 className="text-primary text-2xl font-semibold">Đăng Nhập</h1>
-					</div>
-					<div className={styles.loginForm}>
-						<Form
-							layout="vertical"
-							name="basic"
-							form={form}
-							onFinish={onFinish}
-							className={styles.formContainer}
+			<div className="flex flex-col md:flex-row h-screen">
+				<div className="flex flex-col justify-center items-center md:w-1/2 px-4 md:px-16 py-8 bg-gray-100">
+					<h1 className="text-primary text-3xl font-bold mb-4">Đăng Nhập</h1>
+					<Form
+						layout="vertical"
+						name="basic"
+						form={form}
+						onFinish={onFinish}
+						className="w-full max-w-md space-y-4"
+					>
+						<Form.Item
+							label="Email"
+							name="email"
+							rules={[
+								{required: true, message: 'Hãy nhập email của bạn!', type: 'email'},
+							]}
 						>
-							<Form.Item
-								className={styles.formItem}
-								label="Email"
-								name="email"
-								rules={[
-									{
-										required: true,
-										message: 'Hãy nhập email của bạn!',
-										type: 'email',
-									},
-								]}
+							<Input className="p-2 border rounded-md w-full" />
+						</Form.Item>
+
+						<Form.Item
+							label="Mật Khẩu"
+							name="password"
+							rules={[{required: true, message: 'Hãy nhập mật khẩu!'}]}
+						>
+							<Input.Password className="p-2 border rounded-md w-full" />
+						</Form.Item>
+
+						<Form.Item>
+							<Button
+								type="primary"
+								htmlType="submit"
+								loading={loading}
+								className="w-full bg-blue-500 text-white py-2 rounded-md hover:bg-blue-600"
 							>
-								<Input className={styles.inputField} />
-							</Form.Item>
-
-							<Form.Item
-								className={styles.formItem}
-								label="Mật Khẩu"
-								name="password"
-								rules={[{required: true, message: 'Please input your password!'}]}
-							>
-								<Input.Password className={styles.inputField} />
-							</Form.Item>
-
-							{/* <div className={styles.formItemsContainer}>
-								<Form.Item name="role" valuePropName="checked" initialValue={false}>
-									<Checkbox value={true}>Bạn là Staff</Checkbox>
-								</Form.Item>
-							</div> */}
-
-							<Form.Item className={styles.centerButton}>
-								<Button
-									// loading={isLoading}
-									type="text"
-									htmlType="submit"
-									className={`bg-primary ${styles.loginButton}`}
-									loading={loading}
-								>
-									Đăng Nhập
-								</Button>
-							</Form.Item>
-						</Form>
-						<p className={styles.signUpLink}>
-							Bạn chưa có tài khoản? <Link to="/register">Đăng Ký</Link>
-						</p>
-					</div>
+								Đăng Nhập
+							</Button>
+						</Form.Item>
+					</Form>
+					{/* <p className="mt-4 text-sm">
+						Bạn chưa có tài khoản?{' '}
+						<Link to="/register" className="text-blue-500 underline">
+							Đăng Ký
+						</Link>
+					</p> */}
 				</div>
-				<div className={styles.rightSide}>
+				<div className="sm:hidden md:block md:w-1/2 bg-cover bg-center">
 					<img
 						style={{
 							width: '100%',
