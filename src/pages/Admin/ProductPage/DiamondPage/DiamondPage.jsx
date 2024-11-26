@@ -86,7 +86,7 @@ const DiamondPage = () => {
 	const [diamonds, setDiamonds] = useState([]);
 	const [diamondId, setDiamondId] = useState();
 	const [filters, setFilters] = useState({});
-	const [pageSize, setPageSize] = useState(100);
+	const [pageSize, setPageSize] = useState(5);
 	const [start, setStart] = useState(0);
 	const [checked, setChecked] = useState(false);
 	const [checkedDiamondJewelry, setCheckedDiamondJewelry] = useState(false);
@@ -100,6 +100,8 @@ const DiamondPage = () => {
 	useEffect(() => {
 		dispatch(getDiamondFilter());
 	}, []);
+
+	console.log('start', start);
 
 	useEffect(() => {
 		if (filterLimits) {
@@ -249,7 +251,18 @@ const DiamondPage = () => {
 		fetchDiamondData();
 
 		return () => fetchDiamondData.cancel();
-	}, [dispatch, filters, shape, checked, checkedDiamondJewelry, activeStatus, fetch, searchText]);
+	}, [
+		dispatch,
+		filters,
+		shape,
+		checked,
+		checkedDiamondJewelry,
+		activeStatus,
+		fetch,
+		searchText,
+		start,
+		pageSize,
+	]);
 
 	useEffect(() => {
 		if (diamondList) {
@@ -568,7 +581,14 @@ const DiamondPage = () => {
 						columns={columns}
 						className="custom-table-header"
 						loading={loading}
-						pagination={{pageSize: 5}}
+						pagination={{
+							current: start + 1,
+							total: diamondList?.TotalPage * pageSize,
+							pageSize: pageSize,
+							onChange: (page) => setStart(page - 1),
+							showSizeChanger: false,
+							onShowSizeChange: (current, size) => setPageSize(size),
+						}}
 					/>
 				</div>
 			</div>
