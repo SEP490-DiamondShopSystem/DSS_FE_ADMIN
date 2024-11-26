@@ -106,7 +106,7 @@ const SideDiamondPricePage = () => {
 			message.error(error?.data?.title || error?.detail);
 		}
 		setEditedCells([]);
-		setIsCreating(false);
+		setIsCreating(!isCreating);
 		await dispatch(fetchPriceBoard({isLabDiamond, isSideDiamond})); // Fetch updated board
 	};
 
@@ -132,7 +132,7 @@ const SideDiamondPricePage = () => {
 				message.error(error?.data?.title || error?.detail);
 			});
 		setEditedCells([]);
-		setIsEditing(false);
+		setIsEditing(!isEditing);
 		await dispatch(fetchPriceBoard({isLabDiamond, isSideDiamond, shapeId})); // Fetch updated board
 	};
 

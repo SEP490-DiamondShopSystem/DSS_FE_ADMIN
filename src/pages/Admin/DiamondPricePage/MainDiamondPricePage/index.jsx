@@ -123,6 +123,7 @@ const MainDiamondPricePage = () => {
 				message.error(error?.data?.title || error?.detail);
 			});
 		setEditedCells([]);
+		setIsEditing(false)
 		await dispatch(fetchPriceBoard({shapeId, isLabDiamond, cut}));
 	};
 
@@ -279,7 +280,7 @@ const MainDiamondPricePage = () => {
 											e.target.value
 										);
 									}}
-									min={0}
+									min={1000}
 									step={1000}
 									className="w-full text-center border rounded"
 									placeholder="New Price"
@@ -299,7 +300,7 @@ const MainDiamondPricePage = () => {
 														e.target.value
 													)
 												}
-												min={0}
+												min={1000}
 												step={1000}
 												className="w-full text-center border rounded"
 											/>
