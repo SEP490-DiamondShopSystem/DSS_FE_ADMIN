@@ -1,119 +1,159 @@
-import React, {useState, useEffect} from 'react';
-
-import {Form, Input, Button, Checkbox, message} from 'antd';
-import {imageExporter} from '../../../assets/images';
+import React, { useState } from 'react';
+import { Form, Input, Button, message } from 'antd';
+import { Helmet } from 'react-helmet';
+import { useDispatch, useSelector } from 'react-redux';
+import { handleLogin, setUser } from '../../../redux/slices/userLoginSlice';
+import { Link, useNavigate } from 'react-router-dom';
+import { jwtDecode } from 'jwt-decode';
+import { setLocalStorage } from '../../../utils/localstorage';
+import { LoadingUserSelector } from '../../../redux/selectors';
 import styles from './Login.module.css';
-import {Helmet} from 'react-helmet';
-import {useDispatch, useSelector} from 'react-redux';
-import {handleLogin, handleLoginStaff, setUser} from '../../../redux/slices/userLoginSlice';
-import {Link, useNavigate} from 'react-router-dom';
-import {jwtDecode} from 'jwt-decode';
-import {setLocalStorage} from '../../../utils/localstorage';
-import {LoadingUserSelector} from '../../../redux/selectors';
+import { imageExporter } from '../../../assets/images';
 
 const LoginPage = () => {
-	const [isLoading, setIsLoading] = useState(false);
-	const [form] = Form.useForm();
-	const dispatch = useDispatch();
-	const navigate = useNavigate();
+  const [form] = Form.useForm();
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const loading = useSelector(LoadingUserSelector);
 
-	const loading = useSelector(LoadingUserSelector);
+  const onFinish = (values) => {
+    const { email, password } = values;
 
-	const onFinish = (values) => {
-		console.log('Received values:', values);
-		const {email, password, role} = values;
+    const data = {
+      email,
+      password,
+      isExternalLogin: true,
+    };
 
-		const data = {
-			email,
-			password,
-			isExternalLogin: true,
-			isStaffLogin: role ? true : false,
-		};
+    dispatch(handleLogin(data))
+      .unwrap()
+      .then((res) => {
+        const decodedData = jwtDecode(res.accessToken);
+        setLocalStorage('user', JSON.stringify(decodedData));
+        setLocalStorage('userId', decodedData.UserId);
+        dispatch(setUser(decodedData));
+        message.success('Đăng nhập thành công!');
+        form.resetFields();
+        navigate('/');
+      })
+      .catch((error) => {
+        message.error(error?.data?.title || error?.title);
+      });
+  };
 
-		dispatch(handleLogin(data))
-			.unwrap()
-			.then((res) => {
-				const decodedData = jwtDecode(res.accessToken);
-				console.log(decodedData);
-				setLocalStorage('user', JSON.stringify(decodedData));
-				setLocalStorage('userId', decodedData.UserId);
-				dispatch(setUser(decodedData));
-				message.success('Đăng nhập thành công!');
-				form.resetFields();
+  return (
+    <>
+      <Helmet>
+        <title>Login | Diamond Shop Admin</title>
+      </Helmet>
+      <div className="h-screen flex flex-col md:flex-row">
+        {/* Mobile View with Image Background */}
+        <div className="relative flex md:hidden justify-center items-center bg-black bg-center w-full h-full">
+          <div
+            className="absolute inset-0"
+            style={{
+              opacity: 0.2,
+              backgroundImage: `url(${imageExporter.background})`,
+              backgroundSize: 'cover', // Ensures the background image covers the entire container
+              backgroundPosition: 'center', // Centers the background image
+              backgroundRepeat: 'no-repeat', // Ensures no repetition of the background
+            }}
+          ></div>
+          <div className="relative z-10 w-11/12 max-w-md">
+            <h1 className="text-white text-3xl font-bold mb-4 text-center">
+              Đăng Nhập
+            </h1>
+            <Form
+              layout="vertical"
+              name="basic"
+              form={form}
+              onFinish={onFinish}
+              className="space-y-4 bg-transparent"
+            >
+              <Form.Item
+                label={<span className="text-white">Email</span>}
+                name="email"
+                rules={[
+                  {
+                    required: true,
+                    message: 'Hãy nhập email của bạn!',
+                    type: 'email',
+                  },
+                ]}
+              >
+                <Input className="p-2 border rounded-md w-full" />
+              </Form.Item>
+              <Form.Item
+                label={<span className="text-white">Mật Khẩu</span>}
+                name="password"
+                rules={[{ required: true, message: 'Hãy nhập mật khẩu!' }]}
+              >
+                <Input.Password className="p-2 border rounded-md w-full" />
+              </Form.Item>
+              <Form.Item>
+                <Button
+                  type="primary"
+                  htmlType="submit"
+                  loading={loading}
+                  className="w-full bg-blue text-white py-2 rounded-md hover:bg-blue"
+                >
+                  Đăng Nhập
+                </Button>
+              </Form.Item>
+            </Form>
+          </div>
+        </div>
 
-				navigate('/');
-			})
-			.catch((error) => {
-				message.error(error?.data?.title || error?.title);
-			});
-	};
+        {/* Desktop View without Image Background */}
+        <div className="hidden md:flex flex-col justify-center items-center w-1/2 px-8 bg-gray-100">
+          <h1 className="text-primary text-3xl font-bold mb-4">Đăng Nhập</h1>
+          <Form
+            layout="vertical"
+            name="basic"
+            form={form}
+            onFinish={onFinish}
+            className="w-full max-w-md space-y-4"
+          >
+            <Form.Item
+              label="Email"
+              name="email"
+              rules={[
+                { required: true, message: 'Hãy nhập email của bạn!', type: 'email' },
+              ]}
+            >
+              <Input className="p-2 border rounded-md w-full" />
+            </Form.Item>
+            <Form.Item
+              label="Mật Khẩu"
+              name="password"
+              rules={[{ required: true, message: 'Hãy nhập mật khẩu!' }]}
+            >
+              <Input.Password className="p-2 border rounded-md w-full" />
+            </Form.Item>
+            <Form.Item>
+              <Button
+                type="primary"
+                htmlType="submit"
+                loading={loading}
+                className="w-full bg-blue-500 text-white py-2 rounded-md hover:bg-blue-600"
+              >
+                Đăng Nhập
+              </Button>
+            </Form.Item>
+          </Form>
+        </div>
 
-	return (
-		<>
-			<Helmet>
-				<title>Login | Diamond Shop Admin</title>
-			</Helmet>
-			<div className="flex flex-col md:flex-row h-screen">
-				<div className="flex flex-col justify-center items-center md:w-1/2 px-4 md:px-16 py-8 bg-gray-100">
-					<h1 className="text-primary text-3xl font-bold mb-4">Đăng Nhập</h1>
-					<Form
-						layout="vertical"
-						name="basic"
-						form={form}
-						onFinish={onFinish}
-						className="w-full max-w-md space-y-4"
-					>
-						<Form.Item
-							label="Email"
-							name="email"
-							rules={[
-								{required: true, message: 'Hãy nhập email của bạn!', type: 'email'},
-							]}
-						>
-							<Input className="p-2 border rounded-md w-full" />
-						</Form.Item>
-
-						<Form.Item
-							label="Mật Khẩu"
-							name="password"
-							rules={[{required: true, message: 'Hãy nhập mật khẩu!'}]}
-						>
-							<Input.Password className="p-2 border rounded-md w-full" />
-						</Form.Item>
-
-						<Form.Item>
-							<Button
-								type="primary"
-								htmlType="submit"
-								loading={loading}
-								className="w-full bg-blue-500 text-white py-2 rounded-md hover:bg-blue-600"
-							>
-								Đăng Nhập
-							</Button>
-						</Form.Item>
-					</Form>
-					{/* <p className="mt-4 text-sm">
-						Bạn chưa có tài khoản?{' '}
-						<Link to="/register" className="text-blue-500 underline">
-							Đăng Ký
-						</Link>
-					</p> */}
-				</div>
-				<div className="sm:hidden md:block md:w-1/2 bg-cover bg-center">
-					<img
-						style={{
-							width: '100%',
-							maxHeight: '100%',
-							objectPosition: 'center',
-							objectFit: 'cover',
-						}}
-						src={imageExporter.background}
-						alt="background"
-					></img>
-				</div>
-			</div>
-		</>
-	);
+        {/* Image Background Visible only on Desktop */}
+        <div className="hidden md:block w-1/2 bg-cover bg-center">
+          <img
+            className="w-full h-full object-cover"
+            src={imageExporter.background}
+            alt="background"
+          />
+        </div>
+      </div>
+    </>
+  );
 };
 
 export default LoginPage;

@@ -1,5 +1,4 @@
 import React, {useEffect, useState} from 'react';
-
 import {useDispatch, useSelector} from 'react-redux';
 import {useParams} from 'react-router-dom';
 import {
@@ -49,18 +48,20 @@ const OrderDetail = () => {
 			{loading ? (
 				<Loading />
 			) : (
-				<div className="w-full flex">
+				<div className="w-full flex flex-col lg:flex-row lg:items-start lg:space-x-10">
 					<Helmet>
 						<title>Dashboard</title>
 					</Helmet>
-					<div className="md:w-2/3">
+					{/* Left Section */}
+					<div className="w-full lg:w-2/3">
 						<InformationOrder
 							orders={orderDetail}
 							statusOrder={statusOrder}
 							paymentStatusOrder={paymentStatusOrder}
 						/>
 					</div>
-					<div className="pl-10 md:w-1/3">
+					{/* Right Section */}
+					<div className="w-full lg:w-1/3 mt-6 lg:mt-0">
 						<TimeLineOrder
 							orders={orderDetail}
 							statusOrder={statusOrder}
