@@ -123,6 +123,7 @@ const MainDiamondPricePage = () => {
 				message.error(error?.data?.title || error?.detail);
 			});
 		setEditedCells([]);
+		setIsEditing(false)
 		await dispatch(fetchPriceBoard({shapeId, isLabDiamond, cut}));
 	};
 

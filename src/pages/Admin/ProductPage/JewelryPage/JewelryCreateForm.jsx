@@ -82,7 +82,10 @@ const JewelryCreateForm = ({onClose, isCreateFormOpen, setIsCreateFormOpen}) => 
 
 	const models = useSelector(getAllJewelryModelsSelector);
 	useEffect(() => {
-		dispatch(fetchAllJewelryModels());
+		dispatch(fetchAllJewelryModels({
+			CurrentPage: 1,
+			PageSize: 100,
+		}));
 	}, [dispatch]);
 
 	const diamonds = useSelector(getAllDiamondSelector);
@@ -138,46 +141,50 @@ const JewelryCreateForm = ({onClose, isCreateFormOpen, setIsCreateFormOpen}) => 
 		selectedDiamonds,
 		diamondForFilterId,
 		diamondListId,
-		diamondListTitle
+		diamondListTitle,
+		index 
 	) => {
 		// Tìm index của diamondForFilter trong array
 		const existingIndex = selectedDiamonds.findIndex(
-			(item) => item.diamondForFilterId === diamondForFilterId
+			(item) => item.index === index // Match by Chấu index
 		);
 
 		const newDiamond = {
 			diamondForFilterId,
 			diamondListId,
 			diamondListTitle,
+			index, // Store Chấu index
 		};
 
 		if (existingIndex !== -1) {
-			// Nếu đã tồn tại, thay thế bằng diamond mới
+			// Replace the existing diamond for this Chấu
 			const updatedDiamonds = [...selectedDiamonds];
 			updatedDiamonds[existingIndex] = newDiamond;
 			return updatedDiamonds;
 		} else {
-			// Nếu không, thêm mới vào array
+			// Add the new diamond to the list
 			return [...selectedDiamonds, newDiamond];
 		}
 	};
 
 	// Hàm xử lý khi chọn diamond từ danh sách
 	const handleDiamondSelectChange = (diamond) => {
-		console.log('diamondSelect', diamond);
+		// Ensure we have a valid Chấu index
+		if (selectedIndex === null) return;
 
-		// Cập nhật currentDiamondId
+		// Update currentDiamondId
 		setCurrentDiamondId(diamond);
 
-		// Lấy diamondForFilter hiện tại
-		const diamondForFilterId = diamondForFilter?.Id;
-
-		if (diamondForFilterId) {
-			// Lưu diamond vào selectedDiamondList
-			setSelectedDiamondList((prevList) =>
-				saveSelectedDiamond(prevList, diamondForFilterId, diamond.Id, diamond.Title)
-			);
-		}
+		// Save the diamond for the selected Chấu index
+		setSelectedDiamondList((prevList) =>
+			saveSelectedDiamond(
+				prevList,
+				diamondForFilter?.Id,
+				diamond.Id,
+				diamond.Title,
+				selectedIndex // Pass Chấu index
+			)
+		);
 	};
 
 	// Filter metals based on selected model's supported metals
@@ -362,30 +369,30 @@ const JewelryCreateForm = ({onClose, isCreateFormOpen, setIsCreateFormOpen}) => 
 				<p></p>
 				<div className="my-10">
 					<label className="mr-5">Chấu vỏ trang sức</label>
-					<Select
-						// mode="multiple"
-						onChange={handleDiamondChange}
-						placeholder="Chọn chấu"
-						className="w-64"
-					>
+					<Select onChange={handleDiamondChange} placeholder="Chọn chấu" className="w-64">
 						{Array.isArray(mainDiamonds) &&
-							mainDiamonds.map((diamond, i) => (
-								<Select.Option
-									key={diamond.Id}
-									value={i} // value vẫn là 0 và 1 (nếu cần sử dụng cho logic khác)
-								>
-									{`Chấu ${i + 1}`}
-								</Select.Option>
-							))}
+							mainDiamonds.flatMap((diamond, i) =>
+								Array.from({length: diamond.Quantity || 1}, (_, index) => (
+									<Select.Option
+										key={`${diamond.Id}-${index}`}
+										value={`${i}-${index}`} // Ensure unique key and value
+									>
+										{`Chấu ${i + 1}${
+											diamond.Quantity > 1 ? ` - ${index + 1}` : ''
+										}`}
+									</Select.Option>
+								))
+							)}
 					</Select>
 				</div>
+
 				<label className="font-semibold">Kim Cương Đã Chọn</label>
 				{selectedDiamondList.length > 0 && (
 					<div className="mb-5">
 						<Table
 							dataSource={selectedDiamondList.map((diamond, i) => ({
 								key: i,
-								index: i + 1,
+								index: diamond.index + 1, // Display Chấu index (1-based)
 								diamondForFilterId: diamond.diamondForFilterId,
 								diamondListTitle: diamond.diamondListTitle || 'N/A',
 							}))}
@@ -402,7 +409,7 @@ const JewelryCreateForm = ({onClose, isCreateFormOpen, setIsCreateFormOpen}) => 
 									key: 'diamondListTitle',
 								},
 							]}
-							pagination={false} // Tắt phân trang nếu không cần
+							pagination={false}
 						/>
 					</div>
 				)}
