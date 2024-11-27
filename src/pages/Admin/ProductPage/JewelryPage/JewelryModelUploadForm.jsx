@@ -4,8 +4,8 @@ import {Modal, Form, Button, Upload, List, Image, message, Select, Card} from 'a
 import {
 	UploadOutlined,
 	FileImageOutlined,
-	FileProtectOutlined,
 	EditOutlined,
+	CloseCircleOutlined,
 } from '@ant-design/icons';
 import {
 	fetchJewelryModelFiles,
@@ -23,16 +23,17 @@ export const JewelryModelUploadForm = ({jewelryModelId, visible, onClose}) => {
 	const dispatch = useDispatch();
 	const loading = useSelector(selectFileLoading);
 
-	const [jewelryModelFiles, setJewelryModelFiles] = useState(null);
+	const [categorizedFiles, setCategorizedFiles] = useState([]);
 	const [selectedSideDiamond, setSelectedSideDiamond] = useState(null);
 	const [selectedMetal, setSelectedMetal] = useState(null);
 
-	const [categorizedFile, setCategorizedFile] = useState(null);
+	const [jewelryModelFiles, setJewelryModelFiles] = useState(null);
 	const [thumbnailFile, setThumbnailFile] = useState(null);
 	const [imageFiles, setImageFiles] = useState([]);
 	const [sideDiamondFile, setSideDiamondFile] = useState(null);
 	const [metalFile, setMetalFile] = useState(null);
-
+	const [metalImages, setMetalImages] = useState([]);
+	const [sideDiamondImages, setSideDiamondImages] = useState([]);
 	const [isEditMode, setIsEditMode] = useState(false);
 
 	const [initialFiles, setInitialFiles] = useState({
@@ -75,6 +76,16 @@ export const JewelryModelUploadForm = ({jewelryModelId, visible, onClose}) => {
 		if (jewelryModelFiles) {
 			const initialThumbnail = jewelryModelFiles.Thumbnail?.MediaPath || null;
 			const initialImages = jewelryModelFiles.BaseImages || [];
+			const baseMetalImages =
+				jewelryModelFiles?.BaseMetals?.filter((metal) =>
+					metal.MediaPath.includes(`/Metals/${selectedMetal}/`)
+				) || [];
+			setMetalImages(baseMetalImages);
+			const baseSideDiamondImages =
+				jewelryModelFiles?.BaseSideDiamonds?.filter((diamond) =>
+					diamond.MediaPath.includes(`/SideDiamonds/${selectedSideDiamond}/`)
+				) || [];
+			setSideDiamondImages(baseSideDiamondImages);
 
 			setInitialFiles({
 				thumbnail: initialThumbnail,
@@ -84,8 +95,28 @@ export const JewelryModelUploadForm = ({jewelryModelId, visible, onClose}) => {
 			setThumbnailFile(initialThumbnail);
 			setImageFiles(initialImages);
 		}
-	}, [jewelryModelFiles]);
+	}, [jewelryModelFiles, selectedMetal, selectedSideDiamond]);
+	const reloadJewelryModelFiles = async () => {
+		try {
+			// Fetch files
+			const filesResponse = await dispatch(fetchJewelryModelFiles(jewelryModelId)).unwrap();
+			setJewelryModelFiles(filesResponse);
 
+			// Fetch model details to get updated metadata
+			const detailsResponse = await dispatch(
+				fetchJewelryModelDetail(jewelryModelId)
+			).unwrap();
+			setJewelryModelFiles((prevState) => ({
+				...prevState,
+				SizeMetals: detailsResponse.SizeMetals,
+				SideDiamonds: detailsResponse.SideDiamonds,
+			}));
+
+			message.success('Data refreshed successfully');
+		} catch (error) {
+			message.error(error?.data?.title || error?.detail || 'Failed to reload data');
+		}
+	};
 	const handleCancel = () => {
 		setIsEditMode(false);
 		setThumbnailFile(initialFiles.thumbnail);
@@ -93,49 +124,139 @@ export const JewelryModelUploadForm = ({jewelryModelId, visible, onClose}) => {
 		setRemovedImagePaths([]);
 		onClose();
 	};
+	const handleDeselectMetal = () => {
+		setSelectedMetal(null);
+		setMetalImages([]);
+		setMetalFile(null);
+	};
 
+	const handleDeselectSideDiamond = () => {
+		setSelectedSideDiamond(null);
+		setSideDiamondImages([]);
+		setSideDiamondFile(null);
+	};
 	const handleSwitchToEdit = async () => {
-		// Reset selections before switching to edit mode
 		setSelectedMetal(null);
 		setSelectedSideDiamond(null);
-		// Enable edit mode after data refresh
+		setMetalImages([]);
+		setSideDiamondImages([]);
 		setIsEditMode(true);
 	};
 
-	// Function to fetch the image URL based on Metal ID and Side Diamond ID
-	const getImageForSelection = (selectedMetal, selectedSideDiamond) => {
-		if (!selectedMetal || !selectedSideDiamond) {
-			return null;
-		}
-
-		const imageCategoryKey = `Categories/${selectedMetal}/${selectedSideDiamond}`;
-		const galleryImages = jewelryModelFiles?.Gallery?.[imageCategoryKey] || [];
-
-		if (galleryImages.length > 0) {
-			return galleryImages[0].MediaPath; // Return the first image path found
-		}
-
-		return null; // Return null if no image is found
-	};
-
-	const handleSaveChanges = async () => {
-		if (categorizedFile && selectedSideDiamond && selectedMetal) {
-			await handleUploadCategorizedImage();
-		} else if (sideDiamondFile && selectedSideDiamond) {
-			await handleUploadSideDiamondImage();
-		} else if (metalFile && selectedMetal) {
-			await handleUploadMetalImage();
-		} else {
-			message.warning('Please upload a file for the selected options.');
+	const handleUploadAdditionalMetalImages = async () => {
+		if (!metalFile || !selectedMetal) {
+			message.warning('Vui lòng chọn kim loại để thêm ảnh!');
 			return;
 		}
 
-		// Other save operations (e.g., thumbnail or base images)
-		handleThumbnailUpload();
-		handleImageUpload();
-		handleDeleteImages();
+		const filesToUpload = Array.isArray(metalFile) ? metalFile : [metalFile];
 
-		// Refresh the files
+		for (const file of filesToUpload) {
+			await dispatch(
+				uploadMetalImages({jewelryModelId, formFiles: file, metalId: selectedMetal})
+			)
+				.unwrap()
+				.then(() => {
+					message.success('Hình ảnh kim loại đã được thêm thành công!');
+				})
+				.catch((error) => {
+					message.error(error?.data?.title || error?.detail);
+				});
+		}
+
+		setMetalFile(null);
+		dispatch(fetchJewelryModelFiles(jewelryModelId));
+	};
+	const handleUploadAdditionalSideDiamondImages = async () => {
+		if (!sideDiamondFile || !selectedSideDiamond) {
+			message.warning('Vui lòng chọn kim cương tấm để thêm ảnh!');
+			return;
+		}
+
+		await dispatch(
+			uploadSideDiamondImage({
+				jewelryModelId,
+				image: sideDiamondFile,
+				sideDiamondOptionId: selectedSideDiamond,
+			})
+		)
+			.unwrap()
+			.then(() => {
+				message.success('Hình ảnh kim cương tấm đã được thêm thành công!');
+				dispatch(fetchJewelryModelFiles(jewelryModelId));
+			})
+			.catch((error) => {
+				message.error(error?.data?.title || error?.detail);
+			});
+
+		setSideDiamondFile(null);
+	};
+
+	const getImagesForSelection = (selectedMetal, selectedSideDiamond) => {
+		const images = [];
+
+		if (selectedMetal && selectedSideDiamond) {
+			const imageCategoryKey = `Categories/${selectedMetal}/${selectedSideDiamond}`;
+			const galleryImages = jewelryModelFiles?.Gallery?.[imageCategoryKey] || [];
+
+			if (galleryImages.length > 0) {
+				return galleryImages.map((img) => img.MediaPath); // Return all gallery images
+			}
+		}
+
+		if (selectedMetal) {
+			const baseMetals = jewelryModelFiles?.BaseMetals || [];
+			const matchingMetalImages = baseMetals.filter((metal) =>
+				metal.MediaPath.includes(`/Metals/${selectedMetal}/`)
+			);
+			if (matchingMetalImages.length > 0) {
+				images.push(...matchingMetalImages.map((img) => img.MediaPath));
+			}
+		}
+
+		if (selectedSideDiamond) {
+			const baseSideDiamonds = jewelryModelFiles?.BaseSideDiamonds || [];
+			const matchingSideDiamondImages = baseSideDiamonds.filter((diamond) =>
+				diamond.MediaPath.includes(`/SideDiamonds/${selectedSideDiamond}/`)
+			);
+			if (matchingSideDiamondImages.length > 0) {
+				images.push(...matchingSideDiamondImages.map((img) => img.MediaPath));
+			}
+		}
+
+		if (images.length === 0) {
+			const baseImages = jewelryModelFiles?.BaseImages || [];
+			if (baseImages.length > 0) {
+				images.push(...baseImages.map((img) => img.MediaPath));
+			}
+		}
+
+		return images.length > 0 ? images : null;
+	};
+
+	const handleSaveChanges = async () => {
+		// Existing upload methods
+		if (categorizedFiles.length && selectedSideDiamond && selectedMetal) {
+			await handleUploadCategorizedImage();
+		}
+
+		// New additional image uploads
+		if (metalFile && selectedMetal) {
+			await handleUploadAdditionalMetalImages();
+		}
+		if (sideDiamondFile && selectedSideDiamond) {
+			await handleUploadAdditionalSideDiamondImages();
+		}
+
+		// Other existing save operations
+		await handleThumbnailUpload();
+		await handleImageUpload();
+		await handleDeleteImages();
+
+		// Reload files after all operations
+		await reloadJewelryModelFiles();
+
+		// Refresh files
 		await dispatch(fetchJewelryModelFiles(jewelryModelId))
 			.unwrap()
 			.then((response) => {
@@ -145,7 +266,6 @@ export const JewelryModelUploadForm = ({jewelryModelId, visible, onClose}) => {
 				message.error(error?.data?.title || error?.detail);
 			});
 
-		// Reset states after saving
 		resetFormState();
 	};
 
@@ -166,19 +286,6 @@ export const JewelryModelUploadForm = ({jewelryModelId, visible, onClose}) => {
 	const uniqueMetals = Array.from(
 		new Map(jewelryModelFiles?.SizeMetals?.map((item) => [item.MetalId, item])).values()
 	);
-
-	const hasFileListChanged = (currentFileList, initialFileList) => {
-		if (Array.isArray(currentFileList)) {
-			return (
-				currentFileList.length !== initialFileList.length ||
-				!currentFileList.every(
-					(file, index) => file.MediaPath !== initialFileList[index].MediaPath
-				)
-			);
-		}
-		return currentFileList !== initialFileList;
-	};
-
 	// Handle removing images
 	const handleImageRemove = (file) => {
 		// Add the removed file's path to the removedImagePaths array
@@ -219,69 +326,34 @@ export const JewelryModelUploadForm = ({jewelryModelId, visible, onClose}) => {
 			});
 	};
 	const handleUploadCategorizedImage = async () => {
-		if (!categorizedFile || !selectedSideDiamond || !selectedMetal) {
+		if (!categorizedFiles.length || !selectedSideDiamond || !selectedMetal) {
 			message.warning(
-				'Please select a Side Diamond, Metal, and upload an image before submitting.'
+				'Please select a Side Diamond, Metal, and upload at least one image before submitting.'
 			);
 			return;
 		}
 
-		await dispatch(
-			uploadCategorizedImage({
-				jewelryModelId,
-				imageFile: categorizedFile,
-				sideDiamondOptId: selectedSideDiamond,
-				metalId: selectedMetal,
-			})
-		)
-			.unwrap()
-			.then(() => {
-				message.success('Categorized image uploaded successfully');
-			})
-			.catch((error) => {
-				message.error(error?.data?.title || error?.detail);
-			});
+		// Upload each categorized file individually
+		for (const file of categorizedFiles) {
+			await dispatch(
+				uploadCategorizedImage({
+					jewelryModelId,
+					imageFile: file,
+					sideDiamondOptId: selectedSideDiamond,
+					metalId: selectedMetal,
+				})
+			)
+				.unwrap()
+				.then(() => {
+					message.success('Categorized image uploaded successfully');
+				})
+				.catch((error) => {
+					message.error(error?.data?.title || error?.detail);
+				});
+		}
+
 		dispatch(fetchJewelryModelFiles(jewelryModelId)); // Refresh the data
-		setCategorizedFile(null); // Reset the categorized file after upload
-	};
-	const handleUploadSideDiamondImage = async () => {
-		console.log('sideDiamondFile:', sideDiamondFile);
-		console.log('selectedSideDiamond:', selectedSideDiamond);
-
-		await dispatch(
-			uploadSideDiamondImage({
-				jewelryModelId,
-				image: sideDiamondFile, // Wrap the file in an array
-				sideDiamondOptionId: selectedSideDiamond,
-			})
-		)
-			.unwrap()
-			.then(() => {
-				message.success('Side Diamond image uploaded successfully');
-			})
-			.catch((error) => {
-				message.error(error?.data?.title || error?.detail);
-			});
-
-		setSideDiamondFile(null); // Reset the state after upload
-	};
-
-	const handleUploadMetalImage = async () => {
-		console.log('MetalFile:', metalFile);
-		console.log('selectedMetal:', selectedMetal);
-
-		await dispatch(
-			uploadMetalImages({jewelryModelId, formFiles: metalFile, metalId: selectedMetal})
-		)
-			.unwrap()
-			.then((res) => {
-				message.success('Metal image uploaded successfully');
-			})
-			.catch((error) => {
-				message.error(error?.data?.title || error?.detail);
-			});
-
-		setMetalFile(null);
+		setCategorizedFiles([]); // Reset the categorized files after upload
 	};
 	const handleImageUpload = async () => {
 		if (imageFiles.length === 0 || imageFiles === initialFiles.images) {
@@ -299,11 +371,6 @@ export const JewelryModelUploadForm = ({jewelryModelId, visible, onClose}) => {
 				message.error(error?.data?.title || error?.detail);
 			});
 	};
-
-	const handleFileChange = (fileList, setState) => {
-		setState(fileList);
-	};
-
 	return (
 		<Modal
 			title="Jewelry Model's Files"
@@ -339,117 +406,370 @@ export const JewelryModelUploadForm = ({jewelryModelId, visible, onClose}) => {
 			{isEditMode ? (
 				<Form layout="vertical">
 					<Form.Item label="Chọn Kim Cương Tấm">
-						<Select
-							placeholder="Chọn một cài đặt kim cương tấm"
-							onChange={(value) => setSelectedSideDiamond(value)}
-						>
-							{jewelryModelFiles?.SideDiamonds?.length > 0 ? (
-								jewelryModelFiles.SideDiamonds.map((diamond) => (
-									<Option key={diamond.Id} value={diamond.Id}>
-										{diamond?.Shape ? (
-											<>
-												{diamond.Shape.ShapeName} -{' '}
-												{diamond.SettingType || 'Unknown Setting'}
-											</>
-										) : (
-											<>
-												{diamond.CaratWeight
-													? `${diamond.CaratWeight}ct`
-													: 'Unknown Carat Weight'}{' '}
-												-{' '}
-												{diamond.ClarityMin && diamond.ClarityMax
-													? `Clarity: ${diamond.ClarityMin} to ${diamond.ClarityMax}`
-													: 'Unknown Clarity'}{' '}
-												-{' '}
-												{diamond.ColorMin && diamond.ColorMax
-													? `Color: ${diamond.ColorMin} to ${diamond.ColorMax}`
-													: 'Unknown Color'}{' '}
-												- {diamond.SettingType || 'Unknown Setting'}
-											</>
-										)}
-									</Option>
-								))
-							) : (
-								<Option disabled>Không có kim cương tấm</Option>
+						<div className="flex items-center space-x-2">
+							<Select
+								placeholder="Chọn một cài đặt kim cương tấm"
+								onChange={(value) => setSelectedSideDiamond(value)}
+								value={selectedSideDiamond}
+							>
+								{jewelryModelFiles?.SideDiamonds?.length > 0 ? (
+									jewelryModelFiles.SideDiamonds.map((diamond) => (
+										<Option key={diamond.Id} value={diamond.Id}>
+											{diamond?.Shape ? (
+												<>
+													{diamond.Shape.ShapeName} -{' '}
+													{diamond.SettingType || 'Unknown Setting'}
+												</>
+											) : (
+												<>
+													{diamond.CaratWeight
+														? `${diamond.CaratWeight}ct`
+														: 'Unknown Carat Weight'}{' '}
+													-{' '}
+													{diamond.ClarityMin && diamond.ClarityMax
+														? `Clarity: ${diamond.ClarityMin} to ${diamond.ClarityMax}`
+														: 'Unknown Clarity'}{' '}
+													-{' '}
+													{diamond.ColorMin && diamond.ColorMax
+														? `Color: ${diamond.ColorMin} to ${diamond.ColorMax}`
+														: 'Unknown Color'}{' '}
+													- {diamond.SettingType || 'Unknown Setting'}
+												</>
+											)}
+										</Option>
+									))
+								) : (
+									<Option disabled>Không có kim cương tấm</Option>
+								)}
+							</Select>
+							{selectedSideDiamond && (
+								<Button
+									icon={<CloseCircleOutlined />}
+									onClick={handleDeselectSideDiamond}
+									type="text"
+									danger
+								>
+									Hủy chọn
+								</Button>
 							)}
-						</Select>
+						</div>
 					</Form.Item>
-
 					<Form.Item label="Chọn Kim Loại">
-						<Select
-							placeholder="Chọn Kim Loại"
-							onChange={(value) => setSelectedMetal(value)}
-						>
-							{uniqueMetals?.map((metal) => (
-								<Option key={metal.MetalId} value={metal.MetalId}>
-									{metal.Metal?.Name || 'Unknown Metal'}
-								</Option>
-							))}
-						</Select>
+						<div className="flex items-center space-x-2">
+							<Select
+								placeholder="Chọn Kim Loại"
+								onChange={(value) => setSelectedMetal(value)}
+								value={selectedMetal}
+							>
+								{uniqueMetals?.map((metal) => (
+									<Option key={metal.MetalId} value={metal.MetalId}>
+										{metal.Metal?.Name || 'Unknown Metal'}
+									</Option>
+								))}
+							</Select>
+							{selectedMetal && (
+								<Button
+									icon={<CloseCircleOutlined />}
+									onClick={handleDeselectMetal}
+									type="text"
+									danger
+								>
+									Hủy chọn
+								</Button>
+							)}
+						</div>
 					</Form.Item>
+					{selectedMetal && selectedSideDiamond ? (
+						<div className="mt-4">
+							<h4 className="text-lg font-semibold mb-2">Hình Ảnh Theo Danh Mục</h4>
+							<div className="grid grid-cols-4 gap-4">
+								{(() => {
+									const imageCategoryKey = `Categories/${selectedMetal}/${selectedSideDiamond}`;
+									const galleryImages =
+										jewelryModelFiles?.Gallery?.[imageCategoryKey] || [];
 
-					<Form.Item label="Tải Hình Ảnh Lên">
-						<Upload
-							accept="image/*"
-							beforeUpload={(file) => {
-								if (selectedMetal && selectedSideDiamond) {
-									// Both Metal and Side Diamond selected
-									setCategorizedFile(file);
-								} else if (selectedSideDiamond) {
-									// Only Side Diamond selected
-									setSideDiamondFile(file);
-								} else if (selectedMetal) {
-									// Only Metal selected
-									setMetalFile(file);
-								} else {
-									message.warning(
-										'Vui lòng chọn kim loại, kim cương tấm hoặc cả hai để tải hình ảnh lên'
-									);
-									return Upload.LIST_IGNORE; // Prevent file from being added to the upload list
-								}
-								return false; // Prevent default upload behavior
-							}}
-							showUploadList={false}
-						>
-							<Button icon={<UploadOutlined />}>Chọn Hình Ảnh</Button>
-						</Upload>
-						{/* Preview the file */}
-						{categorizedFile && selectedMetal && selectedSideDiamond && (
-							<div style={{marginTop: 10}}>
-								<Image
-									src={URL.createObjectURL(categorizedFile)}
-									alt="Categorized Image Preview"
-									width={100}
-									height={100}
-									style={{objectFit: 'cover'}}
-								/>
+									if (galleryImages.length > 0) {
+										return galleryImages
+											.filter(
+												(image) =>
+													!removedImagePaths.includes(image.MediaPath)
+											)
+											.map((image, index) => (
+												<div key={index} className="relative">
+													<Image
+														src={image.MediaPath}
+														alt={`Categorized Image ${index + 1}`}
+														width={100}
+														height={100}
+														style={{objectFit: 'cover'}}
+													/>
+													<Button
+														type="link"
+														danger
+														className="absolute top-0 right-0"
+														onClick={() => {
+															setRemovedImagePaths((prev) => [
+																...prev,
+																image.MediaPath,
+															]);
+														}}
+													>
+														Xóa
+													</Button>
+												</div>
+											));
+									} else {
+										return (
+											<div className="col-span-4 text-center text-gray-500">
+												Không có hình ảnh theo danh mục
+											</div>
+										);
+									}
+								})()}
 							</div>
-						)}
-						{sideDiamondFile && selectedSideDiamond && !selectedMetal && (
-							<div style={{marginTop: 10}}>
-								<Image
-									src={URL.createObjectURL(sideDiamondFile)}
-									alt="Side Diamond Image Preview"
-									width={100}
-									height={100}
-									style={{objectFit: 'cover'}}
-								/>
-							</div>
-						)}
-						{metalFile && selectedMetal && !selectedSideDiamond && (
-							<div style={{marginTop: 10}}>
-								<Image
-									src={URL.createObjectURL(metalFile)}
-									alt="Metal Image Preview"
-									width={100}
-									height={100}
-									style={{objectFit: 'cover'}}
-								/>
-							</div>
-						)}
-					</Form.Item>
 
-					{/* Thumbnail Upload */}
+							<Form.Item label="Tải Hình Ảnh Theo Danh Mục" className="mt-4">
+								<Upload
+									multiple
+									accept="image/*"
+									beforeUpload={(file) => {
+										setCategorizedFiles((prevFiles) => [...prevFiles, file]);
+										return false;
+									}}
+									onRemove={(file) => {
+										setCategorizedFiles((prevFiles) =>
+											prevFiles.filter((f) => f !== file)
+										);
+									}}
+									fileList={categorizedFiles.map((file, index) => ({
+										uid: `-${index}`,
+										name: file.name,
+										status: 'done',
+									}))}
+								>
+									<Button icon={<UploadOutlined />}>
+										Tải Hình Ảnh Theo Danh Mục
+									</Button>
+								</Upload>
+
+								{categorizedFiles.length > 0 && (
+									<div
+										style={{
+											marginTop: 10,
+											display: 'flex',
+											flexWrap: 'wrap',
+											gap: '10px',
+										}}
+									>
+										{categorizedFiles.map((file, index) => (
+											<Image
+												key={index}
+												src={URL.createObjectURL(file)}
+												alt={`Categorized Image Preview ${index + 1}`}
+												width={100}
+												height={100}
+												style={{objectFit: 'cover'}}
+											/>
+										))}
+									</div>
+								)}
+							</Form.Item>
+						</div>
+					) : (
+						<>
+							{selectedMetal && (
+								<Form.Item label="Hình Ảnh Kim Loại">
+									<Upload
+										multiple
+										accept="image/*"
+										beforeUpload={(file) => {
+											if (selectedMetal) {
+												setMetalFile((prevFiles) =>
+													prevFiles
+														? [
+																...(Array.isArray(prevFiles)
+																	? prevFiles
+																	: [prevFiles]),
+																file,
+														  ]
+														: [file]
+												);
+											} else {
+												message.warning('Vui lòng chọn kim loại trước');
+												return Upload.LIST_IGNORE;
+											}
+											return false;
+										}}
+										showUploadList={false}
+									>
+										<Button icon={<UploadOutlined />}>
+											Tải Hình Ảnh Kim Loại
+										</Button>
+									</Upload>
+
+									{/* Metal Image Preview */}
+									{metalFile && (
+										<div
+											style={{
+												marginTop: 10,
+												display: 'flex',
+												flexWrap: 'wrap',
+												gap: '10px',
+											}}
+										>
+											{(Array.isArray(metalFile)
+												? metalFile
+												: [metalFile]
+											).map((file, index) => (
+												<Image
+													key={index}
+													src={URL.createObjectURL(file)}
+													alt={`Metal Image Preview ${index + 1}`}
+													width={100}
+													height={100}
+													style={{objectFit: 'cover'}}
+												/>
+											))}
+										</div>
+									)}
+									{/* Metal Images List */}
+									{metalImages.length > 0 && (
+										<div className="mt-4">
+											<h4>Danh Sách Hình Ảnh Hiện Tại</h4>
+											<div className="grid grid-cols-4 gap-4">
+												{metalImages
+													.filter(
+														(image) =>
+															!removedImagePaths.includes(
+																image.MediaPath
+															)
+													)
+													.map((image, index) => (
+														<div key={index} className="relative">
+															<Image
+																src={image.MediaPath}
+																alt={`Metal Image ${index + 1}`}
+																width={100}
+																height={100}
+																style={{objectFit: 'cover'}}
+															/>
+															<Button
+																type="link"
+																danger
+																className="absolute top-0 right-0"
+																onClick={() => {
+																	setRemovedImagePaths((prev) => [
+																		...prev,
+																		image.MediaPath,
+																	]);
+																	setMetalImages((prevImages) =>
+																		prevImages.filter(
+																			(img) =>
+																				img.MediaPath !==
+																				image.MediaPath
+																		)
+																	);
+																}}
+															>
+																Xóa
+															</Button>
+														</div>
+													))}
+											</div>
+										</div>
+									)}
+								</Form.Item>
+							)}
+
+							{selectedSideDiamond && (
+								<Form.Item label="Hình Ảnh Kim Cương Tấm">
+									<Upload
+										multiple
+										accept="image/*"
+										beforeUpload={(file) => {
+											if (selectedSideDiamond) {
+												setSideDiamondFile(file);
+											} else {
+												message.warning(
+													'Vui lòng chọn kim cương tấm trước'
+												);
+												return Upload.LIST_IGNORE;
+											}
+											return false;
+										}}
+										showUploadList={false}
+									>
+										<Button icon={<UploadOutlined />}>
+											Tải Hình Ảnh Kim Cương Tấm
+										</Button>
+									</Upload>
+
+									{/* Side Diamond Image Preview */}
+									{sideDiamondFile && (
+										<div style={{marginTop: 10}}>
+											<Image
+												src={URL.createObjectURL(sideDiamondFile)}
+												alt="Side Diamond Image Preview"
+												width={100}
+												height={100}
+												style={{objectFit: 'cover'}}
+											/>
+										</div>
+									)}
+
+									{/* Side Diamond Images List */}
+									{sideDiamondImages.length > 0 && (
+										<div className="mt-4">
+											<h4>Danh Sách Hình Ảnh Hiện Tại</h4>
+											<div className="grid grid-cols-4 gap-4">
+												{sideDiamondImages
+													.filter(
+														(image) =>
+															!removedImagePaths.includes(
+																image.MediaPath
+															)
+													)
+													.map((image, index) => (
+														<div key={index} className="relative">
+															<Image
+																src={image.MediaPath}
+																alt={`Side Diamond Image ${
+																	index + 1
+																}`}
+																width={100}
+																height={100}
+																style={{objectFit: 'cover'}}
+															/>
+															<Button
+																type="link"
+																danger
+																className="absolute top-0 right-0"
+																onClick={() => {
+																	setRemovedImagePaths((prev) => [
+																		...prev,
+																		image.MediaPath,
+																	]);
+																	setSideDiamondImages(
+																		(prevImages) =>
+																			prevImages.filter(
+																				(img) =>
+																					img.MediaPath !==
+																					image.MediaPath
+																			)
+																	);
+																}}
+															>
+																Xóa
+															</Button>
+														</div>
+													))}
+											</div>
+										</div>
+									)}
+								</Form.Item>
+							)}
+						</>
+					)}
 					<Form.Item label="Thumbnail">
 						<Upload
 							accept="image/*"
@@ -474,8 +794,6 @@ export const JewelryModelUploadForm = ({jewelryModelId, visible, onClose}) => {
 							/>
 						)}
 					</Form.Item>
-
-					{/* Jewelry Model Images Upload */}
 					<Form.Item label="Hình Ảnh Mẫu Trang Sức">
 						<Upload
 							multiple
@@ -506,9 +824,7 @@ export const JewelryModelUploadForm = ({jewelryModelId, visible, onClose}) => {
 				</Form>
 			) : (
 				<div className="space-y-8">
-					{/* View Mode */}
 					<div>
-						{/* Thumbnail Section */}
 						<div className="space-y-2">
 							<h3 className="text-lg font-semibold">Thumbnail</h3>
 							<Card
@@ -531,8 +847,6 @@ export const JewelryModelUploadForm = ({jewelryModelId, visible, onClose}) => {
 								}
 							/>
 						</div>
-
-						{/* Images Section */}
 						<div className="space-y-2">
 							<h3 className="text-lg font-semibold">Hình Ảnh</h3>
 							<Card bordered={false} className="shadow-md p-4">
@@ -560,69 +874,99 @@ export const JewelryModelUploadForm = ({jewelryModelId, visible, onClose}) => {
 							</Card>
 						</div>
 					</div>
-
-					{/* Selection Form */}
 					<Form layout="vertical" className="space-y-4">
-						{/* Side Diamond Select */}
 						<Form.Item label="Chọn Kim Cương Tấm" className="mb-4">
-							<Select
-								placeholder="Chọn Kim Cương Tấm"
-								onChange={setSelectedSideDiamond}
-								value={selectedSideDiamond}
-								className="w-full"
-							>
-								{jewelryModelFiles?.SideDiamonds?.map((diamond) => (
-									<Option key={diamond.Id} value={diamond.Id}>
-										{diamond.CaratWeight
-											? `${diamond.CaratWeight}ct`
-											: 'Unknown Carat Weight'}
-									</Option>
-								))}
-							</Select>
-						</Form.Item>
-
-						{/* Metal Select */}
-						<Form.Item label="Chọn Kim Loại" className="mb-4">
-							<Select
-								placeholder="Chọn Kim Loại"
-								onChange={(value) => setSelectedMetal(value)}
-								className="w-full"
-							>
-								{uniqueMetals.length > 0 ? (
-									uniqueMetals.map((metal) => (
-										<Option key={metal.MetalId} value={metal.MetalId}>
-											{metal.Metal?.Name || 'Unknown Metal'}
+							<div className="flex items-center space-x-2">
+								<Select
+									placeholder="Chọn Kim Cương Tấm"
+									onChange={setSelectedSideDiamond}
+									value={selectedSideDiamond}
+									className="w-full"
+								>
+									{jewelryModelFiles?.SideDiamonds?.map((diamond) => (
+										<Option key={diamond.Id} value={diamond.Id}>
+											{diamond.CaratWeight
+												? `${diamond.CaratWeight}ct`
+												: 'Unknown Carat Weight'}
 										</Option>
-									))
-								) : (
-									<Option disabled>Không có kim loại</Option>
-								)}
-							</Select>
-						</Form.Item>
-					</Form>
-
-					{/* Display the image based on Metal and Side Diamond selection */}
-					{selectedMetal && selectedSideDiamond && (
-						<div className="space-y-2 mt-6">
-							<h3 className="text-lg font-semibold">Chọn Hình Ảnh Cho Trang Sức</h3>
-							<div className="flex justify-center items-center">
-								{getImageForSelection(selectedMetal, selectedSideDiamond) ? (
-									<Image
-										src={getImageForSelection(
-											selectedMetal,
-											selectedSideDiamond
-										)}
-										alt="Selected Jewelry"
-										width={200}
-										style={{objectFit: 'cover'}}
-										className="rounded-lg shadow-lg"
-									/>
-								) : (
-									<div className="flex justify-center items-center w-48 h-48 bg-gray-200 text-gray-500 rounded-lg shadow-lg">
-										Not Available
-									</div>
+									))}
+								</Select>{' '}
+								{selectedSideDiamond && (
+									<Button
+										icon={<CloseCircleOutlined />}
+										onClick={handleDeselectSideDiamond}
+										type="text"
+										danger
+									>
+										Hủy chọn
+									</Button>
 								)}
 							</div>
+						</Form.Item>
+						<Form.Item label="Chọn Kim Loại" className="mb-4">
+							<div className="flex items-center space-x-2">
+								<Select
+									placeholder="Chọn Kim Loại"
+									onChange={(value) => setSelectedMetal(value)}
+									value={selectedMetal}
+									className="w-full"
+								>
+									{uniqueMetals.length > 0 ? (
+										uniqueMetals.map((metal) => (
+											<Option key={metal.MetalId} value={metal.MetalId}>
+												{metal.Metal?.Name || 'Unknown Metal'}
+											</Option>
+										))
+									) : (
+										<Option disabled>Không có kim loại</Option>
+									)}
+								</Select>
+								{selectedMetal && (
+									<Button
+										icon={<CloseCircleOutlined />}
+										onClick={handleDeselectMetal}
+										type="text"
+										danger
+									>
+										Hủy chọn
+									</Button>
+								)}
+							</div>
+						</Form.Item>
+					</Form>
+					{selectedMetal || selectedSideDiamond ? (
+						(() => {
+							const selectedImages = getImagesForSelection(
+								selectedMetal,
+								selectedSideDiamond
+							);
+							if (selectedImages && selectedImages.length > 0) {
+								return (
+									<div className="grid grid-cols-3 gap-4">
+										{selectedImages.map((image, index) => (
+											<Image
+												key={index}
+												src={image}
+												alt={`Selected Jewelry ${index + 1}`}
+												width={150}
+												height={150}
+												style={{objectFit: 'cover'}}
+												className="rounded-lg shadow-lg"
+											/>
+										))}
+									</div>
+								);
+							} else {
+								return (
+									<div className="flex justify-center items-center w-48 h-48 bg-gray-200 text-gray-500 rounded-lg shadow-lg">
+										Không tìm thấy hình ảnh
+									</div>
+								);
+							}
+						})()
+					) : (
+						<div className="flex justify-center items-center w-full h-48 bg-gray-200 text-gray">
+							Vui lòng chọn kim loại hoặc kim cương
 						</div>
 					)}
 				</div>
