@@ -1,11 +1,9 @@
 import React, {useEffect, useState} from 'react';
-
 import {CalendarOutlined, EditFilled} from '@ant-design/icons';
 import {Button, DatePicker, Input, Select, Space, Table, Tag, Typography} from 'antd';
-import debounce from 'lodash/debounce';
 import {useDispatch, useSelector} from 'react-redux';
-import {Link, useNavigate} from 'react-router-dom';
-import {Filter} from '../../../components/Filter';
+import {useNavigate} from 'react-router-dom';
+import {Helmet} from 'react-helmet';
 import {
 	getAllOrderSelector,
 	GetUserDetailSelector,
@@ -14,11 +12,12 @@ import {
 import {getAllOrder} from '../../../redux/slices/orderSlice';
 import {formatPrice} from '../../../utils';
 import {enums} from '../../../utils/constant';
-import {Helmet} from 'react-helmet';
+import {Filter} from '../../../components/Filter';
 
 const {Search} = Input;
 const {RangePicker} = DatePicker;
 const {Title} = Typography;
+const {Option} = Select;
 
 const statusList = [
 	{name: 'Tất Cả', value: ''},
@@ -42,23 +41,6 @@ const statusMapping = {
 	7: {label: 'Vận Chuyển Thất Bại', color: 'volcano'},
 	8: {label: 'Thành Công', color: 'geekblue'},
 };
-
-const statusPaymentMapping = {
-	1: {label: 'Trả Hết', color: 'geekblue'},
-	2: {label: 'Trả Trước', color: 'blue'},
-	3: {label: 'Chờ Hoàn Tiền', color: 'orange'},
-	4: {label: 'Đã Hoàn Tiền', color: 'volcano'},
-	5: {label: 'Chờ Xử Lý', color: 'green'},
-};
-
-const delivererStatusList = [
-	{name: 'Tất Cả', value: ''},
-	{name: 'Đã Chuẩn Bị', value: '5'},
-	{name: 'Đang Vận Chuyển', value: '6'},
-	{name: 'Vận Chuyển Thất Bại', value: '7'},
-	{name: 'Thành Công', value: '8'},
-	// {name: 'Refused', value: '9'},
-];
 
 const OrderPage = () => {
 	const navigate = useNavigate();
@@ -93,34 +75,22 @@ const OrderPage = () => {
 			})
 		);
 	}, [dispatch, pageSize, current, activeStatus, startDate, endDate, searchText, selectOrder]);
-
 	useEffect(() => {
-		if (userDetail?.Roles) {
-			const isDeliverer = userDetail.Roles.some((role) => role?.RoleName === 'deliverer');
-
-			setDelivererRole(isDeliverer);
-		}
-	}, [userDetail]);
-
-	useEffect(() => {
-		if (orderList && enums) {
-			const mapAttributes = (data, attributes) => ({
-				id: data?.Id,
-				orderTime: data?.CreatedDate,
-				Status: data?.Status,
-				email: data?.Account?.Email,
-				totalAmount: formatPrice(data?.TotalPrice),
-				customer: null,
-				paymentMethod: data?.PaymentStatus,
-				OrderCode: data?.OrderCode,
-				CustomizeRequestId: data?.CustomizeRequestId,
-			});
-
-			const mappedData = orderList?.Values?.map((order) => mapAttributes(order, enums));
+		if (orderList) {
+			const mappedData = orderList?.Values?.map((order) => ({
+				id: order?.Id,
+				orderTime: order?.CreatedDate,
+				Status: order?.Status,
+				email: order?.Account?.Email,
+				totalAmount: formatPrice(order?.TotalPrice),
+				paymentMethod: order?.PaymentStatus,
+				OrderCode: order?.OrderCode,
+				CustomizeRequestId: order?.CustomizeRequestId,
+			}));
 
 			setOrders(mappedData);
 		}
-	}, [orderList, enums]);
+	}, [orderList]);
 
 	const columns = [
 		{
@@ -128,18 +98,21 @@ const OrderPage = () => {
 			dataIndex: 'OrderCode',
 			key: 'OrderCode',
 			align: 'center',
+			responsive: ['sm'],
 		},
 		{
 			title: 'Email',
 			key: 'email',
 			dataIndex: 'email',
 			align: 'center',
+			ellipsis: true,
 		},
 		{
-			title: 'Thời Gian Đặt Hàng',
+			title: 'Thời Gian',
 			dataIndex: 'orderTime',
 			key: 'orderTime',
 			align: 'center',
+			responsive: ['md'],
 		},
 		{
 			title: 'Giá',
@@ -148,145 +121,72 @@ const OrderPage = () => {
 			align: 'center',
 		},
 		{
-			title: 'Loại Đơn Hàng',
-			key: 'CustomizeRequestId',
-			dataIndex: 'CustomizeRequestId',
-			align: 'center',
-			render: (CustomizeRequestId) => (CustomizeRequestId ? 'Đơn Thiết Kế' : 'Đơn Thường'),
-		},
-		{
-			title: 'PT Thanh Toán',
-			key: 'paymentMethod',
-			dataIndex: 'paymentMethod',
-			align: 'center',
-			render: (status) => {
-				console.log('status', status);
-
-				const {label, color} = statusPaymentMapping[status] || {
-					label: 'Unknown',
-					color: 'gray',
-				};
-				return <Tag color={color}>{label?.toUpperCase()}</Tag>;
-			},
-		},
-
-		{
 			title: 'Trạng Thái',
 			key: 'Status',
 			dataIndex: 'Status',
 			align: 'center',
 			render: (status) => {
-				console.log('status', status);
-
 				const {label, color} = statusMapping[status] || {label: 'Unknown', color: 'gray'};
 				return <Tag color={color}>{label?.toUpperCase()}</Tag>;
 			},
 		},
-		{
-			title: '',
-			key: 'action',
-			align: 'center',
-			render: (_, record) => (
-				<Space size="middle">
-					<Link to={`/orders/${record.id}`}>
-						<Button type="text" className="bg-primary">
-							<EditFilled />
-						</Button>
-					</Link>
-				</Space>
-			),
-		},
 	];
 
-	const handleDateChange = (dates, dateStrings) => {
-		setStartDate(dates[0]);
-		setEndDate(dates[1]);
-	};
-
-	const handleStatusChange = (value) => {
-		setActiveStatus(value);
-	};
-
-	const onSearch = (value) => {
-		setSearchText(value);
-	};
-
-	const handleOrderChange = (value) => {
-		console.log(value);
-
-		setSelectOrder(value);
+	const handleDateChange = (dates) => {
+		setStartDate(dates?.[0]);
+		setEndDate(dates?.[1]);
 	};
 
 	return (
-		<div className="mx-20 my-10">
+		<div className="mx-4 sm:mx-20 my-1">
 			<Helmet>
 				<title>Danh Sách Đơn Đặt Hàng</title>
 			</Helmet>
-			<Title level={3}>Danh Sách Đơn Đặt Hàng</Title>
-			<Filter
-				filter={delivererRole ? delivererStatusList : statusList}
-				handleStatusBtn={handleStatusChange}
-				active={activeStatus}
-			/>
-			<div className="flex flex-col sm:flex-row sm:items-center">
-				<Space wrap className="w-full my-5">
-					<div className="flex items-center my-3 sm:my-5">
-						<p className="mr-3 text-sm sm:text-base">Tìm theo ngày:</p>
-					</div>
-					<div
-						className="flex items-center pl-2 sm:my-0"
-						style={{
-							border: '1px solid #d9d9d9',
-							borderRadius: '4px',
-							width: '100%',
-							maxWidth: '400px',
-						}}
-					>
-						<span className="mr-3 font-bold text-sm sm:text-base">Từ</span>
-						<span className="mr-3">→</span>
-						<span className="mr-3 font-bold text-sm sm:text-base">Đến</span>
-						<RangePicker
-							format="DD/MM/YYYY"
-							suffixIcon={<CalendarOutlined />}
-							style={{border: 'none', width: '100%'}}
-							onChange={handleDateChange}
-						/>
-					</div>
-
-					<div className="flex items-center my-3 sm:my-5 ml-5">
-						<p className="mr-3 text-sm sm:text-base">Tìm kiếm:</p>
-					</div>
-					<Search
-						className="w-full sm:w-60"
-						placeholder="Tìm theo email"
-						allowClear
-						onSearch={onSearch}
-					/>
-					<div className="flex items-center my-3 sm:my-5 ml-5">
-						<p className="mr-3 text-sm sm:text-base">Chọn loại đơn:</p>
-					</div>
-					<Select className="w-32" onChange={handleOrderChange} allowClear>
-						<Option value={false}>Đơn Thường</Option>
-						<Option value={true}>Đơn Thiết Kế</Option>
-					</Select>
-				</Space>
-			</div>
-
-			<div>
-				<Table
-					dataSource={orders}
-					columns={columns}
-					pagination={{
-						current: current,
-						total: orderList?.TotalPage * pageSize,
-						pageSize: pageSize,
-						onChange: (page) => setCurrent(page),
-						showSizeChanger: false,
-						onShowSizeChange: (current, size) => setPageSize(size),
-					}}
-					loading={loading}
+			<Title level={3} className="text-center sm:text-left">
+				Danh Sách Đơn Đặt Hàng
+			</Title>
+			<div className="flex flex-wrap items-center justify-between mb-5 gap-2">
+				<Search
+					placeholder="Tìm theo email"
+					allowClear
+					onSearch={setSearchText}
+					className="my-2 sm:my-0 sm:ml-5"
 				/>
+				<RangePicker
+					format="DD/MM/YYYY"
+					suffixIcon={<CalendarOutlined />}
+					onChange={handleDateChange}
+				/>
+				<Select
+					className="w-32 my-2 sm:my-0 sm:ml-5"
+					placeholder="Loại đơn"
+					onChange={setSelectOrder}
+				>
+					<Option value={false}>Đơn Thường</Option>
+					<Option value={true}>Đơn Thiết Kế</Option>
+				</Select>
 			</div>
+			<Table
+				dataSource={orders}
+				columns={columns}
+				pagination={{
+					current: current,
+					total: orderList?.TotalPage * pageSize,
+					pageSize: 1000, // Set the default page size to 50
+					onChange: (page) => setCurrent(page),
+					showSizeChanger: false, // Disable size changer for consistency
+				}}
+				loading={loading}
+				rowKey="id"
+				onRow={(record) => ({
+					onClick: () => navigate(`/orders/${record.id}`),
+				})}
+				scroll={{
+					y: 500, // Set vertical scroll height
+				}}
+				className="w-full overflow-x-auto"
+				sticky // Enable sticky headers
+			/>
 		</div>
 	);
 };
