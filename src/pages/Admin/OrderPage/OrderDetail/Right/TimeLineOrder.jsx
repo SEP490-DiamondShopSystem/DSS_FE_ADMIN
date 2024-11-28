@@ -141,7 +141,6 @@ const TimeLineOrder = ({orders, loading, statusOrder, paymentStatusOrder, id}) =
 			.unwrap()
 			.then(() => {
 				message.success('Đã chuyển giao cho nhân viên vận chuyển!');
-				// localStorage.setItem(`isAssigned_${orders.Id}`, JSON.stringify(true));
 			})
 			.catch((error) => {
 				message.error(error?.data?.title || error?.title);
