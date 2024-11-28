@@ -48,20 +48,18 @@ const OrderDetail = () => {
 			{loading ? (
 				<Loading />
 			) : (
-				<div className="w-full flex flex-col lg:flex-row lg:items-start lg:space-x-10">
+				<div className="w-full flex">
 					<Helmet>
 						<title>Dashboard</title>
 					</Helmet>
-					{/* Left Section */}
-					<div className="w-full lg:w-2/3">
+					<div className="md:w-2/3">
 						<InformationOrder
 							orders={orderDetail}
 							statusOrder={statusOrder}
 							paymentStatusOrder={paymentStatusOrder}
 						/>
 					</div>
-					{/* Right Section */}
-					<div className="w-full lg:w-1/3 mt-6 lg:mt-0">
+					<div className="pl-10 md:w-1/3">
 						<TimeLineOrder
 							orders={orderDetail}
 							statusOrder={statusOrder}
