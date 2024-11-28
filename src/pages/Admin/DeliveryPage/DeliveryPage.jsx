@@ -149,7 +149,7 @@ const DeliveryPage = () => {
     };
 
     return (
-        <div className="p-4 sm:p-6 lg:p-10">
+        <div className=" sm:p-6 lg:p-10">
             <Row gutter={[16, 16]} align="middle" justify="space-between" className="mb-6">
                 <Col xs={24} sm={24} md={12} lg={16}>
                     <Row gutter={[16, 16]} align="middle" wrap>

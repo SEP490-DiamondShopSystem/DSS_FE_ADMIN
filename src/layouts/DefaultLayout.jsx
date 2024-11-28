@@ -263,6 +263,21 @@ const DefaultLayout = () => {
 								Đăng Xuất
 							</Button>
 						</Tooltip>
+						{showSignOutPopup && (
+							<div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+								<div className="bg-white p-4 rounded-lg">
+									<p className="text-center mb-4">Bạn có muốn đăng xuất?</p>
+									<div className="flex gap-5 justify-between">
+										<Button onClick={handleLogout} type="primary">
+											Đăng Xuất{' '}
+										</Button>
+										<Button onClick={() => setShowSignOutPopup(false)}>
+											Hủy
+										</Button>
+									</div>
+								</div>
+							</div>
+						)} 
 					</div>
 				</Drawer>
 			)}
@@ -345,23 +360,10 @@ const DefaultLayout = () => {
                         ${isMobile ? 'text-xs p-2' : ''}
                     `}
 					>
-						Diamond Admin Page ©{new Date().getFullYear()} Created by Diamond Shop Team
+						Diamond Admin Page ©{new Date().getFullYear()}
 					</Footer>
 				)}
 			</Layout>
-			{showSignOutPopup && (
-				<div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
-					<div className="bg-white p-4 rounded-lg">
-						<p className="text-center mb-4">Bạn có muốn đăng xuất?</p>
-						<div className="flex gap-5 justify-between">
-							<Button onClick={handleLogout} type="primary">
-								Đăng Xuất{' '}
-							</Button>
-							<Button onClick={() => setShowSignOutPopup(false)}>Hủy</Button>
-						</div>
-					</div>
-				</div>
-			)}
 		</Layout>
 	);
 };

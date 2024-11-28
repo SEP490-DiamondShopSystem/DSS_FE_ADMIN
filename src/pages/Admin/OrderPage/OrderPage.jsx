@@ -98,14 +98,15 @@ const OrderPage = () => {
 			dataIndex: 'OrderCode',
 			key: 'OrderCode',
 			align: 'center',
-			responsive: ['sm'],
+			ellipsis: true,
 		},
 		{
 			title: 'Email',
 			key: 'email',
 			dataIndex: 'email',
 			align: 'center',
-			ellipsis: true,
+
+			responsive: ['sm'],
 		},
 		{
 			title: 'Thời Gian',
@@ -129,6 +130,7 @@ const OrderPage = () => {
 				const {label, color} = statusMapping[status] || {label: 'Unknown', color: 'gray'};
 				return <Tag color={color}>{label?.toUpperCase()}</Tag>;
 			},
+			ellipsis: true,
 		},
 	];
 
@@ -138,7 +140,7 @@ const OrderPage = () => {
 	};
 
 	return (
-		<div className="mx-4 sm:mx-20 my-1">
+		<div className="  my-1">
 			<Helmet>
 				<title>Danh Sách Đơn Đặt Hàng</title>
 			</Helmet>
@@ -180,12 +182,14 @@ const OrderPage = () => {
 				rowKey="id"
 				onRow={(record) => ({
 					onClick: () => navigate(`/orders/${record.id}`),
+					className: 'cursor-pointer hover:bg-gray-100 transition-colors duration-200' // Add hover effect
+
 				})}
 				scroll={{
 					y: 500, // Set vertical scroll height
 				}}
-				className="w-full overflow-x-auto"
-				sticky // Enable sticky headers
+				className="w-svw"
+				sticky
 			/>
 		</div>
 	);
