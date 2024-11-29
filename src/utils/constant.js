@@ -70,9 +70,10 @@ export const enums = {
 		Cancelled: 4,
 	},
 	OrderItemStatus: {
-		Preparing: 0,
-		Done: 1,
-		Removed: 2,
+		Pending: 0,
+		Prepared: 1,
+		Done: 2,
+		Removed: 3,
 	},
 	OrderStatus: {
 		Pending: 1,
@@ -240,11 +241,11 @@ export const enums = {
 
 export const enumMappings = {
 	Status: {
-		1:'Đã Lên Lịch',
-		2:'Đang Hoạt Động',
-		3:'Hết Hạn',
-		4:'Đã Tạm Dừng',
-		5:'Đã Hủy',
+		1: 'Đã Lên Lịch',
+		2: 'Đang Hoạt Động',
+		3: 'Hết Hạn',
+		4: 'Đã Tạm Dừng',
+		5: 'Đã Hủy',
 	},
 	Origin: {
 		1: 'Tự Nhiên',
@@ -285,7 +286,7 @@ export const enumMappings = {
 		8: 'Pearl',
 		9: 'Bracelet Catch',
 	},
-	
+
 	SettingType: {
 		0: 'Prong',
 		1: 'Bezel',

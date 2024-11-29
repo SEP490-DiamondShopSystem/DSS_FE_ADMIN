@@ -573,6 +573,7 @@ const InformationOrder = ({orders, statusOrder, paymentStatusOrder}) => {
 					rowKey="orderId"
 					expandedRowRender={expandedRowRender}
 					loading={loading}
+					responsive="sm"
 				/>
 			</div>
 			<Modal

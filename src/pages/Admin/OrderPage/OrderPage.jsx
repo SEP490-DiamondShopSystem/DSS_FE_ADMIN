@@ -62,7 +62,6 @@ const OrderPage = () => {
 	const dispatch = useDispatch();
 
 	const loading = useSelector(LoadingOrderSelector);
-	const orderList = useSelector(getAllOrderSelector);
 	const userDetail = useSelector(GetUserDetailSelector);
 
 	const [startDate, setStartDate] = useState(null);
@@ -74,6 +73,7 @@ const OrderPage = () => {
 	const [pageSize, setPageSize] = useState(5);
 	const [current, setCurrent] = useState(1);
 	const [delivererRole, setDelivererRole] = useState(false);
+	const [orderList, setOrderList] = useState();
 
 	console.log('orderList', orderList);
 
@@ -88,7 +88,11 @@ const OrderPage = () => {
 				Email: searchText,
 				IsCustomize: selectOrder,
 			})
-		);
+		)
+			.unwrap()
+			.then((res) => {
+				setOrderList(res);
+			});
 	}, [dispatch, pageSize, current, activeStatus, startDate, endDate, searchText, selectOrder]);
 	useEffect(() => {
 		if (userDetail?.Roles) {

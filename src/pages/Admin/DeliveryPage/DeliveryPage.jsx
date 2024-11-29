@@ -175,8 +175,8 @@ const DeliveryPage = () => {
 		dispatch(handleCreateDelivery(values))
 			.unwrap()
 			.then((es) => {
-					message.success('Chuyển giao shipper thành công!');
-					setIsModalVisible(false);
+				message.success('Chuyển giao shipper thành công!');
+				setIsModalVisible(false);
 			})
 			.catch((error) => {
 				message.error(error?.data?.title || error?.detail);

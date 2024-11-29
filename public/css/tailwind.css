@@ -2661,3 +2661,20 @@ video {
 		display: block;
 	}
 }
+
+@media (min-width: 640px) {
+	.sm\:w-32 {
+		width: 8rem /* 128px */;
+	}
+}
+
+.text-sm {
+	font-size: 0.875rem /* 14px */;
+	line-height: 1.25rem /* 20px */;
+}
+
+@media (min-width: 640px) {
+	.sm\:hidden {
+		display: none;
+	}
+}
