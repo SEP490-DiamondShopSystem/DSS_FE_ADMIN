@@ -5,11 +5,7 @@ import CircleIcon from '@mui/icons-material/Circle';
 import {Button, Form, Input, message, Modal, Select, Space, Typography} from 'antd';
 import {useDispatch, useSelector} from 'react-redux';
 import Loading from '../../../../../components/Loading';
-import {
-	getAllDelivererSelector,
-	getAllDeliverySelector,
-	GetUserDetailSelector,
-} from '../../../../../redux/selectors';
+import {getAllDelivererSelector, GetUserDetailSelector} from '../../../../../redux/selectors';
 import {
 	handleDeliveryFailed,
 	handleOrder,
@@ -18,8 +14,8 @@ import {
 	handleRedeliver,
 	handleRefundOrder,
 } from '../../../../../redux/slices/orderSlice';
-import {getAllUser, getDelivererAccount} from '../../../../../redux/slices/userSlice';
-import {convertToVietnamDate, getOrderStatus} from '../../../../../utils';
+import {getDelivererAccount} from '../../../../../redux/slices/userSlice';
+import {getOrderStatus} from '../../../../../utils';
 import {TimeLine} from './TimeLine';
 
 const {Title, Text} = Typography;
@@ -141,7 +137,6 @@ const TimeLineOrder = ({orders, loading, statusOrder, paymentStatusOrder, id}) =
 			.unwrap()
 			.then(() => {
 				message.success('Đã chuyển giao cho nhân viên vận chuyển!');
-				// localStorage.setItem(`isAssigned_${orders.Id}`, JSON.stringify(true));
 			})
 			.catch((error) => {
 				message.error(error?.data?.title || error?.title);
