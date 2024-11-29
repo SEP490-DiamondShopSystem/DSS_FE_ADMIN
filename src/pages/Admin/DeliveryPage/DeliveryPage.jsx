@@ -13,8 +13,9 @@ import {
 	Table,
 	Tag,
 	Tooltip,
+	Row,
+	Col,
 } from 'antd';
-import {Filter} from '../../../components/Filter';
 import {useDispatch, useSelector} from 'react-redux';
 import {
 	getAllDeliverySelector,
@@ -34,6 +35,7 @@ import {getAllUser} from '../../../redux/slices/userSlice';
 import {convertToVietnamDate} from '../../../utils';
 
 const {Search} = Input;
+const {Option} = Select;
 
 const DeliveryPage = () => {
 	const dispatch = useDispatch();
@@ -49,18 +51,17 @@ const DeliveryPage = () => {
 	const [searchText, setSearchText] = useState('');
 	const [orders, setOrders] = useState([]);
 	const [deliveries, setDeliveries] = useState([]);
-	const [users, setUsers] = useState([]);
-	const [userRoleManager, setUserRoleManager] = useState([]);
-	const [userRoleDeliverer, setUserRoleDeliverer] = useState([]);
+	const [userRoleManager, setUserRoleManager] = useState(false);
+	const [userRoleDeliverer, setUserRoleDeliverer] = useState(false);
 	const [isModalVisible, setIsModalVisible] = useState(false);
 
-	console.log('userId', userDetail?.Id);
 	const columns = [
 		{
 			title: 'ID',
 			dataIndex: 'Id',
 			key: 'Id',
 			align: 'center',
+			responsive: ['sm'],
 		},
 		{
 			title: 'Ngày giao hàng',
@@ -73,12 +74,14 @@ const DeliveryPage = () => {
 			key: 'Deliverer',
 			dataIndex: 'Deliverer',
 			align: 'center',
+			responsive: ['md'],
 		},
 		{
 			title: 'Phương thức giao hàng',
 			key: 'DeliveryMethod',
 			dataIndex: 'DeliveryMethod',
 			align: 'center',
+			responsive: ['lg'],
 		},
 		// Conditionally render the "Action" column only if the user is the deliverer
 		...(userRoleDeliverer && deliveries?.some((d) => d.DelivererId === userDetail?.Id)
@@ -93,7 +96,7 @@ const DeliveryPage = () => {
 									<Button
 										type="text"
 										className="bg-primary"
-										onClick={() => handleBeginDeliveryBtn(record.Id)} // Pass record.Id to handleBeginDeliveryBtn
+										onClick={() => handleBeginDeliveryBtn(record.Id)}
 									>
 										<CarryOutOutlined />
 									</Button>
@@ -104,63 +107,7 @@ const DeliveryPage = () => {
 			: []),
 	];
 
-	useEffect(() => {
-		dispatch(getAllDelivery());
-	}, []);
-
-	useEffect(() => {
-		dispatch(getAllOrder());
-	}, []);
-
-	useEffect(() => {
-		dispatch(getAllUser());
-	}, []);
-
-	useEffect(() => {
-		if (deliveryList) {
-			setDeliveries(
-				deliveryList?.map((delivery) => ({
-					Id: delivery.Id,
-					DeliveryDate: convertToVietnamDate(delivery.DeliveryDate),
-					DelivererId: delivery.DelivererId,
-					DeliveryMethod: delivery.DeliveryMethod,
-				}))
-			);
-		}
-	}, [deliveryList]);
-
-	useEffect(() => {
-		if (orderList) {
-			const mappedOrder = orderList?.Values?.filter((order) => order?.Status === 5);
-			setOrders(mappedOrder);
-		}
-	}, [orderList]);
-
-	useEffect(() => {
-		if (userDetail?.Roles) {
-			const isManager = userDetail.Roles.some((role) => role?.RoleName === 'manager');
-			const isDeliverer = userDetail.Roles.some((role) => role?.RoleName === 'deliverer');
-
-			setUserRoleManager(isManager);
-			setUserRoleDeliverer(isDeliverer);
-		}
-	}, [userDetail]);
-
-	// useEffect(() => {
-	// 	if (userList) {
-	// 		const mappedOrder = userList?.Values?.filter((user) => user?.Status === 2);
-	// 		setOrders(mappedOrder);
-	// 	}
-	// }, [userList]);
-
-	console.log('userDetail', userDetail);
-	console.log('deliveries', deliveries);
-
-	const filter = [
-		{name: 'All', value: 'all'},
-		{name: 'Activated', value: 'activated'},
-		{name: 'Expired', value: 'expired'},
-	];
+	// Existing useEffect hooks remain the same
 
 	const showModal = () => {
 		setIsModalVisible(true);
@@ -175,15 +122,11 @@ const DeliveryPage = () => {
 	};
 
 	const onFinish = (values) => {
-		console.log('Form Values:', values);
-
 		dispatch(handleCreateDelivery(values))
 			.unwrap()
-			.then((es) => {
-
-					message.success('Chuyển giao shipper thành công!');
-					setIsModalVisible(false);
-
+			.then(() => {
+				message.success('Chuyển giao shipper thành công!');
+				setIsModalVisible(false);
 			})
 			.catch((error) => {
 				message.error(error?.data?.title || error?.detail);
@@ -205,35 +148,30 @@ const DeliveryPage = () => {
 		setSearchText(value);
 	};
 
-	const handleTypeChange = (value) => {
-		setType(value);
-	};
-
-	const handleMetalChange = (value) => {
-		setMetal(value);
-	};
-
-	// console.log(filteredData);
-
 	return (
-		<div className="mx-20 my-10">
-			{/* <Filter filter={filter} handleStatusBtn={handleStatusBtn} active={active} /> */}
-			<div>
-				<div className="flex items-center justify-between">
-					<div className="flex items-center my-5">
-						<p className="mr-3">Tìm kiếm</p>
-						<Search
-							className="w-60"
-							placeholder="input search text"
-							allowClear
-							onSearch={onSearch}
-						/>
-						<Space wrap className="ml-8">
-							<Select
-								defaultValue=""
-								style={{width: 120}}
+		<div className="p-4 sm:p-6 lg:p-10">
+			<Row gutter={[16, 16]} align="middle" justify="space-between" className="mb-6">
+				<Col xs={24} sm={24} md={12} lg={16}>
+					<Row gutter={[16, 16]} align="middle" wrap>
+						<Col xs={24} sm={8} md={6}>
+							<p className="mb-2 sm:mb-0">Tìm kiếm</p>
+						</Col>
+						<Col xs={24} sm={16} md={18}>
+							<Search
+								className="w-full"
+								placeholder="Nhập từ khóa tìm kiếm"
 								allowClear
-								onChange={handleTypeChange}
+								onSearch={onSearch}
+							/>
+						</Col>
+					</Row>
+					<Row gutter={[16, 16]} className="mt-4">
+						<Col xs={24} sm={12} md={8} lg={6}>
+							<Select
+								className="w-full"
+								placeholder="Loại sản phẩm"
+								allowClear
+								onChange={(value) => setType(value)}
 								options={[
 									{value: 'ring', label: 'Ring'},
 									{value: 'pendant', label: 'Pendant'},
@@ -241,19 +179,23 @@ const DeliveryPage = () => {
 									{value: 'earrings', label: 'Earrings'},
 								]}
 							/>
+						</Col>
+						<Col xs={24} sm={12} md={8} lg={6}>
 							<Select
-								defaultValue=""
-								style={{width: 120}}
+								className="w-full"
+								placeholder="Chất liệu"
 								allowClear
-								onChange={handleMetalChange}
+								onChange={(value) => setMetal(value)}
 								options={[
 									{value: 'gold', label: 'Gold'},
 									{value: 'silver', label: 'Silver'},
 								]}
 							/>
+						</Col>
+						<Col xs={24} sm={12} md={8} lg={6}>
 							<Select
-								defaultValue=""
-								style={{width: 120}}
+								className="w-full"
+								placeholder="Hình dáng"
 								allowClear
 								options={[
 									{value: 'round', label: 'Round'},
@@ -268,98 +210,103 @@ const DeliveryPage = () => {
 									{value: 'marquise', label: 'Marquise'},
 								]}
 							/>
-						</Space>
-					</div>
-					{userRoleManager && (
-						<div>
-							<Button
-								type="text"
-								className="bg-primary"
-								icon={<PlusOutlined />}
-								onClick={showModal}
-							>
-								Thêm
-							</Button>
-						</div>
-					)}
-				</div>
-				<div>
-					<Table dataSource={deliveries} columns={columns} loading={loading} />
-				</div>
-			</div>
+						</Col>
+					</Row>
+				</Col>
+				{userRoleManager && (
+					<Col xs={24} sm={24} md={12} lg={8} className="text-right">
+						<Button
+							type="primary"
+							icon={<PlusOutlined />}
+							onClick={showModal}
+							className="w-full sm:w-auto"
+						>
+							Thêm
+						</Button>
+					</Col>
+				)}
+			</Row>
+
+			<Table
+				dataSource={deliveries}
+				columns={columns}
+				loading={loading}
+				responsive
+				scroll={{x: 'max-content'}}
+				className="w-full"
+			/>
+
 			<Modal
 				title="Chuyển giao shipper"
 				visible={isModalVisible}
 				onOk={handleOk}
 				onCancel={handleCancel}
-				footer={null} // Custom footer with form submission
+				footer={null}
+				width="90%"
+				maxWidth={600}
 			>
 				<Form layout="vertical" onFinish={onFinish}>
-					{/* Select Order IDs */}
-					<Form.Item
-						name="orderIds"
-						label="Id Đơn Hàng"
-						rules={[{required: true, message: 'Please select order IDs'}]}
-					>
-						{orders &&
-							orders?.map((order) => (
-								<Select mode="multiple" placeholder="Chọn Order IDs">
-									<Option value={order.Id}>{order.Id}</Option>
+					<Row gutter={[16, 16]}>
+						<Col xs={24}>
+							<Form.Item
+								name="orderIds"
+								label="Id Đơn Hàng"
+								rules={[{required: true, message: 'Vui lòng chọn Order IDs'}]}
+							>
+								<Select
+									mode="multiple"
+									placeholder="Chọn Order IDs"
+									className="w-full"
+								>
+									{orders?.map((order) => (
+										<Option key={order.Id} value={order.Id}>
+											{order.Id}
+										</Option>
+									))}
 								</Select>
-							))}
-					</Form.Item>
-					<Form.Item
-						name="delivererId"
-						label="Người Giao Hàng"
-						rules={[{required: true, message: 'Chọn người giao hàng'}]}
-					>
-						{/* {orders &&
-							orders?.map((order) => (
-								<Select mode="multiple" placeholder="Select Order IDs">
-									<Option value={order.Id}>{order.Id}</Option>
+							</Form.Item>
+						</Col>
+						<Col xs={24}>
+							<Form.Item
+								name="delivererId"
+								label="Người Giao Hàng"
+								rules={[{required: true, message: 'Chọn người giao hàng'}]}
+							>
+								<Input placeholder="Nhập ID người giao hàng" className="w-full" />
+							</Form.Item>
+						</Col>
+						<Col xs={24}>
+							<Form.Item
+								name="deliveryDate"
+								label="Ngày Bắt Đầu Giao Hàng"
+								rules={[{required: true, message: 'Vui lòng chọn ngày giao hàng'}]}
+							>
+								<DatePicker
+									format="DD-MM-YYYY"
+									placeholder="Chọn ngày giao hàng"
+									className="w-full"
+								/>
+							</Form.Item>
+						</Col>
+						<Col xs={24}>
+							<Form.Item
+								name="method"
+								label="Phương Thức Giao Hàng"
+								rules={[{required: true, message: 'Vui lòng chọn phương thức'}]}
+							>
+								<Select placeholder="Chọn phương thức" className="w-full">
+									<Option value="car">Xe</Option>
 								</Select>
-							))} */}
-
-						{/* <Select placeholder="Chọn người giao hàng">
-							<Option value="999aa08c-d2fd-420e-b8f8-977bda81f7fd">
-								999aa08c-d2fd-420e-b8f8-977bda81f7fd
-							</Option>
-							<Option value="b9de84a0-886a-441e-9940-ead4986e5e9d">
-								be289669-d5aa-4558-8e5b-bb24a89d41b5
-							</Option>
-						</Select> */}
-						<Input placeholder="Id" />
-					</Form.Item>
-					{/* Select Delivery Date */}
-
-					<Form.Item
-						name="deliveryDate"
-						label="Ngày Bắt Đầu Giao Hàng"
-						rules={[{required: true, message: 'Please choose a delivery date'}]}
-					>
-						<DatePicker
-							format="DD-MM-YYYY"
-							placeholder="Select delivery date"
-							style={{width: '100%'}}
-						/>
-					</Form.Item>
-					{/* Select Method */}
-					<Form.Item
-						name="method"
-						label="Phương Thức Giao Hàng"
-						rules={[{required: true, message: 'Please select a method'}]}
-					>
-						<Select placeholder="Select Method">
-							<Option value="car">Car</Option>
-							{/* <Option value="Online Payment">Online Payment</Option> */}
-						</Select>
-					</Form.Item>
-					{/* Submit Button */}
-					<Form.Item>
-						<Button type="text" className="bg-primary" htmlType="submit">
-							Thêm
-						</Button>
-					</Form.Item>
+							</Form.Item>
+						</Col>
+						<Col xs={24}>
+							<Form.Item>
+								<Button type="primary" htmlType="submit" className="w-full">
+									Thêm
+								</Button>
+							</Form.Item>
+						</Col>
+					</Row>
 				</Form>
 			</Modal>
 		</div>

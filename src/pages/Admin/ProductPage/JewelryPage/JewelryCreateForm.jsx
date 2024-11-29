@@ -82,7 +82,10 @@ const JewelryCreateForm = ({onClose, isCreateFormOpen, setIsCreateFormOpen}) => 
 
 	const models = useSelector(getAllJewelryModelsSelector);
 	useEffect(() => {
-		dispatch(fetchAllJewelryModels());
+		dispatch(fetchAllJewelryModels({
+			CurrentPage: 1,
+			PageSize: 100,
+		}));
 	}, [dispatch]);
 
 	const diamonds = useSelector(getAllDiamondSelector);

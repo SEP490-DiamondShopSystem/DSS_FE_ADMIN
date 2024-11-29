@@ -20,7 +20,7 @@
 		"@mui/material": "^5.16.7",
 		"@react-oauth/google": "^0.12.1",
 		"@reduxjs/toolkit": "^2.2.7",
-		"antd": "^5.20.2",
+		"antd": "^5.22.2",
 		"axios": "^1.7.4",
 		"dayjs": "^1.11.13",
 		"dompurify": "^3.2.1",

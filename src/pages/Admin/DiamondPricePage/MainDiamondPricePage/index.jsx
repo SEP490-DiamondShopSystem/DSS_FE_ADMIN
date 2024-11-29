@@ -280,7 +280,7 @@ const MainDiamondPricePage = () => {
 											e.target.value
 										);
 									}}
-									min={1000}
+									min={0}
 									step={1000}
 									className="w-full text-center border rounded"
 									placeholder="New Price"
@@ -300,7 +300,7 @@ const MainDiamondPricePage = () => {
 														e.target.value
 													)
 												}
-												min={1000}
+												min={0}
 												step={1000}
 												className="w-full text-center border rounded"
 											/>
