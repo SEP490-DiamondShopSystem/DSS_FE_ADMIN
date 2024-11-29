@@ -13,29 +13,31 @@ import InformationOrder from './Left/InformationOrder';
 import TimeLineOrder from './Right/TimeLineOrder';
 import Loading from '../../../../components/Loading';
 import {Helmet} from 'react-helmet';
+import {message} from 'antd';
 
 const OrderDetail = () => {
 	const {id} = useParams();
 	const dispatch = useDispatch();
 	const orderDetail = useSelector(getOrderDetailSelector);
 	const loading = useSelector(LoadingOrderSelector);
-	const statusOrder = useSelector(getOrderStatusDetailSelector);
+	// const statusOrder = useSelector(getOrderStatusDetailSelector);
 	const paymentStatusOrder = useSelector(getPaymentStatusDetailSelector);
 	const childLogOrder = useSelector(getOrderChildLogSelector);
 
 	const [orders, setOrders] = useState();
+	const [statusOrder, setStatusOrder] = useState();
 
 	useEffect(() => {
-		if (id && !loading) {
-			dispatch(getOrderDetail(id));
-		}
+		dispatch(getOrderDetail(id))
+			.unwrap()
+			.then((res) => {
+				setOrders(res);
+				setStatusOrder(res?.Status);
+			})
+			.catch((error) => {
+				message.error(error.title || error.data.title);
+			});
 	}, [id, statusOrder, paymentStatusOrder, childLogOrder]);
-
-	useEffect(() => {
-		if (orderDetail && !loading) {
-			setOrders(orderDetail);
-		}
-	}, [orderDetail]);
 
 	useEffect(() => {
 		if (orders?.Id) {
