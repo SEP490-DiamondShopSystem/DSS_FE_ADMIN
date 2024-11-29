@@ -135,3 +135,9 @@ export const LoadingDashboardSelector = (state) => state.dashboardSlice.loading;
 export const GetAccountCountSelector = (state) => state.dashboardSlice.accountCustomerCount;
 export const GetOrderCompletedCountSelector = (state) => state.dashboardSlice.orderCompletedCount;
 export const GetAllSellingJewelrySelector = (state) => state.dashboardSlice.topSellingJewelry;
+// CONFIG
+export const selectDiamondRule = (state) => state?.config?.diamondRule;
+export const selectFrontendDisplayRule = (state) => state?.config?.frontendDisplayRule;
+export const selectPromotionRule = (state) => state?.config?.promotionRule;
+export const selectIsLoading = (state) => state?.config?.isLoading; 
+export const selectConfigError = (state) => state?.config?.error;

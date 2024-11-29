@@ -11,6 +11,7 @@ import {
 	MenuFoldOutlined,
 	MenuUnfoldOutlined,
 	LogoutOutlined,
+	SettingOutlined,
 } from '@ant-design/icons';
 import {DiamondOutlined} from '@mui/icons-material';
 import {Breadcrumb, message, Layout, Menu, Drawer, Button, Tooltip} from 'antd';
@@ -138,6 +139,8 @@ const DefaultLayout = () => {
 			]),
 		(adminRole || managerRole || staffRole) &&
 			getItem('Quản Lí Bài Viết', '/blogs', <DeliveredProcedureOutlined />),
+
+		adminRole && getItem('Cài Đặt Hệ Thống', '/config', <SettingOutlined />),
 	];
 
 	const handleClickMenuItem = (e) => {
@@ -277,7 +280,7 @@ const DefaultLayout = () => {
 									</div>
 								</div>
 							</div>
-						)} 
+						)}
 					</div>
 				</Drawer>
 			)}
