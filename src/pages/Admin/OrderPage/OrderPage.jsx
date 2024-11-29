@@ -1,7 +1,6 @@
 import React, {useEffect, useState} from 'react';
 import {CalendarOutlined, EditFilled} from '@ant-design/icons';
 import {Button, DatePicker, Input, Select, Space, Table, Tag, Typography} from 'antd';
-import debounce from 'lodash/debounce';
 import {useDispatch, useSelector} from 'react-redux';
 import {Link, useNavigate} from 'react-router-dom';
 import {Filter} from '../../../components/Filter';
@@ -18,6 +17,7 @@ import {Helmet} from 'react-helmet';
 const {Search} = Input;
 const {RangePicker} = DatePicker;
 const {Title} = Typography;
+const {Option} = Select;
 
 const statusList = [
 	{name: 'Tất Cả', value: ''},
@@ -49,14 +49,15 @@ const statusPaymentMapping = {
 	4: {label: 'Đã Hoàn Tiền', color: 'volcano'},
 	5: {label: 'Chờ Xử Lý', color: 'green'},
 };
+
 const delivererStatusList = [
 	{name: 'Tất Cả', value: ''},
 	{name: 'Đã Chuẩn Bị', value: '5'},
 	{name: 'Đang Vận Chuyển', value: '6'},
 	{name: 'Vận Chuyển Thất Bại', value: '7'},
 	{name: 'Thành Công', value: '8'},
-	// {name: 'Refused', value: '9'},
 ];
+
 const OrderPage = () => {
 	const navigate = useNavigate();
 	const dispatch = useDispatch();
@@ -70,12 +71,23 @@ const OrderPage = () => {
 	const [searchText, setSearchText] = useState('');
 	const [selectOrder, setSelectOrder] = useState('');
 	const [orders, setOrders] = useState([]);
-	const [pageSize, setPageSize] = useState(5);
+	const [pageSize, setPageSize] = useState(10);
 	const [current, setCurrent] = useState(1);
 	const [delivererRole, setDelivererRole] = useState(false);
 	const [orderList, setOrderList] = useState();
+	const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
 
-	console.log('orderList', orderList);
+	// Responsive check
+	useEffect(() => {
+		const handleResize = () => {
+			setIsMobile(window.innerWidth <= 768);
+			// Adjust page size based on screen size
+			setPageSize(window.innerWidth <= 768 ? 5 : 10);
+		};
+
+		window.addEventListener('resize', handleResize);
+		return () => window.removeEventListener('resize', handleResize);
+	}, []);
 
 	useEffect(() => {
 		dispatch(
@@ -94,15 +106,17 @@ const OrderPage = () => {
 				setOrderList(res);
 			});
 	}, [dispatch, pageSize, current, activeStatus, startDate, endDate, searchText, selectOrder]);
+
 	useEffect(() => {
 		if (userDetail?.Roles) {
 			const isDeliverer = userDetail.Roles.some((role) => role?.RoleName === 'deliverer');
 			setDelivererRole(isDeliverer);
 		}
 	}, [userDetail]);
+
 	useEffect(() => {
 		if (orderList && enums) {
-			const mapAttributes = (data, attributes) => ({
+			const mapAttributes = (data) => ({
 				id: data?.Id,
 				orderTime: data?.CreatedDate,
 				Status: data?.Status,
@@ -113,13 +127,50 @@ const OrderPage = () => {
 				OrderCode: data?.OrderCode,
 				CustomizeRequestId: data?.CustomizeRequestId,
 			});
-			const mappedData = orderList?.Values?.map((order) => mapAttributes(order, enums));
+			const mappedData = orderList?.Values?.map((order) => mapAttributes(order));
 
 			setOrders(mappedData);
 		}
 	}, [orderList, enums]);
+	// Helper function to render status
+	const renderStatus = (status) => {
+		const {label, color} = statusMapping[status] || {label: 'Unknown', color: 'gray'};
+		return <Tag color={color}>{label?.toUpperCase()}</Tag>;
+	};
 
-	const columns = [
+	// Mobile-friendly columns
+	const mobileColumns = [
+		{
+			title: 'Đơn Hàng',
+			render: (record) => (
+				<div className="flex flex-col">
+					<div className="font-bold">ID: {record.OrderCode}</div>
+					<div>Email: {record.email}</div>
+
+					<div className="flex items-center">
+						<span className="mr-2">PT Thanh Toán:</span>
+						{renderStatus(record.paymentMethod)}
+					</div>
+
+					<div className="flex items-center">
+						<span className="mr-2">Trạng Thái:</span>
+						{renderStatus(record.Status)}
+					</div>
+					<div className="font-semibold">Giá: {record.totalAmount}</div>
+					<div className="flex justify-end mt-2">
+						<Link to={`/orders/${record.id}`}>
+							<Button type="text" className="bg-primary">
+								<EditFilled />
+							</Button>
+						</Link>
+					</div>
+				</div>
+			),
+		},
+	];
+
+	// Desktop columns
+	const desktopColumns = [
 		{
 			title: 'ID Đơn Hàng',
 			dataIndex: 'OrderCode',
@@ -157,7 +208,6 @@ const OrderPage = () => {
 			dataIndex: 'paymentMethod',
 			align: 'center',
 			render: (status) => {
-				console.log('status', status);
 				const {label, color} = statusPaymentMapping[status] || {
 					label: 'Unknown',
 					color: 'gray',
@@ -170,11 +220,7 @@ const OrderPage = () => {
 			key: 'Status',
 			dataIndex: 'Status',
 			align: 'center',
-			render: (status) => {
-				console.log('status', status);
-				const {label, color} = statusMapping[status] || {label: 'Unknown', color: 'gray'};
-				return <Tag color={color}>{label?.toUpperCase()}</Tag>;
-			},
+			render: renderStatus,
 		},
 		{
 			title: '',
@@ -196,85 +242,78 @@ const OrderPage = () => {
 		setStartDate(dates[0]);
 		setEndDate(dates[1]);
 	};
+
 	const handleStatusChange = (value) => {
 		setActiveStatus(value);
 	};
+
 	const onSearch = (value) => {
 		setSearchText(value);
 	};
+
 	const handleOrderChange = (value) => {
-		console.log(value);
 		setSelectOrder(value);
 	};
 
 	return (
-		<div className="mx-20 my-10">
+		<div className={`${isMobile ? ' my-4' : 'mx-20 my-10'}`}>
 			<Helmet>
 				<title>Danh Sách Đơn Đặt Hàng</title>
 			</Helmet>
-			<Title level={3}>Danh Sách Đơn Đặt Hàng</Title>
+			<Title level={3} className="text-center mb-4">
+				Danh Sách Đơn Đặt Hàng
+			</Title>
+
 			<Filter
 				filter={delivererRole ? delivererStatusList : statusList}
 				handleStatusBtn={handleStatusChange}
 				active={activeStatus}
 			/>
-			<div className="flex flex-col sm:flex-row sm:items-center">
-				<Space wrap className="w-full my-5">
-					<div className="flex items-center my-3 sm:my-5">
-						<p className="mr-3 text-sm sm:text-base">Tìm theo ngày:</p>
-					</div>
-					<div
-						className="flex items-center pl-2 sm:my-0"
-						style={{
-							border: '1px solid #d9d9d9',
-							borderRadius: '4px',
-							width: '100%',
-							maxWidth: '400px',
-						}}
-					>
-						<span className="mr-3 font-bold text-sm sm:text-base">Từ</span>
-						<span className="mr-3">→</span>
-						<span className="mr-3 font-bold text-sm sm:text-base">Đến</span>
-						<RangePicker
-							format="DD/MM/YYYY"
-							suffixIcon={<CalendarOutlined />}
-							style={{border: 'none', width: '100%'}}
-							onChange={handleDateChange}
-						/>
-					</div>
-					<div className="flex items-center my-3 sm:my-5 ml-5">
-						<p className="mr-3 text-sm sm:text-base">Tìm kiếm:</p>
-					</div>
+			<div className="flex flex-col space-y-4 mb-4">
+				{/* Date Range Picker */}
+				<div className={isMobile ? 'flex flex-col space-y-2' : 'flex items-center space-x-4'}>					<span className="text-sm">Tìm theo ngày:</span>
+					<RangePicker
+						className="w-full sm:w-auto"
+						format="DD/MM/YYYY"
+						suffixIcon={<CalendarOutlined />}
+						onChange={handleDateChange}
+					/>
+				</div>
+
+				{/* Search and Filter Controls */}
+				<div className="flex flex-col sm:flex-row items-center space-y-2 sm:space-y-0 sm:space-x-4">
 					<Search
 						className="w-full sm:w-60"
 						placeholder="Tìm theo email"
 						allowClear
 						onSearch={onSearch}
 					/>
-					<div className="flex items-center my-3 sm:my-5 ml-5">
-						<p className="mr-3 text-sm sm:text-base">Chọn loại đơn:</p>
-					</div>
-					<Select className="w-32" onChange={handleOrderChange} allowClear>
+					<Select
+						className="w-full sm:w-32"
+						onChange={handleOrderChange}
+						allowClear
+						placeholder="Loại đơn"
+					>
 						<Option value={false}>Đơn Thường</Option>
 						<Option value={true}>Đơn Thiết Kế</Option>
 					</Select>
-				</Space>
+				</div>
 			</div>
-			<div>
-				<Table
-					dataSource={orders}
-					columns={columns}
-					pagination={{
-						current: current,
-						total: orderList?.TotalPage * pageSize,
-						pageSize: pageSize,
-						onChange: (page) => setCurrent(page),
-						showSizeChanger: false,
-						onShowSizeChange: (current, size) => setPageSize(size),
-					}}
-					loading={loading}
-				/>
-			</div>
+
+			<Table
+				dataSource={orders}
+				columns={isMobile ? mobileColumns : desktopColumns}
+				pagination={{
+					current: current,
+					total: orderList?.TotalPage * pageSize,
+					pageSize: pageSize,
+					onChange: (page) => setCurrent(page),
+					showSizeChanger: false,
+				}}
+				loading={loading}
+				// scroll={{x: isMobile ? 300 : 'auto'}}
+				className="overflow-x-auto"
+			/>
 		</div>
 	);
 };

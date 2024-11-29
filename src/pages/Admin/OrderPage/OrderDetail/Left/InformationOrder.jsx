@@ -14,6 +14,7 @@ import {
 	Typography,
 	Upload,
 } from 'antd';
+
 import {useDispatch, useSelector} from 'react-redux';
 import {useNavigate} from 'react-router-dom';
 import {LoadingOrderSelector} from '../../../../../redux/selectors';
@@ -38,6 +39,7 @@ const InformationOrder = ({orders, statusOrder, paymentStatusOrder}) => {
 
 	const orderStatus = getOrderStatusTag(paymentStatusOrder);
 	const status = getOrderStatus(statusOrder);
+	const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
 
 	const [dataSource, setDataSource] = useState([]);
 	const [description, setDescription] = useState('');
@@ -49,6 +51,17 @@ const InformationOrder = ({orders, statusOrder, paymentStatusOrder}) => {
 	const [imageFiles, setImageFiles] = useState([]);
 
 	console.log('fileList', fileList);
+	// Responsive check
+	useEffect(() => {
+		const handleResize = () => {
+			setIsMobile(window.innerWidth <= 768);
+			// Adjust page size based on screen size
+			setPageSize(window.innerWidth <= 768 ? 5 : 10);
+		};
+
+		window.addEventListener('resize', handleResize);
+		return () => window.removeEventListener('resize', handleResize);
+	}, []);
 
 	useEffect(() => {
 		if (orders) {
@@ -76,7 +89,28 @@ const InformationOrder = ({orders, statusOrder, paymentStatusOrder}) => {
 			setDataSource(newDataSource);
 		}
 	}, [orders]);
-
+	const mobileColumns = [
+		{
+			title: 'Đơn Hàng',
+			render: (record) => (
+				<div className="flex flex-col">
+					<div className="font-bold">ID: {record.orderCode}</div>
+					<div>Thời Gian: {record.orderTime}</div>
+					<div className="flex items-center">
+						<span className="mr-2">Phí Giao Hàng:</span>
+						{record.shippingPrice}
+					</div>
+					{record?.UserRankAmountSaved !== 0 && (
+						<div className="flex items-center">
+							<span className="mr-2">Giảm Giá:</span>-
+							{formatPrice(record.UserRankAmountSaved)}
+						</div>
+					)}
+					<div className="font-bold text-darkGreen">Tổng Giá: {record.price}</div>
+				</div>
+			),
+		},
+	];
 	const columns = [
 		{
 			title: 'Mã đơn hàng',
@@ -141,11 +175,26 @@ const InformationOrder = ({orders, statusOrder, paymentStatusOrder}) => {
 			render: (productStatus) => getOrderItemStatusTag(productStatus),
 		},
 	];
+	const expandedMobileColumns = [
+		{
+			title: 'Sản Phẩm',
+			render: (product) => (
+				<div className="flex flex-col">
+					<div className="font-bold">Mã Sản Phẩm: {product.productCode}</div>
+					<div className="flex items-center">{product.productName}</div>
+					<div className="font-bold text-darkGreen">Giá: {product.productPrice}</div>
+					<div className="font-semibold">
+						Trạng Thái: {getOrderItemStatusTag(product.productStatus)}
+					</div>
+				</div>
+			),
+		},
+	];
 
 	const expandedRowRender = (record) => {
 		return (
 			<Table
-				columns={expandedColumns}
+				columns={isMobile ? expandedMobileColumns : expandedColumns}
 				dataSource={record.products}
 				pagination={false}
 				rowKey="productId"
@@ -214,6 +263,11 @@ const InformationOrder = ({orders, statusOrder, paymentStatusOrder}) => {
 					error?.data?.title || error?.title || 'Đã xảy ra lỗi, vui lòng thử lại.'
 				);
 			});
+	};
+	const handleViewDetails = (orderId) => {
+		console.log(`Navigating to order details for ID: ${orderId}`);
+		// Navigate to order details page
+		navigate(`/orders/${orderId}`);
 	};
 
 	return (
@@ -563,10 +617,10 @@ const InformationOrder = ({orders, statusOrder, paymentStatusOrder}) => {
 				</Col>
 			</Row>
 
-			<div className="font-semibold w-full  py-10 bg-white rounded-lg">
+			<div className="font-semibold w-full py-10 bg-white rounded-lg">
 				<Table
 					dataSource={dataSource}
-					columns={columns}
+					columns={isMobile ? mobileColumns : columns} // Conditionally render columns
 					size="large"
 					pagination={{pageSize: 5}}
 					className="custom-table-header"
@@ -576,6 +630,7 @@ const InformationOrder = ({orders, statusOrder, paymentStatusOrder}) => {
 					responsive="sm"
 				/>
 			</div>
+
 			<Modal
 				open={previewOpen}
 				title={previewTitle}

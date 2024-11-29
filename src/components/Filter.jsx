@@ -3,7 +3,7 @@ import React from 'react';
 
 export const Filter = ({filter, active, handleStatusBtn}) => {
 	return (
-		<div className="flex items-center md:flex-wrap gap-1">
+		<div className="flex items-center md:flex-wrap gap-1 overflow-x-auto">
 			{filter?.map((status, i) => (
 				<div key={i} className="w-full md:w-auto">
 					<Button
