@@ -1,6 +1,17 @@
 import {createAsyncThunk, createSlice} from '@reduxjs/toolkit';
 import {api} from '../../services/api';
 
+export const fetchAccountRule = createAsyncThunk(
+	'config/AccountRule',
+	async (_, {rejectWithValue}) => {
+		try {
+			const response = await api.get('/Configuration/AccountRule');
+			return response;
+		} catch (error) {
+			return rejectWithValue(error.response || error.message);
+		}
+	}
+);
 // Async thunks for fetching configuration data
 export const fetchDiamondRule = createAsyncThunk(
 	'config/fetchDiamondRule',
@@ -31,6 +42,19 @@ export const fetchPromotionRule = createAsyncThunk(
 	async (_, {rejectWithValue}) => {
 		try {
 			const response = await api.get('/Configuration/PromotionRule');
+			return response;
+		} catch (error) {
+			return rejectWithValue(error.response || error.message);
+		}
+	}
+);
+
+// Async thunks for updating configuration data
+export const updateAccountRule = createAsyncThunk(
+	'config/updateAccountRule',
+	async (data, {rejectWithValue}) => {
+		try {
+			const response = await api.post('/Configuration/AccountRule', data);
 			return response;
 		} catch (error) {
 			return rejectWithValue(error.response || error.message);
@@ -79,6 +103,7 @@ export const updatePromotionRule = createAsyncThunk(
 export const configSlice = createSlice({
 	name: 'config',
 	initialState: {
+		accountRule: {},
 		diamondRule: {},
 		frontendDisplayRule: {},
 		promotionRule: {},
@@ -92,6 +117,18 @@ export const configSlice = createSlice({
 	},
 	extraReducers: (builder) => {
 		builder
+			.addCase(fetchAccountRule.pending, (state) => {
+				state.isLoading = true;
+				state.error = null;
+			})
+			.addCase(fetchAccountRule.fulfilled, (state, action) => {
+				state.isLoading = false;
+				state.accountRule = action.payload;
+			})
+			.addCase(fetchAccountRule.rejected, (state) => {
+				state.isLoading = false;
+				state.error = action.payload;
+			})
 			.addCase(fetchDiamondRule.pending, (state) => {
 				state.isLoading = true;
 				state.error = null;
@@ -136,6 +173,17 @@ export const configSlice = createSlice({
 				state.isLoading = false;
 			})
 			.addCase(updateDiamondRule.rejected, (state, action) => {
+				state.isLoading = false;
+				state.error = action.payload;
+			})
+			.addCase(updateAccountRule.pending, (state) => {
+				state.isLoading = true;
+				state.error = null;
+			})
+			.addCase(updateAccountRule.fulfilled, (state) => {
+				state.isLoading = false;
+			})
+			.addCase(updateAccountRule.rejected, (state, action) => {
 				state.isLoading = false;
 				state.error = action.payload;
 			})
