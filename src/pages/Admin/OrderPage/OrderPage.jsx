@@ -32,14 +32,14 @@ const statusList = [
 ];
 
 const statusMapping = {
-	1: {label: 'Chờ Xử Lý', color: 'green'},
+	1: {label: 'Chờ Xử Lý', color: 'geekblue'},
 	2: {label: 'Đang Xử Lý', color: 'blue'},
 	3: {label: 'Từ Chối', color: 'red'},
 	4: {label: 'Hủy Đơn', color: 'red'},
 	5: {label: 'Đã Chuẩn Bị', color: 'purple'},
 	6: {label: 'Đang Vận Chuyển', color: 'orange'},
 	7: {label: 'Vận Chuyển Thất Bại', color: 'volcano'},
-	8: {label: 'Thành Công', color: 'geekblue'},
+	8: {label: 'Thành Công', color: 'green'},
 };
 
 const statusPaymentMapping = {
@@ -137,26 +137,35 @@ const OrderPage = () => {
 		const {label, color} = statusMapping[status] || {label: 'Unknown', color: 'gray'};
 		return <Tag color={color}>{label?.toUpperCase()}</Tag>;
 	};
+	const rendePaymentStatus = (status) => {
+		const {label, color} = statusPaymentMapping[status] || {label: 'Unknown', color: 'gray'};
+		return <Tag color={color}>{label?.toUpperCase()}</Tag>;
+	};
+
 
 	// Mobile-friendly columns
 	const mobileColumns = [
 		{
 			title: 'Đơn Hàng',
 			render: (record) => (
-				<div className="flex flex-col">
-					<div className="font-bold">ID: {record.OrderCode}</div>
-					<div>Email: {record.email}</div>
-
-					<div className="flex items-center">
-						<span className="mr-2">PT Thanh Toán:</span>
-						{renderStatus(record.paymentMethod)}
-					</div>
-
-					<div className="flex items-center">
-						<span className="mr-2">Trạng Thái:</span>
+				<div className="flex flex-col border rounded-xl p-2">
+					<div className="flex justify-between pb-3">
+						<div className="font-bold">ID: {record.OrderCode}</div>
 						{renderStatus(record.Status)}
 					</div>
-					<div className="font-semibold">Giá: {record.totalAmount}</div>
+					<div className="font-semibold">Email: {record.email}</div>
+					<div className="flex items-center">
+						<span className="mr-2">Ngày Đặt Đơn:</span>
+						{record.orderTime}
+					</div>
+					<div className="flex items-center">
+						<span className="mr-2">TT Thanh Toán:</span>
+						{rendePaymentStatus(record.paymentMethod)}
+					</div>
+
+					<div className="font-bold flex justify-end py-3 text-darkGreen">
+						Giá: {record.totalAmount}
+					</div>
 					<div className="flex justify-end mt-2">
 						<Link to={`/orders/${record.id}`}>
 							<Button type="text" className="bg-primary">
@@ -269,19 +278,45 @@ const OrderPage = () => {
 				handleStatusBtn={handleStatusChange}
 				active={activeStatus}
 			/>
-			<div className="flex flex-col space-y-4 mb-4">
+			<div className="flex flex-col gap-2 my-4">
 				{/* Date Range Picker */}
-				<div className={isMobile ? 'flex flex-col space-y-2' : 'flex items-center space-x-4'}>					<span className="text-sm">Tìm theo ngày:</span>
-					<RangePicker
-						className="w-full sm:w-auto"
-						format="DD/MM/YYYY"
-						suffixIcon={<CalendarOutlined />}
-						onChange={handleDateChange}
-					/>
-				</div>
+				{isMobile ? (
+					<div className="flex flex-col gap-2">
+						<div className="flex items-center space-x-2">
+							<span className="text-sm mr-5">Từ:</span>
+							<DatePicker
+								className="w-full"
+								format="DD/MM/YYYY"
+								suffixIcon={<CalendarOutlined />}
+								onChange={(date) => setStartDate(date)}
+								placeholder="Chọn ngày bắt đầu"
+							/>
+						</div>
+						<div className="flex items-center space-x-2">
+							<span className="text-sm mr-5">Đến:</span>
+							<DatePicker
+								className="w-full"
+								format="DD/MM/YYYY"
+								suffixIcon={<CalendarOutlined />}
+								onChange={(date) => setEndDate(date)}
+								placeholder="Chọn ngày kết thúc"
+							/>
+						</div>
+					</div>
+				) : (
+					<div className="flex items-center space-x-4">
+						<span className="text-sm">Tìm theo ngày:</span>
+						<RangePicker
+							className="w-full sm:w-auto"
+							format="DD/MM/YYYY"
+							suffixIcon={<CalendarOutlined />}
+							onChange={handleDateChange}
+						/>
+					</div>
+				)}
 
 				{/* Search and Filter Controls */}
-				<div className="flex flex-col sm:flex-row items-center space-y-2 sm:space-y-0 sm:space-x-4">
+				<div className="flex flex-col sm:flex-row items-center gap-2 sm:space-y-0 sm:space-x-4">
 					<Search
 						className="w-full sm:w-60"
 						placeholder="Tìm theo email"
@@ -290,7 +325,7 @@ const OrderPage = () => {
 					/>
 					<Select
 						className="w-full sm:w-32"
-						onChange={handleOrderChange}
+						onChange={(value) => handleOrderChange(value ?? '')}
 						allowClear
 						placeholder="Loại đơn"
 					>
