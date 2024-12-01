@@ -32,14 +32,14 @@ const statusList = [
 ];
 
 const statusMapping = {
-	1: {label: 'Chờ Xử Lý', color: 'green'},
+	1: {label: 'Chờ Xử Lý', color: 'geekblue'},
 	2: {label: 'Đang Xử Lý', color: 'blue'},
 	3: {label: 'Từ Chối', color: 'red'},
 	4: {label: 'Hủy Đơn', color: 'red'},
 	5: {label: 'Đã Chuẩn Bị', color: 'purple'},
 	6: {label: 'Đang Vận Chuyển', color: 'orange'},
 	7: {label: 'Vận Chuyển Thất Bại', color: 'volcano'},
-	8: {label: 'Thành Công', color: 'geekblue'},
+	8: {label: 'Thành Công', color: 'green'},
 };
 
 const statusPaymentMapping = {
@@ -137,26 +137,34 @@ const OrderPage = () => {
 		const {label, color} = statusMapping[status] || {label: 'Unknown', color: 'gray'};
 		return <Tag color={color}>{label?.toUpperCase()}</Tag>;
 	};
+	const rendePaymentStatus = (status) => {
+		const {label, color} = statusPaymentMapping[status] || {label: 'Unknown', color: 'gray'};
+		return <Tag color={color}>{label?.toUpperCase()}</Tag>;
+	};
 
 	// Mobile-friendly columns
 	const mobileColumns = [
 		{
 			title: 'Đơn Hàng',
 			render: (record) => (
-				<div className="flex flex-col">
-					<div className="font-bold">ID: {record.OrderCode}</div>
-					<div>Email: {record.email}</div>
-
-					<div className="flex items-center">
-						<span className="mr-2">PT Thanh Toán:</span>
-						{renderStatus(record.paymentMethod)}
-					</div>
-
-					<div className="flex items-center">
-						<span className="mr-2">Trạng Thái:</span>
+				<div className="flex flex-col border rounded-xl p-2">
+					<div className="flex justify-between pb-3">
+						<div className="font-bold">ID: {record.OrderCode}</div>
 						{renderStatus(record.Status)}
 					</div>
-					<div className="font-semibold">Giá: {record.totalAmount}</div>
+					<div className="font-semibold">Email: {record.email}</div>
+					<div className="flex items-center">
+						<span className="mr-2">Ngày Đặt Đơn:</span>
+						{record.orderTime}
+					</div>
+					<div className="flex items-center">
+						<span className="mr-2">TT Thanh Toán:</span>
+						{rendePaymentStatus(record.paymentMethod)}
+					</div>
+
+					<div className="font-bold flex justify-end py-3 text-darkGreen">
+						Giá: {record.totalAmount}
+					</div>
 					<div className="flex justify-end mt-2">
 						<Link to={`/orders/${record.id}`}>
 							<Button type="text" className="bg-primary">
@@ -239,10 +247,15 @@ const OrderPage = () => {
 	];
 
 	const handleDateChange = (dates, dateStrings) => {
-		setStartDate(dates[0]);
-		setEndDate(dates[1]);
+		if (dates) {
+			setStartDate(dates[0]);
+			setEndDate(dates[1]);
+		} else {
+			// If the dates are cleared
+			setStartDate(null);
+			setEndDate(null);
+		}
 	};
-
 	const handleStatusChange = (value) => {
 		setActiveStatus(value);
 	};
@@ -260,7 +273,7 @@ const OrderPage = () => {
 			<Helmet>
 				<title>Danh Sách Đơn Đặt Hàng</title>
 			</Helmet>
-			<Title level={3} className="text-center mb-4">
+			<Title level={3} className="text-center md:text-start mb-4">
 				Danh Sách Đơn Đặt Hàng
 			</Title>
 
@@ -269,28 +282,72 @@ const OrderPage = () => {
 				handleStatusBtn={handleStatusChange}
 				active={activeStatus}
 			/>
-			<div className="flex flex-col space-y-4 mb-4">
+			<div className="flex flex-col gap-2 my-4">
 				{/* Date Range Picker */}
-				<div className={isMobile ? 'flex flex-col space-y-2' : 'flex items-center space-x-4'}>					<span className="text-sm">Tìm theo ngày:</span>
-					<RangePicker
-						className="w-full sm:w-auto"
-						format="DD/MM/YYYY"
-						suffixIcon={<CalendarOutlined />}
-						onChange={handleDateChange}
-					/>
-				</div>
+				{isMobile ? (
+					<div className="flex flex-col gap-2">
+						<div className="flex items-center space-x-2">
+							<span className="text-sm mr-5">Từ:</span>
+							<DatePicker
+								className="w-full"
+								format="DD/MM/YYYY"
+								suffixIcon={<CalendarOutlined />}
+								onChange={(date) => setStartDate(date)}
+								placeholder="Chọn ngày bắt đầu"
+							/>
+						</div>
+						<div className="flex items-center space-x-2">
+							<span className="text-sm mr-5">Đến:</span>
+							<DatePicker
+								className="w-full"
+								format="DD/MM/YYYY"
+								suffixIcon={<CalendarOutlined />}
+								onChange={(date) => setEndDate(date)}
+								placeholder="Chọn ngày kết thúc"
+							/>
+						</div>
+					</div>
+				) : (
+					<div className="flex items-center">
+						<div className="flex items-center my-3 sm:my-5">
+							<p className="mr-3 text-sm sm:text-base">Tìm theo ngày:</p>
+						</div>
+						<div
+							className="flex items-center pl-2 sm:my-0"
+							style={{
+								border: '1px solid #d9d9d9',
+								borderRadius: '4px',
+								width: '100%',
+								maxWidth: '400px',
+							}}
+						>
+							<span className="mr-3 font-bold text-sm sm:text-base">Từ</span>
+							<span className="mr-3">→</span>
+							<span className="mr-3 font-bold text-sm sm:text-base">Đến</span>
+							<RangePicker
+								allowClear
+								format="DD/MM/YYYY"
+								suffixIcon={<CalendarOutlined />}
+								style={{border: 'none', width: '100%'}}
+								onChange={handleDateChange}
+							/>
+						</div>
+					</div>
+				)}
 
 				{/* Search and Filter Controls */}
-				<div className="flex flex-col sm:flex-row items-center space-y-2 sm:space-y-0 sm:space-x-4">
+				<div className="flex flex-col sm:flex-row items-center gap-2 sm:space-y-0 sm:space-x-4">
+					<p className="mr-3">Tìm theo email:</p>
 					<Search
-						className="w-full sm:w-60"
+						className="w-full md:w-60"
 						placeholder="Tìm theo email"
 						allowClear
 						onSearch={onSearch}
 					/>
+					{/* <p className="mr-3">Tìm kiếm:</p> */}
 					<Select
 						className="w-full sm:w-32"
-						onChange={handleOrderChange}
+						onChange={(value) => handleOrderChange(value ?? '')}
 						allowClear
 						placeholder="Loại đơn"
 					>

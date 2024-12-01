@@ -16,7 +16,7 @@ module.exports = {
 				greenLight: '#66FF8C', // Light version for hover
 				darkGreen: '#3ecc2c',
 				blue: '#2898FF', // Bright blue
-        
+
 				offWhite: '#f7f7f7', // Slightly off-white
 				lightGray: '#dddddd', // Light gray
 				lightGray1: '#e4e4e4', // Another light gray shade
@@ -42,18 +42,19 @@ module.exports = {
 			fontFamily: {
 				body: ['"Open Sans"'],
 			},
+			screens: {
+				sm: '640px', // Small screens
+				md: '768px', // Medium screens
+				lg: '1024px', // Large screens
+				xl: '1280px', // Extra-large screens
+				'2xl': '1536px', // 2X Extra-large screens
+				// Custom breakpoints (nếu cần)
+				tablet: '640px',
+				laptop: '1024px',
+				desktop: '1280px',
+			},
 		},
 	},
-	screens: {
-                sm: '640px', // Small screens
-                md: '768px', // Medium screens
-                lg: '1024px', // Large screens
-                xl: '1280px', // Extra-large screens
-                '2xl': '1536px', // 2X Extra-large screens
-                // Custom breakpoints (nếu cần)
-                tablet: '640px',
-                laptop: '1024px',
-                desktop: '1280px',
-            },
+
 	plugins: [],
 };

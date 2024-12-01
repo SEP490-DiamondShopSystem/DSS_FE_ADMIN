@@ -2678,3 +2678,68 @@ video {
 		display: none;
 	}
 }
+
+@media (min-width: 768px) {
+	.md\:text-start {
+		text-align: start;
+	}
+}
+
+.w-40 {
+	width: 10rem /* 160px */;
+}
+
+.w-60 {
+	width: 15rem /* 240px */;
+}
+
+@media (min-width: 768px) {
+	.md\:w-60 {
+		width: 15rem /* 240px */;
+	}
+}
+
+.max-w-md {
+	max-width: 28rem /* 448px */;
+}
+
+@media (min-width: 768px) {
+	.md\:bg-right {
+		background-position: right;
+	}
+}
+
+@media (min-width: 768px) {
+	.md\:w-1\/2 {
+		width: 50%;
+	}
+}
+
+@media (min-width: 768px) {
+	.md\:flex-row {
+		flex-direction: row;
+	}
+}
+
+.bg-opacity-70 {
+	--tw-bg-opacity: 0.7;
+}
+
+@media (min-width: 768px) {
+	.md\:hidden {
+		display: none;
+	}
+}
+
+.max-w-md {
+	max-width: 28rem /* 448px */;
+}
+.w-11\/12 {
+	width: 91.666667%;
+}
+
+@media (min-width: 768px) {
+	.md\:flex {
+		display: flex;
+	}
+}
