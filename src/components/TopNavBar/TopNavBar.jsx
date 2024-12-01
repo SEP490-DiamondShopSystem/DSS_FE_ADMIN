@@ -5,7 +5,9 @@ import {useNavigate} from 'react-router-dom';
 import {getUserDetail, logout, userLoginSlice} from '../../redux/slices/userLoginSlice';
 import {getLocalStorage, removeLocalStorage} from '../../utils/localstorage';
 import {notifySuccess} from '../../utils/toast';
-import profileImage from './profileImage.jpg'; // Import a sample profile image for illustration
+import profileImage from './profileImage.jpg';
+import adminImage from './admin_avatar.jpg';
+import delivererImage from './deliverer_avatar.png';
 import styles from './TopNavBar.module.css'; // Import CSS module file for styling
 import {Button, message} from 'antd';
 import {GetUserDetailSelector} from '../../redux/selectors';
@@ -25,9 +27,16 @@ const TopNavbar = () => {
 	const [showSignOutPopup, setShowSignOutPopup] = useState(false);
 	const [showSignOutButton, setShowSignOutButton] = useState(false);
 	const signOutRef = useRef(null);
+	const [role, setRole] = useState();
+
+	console.log('role', role);
 
 	useEffect(() => {
-		dispatch(getUserDetail(userId));
+		dispatch(getUserDetail(userId))
+			.unwrap()
+			.then((res) => {
+				setRole(res?.Roles);
+			});
 	}, []);
 
 	useEffect(() => {
@@ -67,22 +76,22 @@ const TopNavbar = () => {
 		navigate('/login');
 	};
 
+	let avatarImage = profileImage;
+
+	if (role?.some((role) => role.RoleDescription === 'admin')) {
+		avatarImage = adminImage;
+	} else if (role?.some((role) => role.RoleDescription === 'deliverer')) {
+		avatarImage = delivererImage;
+	}
+
 	const roles = userDetail?.Roles?.map((role) => role.RoleName);
 	console.log(roles);
 	return (
 		<div className={styles.topNavbar}>
 			<div className={styles.rightSection}>
-				<div className={styles.notificationIconContainer} onClick={handleBellClick}>
-					<BellOutlined className={styles.notificationIcon} />
-					{showNotification && (
-						<div className={styles.notificationDropdown}>
-							{/* Notification items */}
-						</div>
-					)}
-				</div>
 				<div className={styles.profileContainer}>
 					<img
-						src={user?.avatar_url || profileImage}
+						src={user?.avatar_url || avatarImage}
 						alt="Profile"
 						className={styles.profileImage}
 						onClick={handleProfileClick}

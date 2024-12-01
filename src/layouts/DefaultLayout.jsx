@@ -343,7 +343,7 @@ const DefaultLayout = () => {
 				<Content className={`p-4 flex-1 ${isMobile ? 'mt-16' : ''}`}>
 					<Breadcrumb className="mb-4">
 						<Breadcrumb.Item>
-							<Link to="/dashboard">Home</Link>
+							<div>Home</div>
 						</Breadcrumb.Item>
 						{breadcrumbItems}
 					</Breadcrumb>

@@ -34,10 +34,9 @@ const ORDER_STATUS_TEXTS = {
 	Refused: 'Đã Từ Chối',
 };
 
-const TimeLineOrder = ({orders, loading, statusOrder, paymentStatusOrder, id}) => {
+const TimeLineOrder = ({orders, loading, statusOrder, paymentStatusOrder, id, userDetail}) => {
 	const dispatch = useDispatch();
 
-	const userDetail = useSelector(GetUserDetailSelector);
 	const delivererList = useSelector(getAllDelivererSelector);
 
 	const [status, setStatus] = useState();
