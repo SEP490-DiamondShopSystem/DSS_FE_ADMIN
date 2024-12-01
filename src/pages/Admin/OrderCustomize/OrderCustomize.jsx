@@ -171,9 +171,14 @@ const OrderCustomizePage = () => {
 	];
 
 	const handleDateChange = (dates, dateStrings) => {
-		setStartDate(dates[0]);
-		setEndDate(dates[1]);
-		console.log();
+		if (dates) {
+			setStartDate(dates[0]);
+			setEndDate(dates[1]);
+		} else {
+			// If the dates are cleared
+			setStartDate(null);
+			setEndDate(null);
+		}
 	};
 
 	const handleStatusChange = (value) => {
@@ -214,6 +219,7 @@ const OrderCustomizePage = () => {
 						<span className="mr-3">→</span>
 						<span className="mr-3 font-bold text-sm sm:text-base">Đến</span>
 						<RangePicker
+							allowClear
 							format="DD/MM/YYYY"
 							suffixIcon={<CalendarOutlined />}
 							style={{border: 'none', width: '100%'}}
