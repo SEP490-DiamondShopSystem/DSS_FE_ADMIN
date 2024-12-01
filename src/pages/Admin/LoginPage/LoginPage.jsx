@@ -49,7 +49,7 @@ const LoginPage = () => {
       <div className="h-screen flex flex-col md:flex-row">
         {/* Mobile View with Image Background */}
         <div className="relative flex md:hidden justify-center items-center bg-black bg-center w-full h-full">
-          <div
+          {/* <div
             className="absolute inset-0"
             style={{
               opacity: 0.2,
@@ -58,7 +58,7 @@ const LoginPage = () => {
               backgroundPosition: 'center', // Centers the background image
               backgroundRepeat: 'no-repeat', // Ensures no repetition of the background
             }}
-          ></div>
+          ></div> */}
           <div className="relative z-10 w-11/12 max-w-md">
             <h1 className="text-white text-3xl font-bold mb-4 text-center">
               Đăng Nhập
@@ -95,7 +95,7 @@ const LoginPage = () => {
                   type="primary"
                   htmlType="submit"
                   loading={loading}
-                  className="w-full bg-blue text-white py-2 rounded-md hover:bg-blue"
+                  className="w-full bg-blue text-black py-2 rounded-md hover:bg-blue"
                 >
                   Đăng Nhập
                 </Button>
@@ -135,7 +135,7 @@ const LoginPage = () => {
                 type="primary"
                 htmlType="submit"
                 loading={loading}
-                className="w-full bg-blue-500 text-white py-2 rounded-md hover:bg-blue-600"
+                className="w-full bg-bluetext-black py-2 rounded-md hover:bg-blue"
               >
                 Đăng Nhập
               </Button>
