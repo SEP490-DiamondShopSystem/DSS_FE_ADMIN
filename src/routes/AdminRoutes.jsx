@@ -25,6 +25,7 @@ import DeliveryFeePage from '../pages/Admin/DeliveryFeePage';
 import OrderCustomizeDetail from '../pages/Admin/OrderCustomize/OrderDetail/OrderDetail';
 import SideDiamondPricePage from '../pages/Admin/DiamondPricePage/SideDiamondPricePage';
 import BlogPage from '../pages/Admin/BlogPage';
+import ConfigurationPage from '../pages/Admin/ConfigurationPage';
 export const AdminRouters = () => {
 	return (
 		<Routes>
@@ -46,6 +47,14 @@ export const AdminRouters = () => {
 					element={
 						<PrivateRoute roles={['staff', 'admin', 'manager']}>
 							<AccountPage />
+						</PrivateRoute>
+					}
+				/>
+				<Route
+					path="/config"
+					element={
+						<PrivateRoute roles={['admin']}>
+							<ConfigurationPage />
 						</PrivateRoute>
 					}
 				/>
