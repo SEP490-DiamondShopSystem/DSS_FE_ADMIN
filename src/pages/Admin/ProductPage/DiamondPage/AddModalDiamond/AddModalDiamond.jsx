@@ -1,13 +1,12 @@
-import {Modal, Select, Form, Input, InputNumber, Switch, message} from 'antd';
+import {Form, Input, InputNumber, Modal, Select, Switch, message} from 'antd';
 import React, {useEffect, useState} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
 import {getAllShapeSelector} from '../../../../../redux/selectors';
-import {getDiamondShape, handleAddDiamond} from '../../../../../redux/slices/diamondSlice';
 import {
-	uploadDiamondThumbnail,
-	uploadCertificates,
-	uploadDiamondImages,
-} from '../../../../../redux/slices/filesSlice';
+	getDiamondShape,
+	handleAddDiamond,
+	handleEstimatePriceDiamond,
+} from '../../../../../redux/slices/diamondSlice';
 
 const {Option} = Select;
 
@@ -17,19 +16,90 @@ export const AddModalDiamond = ({setShowModal, showModal}) => {
 
 	const shapes = useSelector(getAllShapeSelector);
 
-	const [isLabDiamond, setIsLabDiamond] = useState();
+	const [isLabDiamond, setIsLabDiamond] = useState(false);
+	const [estimatePrice, setEstimatePrice] = useState();
+
+	console.log('estimatePrice', estimatePrice);
 
 	useEffect(() => {
 		dispatch(getDiamondShape());
 	}, []);
 
 	const handleAddDiamondForm = (values) => {
+		const {cut, color, clarity, carat, priceOffset, shapeId} = values;
+		console.log('priceOffset', priceOffset);
+
+		const diamond_4C = {
+			cut,
+			color,
+			clarity,
+			carat,
+			isLabDiamond: isLabDiamond,
+		};
+
+		dispatch(
+			handleEstimatePriceDiamond({
+				shapeId,
+				priceOffset: priceOffset === undefined ? 0 : priceOffset,
+				diamond_4C,
+			})
+		)
+			.unwrap()
+			.then((res) => {
+				console.log('res', res);
+				setEstimatePrice(res);
+			})
+			.catch((error) => {
+				message.error(error?.data?.title || error?.title);
+			});
+
+		const {
+			CorrectPrice,
+			CriteraFound,
+			CurrentGivenOffset,
+			IsPriceKnown,
+			IsValid,
+			Message,
+			Price,
+			PriceFound,
+			SuggestedOffsetTobeAdded,
+		} = estimatePrice;
+
 		Modal.confirm({
 			title: 'Vui Lòng Kiểm Tra Lại Thông Tin',
-			content: 'Bạn có chắc chắn muốn tiếp tục?',
+			content: (
+				<div>
+					<p>
+						<strong>Thông báo:</strong> {Message}
+					</p>
+					<p>
+						<strong>Giá đúng:</strong> {CorrectPrice?.toLocaleString('vi-VN')} VND
+					</p>
+					<p>
+						<strong>Giá tìm thấy:</strong> {PriceFound?.Price?.toLocaleString('vi-VN')}{' '}
+						VND
+					</p>
+					<p>
+						<strong>Tiêu chí:</strong>{' '}
+						{CriteraFound ? JSON.stringify(CriteraFound) : 'Không có'}
+					</p>
+					<p>
+						<strong>Khoảng bù hiện tại:</strong> {CurrentGivenOffset}
+					</p>
+					<p>
+						<strong>Giá đã biết:</strong> {IsPriceKnown ? 'Có' : 'Không'}
+					</p>
+					<p>
+						<strong>Hợp lệ:</strong> {IsValid ? 'Có' : 'Không'}
+					</p>
+					<p>
+						<strong>Gợi ý khoảng bù:</strong> {SuggestedOffsetTobeAdded}
+					</p>
+				</div>
+			),
 			okText: 'Xác nhận',
 			cancelText: 'Hủy',
-			onOk: () => handleOk(values),
+			onOk: () => handleOk(estimatePrice),
 		});
 	};
 
@@ -74,9 +144,6 @@ export const AddModalDiamond = ({setShowModal, showModal}) => {
 			withLenghtRatio,
 			culet,
 		} = values;
-
-		console.log('isLabDiamond', isLabDiamond);
-
 		const diamond4c = {
 			cut,
 			color,
@@ -99,7 +166,6 @@ export const AddModalDiamond = ({setShowModal, showModal}) => {
 			table,
 			measurement,
 		};
-		// console.log('diamond4c', diamond4c);
 
 		dispatch(
 			handleAddDiamond({

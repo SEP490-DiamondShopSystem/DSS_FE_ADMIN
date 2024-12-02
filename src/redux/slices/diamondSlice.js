@@ -58,6 +58,20 @@ export const handleDeleteDiamond = createAsyncThunk(
 	}
 );
 
+export const handleEstimatePriceDiamond = createAsyncThunk(
+	'diamondSlice/handleEstimatePriceDiamond',
+	async (body, {rejectWithValue}) => {
+		try {
+			const response = await api.post(`/Diamond/EstimatePrice`, body);
+
+			return response;
+		} catch (error) {
+			console.log('Error: ', JSON.stringify(error));
+			return rejectWithValue(error);
+		}
+	}
+);
+
 export const getAllDiamond = createAsyncThunk(
 	'diamondSlice/getAllDiamond',
 	async (params, {rejectWithValue}) => {
@@ -235,6 +249,17 @@ export const diamondSlice = createSlice({
 				state.addData = action.payload;
 			})
 			.addCase(handleLockDiamond.rejected, (state, action) => {
+				state.loading = false;
+				state.error = action.payload;
+			})
+			.addCase(handleEstimatePriceDiamond.pending, (state) => {
+				state.loading = true;
+			})
+			.addCase(handleEstimatePriceDiamond.fulfilled, (state, action) => {
+				state.loading = false;
+				state.estimatePrice = action.payload;
+			})
+			.addCase(handleEstimatePriceDiamond.rejected, (state, action) => {
 				state.loading = false;
 				state.error = action.payload;
 			});

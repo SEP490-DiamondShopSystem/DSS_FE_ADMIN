@@ -2743,3 +2743,23 @@ video {
 		display: flex;
 	}
 }
+
+.hover\:brightness-90:hover {
+	--tw-brightness: brightness(0.9);
+	filter: var(--tw-blur) var(--tw-brightness) var(--tw-contrast) var(--tw-grayscale)
+		var(--tw-hue-rotate) var(--tw-invert) var(--tw-saturate) var(--tw-sepia)
+		var(--tw-drop-shadow);
+}
+
+.border-none {
+	border-style: none;
+}
+
+.w-\[100px\] {
+	width: 100px;
+}
+
+.text-darkBlue {
+	--tw-text-opacity: 1;
+	color: rgb(26 35 126 / var(--tw-text-opacity)) /* #1a237e */;
+}
