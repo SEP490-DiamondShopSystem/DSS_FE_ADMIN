@@ -1,7 +1,6 @@
 import {createAsyncThunk, createSlice, configureStore} from '@reduxjs/toolkit';
 import {api} from '../../services/api';
 
-// GET /api/Diamond/Price/PriceBoard
 export const fetchPriceBoard = createAsyncThunk(
 	'diamondPrice/fetchPriceBoard',
 	async ({shapeId, isLabDiamond, cut, isSideDiamond}, {rejectWithValue}) => {
@@ -16,13 +15,12 @@ export const fetchPriceBoard = createAsyncThunk(
 			});
 			return response;
 		} catch (error) {
-			console.error('Error fetching price board:', error); // Log the full error
-			return rejectWithValue(error || error.message); // Return the response if available, otherwise return the error message
+			console.error('Error fetching price board:', error);
+			return rejectWithValue(error || error.message);
 		}
 	}
 );
 
-// GET /api/Diamond/Price
 export const fetchDiamondPrices = createAsyncThunk(
 	'diamondPrice/fetchDiamondPrices',
 	async ({diamondShapeId, pageSize, start}, {rejectWithValue}) => {
@@ -41,12 +39,10 @@ export const fetchDiamondPrices = createAsyncThunk(
 	}
 );
 
-// POST /api/Diamond/Price
 export const createDiamondPrice = createAsyncThunk(
 	'diamondPrice/createDiamondPrice',
 	async ({listPrices, shapeId, isSideDiamond, isLabDiamond}, {rejectWithValue}) => {
 		try {
-			// Log the data being sent to the API
 			console.log('Sending listPrices to API:', {
 				listPrices,
 				shapeId,
@@ -54,7 +50,6 @@ export const createDiamondPrice = createAsyncThunk(
 				isSideDiamond,
 			});
 
-			// Make the PUT request to update prices
 			const response = await api.post('/Diamond/Price', {
 				listPrices,
 				shapeId,
@@ -62,13 +57,9 @@ export const createDiamondPrice = createAsyncThunk(
 				isSideDiamond,
 			});
 
-			// Log the response received from the API
 			console.log('Response from creating diamond prices:', response);
-
-			// Check if the API response is structured as expected
-			return response.data || response; // Adjust this based on your API's response structure
+			return response.data || response;
 		} catch (error) {
-			// Log the error response for better debugging
 			console.error('Error creating diamond prices:', error);
 			return rejectWithValue(error);
 		}
@@ -78,12 +69,8 @@ export const createDiamondPrice = createAsyncThunk(
 // PUT /api/Diamond/Price
 export const updateDiamondPrices = createAsyncThunk(
 	'diamondPrice/updateDiamondPrices',
-	async (
-		{updatedDiamondPrices, shapeId, isLabDiamond, isSideDiamond},
-		{rejectWithValue}
-	) => {
+	async ({updatedDiamondPrices, shapeId, isLabDiamond, isSideDiamond}, {rejectWithValue}) => {
 		try {
-			// Log the data being sent to the API
 			console.log('Sending updatedDiamondPrices to API:', {
 				updatedDiamondPrices,
 				shapeId,
@@ -91,7 +78,6 @@ export const updateDiamondPrices = createAsyncThunk(
 				isSideDiamond,
 			});
 
-			// Make the PUT request to update prices
 			const response = await api.put('/Diamond/Price', {
 				updatedDiamondPrices,
 				shapeId,
@@ -99,20 +85,16 @@ export const updateDiamondPrices = createAsyncThunk(
 				isSideDiamond,
 			});
 
-			// Log the response received from the API
 			console.log('Response from updating diamond prices:', response);
 
-			// Check if the API response is structured as expected
-			return response.data || response; // Adjust this based on your API's response structure
+			return response.data || response;
 		} catch (error) {
-			// Log the error response for better debugging
 			console.error('Error updating diamond prices:', error);
 			return rejectWithValue(error);
 		}
 	}
 );
 
-// GET /api/Diamond/Price/Shape
 export const fetchDiamondPriceByShape = createAsyncThunk(
 	'diamondPrice/fetchDiamondPriceByShape',
 	async ({shapeId, isLabDiamond}, {rejectWithValue}) => {
@@ -126,49 +108,41 @@ export const fetchDiamondPriceByShape = createAsyncThunk(
 		}
 	}
 );
-
-// DELETE /api/Diamond/Price/{shapeId}/{criteriaId}
-
 export const deleteDiamondPrice = createAsyncThunk(
 	'diamondPrice/deleteDiamondPrice',
-	async ({deleteList, shapeId, isLabDiamond, isSideDiamond}, {rejectWithValue}) => {
+	async ({priceIds, shapeId, isLabDiamond, isSideDiamond}, {rejectWithValue}) => {
 		try {
-			// Log the data being sent to the API for debugging
 			console.log('Sending delete request with:', {
-				deleteList,
+				priceIds,
 				shapeId,
 				isLabDiamond,
 				isSideDiamond,
 			});
 
-			// Make the DELETE request with the appropriate request body
 			const response = await api.delete('/Diamond/Price', {
 				data: {
-					deleteList,
+					priceIds,
 					shapeId,
 					isLabDiamond,
 					isSideDiamond,
 				},
 			});
 
-			// Log the response from the API for debugging
 			console.log('Response from delete diamond prices:', response);
 
-			// Check if the response is structured as expected and return the data
 			return response.data || response;
 		} catch (error) {
-			// Log the error response for better debugging
 			console.error('Error deleting diamond prices:', error);
-			// Handle different error response formats
+
 			if (error) {
-				return rejectWithValue(error.data); // Use the detailed error information
+				return rejectWithValue(error.data);
 			}
 			return rejectWithValue({
 				type: 'Unknown Error',
 				title: 'Error occurred during deletion',
 				status: 500,
 				detail: error.message,
-			}); // Fallback for unknown errors
+			});
 		}
 	}
 );
@@ -182,6 +156,89 @@ export const deleteDiamondPriceShape = createAsyncThunk(
 			return response;
 		} catch (error) {
 			return rejectWithValue(error);
+		}
+	}
+);
+
+export const fetchDiamondCriteria = createAsyncThunk(
+	'diamondPrice/fetchDiamondCriteria',
+	async (_, {rejectWithValue}) => {
+		try {
+			const response = await api.get('/Diamond/Criteria/All');
+			return response;
+		} catch (error) {
+			console.error('Error fetching price board:', error);
+			return rejectWithValue(error || error.message);
+		}
+	}
+);
+
+// POST /api/Diamond/Criteria/Range/MainDiamond
+export const createMainDiamondCriteria = createAsyncThunk(
+	'diamondPrice/createMainDiamondCriteria',
+	async ({caratFrom, caratTo, diamondShapeId, isSideDiamond}, {rejectWithValue}) => {
+		try {
+			const response = await api.post('/Diamond/Criteria/Range/MainDiamond', {
+				caratFrom,
+				caratTo,
+				diamondShapeId,
+				isSideDiamond,
+			});
+			return response.data || response;
+		} catch (error) {
+			console.error('Error creating Main Diamond criteria:', error);
+			return rejectWithValue(error.message || error);
+		}
+	}
+);
+
+// DELETE /api/Diamond/Criteria/Range/MainDiamond
+export const deleteMainDiamondCriteria = createAsyncThunk(
+	'diamondPrice/deleteMainDiamondCriteria',
+	async ({caratFrom, caratTo, diamondShapeId, isSideDiamond}, {rejectWithValue}) => {
+		try {
+			const response = await api.delete('/Diamond/Criteria/Range/MainDiamond', {
+				data: {caratFrom, caratTo, diamondShapeId, isSideDiamond},
+			});
+			return response.data || response;
+		} catch (error) {
+			console.error('Error deleting Main Diamond criteria:', error);
+			return rejectWithValue(error.message || error);
+		}
+	}
+);
+
+// POST /api/Diamond/Criteria/Range/SideDiamond
+export const createSideDiamondCriteria = createAsyncThunk(
+	'diamondPrice/createSideDiamondCriteria',
+	async ({caratFrom, caratTo, diamondShapeId, isSideDiamond}, {rejectWithValue}) => {
+		try {
+			const response = await api.post('/Diamond/Criteria/Range/SideDiamond', {
+				caratFrom,
+				caratTo,
+				diamondShapeId,
+				isSideDiamond,
+			});
+			return response.data || response;
+		} catch (error) {
+			console.error('Error creating Side Diamond criteria:', error);
+			return rejectWithValue(error.message || error);
+		}
+	}
+);
+
+// DELETE /api/Diamond/Criteria/Range/SideDiamond
+export const deleteSideDiamondCriteria = createAsyncThunk(
+	'diamondPrice/deleteSideDiamondCriteria',
+	async ({caratFrom, caratTo, diamondShapeId, isSideDiamond}, {rejectWithValue}) => {
+		try {
+			const response = await api.delete('/Diamond/Criteria/Range/SideDiamond', {
+				data: {caratFrom, caratTo, diamondShapeId, isSideDiamond},
+			});
+			return response.data || response;
+		} catch (error) {
+			console.error('Error deleting Side Diamond criteria:', error);
+			return rejectWithValue(error.message || error);
 		}
 	}
 );
@@ -215,6 +272,19 @@ export const diamondPriceSlice = createSlice({
 				state.loading = false;
 				const errorMsg = action.payload ? action.payload : 'An error occurred'; // Better error handling
 				console.error('Failed to fetch price board:', errorMsg); // Log the error message
+				state.error = errorMsg;
+			})
+			.addCase(fetchDiamondCriteria.pending, (state) => {
+				state.loading = true;
+				state.error = null;
+			})
+			.addCase(fetchDiamondCriteria.fulfilled, (state, action) => {
+				state.loading = false;
+				state.criteria = action.payload.data || action.payload;
+			})
+			.addCase(fetchDiamondCriteria.rejected, (state, action) => {
+				state.loading = false;
+				const errorMsg = action.payload ? action.payload : 'An error occurred'; // Better error handling
 				state.error = errorMsg;
 			})
 
@@ -305,6 +375,62 @@ export const diamondPriceSlice = createSlice({
 				state.prices = state.prices.filter((price) => price.criteriaId !== criteriaId);
 			})
 			.addCase(deleteDiamondPrice.rejected, (state, action) => {
+				state.loading = false;
+				state.error = action.payload;
+			})
+			.addCase(createMainDiamondCriteria.pending, (state) => {
+				state.loading = true;
+				state.error = null;
+			})
+			.addCase(createMainDiamondCriteria.fulfilled, (state, action) => {
+				state.loading = false;
+				console.log('Main Diamond criteria created successfully:', action.payload);
+				state.prices.push(action.payload);
+			})
+			.addCase(createMainDiamondCriteria.rejected, (state, action) => {
+				state.loading = false;
+				state.error = action.payload;
+			})
+			.addCase(deleteMainDiamondCriteria.pending, (state) => {
+				state.loading = true;
+				state.error = null;
+			})
+			.addCase(deleteMainDiamondCriteria.fulfilled, (state, action) => {
+				state.loading = false;
+				console.log('Main Diamond criteria deleted successfully:', action.payload);
+				state.prices = state.prices.filter(
+					(criteria) => criteria.id !== action.meta.arg.criteriaId
+				);
+			})
+			.addCase(deleteMainDiamondCriteria.rejected, (state, action) => {
+				state.loading = false;
+				state.error = action.payload;
+			})
+			.addCase(createSideDiamondCriteria.pending, (state) => {
+				state.loading = true;
+				state.error = null;
+			})
+			.addCase(createSideDiamondCriteria.fulfilled, (state, action) => {
+				state.loading = false;
+				console.log('Side Diamond criteria created successfully:', action.payload);
+				state.prices.push(action.payload);
+			})
+			.addCase(createSideDiamondCriteria.rejected, (state, action) => {
+				state.loading = false;
+				state.error = action.payload;
+			})
+			.addCase(deleteSideDiamondCriteria.pending, (state) => {
+				state.loading = true;
+				state.error = null;
+			})
+			.addCase(deleteSideDiamondCriteria.fulfilled, (state, action) => {
+				state.loading = false;
+				console.log('Side Diamond criteria deleted successfully:', action.payload);
+				state.prices = state.prices.filter(
+					(criteria) => criteria.id !== action.meta.arg.criteriaId
+				);
+			})
+			.addCase(deleteSideDiamondCriteria.rejected, (state, action) => {
 				state.loading = false;
 				state.error = action.payload;
 			});
