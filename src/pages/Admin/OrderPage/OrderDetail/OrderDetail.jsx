@@ -3,8 +3,10 @@ import {useDispatch, useSelector} from 'react-redux';
 import {useParams} from 'react-router-dom';
 import {
 	getOrderChildLogSelector,
+	getOrderCompletedSelector,
 	getOrderDetailSelector,
 	getOrderStatusDetailSelector,
+	getOrderTransferSelector,
 	getPaymentStatusDetailSelector,
 	GetUserDetailSelector,
 	LoadingOrderSelector,
@@ -24,10 +26,15 @@ const OrderDetail = () => {
 	const paymentStatusOrder = useSelector(getPaymentStatusDetailSelector);
 	const childLogOrder = useSelector(getOrderChildLogSelector);
 	const userDetail = useSelector(GetUserDetailSelector);
+	const statusDetail = useSelector(getOrderStatusDetailSelector);
+	const transfer = useSelector(getOrderTransferSelector);
 
 	const [orders, setOrders] = useState();
 	const [statusOrder, setStatusOrder] = useState();
 	const [isMobileView, setIsMobileView] = useState(window.innerWidth <= 768);
+	const [completed, setCompleted] = useState(null);
+
+	console.log('orders', orders);
 
 	// Handle responsive layout
 	useEffect(() => {
@@ -50,7 +57,16 @@ const OrderDetail = () => {
 			.catch((error) => {
 				message.error(error.title || error.data.title);
 			});
-	}, [id, statusOrder, paymentStatusOrder, childLogOrder, dispatch]);
+	}, [
+		id,
+		statusOrder,
+		paymentStatusOrder,
+		childLogOrder,
+		dispatch,
+		statusDetail,
+		transfer,
+		completed,
+	]);
 
 	// Fetch order log
 	useEffect(() => {
@@ -92,6 +108,7 @@ const OrderDetail = () => {
 							paymentStatusOrder={paymentStatusOrder}
 							loading={loading}
 							id={id}
+							setCompleted={setCompleted}
 						/>
 					</div>
 				</div>

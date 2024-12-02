@@ -2754,3 +2754,12 @@ video {
 .border-none {
 	border-style: none;
 }
+
+.w-\[100px\] {
+	width: 100px;
+}
+
+.text-darkBlue {
+	--tw-text-opacity: 1;
+	color: rgb(26 35 126 / var(--tw-text-opacity)) /* #1a237e */;
+}

@@ -46,19 +46,6 @@ export const getOrderDetail = createAsyncThunk(
 	}
 );
 
-export const handleOrder = createAsyncThunk(
-	'orderSlice/handleOrder',
-	async (id, {rejectWithValue}) => {
-		try {
-			const data = await api.put(`/Order/Proceed?orderId=${id}`);
-			return data;
-		} catch (error) {
-			console.error(error);
-			return rejectWithValue(error);
-		}
-	}
-);
-
 export const handleCheckoutCustomizeOrder = createAsyncThunk(
 	'orderSlice/handleCheckoutCustomizeOrder',
 	async (body, {rejectWithValue}) => {
@@ -206,18 +193,67 @@ export const handleRedeliver = createAsyncThunk(
 	}
 );
 
-// export const getProcessingDetail = createAsyncThunk(
-// 	'orderSlice/getProcessingDetail',
-// 	async ({orderId, logId}, {rejectWithValue}) => {
-// 		try {
-// 			const response = await api.get(`/Order/Log/${orderId}/${logId}/Detail`);
-// 			return response;
-// 		} catch (error) {
-// 			console.log('Error: ', JSON.stringify(error));
-// 			return rejectWithValue(error);
-// 		}
-// 	}
-// );
+export const handleConfirmTransferStaff = createAsyncThunk(
+	'orderSlice/handleConfirmTransferStaff',
+	async (body, {rejectWithValue}) => {
+		try {
+			const response = await api.put(`/Order/Staff/ConfirmTransfer/Delivering`, body);
+			return response;
+		} catch (error) {
+			console.log('Error: ', JSON.stringify(error));
+			return rejectWithValue(error);
+		}
+	}
+);
+
+export const handleConfirmTransfer = createAsyncThunk(
+	'orderSlice/handleConfirmTransfer',
+	async (body, {rejectWithValue}) => {
+		try {
+			const response = await api.put(`/Order/Staff/ConfirmTransfer/Pending`, body);
+			return response;
+		} catch (error) {
+			console.log('Error: ', JSON.stringify(error));
+			return rejectWithValue(error);
+		}
+	}
+);
+
+export const handleAddTransfer = createAsyncThunk(
+	'orderSlice/handleAddTransfer',
+	async (body, {rejectWithValue}) => {
+		try {
+			const {OrderId, Evidence} = body;
+
+			const formData = new FormData();
+
+			// Kiểm tra và thêm tệp nếu nó tồn tại
+			if (Evidence && Evidence.length > 0) {
+				const file = Evidence[0]?.originFileObj; // Lấy file đầu tiên từ Evidence
+				if (file) {
+					formData.append('Evidence', file);
+				} else {
+					console.warn('No valid file found in Evidence');
+				}
+			}
+
+			const response = await api.put(
+				`/Order/Deliverer/AddTransfer/?OrderId=${OrderId}`,
+				formData,
+				{
+					headers: {
+						'Content-Type': 'multipart/form-data',
+					},
+				}
+			);
+
+			return response;
+		} catch (error) {
+			console.log('Error: ', JSON.stringify(error));
+			return rejectWithValue(error);
+		}
+	}
+);
 
 export const orderSlice = createSlice({
 	name: 'orderSlice',
@@ -233,7 +269,7 @@ export const orderSlice = createSlice({
 		orderPaymentStatusCustomizeDetail: null,
 		orderLogsDetail: null,
 		orderChildLogDetail: null,
-		// orderChildLogList: null,
+		transfer: null,
 		loading: false,
 		error: null,
 		orderLogs: null,
@@ -275,18 +311,6 @@ export const orderSlice = createSlice({
 				state.loading = false;
 			})
 			.addCase(handleCheckoutCustomizeOrder.rejected, (state, action) => {
-				state.loading = false;
-				state.error = action.payload;
-			})
-			.addCase(handleOrder.pending, (state) => {
-				state.loading = true;
-			})
-			.addCase(handleOrder.fulfilled, (state, action) => {
-				state.loading = false;
-				state.orderStatusDetail = action.payload.Status;
-				state.orderLogsDetail = action.payload.Logs;
-			})
-			.addCase(handleOrder.rejected, (state, action) => {
 				state.loading = false;
 				state.error = action.payload;
 			})
@@ -390,6 +414,39 @@ export const orderSlice = createSlice({
 				state.orderChildLogDetail = action.payload;
 			})
 			.addCase(handleOrderLogDeliver.rejected, (state, action) => {
+				state.loading = false;
+				state.error = action.payload;
+			})
+			.addCase(handleConfirmTransfer.pending, (state) => {
+				state.loading = true;
+			})
+			.addCase(handleConfirmTransfer.fulfilled, (state, action) => {
+				state.loading = false;
+				state.orderStatusDetail = action.payload.Status;
+			})
+			.addCase(handleConfirmTransfer.rejected, (state, action) => {
+				state.loading = false;
+				state.error = action.payload;
+			})
+			.addCase(handleConfirmTransferStaff.pending, (state) => {
+				state.loading = true;
+			})
+			.addCase(handleConfirmTransferStaff.fulfilled, (state, action) => {
+				state.loading = false;
+				state.transfer = action.payload;
+			})
+			.addCase(handleConfirmTransferStaff.rejected, (state, action) => {
+				state.loading = false;
+				state.error = action.payload;
+			})
+			.addCase(handleAddTransfer.pending, (state) => {
+				state.loading = true;
+			})
+			.addCase(handleAddTransfer.fulfilled, (state, action) => {
+				state.loading = false;
+				state.transfer = action.payload;
+			})
+			.addCase(handleAddTransfer.rejected, (state, action) => {
 				state.loading = false;
 				state.error = action.payload;
 			});
