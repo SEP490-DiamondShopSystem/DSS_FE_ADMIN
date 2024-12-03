@@ -24,7 +24,6 @@ import {useDispatch, useSelector} from 'react-redux';
 import Loading from '../../../../../components/Loading';
 import {getAllDelivererSelector, GetUserDetailSelector} from '../../../../../redux/selectors';
 import {
-	handleAddTransfer,
 	handleConfirmTransfer,
 	handleConfirmTransferStaff,
 	handleDeliveryFailed,
@@ -32,11 +31,16 @@ import {
 	handleOrderReject,
 	handleRedeliver,
 	handleRefundOrder,
+	handleRejectTransfer,
 } from '../../../../../redux/slices/orderSlice';
 import {getDelivererAccount} from '../../../../../redux/slices/userSlice';
 import {getOrderStatus} from '../../../../../utils';
 import {TimeLine} from './TimeLine';
-import {handleOrder} from '../../../../../redux/slices/paymentSlice';
+import {
+	handleAddTransfer,
+	handleChangeEvidence,
+	handleOrder,
+} from '../../../../../redux/slices/paymentSlice';
 
 const {Title, Text} = Typography;
 const {Option} = Select;
@@ -81,6 +85,10 @@ const TimeLineOrder = ({
 	const [video, setVideo] = useState(null);
 
 	console.log('video', video);
+
+	const resultTransaction = orders?.Transactions?.filter((obj) =>
+		obj?.Description?.includes('Chuyển tiền còn lại')
+	);
 
 	useEffect(() => {
 		dispatch(getDelivererAccount());
@@ -172,7 +180,7 @@ const TimeLineOrder = ({
 					setTransactionCode(null);
 				})
 				.catch((error) => {
-					message.error(error?.data?.title || error?.detail);
+					message.error(error?.detail || error?.data?.title);
 				});
 		} else {
 			message.error('Không tìm thấy giao dịch');
@@ -243,7 +251,7 @@ const TimeLineOrder = ({
 				setCompleted(res);
 			})
 			.catch((error) => {
-				message.error(error?.detail);
+				message.error(error?.detail || error?.data?.title);
 			});
 	};
 
@@ -265,7 +273,7 @@ const TimeLineOrder = ({
 				message.success('Đã chuyển giao cho nhân viên vận chuyển!');
 			})
 			.catch((error) => {
-				message.error(error?.detail);
+				message.error(error?.detail || error?.data?.title);
 			});
 	};
 
@@ -283,12 +291,12 @@ const TimeLineOrder = ({
 	const handleDeliveringStatus = () => {
 		dispatch(handleOrder({id: orders.Id, confirmImages: null, confirmVideo: null}))
 			.unwrap()
-			.then(() => {
+			.then((res) => {
 				message.success('Xác nhận giao hàng!');
 				setCompleted(res);
 			})
 			.catch((error) => {
-				message.error(error?.detail);
+				message.error(error?.detail || error?.data?.title);
 			});
 	};
 
@@ -323,7 +331,7 @@ const TimeLineOrder = ({
 				setCompleted(res);
 			})
 			.catch((error) => {
-				message.error(error?.detail);
+				message.error(error?.detail || error?.data?.title);
 			});
 	};
 
@@ -342,10 +350,33 @@ const TimeLineOrder = ({
 		dispatch(handleDeliveryFailed(orders.Id))
 			.unwrap()
 			.then((res) => {
-				message.warning('Giao hàng không thành công!');
+				message.success('Xác nhận giao hàng không thành công!');
 			})
 			.catch((error) => {
-				message.error(error?.data?.title || error?.detail);
+				message.error(error?.detail || error?.title);
+			});
+	};
+	const handleRejectEvidence = () => {
+		Modal.confirm({
+			title: 'Xác nhận hủy giao đơn đặt hàng này',
+			content: 'Bạn có chắc chắn muốn tiếp tục?',
+			okText: 'Xác nhận',
+			cancelText: 'Hủy',
+			okType: 'danger',
+			onOk: handleRejectEvidenceStatus,
+		});
+	};
+
+	const handleRejectEvidenceStatus = () => {
+		dispatch(
+			handleRejectTransfer({transactionId: resultTransaction[0]?.Id, orderId: orders?.Id})
+		)
+			.unwrap()
+			.then((res) => {
+				message.warning('Chứng từ không hợp lệ, đã từ chối!');
+			})
+			.catch((error) => {
+				message.error(error?.detail || error?.data?.title);
 			});
 	};
 
@@ -373,13 +404,20 @@ const TimeLineOrder = ({
 	};
 
 	const handleRefundStatus = async () => {
-		dispatch(handleRefundOrder(orders.Id))
+		dispatch(
+			handleRefundOrder({
+				OrderId: orders.Id,
+				Amount: amount,
+				TransactionCode: transactionCode,
+				Evidence: fileList,
+			})
+		)
 			.unwrap()
 			.then((res) => {
 				handleRefundSuccess();
 			})
 			.catch((error) => {
-				message.error(error?.data?.title || error?.detail);
+				message.error(error?.detail || error?.data?.title);
 			});
 	};
 
@@ -439,7 +477,30 @@ const TimeLineOrder = ({
 	const handleAdd = () => {
 		dispatch(handleAddTransfer({OrderId: orders.Id, Evidence: fileList}))
 			.unwrap()
-			.then((res) => {})
+			.then((res) => {
+				message.success('Tải lên chứng từ thành công!');
+			})
+			.catch((error) => {
+				message.error(error.detail || error.title);
+			});
+	};
+
+	const handleChangeEvidenceBtn = () => {
+		Modal.confirm({
+			title: 'Bạn có chắc chắn muốn tải lên ảnh này!',
+			// content: 'Bạn có chắc chắn muốn tiếp tục?',
+			okText: 'Đồng Ý',
+			cancelText: 'Hủy Bỏ',
+			onOk: handleChangeBtn,
+		});
+	};
+
+	const handleChangeBtn = () => {
+		dispatch(handleChangeEvidence({TransactionId: resultTransaction[0].Id, Evidence: fileList}))
+			.unwrap()
+			.then((res) => {
+				message.success('Thay đổi chứng từ thành công!');
+			})
 			.catch((error) => {
 				message.error(error.detail || error.title);
 			});
@@ -523,7 +584,7 @@ const TimeLineOrder = ({
 							) : (
 								<div className="text-center">
 									<div className="font-semibold text-base text-darkBlue mb-5">
-										Chờ Nhân Viên Giao Hàng Xác Nhận
+										Chờ Khách Hàng Gửi Chứng Từ
 									</div>
 									<div className="flex justify-around">
 										<Button
@@ -540,7 +601,7 @@ const TimeLineOrder = ({
 						</div>
 					)}
 
-					{status === 'Rejected' && paymentStatusOrder === 3 && (
+					{status === 'Rejected' && paymentStatusOrder === 4 && userRoleManager && (
 						<div className="border rounded-lg border-primary bg-tintWhite p-5 mb-5">
 							<div className="flex items-center mb-5" style={{fontSize: 16}}>
 								<p className="font-semibold">Trạng thái đơn hàng:</p>
@@ -548,6 +609,55 @@ const TimeLineOrder = ({
 									<CloseCircleOutlined /> {ORDER_STATUS_TEXTS.Rejected}
 								</p>
 							</div>
+							<div className="my-5">
+								<Title level={5}>Xác Nhận Thông Tin Giao Dịch Từ Ngân Hàng</Title>
+
+								<div className="my-2">
+									<label className="font-semibold text-base">Số Tiền</label>
+									<InputNumber
+										className="w-full"
+										value={amount}
+										onChange={handleAmountChange}
+										min={0} // Đảm bảo số không âm
+										placeholder="Nhập số tiền"
+									/>
+								</div>
+
+								<div className="my-2">
+									<label className="font-semibold text-base">Mã Giao Dịch</label>
+									<Input
+										value={transactionCode}
+										onChange={handleTransactionCodeChange}
+										placeholder="Nhập mã giao dịch"
+									/>
+								</div>
+							</div>
+							<div className="my-5">
+								<h4 className="text-lg font-medium mb-2">Chứng từ</h4>
+								<div className="flex items-center justify-center">
+									<Upload.Dragger
+										listType="picture-card"
+										fileList={fileList}
+										onChange={handleFileChange}
+										beforeUpload={beforeUpload}
+										maxCount={1} // Giới hạn số lượng file
+										accept="image/*"
+										capture="camera"
+									>
+										<p className="ant-upload-drag-icon">
+											<InboxOutlined />
+										</p>
+										<p className="ant-upload-text">
+											Nhấp hoặc kéo tệp vào khu vực này để tải lên
+										</p>
+										<p className="ant-upload-hint">
+											Hỗ trợ cho một lần tải lên. Kéo tệp vào đây hoặc nhấp để
+											tải lên.
+										</p>
+									</Upload.Dragger>
+								</div>
+							</div>
+
 							<div className="flex justify-around">
 								<Button
 									type="text"
@@ -560,7 +670,18 @@ const TimeLineOrder = ({
 							</div>
 						</div>
 					)}
-					{status === 'Rejected' && paymentStatusOrder === 4 && (
+					{status === 'Rejected' && paymentStatusOrder === 4 && !userRoleManager && (
+						<div className="border rounded-lg border-primary bg-tintWhite p-5 mb-5">
+							<div className="flex items-center " style={{fontSize: 16}}>
+								<p className="font-semibold">Trạng thái đơn hàng:</p>
+								<p className="ml-5 text-red font-semibold">
+									<CloseCircleOutlined /> {ORDER_STATUS_TEXTS.Rejected}
+								</p>
+							</div>
+							<div>Chờ Quản Lý Xác Nhận Hoàn Tiền</div>
+						</div>
+					)}
+					{status === 'Rejected' && paymentStatusOrder === 5 && (
 						<div className="border rounded-lg border-primary bg-tintWhite p-5 mb-5">
 							<div className="flex items-center " style={{fontSize: 16}}>
 								<p className="font-semibold">Trạng thái đơn hàng:</p>
@@ -570,13 +691,61 @@ const TimeLineOrder = ({
 							</div>
 						</div>
 					)}
-					{status === 'Cancelled' && paymentStatusOrder === 3 && (
+					{status === 'Cancelled' && paymentStatusOrder === 4 && userRoleManager && (
 						<div className="border rounded-lg border-primary bg-tintWhite p-5 mb-5">
 							<div className="flex items-center mb-5" style={{fontSize: 16}}>
 								<p className="font-semibold">Trạng thái đơn hàng:</p>
 								<p className="ml-5 text-red font-semibold">
 									<CloseCircleOutlined /> {ORDER_STATUS_TEXTS.Cancelled}
 								</p>
+							</div>
+							<div className="my-5">
+								<Title level={5}>Xác Nhận Thông Tin Giao Dịch Từ Ngân Hàng</Title>
+
+								<div className="my-2">
+									<label className="font-semibold text-base">Số Tiền</label>
+									<InputNumber
+										className="w-full"
+										value={amount}
+										onChange={handleAmountChange}
+										min={0} // Đảm bảo số không âm
+										placeholder="Nhập số tiền"
+									/>
+								</div>
+
+								<div className="my-2">
+									<label className="font-semibold text-base">Mã Giao Dịch</label>
+									<Input
+										value={transactionCode}
+										onChange={handleTransactionCodeChange}
+										placeholder="Nhập mã giao dịch"
+									/>
+								</div>
+							</div>
+							<div className="my-5">
+								<h4 className="text-lg font-medium mb-2">Chứng từ</h4>
+								<div className="flex items-center justify-center">
+									<Upload.Dragger
+										listType="picture-card"
+										fileList={fileList}
+										onChange={handleFileChange}
+										beforeUpload={beforeUpload}
+										maxCount={1} // Giới hạn số lượng file
+										accept="image/*"
+										capture="camera"
+									>
+										<p className="ant-upload-drag-icon">
+											<InboxOutlined />
+										</p>
+										<p className="ant-upload-text">
+											Nhấp hoặc kéo tệp vào khu vực này để tải lên
+										</p>
+										<p className="ant-upload-hint">
+											Hỗ trợ cho một lần tải lên. Kéo tệp vào đây hoặc nhấp để
+											tải lên.
+										</p>
+									</Upload.Dragger>
+								</div>
 							</div>
 							<div className="flex justify-around">
 								<Button
@@ -590,7 +759,18 @@ const TimeLineOrder = ({
 							</div>
 						</div>
 					)}
-					{status === 'Cancelled' && paymentStatusOrder === 4 && (
+					{status === 'Cancelled' && paymentStatusOrder === 4 && !userRoleManager && (
+						<div className="border rounded-lg border-primary bg-tintWhite p-5 mb-5">
+							<div className="flex items-center " style={{fontSize: 16}}>
+								<p className="font-semibold">Trạng thái đơn hàng:</p>
+								<p className="ml-5 text-red font-semibold">
+									<CloseCircleOutlined /> {ORDER_STATUS_TEXTS.Cancelled}
+								</p>
+							</div>
+							<div>Chờ Quản Lý Xác Nhận Hoàn Tiền</div>
+						</div>
+					)}
+					{status === 'Cancelled' && paymentStatusOrder === 5 && (
 						<div className="border rounded-lg border-primary bg-tintWhite p-5 mb-5">
 							<div className="flex items-center " style={{fontSize: 16}}>
 								<p className="font-semibold">Trạng thái đơn hàng:</p>
@@ -725,7 +905,6 @@ const TimeLineOrder = ({
 						</div>
 					)}
 
-					{/* Chuyển giao shipper thành công */}
 					{status === 'Delivering' && orders?.PaymentType === 1 && (
 						<div className="border rounded-lg border-primary bg-tintWhite p-5 mb-5">
 							<div className="flex items-center mb-5" style={{fontSize: 16}}>
@@ -792,9 +971,7 @@ const TimeLineOrder = ({
 							<div className="flex justify-around">
 								{!userRoleDeliverer && (
 									<div className="">
-										{orders?.Transactions?.find(
-											(transaction) => transaction.Status === 1
-										) ? (
+										{orders?.PaymentStatus === 2 ? (
 											<>
 												<div className="my-5">
 													<Title level={5}>
@@ -838,7 +1015,7 @@ const TimeLineOrder = ({
 													<Button
 														danger
 														className="font-semibold w-full rounded-full"
-														onClick={handleFailedDelivered}
+														onClick={handleRejectEvidence}
 													>
 														Từ Chối
 													</Button>
@@ -854,10 +1031,8 @@ const TimeLineOrder = ({
 
 								{userRoleDeliverer && (
 									<div className="">
-										{orders?.Transactions?.length === 1 &&
-										orders?.Transactions?.some(
-											(transaction) => transaction.Status !== 1
-										) ? (
+										{orders?.PaymentStatus === 2 &&
+										orders?.Transactions?.length === 1 ? (
 											<>
 												<div className="mt-6">
 													<h4 className="text-lg font-medium mb-2">
@@ -869,7 +1044,7 @@ const TimeLineOrder = ({
 															fileList={fileList}
 															onChange={handleFileChange}
 															beforeUpload={beforeUpload}
-															maxCount={1} // Giới hạn số lượng file
+															maxCount={1}
 															accept="image/*"
 															capture="camera"
 														>
@@ -905,12 +1080,51 @@ const TimeLineOrder = ({
 													</Button>
 												</Space>
 											</>
-										) : orders?.Transactions?.some(
-												(transaction) => transaction.Status === 1
-										  ) ? (
-											<div className="font-semibold text-base text-darkBlue">
-												Chờ Quản Lý, Nhân Viên Xác Nhận
-											</div>
+										) : orders?.PaymentStatus === 2 &&
+										  orders?.Transactions?.length === 2 ? (
+											<>
+												<div className="font-semibold text-base text-darkBlue">
+													Chờ Quản Lý, Nhân Viên Xác Nhận
+												</div>
+												<div className="mt-6">
+													<h4 className="text-lg font-medium mb-2">
+														Thay đổi chứng từ đã gửi
+													</h4>
+													<div className="flex items-center justify-center">
+														<Upload.Dragger
+															listType="picture-card"
+															fileList={fileList}
+															onChange={handleFileChange}
+															beforeUpload={beforeUpload}
+															maxCount={1} // Giới hạn số lượng file
+															accept="image/*"
+															capture="camera"
+														>
+															<p className="ant-upload-drag-icon">
+																<InboxOutlined />
+															</p>
+															<p className="ant-upload-text">
+																Nhấp hoặc kéo tệp vào khu vực này để
+																tải lên
+															</p>
+															<p className="ant-upload-hint">
+																Hỗ trợ cho một lần tải lên. Kéo tệp
+																vào đây hoặc nhấp để tải lên.
+															</p>
+														</Upload.Dragger>
+													</div>
+												</div>
+												<Space className="mt-5 flex items-center justify-center">
+													<Button
+														type="text"
+														className="font-semibold w-full rounded-full bg-primary"
+														onClick={handleChangeEvidenceBtn}
+														loading={loading}
+													>
+														Gửi
+													</Button>
+												</Space>
+											</>
 										) : (
 											<>
 												<Upload
@@ -980,11 +1194,14 @@ const TimeLineOrder = ({
 									onChange={handleChange}
 								>
 									{deliverer &&
-										deliverer?.map((user) => (
-											<Option key={user?.Account?.Id}>
-												<Space>
-													{user?.Account?.Email}{' '}
-													<div>
+										deliverer.map((user) => (
+											<Option
+												key={user?.Account?.Id}
+												value={user?.Account?.Id}
+												disabled={!user?.IsFree}
+											>
+												<div className="flex ">
+													<div className="mr-3">
 														<CircleIcon
 															style={{
 																color: user?.IsFree
@@ -994,8 +1211,17 @@ const TimeLineOrder = ({
 															}}
 														/>
 													</div>
-													{user?.BusyMessage}
-												</Space>
+													<div>
+														<div className="flex items-center">
+															<Space className="font-semibold">
+																{user?.Account?.FirstName}
+																{user?.Account?.LastName} •{' '}
+															</Space>
+															{user?.Account?.Email}{' '}
+														</div>
+														{user?.BusyMessage}
+													</div>
+												</div>
 											</Option>
 										))}
 								</Select>

@@ -7,6 +7,7 @@ import {
 	getOrderDetailSelector,
 	getOrderStatusDetailSelector,
 	getOrderTransferSelector,
+	getOrderTransferStaffSelector,
 	getPaymentStatusDetailSelector,
 	GetUserDetailSelector,
 	LoadingOrderSelector,
@@ -28,12 +29,14 @@ const OrderDetail = () => {
 	const userDetail = useSelector(GetUserDetailSelector);
 	const statusDetail = useSelector(getOrderStatusDetailSelector);
 	const transfer = useSelector(getOrderTransferSelector);
+	const transferStaff = useSelector(getOrderTransferStaffSelector);
 
 	const [orders, setOrders] = useState();
 	const [statusOrder, setStatusOrder] = useState();
 	const [isMobileView, setIsMobileView] = useState(window.innerWidth <= 768);
 	const [completed, setCompleted] = useState(null);
 
+	console.log('completed', completed);
 	console.log('orders', orders);
 
 	// Handle responsive layout
@@ -66,6 +69,7 @@ const OrderDetail = () => {
 		statusDetail,
 		transfer,
 		completed,
+		transferStaff,
 	]);
 
 	// Fetch order log

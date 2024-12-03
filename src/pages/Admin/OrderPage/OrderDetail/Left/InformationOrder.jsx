@@ -584,10 +584,10 @@ const InformationOrder = ({orders, statusOrder, paymentStatusOrder, userDetail})
 								>
 									<Col xs={12} sm={12} lg={12}>
 										<Text strong style={{fontSize: 18}}>
-											Ngày thanh toán
+											Ngày tạo
 										</Text>
 										<br />
-										<Text>{transaction?.PayDate}</Text>
+										<Text>{transaction?.InitDate}</Text>
 									</Col>
 									<Col xs={12} sm={12} lg={12}>
 										<Text strong style={{fontSize: 18}}>
@@ -604,13 +604,29 @@ const InformationOrder = ({orders, statusOrder, paymentStatusOrder, userDetail})
 									className="my-3"
 								>
 									<Col xs={12} sm={12} lg={12}>
-										<Text strong style={{fontSize: 18}}>
-											Số tiền phạt
-										</Text>
-										<br />
-										<Text>{formatPrice(transaction?.FineAmount)}</Text>
+										<>
+											<Text strong style={{fontSize: 18}}>
+												Ngày xác nhận
+											</Text>
+											<br />
+											<Text>
+												{transaction?.VerifiedDate
+													? transaction?.VerifiedDate
+													: 'Chưa được xác nhận'}
+											</Text>
+										</>
 									</Col>
-									<Col xs={12} sm={12} lg={12}></Col>
+									<Col xs={12} sm={12} lg={12}>
+										{transaction?.FineAmount !== 0 && (
+											<>
+												<Text strong style={{fontSize: 18}}>
+													Số tiền phạt
+												</Text>
+												<br />
+												<Text>{formatPrice(transaction?.FineAmount)}</Text>
+											</>
+										)}
+									</Col>
 								</Row>
 								<Row>
 									<Col span={24}>
