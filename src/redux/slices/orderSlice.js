@@ -76,12 +76,32 @@ export const handleDeliveryFailed = createAsyncThunk(
 
 export const handleRefundOrder = createAsyncThunk(
 	'orderSlice/handleRefundOrder',
-	async (id, {rejectWithValue}) => {
+	async (body, {rejectWithValue}) => {
 		try {
-			const data = await api.put(`/Order/CompleteRefund?orderId=${id}`);
-			console.log(data);
+			const {OrderId, Amount, TransactionCode, Evidence} = body;
 
-			return data;
+			const formData = new FormData();
+			formData.append('OrderId', OrderId);
+			formData.append('Amount', Amount);
+			formData.append('TransactionCode', TransactionCode);
+
+			// Kiểm tra và thêm tệp nếu nó tồn tại
+			if (Evidence && Evidence.length > 0) {
+				const file = Evidence[0]?.originFileObj; // Lấy file đầu tiên từ Evidence
+				if (file) {
+					formData.append('Evidence', file);
+				} else {
+					console.warn('No valid file found in Evidence');
+				}
+			}
+
+			const response = await api.post(`/Order/Manager/ConfirmTransfer/Refund`, formData, {
+				headers: {
+					'Content-Type': 'multipart/form-data',
+				},
+			});
+
+			return response;
 		} catch (error) {
 			console.error(error);
 			return rejectWithValue(error);
@@ -219,34 +239,11 @@ export const handleConfirmTransfer = createAsyncThunk(
 	}
 );
 
-export const handleAddTransfer = createAsyncThunk(
-	'orderSlice/handleAddTransfer',
+export const handleRejectTransfer = createAsyncThunk(
+	'orderSlice/handleRejectTransfer',
 	async (body, {rejectWithValue}) => {
 		try {
-			const {OrderId, Evidence} = body;
-
-			const formData = new FormData();
-
-			// Kiểm tra và thêm tệp nếu nó tồn tại
-			if (Evidence && Evidence.length > 0) {
-				const file = Evidence[0]?.originFileObj; // Lấy file đầu tiên từ Evidence
-				if (file) {
-					formData.append('Evidence', file);
-				} else {
-					console.warn('No valid file found in Evidence');
-				}
-			}
-
-			const response = await api.put(
-				`/Order/Deliverer/AddTransfer/?OrderId=${OrderId}`,
-				formData,
-				{
-					headers: {
-						'Content-Type': 'multipart/form-data',
-					},
-				}
-			);
-
+			const response = await api.put(`/Order/Staff/RejectTransfer`, body);
 			return response;
 		} catch (error) {
 			console.log('Error: ', JSON.stringify(error));
@@ -439,14 +436,14 @@ export const orderSlice = createSlice({
 				state.loading = false;
 				state.error = action.payload;
 			})
-			.addCase(handleAddTransfer.pending, (state) => {
+			.addCase(handleRejectTransfer.pending, (state) => {
 				state.loading = true;
 			})
-			.addCase(handleAddTransfer.fulfilled, (state, action) => {
+			.addCase(handleRejectTransfer.fulfilled, (state, action) => {
 				state.loading = false;
 				state.transfer = action.payload;
 			})
-			.addCase(handleAddTransfer.rejected, (state, action) => {
+			.addCase(handleRejectTransfer.rejected, (state, action) => {
 				state.loading = false;
 				state.error = action.payload;
 			});

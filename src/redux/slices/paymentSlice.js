@@ -14,8 +14,80 @@ export const getAllPayment = createAsyncThunk(
 	}
 );
 
+export const handleAddTransfer = createAsyncThunk(
+	'paymentSlice/handleAddTransfer',
+	async (body, {rejectWithValue}) => {
+		try {
+			const {OrderId, Evidence} = body;
+
+			const formData = new FormData();
+
+			// Kiểm tra và thêm tệp nếu nó tồn tại
+			if (Evidence && Evidence.length > 0) {
+				const file = Evidence[0]?.originFileObj; // Lấy file đầu tiên từ Evidence
+				if (file) {
+					formData.append('Evidence', file);
+				} else {
+					console.warn('No valid file found in Evidence');
+				}
+			}
+
+			const response = await api.put(
+				`/Order/Deliverer/AddTransfer?OrderId=${OrderId}`,
+				formData,
+				{
+					headers: {
+						'Content-Type': 'multipart/form-data',
+					},
+				}
+			);
+
+			return response;
+		} catch (error) {
+			console.log('Error: ', JSON.stringify(error));
+			return rejectWithValue(error);
+		}
+	}
+);
+
+export const handleChangeEvidence = createAsyncThunk(
+	'paymentSlice/handleChangeEvidence',
+	async (body, {rejectWithValue}) => {
+		try {
+			const {TransactionId, Evidence} = body;
+
+			const formData = new FormData();
+
+			// Kiểm tra và thêm tệp nếu nó tồn tại
+			if (Evidence && Evidence.length > 0) {
+				const file = Evidence[0]?.originFileObj; // Lấy file đầu tiên từ Evidence
+				if (file) {
+					formData.append('Evidence', file);
+				} else {
+					console.warn('No valid file found in Evidence');
+				}
+			}
+
+			const response = await api.put(
+				`/Order/Deliverer/ChangeEvidence?TransactionId=${TransactionId}`,
+				formData,
+				{
+					headers: {
+						'Content-Type': 'multipart/form-data',
+					},
+				}
+			);
+
+			return response;
+		} catch (error) {
+			console.log('Error: ', JSON.stringify(error));
+			return rejectWithValue(error);
+		}
+	}
+);
+
 export const handleOrder = createAsyncThunk(
-	'orderSlice/handleOrder',
+	'paymentSlice/handleOrder',
 	async ({id, confirmImages, confirmVideo}, {rejectWithValue}) => {
 		try {
 			const formData = new FormData();
@@ -74,6 +146,28 @@ export const paymentSlice = createSlice({
 				state.completed = action.payload;
 			})
 			.addCase(handleOrder.rejected, (state, action) => {
+				state.loading = false;
+				state.error = action.payload;
+			})
+			.addCase(handleAddTransfer.pending, (state) => {
+				state.loading = true;
+			})
+			.addCase(handleAddTransfer.fulfilled, (state, action) => {
+				state.loading = false;
+				state.transfer = action.payload;
+			})
+			.addCase(handleAddTransfer.rejected, (state, action) => {
+				state.loading = false;
+				state.error = action.payload;
+			})
+			.addCase(handleChangeEvidence.pending, (state) => {
+				state.loading = true;
+			})
+			.addCase(handleChangeEvidence.fulfilled, (state, action) => {
+				state.loading = false;
+				state.transfer = action.payload;
+			})
+			.addCase(handleChangeEvidence.rejected, (state, action) => {
 				state.loading = false;
 				state.error = action.payload;
 			});
