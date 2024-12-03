@@ -143,3 +143,7 @@ export const selectFrontendDisplayRule = (state) => state?.config?.frontendDispl
 export const selectPromotionRule = (state) => state?.config?.promotionRule;
 export const selectIsLoading = (state) => state?.config?.isLoading;
 export const selectConfigError = (state) => state?.config?.error;
+//CRITERIA 
+export const selectCriterias = (state) => state.criteriaRangeSlice.criterias;
+export const selectCriteriaLoading = (state) => state.criteriaRangeSlice.loading;
+export const selectCriteriaError = (state) => state.criteriaRangeSlice.error;

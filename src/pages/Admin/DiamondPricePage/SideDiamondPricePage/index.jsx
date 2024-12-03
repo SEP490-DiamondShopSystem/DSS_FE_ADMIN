@@ -6,7 +6,12 @@ import {
 	updateDiamondPrices,
 	deleteDiamondPrice,
 } from '../../../../redux/slices/diamondPriceSlice';
-import {message, Alert} from 'antd';
+import {
+	createSideDiamondRange,
+	deleteSideDiamondRange,
+	updateCriteriaRange,
+} from '../../../../redux/slices/criteriaRangeSlice';
+import {message, Alert, Modal, Form, InputNumber} from 'antd';
 import {getPriceBoardSelector, LoadingDiamondPriceSelector} from '../../../../redux/selectors';
 
 const formatPrice = (price) => {
@@ -44,6 +49,11 @@ const SideDiamondPricePage = () => {
 	const [isCreating, setIsCreating] = useState(false);
 	const [listPrices, setListPrices] = useState([]);
 	const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+	// State for Criteria Range Modals
+	const [isCreateRangeModalVisible, setIsCreateRangeModalVisible] = useState(false);
+	const [isUpdateRangeModalVisible, setIsUpdateRangeModalVisible] = useState(false);
+	const [selectedRange, setSelectedRange] = useState(null);
+	const [criteriaRangeToDelete, setCriteriaRangeToDelete] = useState(null);
 
 	useEffect(() => {
 		dispatch(fetchPriceBoard({shapeId, isLabDiamond, cut, isSideDiamond: true}));
@@ -77,7 +87,7 @@ const SideDiamondPricePage = () => {
 		await dispatch(deleteDiamondPrice(payload)); // Wait for delete to finish
 		setSelectedPrices([]);
 		setShowDeleteConfirm(false);
-		await dispatch(fetchPriceBoard({shapeId, isLabDiamond, cut, isSideDiamond})); // Fetch updated board
+		await dispatch(fetchPriceBoard({shapeId, isLabDiamond, cut, isSideDiamond: true})); // Fetch updated board
 	};
 
 	const savePrices = async () => {
@@ -91,7 +101,9 @@ const SideDiamondPricePage = () => {
 
 		if (listPrices.length === 0) return;
 
-		await dispatch(createDiamondPrice({listPrices, shapeId, isLabDiamond, isSideDiamond: true}))
+		await dispatch(
+			createDiamondPrice({listPrices, shapeId, isLabDiamond, isSideDiamond: true})
+		)
 			.unwrap()
 			.then(() => {
 				message.success('Thêm giá kim cương thành công!');
@@ -170,6 +182,197 @@ const SideDiamondPricePage = () => {
 			/>
 		);
 	};
+	const handleCreateSideDiamondRange = async (values) => {
+		try {
+			await dispatch(
+				createSideDiamondRange({
+					caratFrom: values.caratFrom,
+					caratTo: values.caratTo,
+					diamondShapeId: shapeId,
+					isLabDiamond: isLabDiamond,
+				})
+			).unwrap();
+
+			message.success('Tạo phạm vi kim cương mới thành công!');
+			setIsCreateRangeModalVisible(false);
+
+			// Refresh price board after creating range
+			dispatch(fetchPriceBoard({shapeId, isLabDiamond, cut, isSideDiamond: true}));
+		} catch (error) {
+			message.error(error?.data?.title || 'Không thể tạo phạm vi kim cương');
+		}
+	};
+
+	// New function to handle deleting a main diamond range
+	const handleDeleteSideDiamondRange = async () => {
+		try {
+			// Ensure criteriaRangeToDelete has valid data
+			if (!criteriaRangeToDelete) {
+				message.error('Phạm vi tiêu chí để xóa không tồn tại!');
+				return;
+			}
+
+			// Dispatch delete action with the selected range values
+			await dispatch(
+				deleteSideDiamondRange({
+					caratFrom: criteriaRangeToDelete.CaratFrom,
+					caratTo: criteriaRangeToDelete.CaratTo,
+					diamondShapeId: shapeId,
+					isLabDiamond: isLabDiamond,
+				})
+			).unwrap();
+
+			message.success('Xóa phạm vi kim cương thành công!');
+
+			// Refresh price board after deleting range
+			dispatch(fetchPriceBoard({shapeId, isLabDiamond, cut, isSideDiamond: true}));
+
+			// Reset criteriaRangeToDelete
+			setCriteriaRangeToDelete(null);
+		} catch (error) {
+			message.error(error?.data?.title || 'Không thể xóa phạm vi kim cương');
+		}
+	};
+	// New function to handle updating a criteria range
+	const handleUpdateCriteriaRange = async (values) => {
+		try {
+			// Prepare payload with old and new ranges
+			const payload = {
+				isSideDiamond: true, // Assuming it's always false as per your example
+				diamondShapeId: shapeId,
+				oldCaratRange: {
+					caratFrom: selectedRange.CaratFrom,
+					caratTo: selectedRange.CaratTo,
+				},
+				newCaratRange: {
+					caratFrom: values.caratFrom,
+					caratTo: values.caratTo,
+				},
+			};
+
+			// Dispatch update action with the new payload
+			await dispatch(updateCriteriaRange(payload)).unwrap();
+
+			message.success('Cập nhật phạm vi kim cương thành công!');
+			setIsUpdateRangeModalVisible(false);
+			setSelectedRange(null);
+
+			// Refresh price board after updating range
+			dispatch(fetchPriceBoard({shapeId, isLabDiamond, cut, isSideDiamond: true}));
+		} catch (error) {
+			message.error(error?.data?.title || 'Không thể cập nhật phạm vi kim cương');
+		}
+	};
+	// Create Range Modal
+	const CreateRangeModal = () => (
+		<Modal
+			title="Tạo Phạm Vi Kim Cương Mới"
+			visible={isCreateRangeModalVisible}
+			onCancel={() => setIsCreateRangeModalVisible(false)}
+			footer={null}
+		>
+			<Form onFinish={handleCreateSideDiamondRange}>
+				<Form.Item
+					name="caratFrom"
+					label="Từ Carat"
+					rules={[{required: true, message: 'Vui lòng nhập giá trị Carat từ'}]}
+				>
+					<InputNumber min={0} step={0.01} />
+				</Form.Item>
+				<Form.Item
+					name="caratTo"
+					label="Đến Carat"
+					rules={[{required: true, message: 'Vui lòng nhập giá trị Carat đến'}]}
+				>
+					<InputNumber min={0} step={0.01} />
+				</Form.Item>
+				<Form.Item>
+					<button
+						type="submit"
+						className="w-full bg-primary text-black py-2 rounded hover:bg-primaryLight"
+					>
+						Tạo Phạm Vi
+					</button>
+				</Form.Item>
+			</Form>
+		</Modal>
+	);
+
+	// Update Range Modal
+	const UpdateRangeModal = () => (
+		<Modal
+			title="Cập Nhật Phạm Vi Carat"
+			visible={isUpdateRangeModalVisible}
+			onCancel={() => {
+				setIsUpdateRangeModalVisible(false);
+				setSelectedRange(null);
+			}}
+			footer={null}
+		>
+			{selectedRange && (
+				<Form
+					initialValues={{
+						caratFrom: selectedRange.CaratFrom,
+						caratTo: selectedRange.CaratTo,
+					}}
+					onFinish={handleUpdateCriteriaRange}
+				>
+					<Form.Item
+						name="caratFrom"
+						label="Từ Carat"
+						rules={[{required: true, message: 'Vui lòng nhập giá trị Carat từ'}]}
+					>
+						<InputNumber min={0} step={0.01} />
+					</Form.Item>
+					<Form.Item
+						name="caratTo"
+						label="Đến Carat"
+						rules={[{required: true, message: 'Vui lòng nhập giá trị Carat đến'}]}
+					>
+						<InputNumber min={0} step={0.01} />
+					</Form.Item>
+					<Form.Item>
+						<button
+							type="submit"
+							className="w-full bg-primary text-black py-2 rounded hover:bg-primaryLight"
+						>
+							Cập Nhật Phạm Vi
+						</button>
+					</Form.Item>
+				</Form>
+			)}
+		</Modal>
+	);
+	// Delete Criteria Range Confirmation Modal
+	const DeleteCriteriaRangeModal = () => (
+		<Modal
+			title="Xác Nhận Xóa Phạm Vi Tiêu Chí"
+			visible={!!criteriaRangeToDelete}
+			onCancel={() => setCriteriaRangeToDelete(null)}
+			footer={[
+				<button
+					key="cancel"
+					onClick={() => setCriteriaRangeToDelete(null)}
+					className="mr-2 bg-gray-200 text-black px-4 py-2 rounded hover:bg-gray-300"
+				>
+					Hủy
+				</button>,
+				<button
+					key="delete"
+					onClick={handleDeleteSideDiamondRange}
+					className="bg-red text-white px-4 py-2 rounded hover:bg-red-600"
+				>
+					Xóa
+				</button>,
+			]}
+		>
+			<p>
+				Bạn có chắc chắn muốn xóa phạm vi tiêu chí từ {criteriaRangeToDelete?.CaratFrom} đến{' '}
+				{criteriaRangeToDelete?.CaratTo} Carat không?
+			</p>
+		</Modal>
+	);
+
 	const cancelDelete = () => {
 		setShowDeleteConfirm(false);
 	};
@@ -515,13 +718,19 @@ const SideDiamondPricePage = () => {
 				{/* )} */}
 
 				{/* Clear Filters Button */}
-				<div>
+				<div className="flex gap-4">
 					<button
 						onClick={clearFilters}
 						className="bg-red text-white px-4 py-2 rounded hover:bg-redLight transition duration-200 font-semibold shadow hover:scale-105"
 						aria-label="Clear Filters"
 					>
 						Xóa bộ lọc
+					</button>
+					<button
+						onClick={() => setIsCreateRangeModalVisible(true)}
+						className=" bg-green text-black px-4 py-2 rounded hover:bg-darkGreen hover:text-white transition duration-200 font-semibold right-1"
+					>
+						Tạo Phạm Vi Carat Mới
 					</button>
 				</div>
 			</div>
@@ -608,6 +817,7 @@ const SideDiamondPricePage = () => {
 			)}
 			{/* Table Rendering */}
 			{renderMissingRangesAlert()}
+
 			<div className="overflow-x-auto">
 				<table className="min-w-full border border-gray-300 text-sm w-full">
 					<thead className="bg-primary">
@@ -635,6 +845,23 @@ const SideDiamondPricePage = () => {
 										colSpan={Object.keys(table.ClarityRange).length + 1}
 									>
 										{table.CaratFrom} - {table.CaratTo} Carat
+										<div className="flex justify-end">
+											<button
+												onClick={() => {
+													setSelectedRange(table);
+													setIsUpdateRangeModalVisible(true);
+												}}
+												className="ml-4 bg-primaryDark text-black px-2 py-1 rounded hover:bg-blue transition duration-200 text-xs"
+											>
+												Sửa
+											</button>
+											<button
+												onClick={() => setCriteriaRangeToDelete(table)}
+												className="bg-red text-white px-2 py-1 rounded hover:bg-red-600 transition duration-200 text-xs"
+											>
+												Xóa
+											</button>
+										</div>
 									</td>
 								</tr>
 								{renderPriceRows(
@@ -686,6 +913,9 @@ const SideDiamondPricePage = () => {
 					)}
 				</div>
 			)}
+			<CreateRangeModal />
+			<UpdateRangeModal />
+			<DeleteCriteriaRangeModal />
 		</div>
 	);
 };
