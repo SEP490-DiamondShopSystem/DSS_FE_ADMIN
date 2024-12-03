@@ -49,16 +49,6 @@ const LoginPage = () => {
 			<div className="h-screen flex flex-col md:flex-row">
 				{/* Mobile View with Image Background */}
 				<div className="relative flex md:hidden justify-center items-center bg-black bg-opacity-70 bg-center w-full h-full">
-					{/* <div
-            className="absolute inset-0"
-            style={{
-              opacity: 0.2,
-              backgroundImage: `url(${imageExporter.background})`,
-              backgroundSize: 'cover', // Ensures the background image covers the entire container
-              backgroundPosition: 'center', // Centers the background image
-              backgroundRepeat: 'no-repeat', // Ensures no repetition of the background
-            }}
-          ></div> */}
 					<div className="relative z-10 w-11/12 max-w-md">
 						<h1 className="text-white text-3xl font-bold mb-4 text-center">
 							Đăng Nhập

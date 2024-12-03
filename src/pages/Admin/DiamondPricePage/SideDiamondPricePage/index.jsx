@@ -2,11 +2,16 @@ import React, {useEffect, useState} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
 import {
 	fetchPriceBoard,
-	fetchDiamondPrices,
 	createDiamondPrice,
 	updateDiamondPrices,
 	deleteDiamondPrice,
 } from '../../../../redux/slices/diamondPriceSlice';
+import {
+	createSideDiamondRange,
+	deleteSideDiamondRange,
+	updateCriteriaRange,
+} from '../../../../redux/slices/criteriaRangeSlice';
+import {message, Alert, Modal, Form, InputNumber} from 'antd';
 import {getPriceBoardSelector, LoadingDiamondPriceSelector} from '../../../../redux/selectors';
 
 const formatPrice = (price) => {
@@ -22,7 +27,10 @@ const SideDiamondPricePage = () => {
 		loading: LoadingDiamondPriceSelector(state),
 	}));
 	const [filters, setFilters] = useState({
+		isSideDiamond: true,
+		shapeId: 1,
 		isLabDiamond: false,
+		cut: 1,
 	});
 
 	const handleFilterChange = (filterName) => (event) => {
@@ -32,87 +40,95 @@ const SideDiamondPricePage = () => {
 		}));
 	};
 
+	const [shapeId, setShapeId] = useState(1);
 	const [isLabDiamond, setIsLabDiamond] = useState(false);
-	const [shapeId, setShapeId] = useState(99);
-
-	const [isSideDiamond, setIsSideDiamond] = useState(true);
+	const [cut, setCut] = useState(1);
 	const [editedCells, setEditedCells] = useState([]);
 	const [isEditing, setIsEditing] = useState(false);
 	const [selectedPrices, setSelectedPrices] = useState([]);
 	const [isCreating, setIsCreating] = useState(false);
 	const [listPrices, setListPrices] = useState([]);
 	const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+	// State for Criteria Range Modals
+	const [isCreateRangeModalVisible, setIsCreateRangeModalVisible] = useState(false);
+	const [isUpdateRangeModalVisible, setIsUpdateRangeModalVisible] = useState(false);
+	const [selectedRange, setSelectedRange] = useState(null);
+	const [criteriaRangeToDelete, setCriteriaRangeToDelete] = useState(null);
 
 	useEffect(() => {
-		dispatch(fetchPriceBoard({isLabDiamond, isSideDiamond}));
-	}, [dispatch, isLabDiamond, isSideDiamond]);
+		dispatch(fetchPriceBoard({shapeId, isLabDiamond, cut, isSideDiamond: true}));
+	}, [dispatch, shapeId, isLabDiamond, cut]);
 
-	const handleCheckboxChange = (criteriaId) => {
-		setSelectedPrices(
-			(prev) =>
-				prev.includes(criteriaId)
-					? prev.filter((id) => id !== criteriaId) // Uncheck
-					: [...prev, criteriaId] // Check
-		);
+	const handleShapeChange = (event) => {
+		setShapeId(Number(event.target.value));
 	};
 
 	const handleDelete = () => {
 		if (selectedPrices.length === 0) return;
 		setShowDeleteConfirm(true); // Show confirmation popup
 	};
-
+	const handleCheckboxChange = (diamondPriceId) => {
+		setSelectedPrices(
+			(prev) =>
+				prev.includes()
+					? prev.filter((id) => id !== diamondPriceId) // Uncheck
+					: [...prev, diamondPriceId] // Check
+		);
+	};
 	const confirmDelete = async () => {
-		try {
-			const deleteList = selectedPrices.map((criteriaId) => ({criteriaId}));
-			const payload = {
-				deleteList,
-				isLabDiamond,
-			};
+		const priceIds = selectedPrices;
+		const payload = {
+			priceIds,
+			shapeId,
+			isLabDiamond,
+			isSideDiamond: true,
+		};
 
-			dispatch(deleteDiamondPrice(payload))
-				.unwrap()
-				.then((res) => {
-					message.success('Xóa Giá Thành Công!');
-				})
-				.catch((error) => {
-					message.error(error?.data?.title || error?.detail);
-				}); // Wait for delete to finish
-		} catch (error) {
-			message.error(error?.data?.title || error?.detail);
-		}
+		await dispatch(deleteDiamondPrice(payload)); // Wait for delete to finish
 		setSelectedPrices([]);
 		setShowDeleteConfirm(false);
-		await dispatch(fetchPriceBoard({isLabDiamond, isSideDiamond})); // Fetch updated board
+		await dispatch(fetchPriceBoard({shapeId, isLabDiamond, cut, isSideDiamond: true})); // Fetch updated board
 	};
 
 	const savePrices = async () => {
-		try {
-			const listPrices = editedCells.map((cell) => ({
-				diamondCriteriaId: cell.diamondCriteriaId,
-				price: Number(cell.price),
-			}));
+		const listPrices = editedCells.map((cell) => ({
+			DiamondCriteriaId: priceBoard.PriceTables[0].CriteriaId,
+			price: Number(cell.price),
+			cut: priceBoard.MainCut,
+			color: Object.keys(priceBoard.PriceTables[0].ColorRange)[cell.rowIndex],
+			clarity: Object.keys(priceBoard.PriceTables[0].ClarityRange)[cell.cellIndex],
+		}));
 
-			if (listPrices.length === 0) return;
+		if (listPrices.length === 0) return;
 
-			await dispatch(createDiamondPrice({listPrices, isLabDiamond, isSideDiamond, shapeId}))
-				.unwrap()
-				.then((res) => {
-					message.success('Thêm Giá Thành Công!');
-				})
-				.catch((error) => {
-					message.error(error?.data?.title || error?.detail);
-				});
-		} catch (error) {
-			message.error(error?.data?.title || error?.detail);
-		}
+		await dispatch(
+			createDiamondPrice({listPrices, shapeId, isLabDiamond, isSideDiamond: true})
+		)
+			.unwrap()
+			.then(() => {
+				message.success('Thêm giá kim cương thành công!');
+			})
+			.catch((error) => {
+				message.error(error?.data?.title || error?.detail);
+			});
+
 		setEditedCells([]);
-		setIsCreating(!isCreating);
-		await dispatch(fetchPriceBoard({isLabDiamond, isSideDiamond})); // Fetch updated board
+		setIsCreating(false);
+
+		await dispatch(fetchPriceBoard({shapeId, isLabDiamond, cut, isSideDiamond: true}));
 	};
 
 	const handleSave = async () => {
+		// Check if any edited price is 0 or negative
+		const invalidPrices = editedCells.filter((cell) => cell.price <= 0);
+
+		if (invalidPrices.length > 0) {
+			message.error('Giá kim cương phải lớn hơn 0. Vui lòng kiểm tra lại các giá trị.');
+			return;
+		}
+
 		const updatedPrices = editedCells.map((cell) => ({
-			diamondCriteriaId: cell.diamondCriteriaId,
+			diamondPriceId: cell.diamondPriceId,
 			price: Number(cell.price),
 		}));
 
@@ -121,26 +137,251 @@ const SideDiamondPricePage = () => {
 				updatedDiamondPrices: updatedPrices,
 				shapeId,
 				isLabDiamond,
-				isSideDiamond,
+				isSideDiamond: true,
 			})
 		)
 			.unwrap()
 			.then(() => {
-				message.success('Cập Nhật Giá Thành Công!');
+				message.success('Cập nhật giá kim cương thành công!');
 			})
 			.catch((error) => {
 				message.error(error?.data?.title || error?.detail);
 			});
+
 		setEditedCells([]);
-		setIsEditing(!isEditing);
-		await dispatch(fetchPriceBoard({isLabDiamond, isSideDiamond, shapeId})); // Fetch updated board
+		setIsEditing(false);
+		await dispatch(fetchPriceBoard({shapeId, isLabDiamond, cut, isSideDiamond: true}));
 	};
+
+	// Render missing ranges alert
+	const renderMissingRangesAlert = () => {
+		// Check if there are missing ranges
+		const missingRanges = priceBoard.MissingRange || [];
+		const uncoveredCaratRanges = priceBoard.UncoveredTableCaratRange || [];
+
+		// Combine and deduplicate missing ranges
+		const allMissingRanges = [
+			...missingRanges.map((range) => `${range.Item1} - ${range.Item2} Carat`),
+		];
+
+		if (allMissingRanges.length === 0) return null;
+
+		return (
+			<Alert
+				message="Các khoảng Carat chưa có sẵn"
+				description={
+					<ul className="list-disc pl-5">
+						{allMissingRanges.map((range, index) => (
+							<li key={index}>{range}</li>
+						))}
+					</ul>
+				}
+				type="warning"
+				showIcon
+				className="mb-4"
+			/>
+		);
+	};
+	const handleCreateSideDiamondRange = async (values) => {
+		try {
+			await dispatch(
+				createSideDiamondRange({
+					caratFrom: values.caratFrom,
+					caratTo: values.caratTo,
+					diamondShapeId: shapeId,
+					isLabDiamond: isLabDiamond,
+				})
+			).unwrap();
+
+			message.success('Tạo phạm vi kim cương mới thành công!');
+			setIsCreateRangeModalVisible(false);
+
+			// Refresh price board after creating range
+			dispatch(fetchPriceBoard({shapeId, isLabDiamond, cut, isSideDiamond: true}));
+		} catch (error) {
+			message.error(error?.data?.title || 'Không thể tạo phạm vi kim cương');
+		}
+	};
+
+	// New function to handle deleting a main diamond range
+	const handleDeleteSideDiamondRange = async () => {
+		try {
+			// Ensure criteriaRangeToDelete has valid data
+			if (!criteriaRangeToDelete) {
+				message.error('Phạm vi tiêu chí để xóa không tồn tại!');
+				return;
+			}
+
+			// Dispatch delete action with the selected range values
+			await dispatch(
+				deleteSideDiamondRange({
+					caratFrom: criteriaRangeToDelete.CaratFrom,
+					caratTo: criteriaRangeToDelete.CaratTo,
+					diamondShapeId: shapeId,
+					isLabDiamond: isLabDiamond,
+				})
+			).unwrap();
+
+			message.success('Xóa phạm vi kim cương thành công!');
+
+			// Refresh price board after deleting range
+			dispatch(fetchPriceBoard({shapeId, isLabDiamond, cut, isSideDiamond: true}));
+
+			// Reset criteriaRangeToDelete
+			setCriteriaRangeToDelete(null);
+		} catch (error) {
+			message.error(error?.data?.title || 'Không thể xóa phạm vi kim cương');
+		}
+	};
+	// New function to handle updating a criteria range
+	const handleUpdateCriteriaRange = async (values) => {
+		try {
+			// Prepare payload with old and new ranges
+			const payload = {
+				isSideDiamond: true, // Assuming it's always false as per your example
+				diamondShapeId: shapeId,
+				oldCaratRange: {
+					caratFrom: selectedRange.CaratFrom,
+					caratTo: selectedRange.CaratTo,
+				},
+				newCaratRange: {
+					caratFrom: values.caratFrom,
+					caratTo: values.caratTo,
+				},
+			};
+
+			// Dispatch update action with the new payload
+			await dispatch(updateCriteriaRange(payload)).unwrap();
+
+			message.success('Cập nhật phạm vi kim cương thành công!');
+			setIsUpdateRangeModalVisible(false);
+			setSelectedRange(null);
+
+			// Refresh price board after updating range
+			dispatch(fetchPriceBoard({shapeId, isLabDiamond, cut, isSideDiamond: true}));
+		} catch (error) {
+			message.error(error?.data?.title || 'Không thể cập nhật phạm vi kim cương');
+		}
+	};
+	// Create Range Modal
+	const CreateRangeModal = () => (
+		<Modal
+			title="Tạo Phạm Vi Kim Cương Mới"
+			visible={isCreateRangeModalVisible}
+			onCancel={() => setIsCreateRangeModalVisible(false)}
+			footer={null}
+		>
+			<Form onFinish={handleCreateSideDiamondRange}>
+				<Form.Item
+					name="caratFrom"
+					label="Từ Carat"
+					rules={[{required: true, message: 'Vui lòng nhập giá trị Carat từ'}]}
+				>
+					<InputNumber min={0} step={0.01} />
+				</Form.Item>
+				<Form.Item
+					name="caratTo"
+					label="Đến Carat"
+					rules={[{required: true, message: 'Vui lòng nhập giá trị Carat đến'}]}
+				>
+					<InputNumber min={0} step={0.01} />
+				</Form.Item>
+				<Form.Item>
+					<button
+						type="submit"
+						className="w-full bg-primary text-black py-2 rounded hover:bg-primaryLight"
+					>
+						Tạo Phạm Vi
+					</button>
+				</Form.Item>
+			</Form>
+		</Modal>
+	);
+
+	// Update Range Modal
+	const UpdateRangeModal = () => (
+		<Modal
+			title="Cập Nhật Phạm Vi Carat"
+			visible={isUpdateRangeModalVisible}
+			onCancel={() => {
+				setIsUpdateRangeModalVisible(false);
+				setSelectedRange(null);
+			}}
+			footer={null}
+		>
+			{selectedRange && (
+				<Form
+					initialValues={{
+						caratFrom: selectedRange.CaratFrom,
+						caratTo: selectedRange.CaratTo,
+					}}
+					onFinish={handleUpdateCriteriaRange}
+				>
+					<Form.Item
+						name="caratFrom"
+						label="Từ Carat"
+						rules={[{required: true, message: 'Vui lòng nhập giá trị Carat từ'}]}
+					>
+						<InputNumber min={0} step={0.01} />
+					</Form.Item>
+					<Form.Item
+						name="caratTo"
+						label="Đến Carat"
+						rules={[{required: true, message: 'Vui lòng nhập giá trị Carat đến'}]}
+					>
+						<InputNumber min={0} step={0.01} />
+					</Form.Item>
+					<Form.Item>
+						<button
+							type="submit"
+							className="w-full bg-primary text-black py-2 rounded hover:bg-primaryLight"
+						>
+							Cập Nhật Phạm Vi
+						</button>
+					</Form.Item>
+				</Form>
+			)}
+		</Modal>
+	);
+	// Delete Criteria Range Confirmation Modal
+	const DeleteCriteriaRangeModal = () => (
+		<Modal
+			title="Xác Nhận Xóa Phạm Vi Tiêu Chí"
+			visible={!!criteriaRangeToDelete}
+			onCancel={() => setCriteriaRangeToDelete(null)}
+			footer={[
+				<button
+					key="cancel"
+					onClick={() => setCriteriaRangeToDelete(null)}
+					className="mr-2 bg-gray-200 text-black px-4 py-2 rounded hover:bg-gray-300"
+				>
+					Hủy
+				</button>,
+				<button
+					key="delete"
+					onClick={handleDeleteSideDiamondRange}
+					className="bg-red text-white px-4 py-2 rounded hover:bg-red-600"
+				>
+					Xóa
+				</button>,
+			]}
+		>
+			<p>
+				Bạn có chắc chắn muốn xóa phạm vi tiêu chí từ {criteriaRangeToDelete?.CaratFrom} đến{' '}
+				{criteriaRangeToDelete?.CaratTo} Carat không?
+			</p>
+		</Modal>
+	);
 
 	const cancelDelete = () => {
 		setShowDeleteConfirm(false);
 	};
 	const handleLabDiamondChange = (event) => {
 		setIsLabDiamond(event.target.checked);
+	};
+
+	const handleCutChange = (event) => {
+		setCut(Number(event.target.value));
 	};
 
 	const handleAddPriceToggle = () => {
@@ -153,9 +394,9 @@ const SideDiamondPricePage = () => {
 		setIsCreating(false);
 		setEditedCells([]);
 	};
-	const handleEditCell = (rowIndex, cellIndex, criteriaId, newValue) => {
+	const handleEditCell = (rowIndex, cellIndex, diamondPriceId, newValue) => {
 		const numericValue = parseFloat(newValue.replace(/\./g, '').replace(',', '.')) || 0;
-		console.log(`Received CriteriaId: ${criteriaId}`);
+		console.log(`Received diamondPriceId: ${diamondPriceId}`);
 
 		setEditedCells((prev) => {
 			const existingCell = prev.find(
@@ -163,41 +404,36 @@ const SideDiamondPricePage = () => {
 			);
 
 			if (existingCell) {
-				if (newValue.trim() === '' || numericValue === 0) {
-					// Remove the existing cell entry if the new value is empty
-					console.log(`Removing entry for CriteriaId: ${criteriaId} due to empty value`);
+				if (newValue.trim() === '') {
+					console.log(
+						`Removing entry for price Id: ${diamondPriceId} due to empty value`
+					);
 					return prev.filter((cell) => cell !== existingCell);
 				} else {
-					// Update the existing entry
 					console.log(
-						`Updating existing entry with CriteriaId: ${criteriaId}, Price: ${numericValue}`
+						`Updating existing entry with diamondPriceId: ${diamondPriceId}, Price: ${numericValue}`
 					);
 					return prev.map((cell) =>
 						cell === existingCell ? {...existingCell, price: numericValue} : cell
 					);
 				}
 			} else {
-				if (numericValue > 0) {
-					// Add new entry only if the value is greater than zero
-					const newEntry = {
-						diamondCriteriaId: criteriaId,
-						price: numericValue,
-						rowIndex,
-						cellIndex,
-					};
-					console.log(
-						`Adding new entry with CriteriaId: ${criteriaId}, Price: ${numericValue}`
-					);
-					return [...prev, newEntry];
-				}
-				// If the numeric value is zero or the new value is empty, do not add a new entry
-				return prev;
+				const newEntry = {
+					diamondPriceId: diamondPriceId,
+					price: numericValue,
+					rowIndex,
+					cellIndex,
+				};
+				console.log(
+					`Adding new entry with Price Id: ${diamondPriceId}, Price: ${numericValue}`
+				);
+				return [...prev, newEntry];
 			}
 		});
 	};
 
-	const handleAddPriceCell = (rowIndex, cellIndex, criteriaId, newValue) => {
-		console.log(`Received CriteriaId: ${criteriaId}, New Value: ${newValue}`);
+	const handleAddPriceCell = (rowIndex, cellIndex, diamondPriceId, newValue) => {
+		console.log(`Received DiamondPriceId: ${diamondPriceId}, New Value: ${newValue}`);
 		const numericValue = parseFloat(newValue.replace(/\./g, '').replace(',', '.')) || 0;
 
 		setEditedCells((prev) => {
@@ -208,12 +444,14 @@ const SideDiamondPricePage = () => {
 			if (existingCell) {
 				if (newValue.trim() === '' || numericValue === 0) {
 					// Remove the existing cell entry if the new value is empty
-					console.log(`Removing entry for CriteriaId: ${criteriaId} due to empty value`);
+					console.log(
+						`Removing entry for DiamondPriceId: ${diamondPriceId} due to empty value`
+					);
 					return prev.filter((cell) => cell !== existingCell);
 				} else {
 					// Update the existing entry
 					console.log(
-						`Updating existing entry with CriteriaId: ${criteriaId}, New Price: ${numericValue}`
+						`Updating existing entry with DiamondPriceId: ${diamondPriceId}, New Price: ${numericValue}`
 					);
 					return prev.map((cell) =>
 						cell === existingCell ? {...existingCell, price: numericValue} : cell
@@ -223,13 +461,13 @@ const SideDiamondPricePage = () => {
 				if (numericValue > 0) {
 					// Add new entry only if the value is greater than zero
 					const newCell = {
-						diamondCriteriaId: criteriaId,
+						diamondPriceId: diamondPriceId,
 						price: numericValue,
 						rowIndex,
 						cellIndex,
 					};
 					console.log(
-						`Adding new entry with CriteriaId: ${criteriaId}, Price: ${numericValue}`
+						`Adding new entry with DiamondPriceId: ${diamondPriceId}, Price: ${numericValue}`
 					);
 					return [...prev, newCell];
 				}
@@ -240,8 +478,9 @@ const SideDiamondPricePage = () => {
 	};
 
 	const clearFilters = () => {
+		setShapeId(1);
 		setIsLabDiamond(false);
-		setIsSideDiamond(true);
+		setCut(1);
 	};
 
 	if (loading) {
@@ -275,16 +514,16 @@ const SideDiamondPricePage = () => {
 									onChange={(e) => {
 										console.log(
 											'Creating price for cell with CriteriaId:',
-											cell.CriteriaId
+											cell.DiamondPriceId
 										);
 										handleAddPriceCell(
 											rowIndex,
 											cellIndex,
-											cell.CriteriaId,
+											cell.DiamondPriceId,
 											e.target.value
 										);
 									}}
-									min={0}
+									min={-1}
 									step={1000}
 									className="w-full text-center border rounded"
 									placeholder="New Price"
@@ -300,19 +539,21 @@ const SideDiamondPricePage = () => {
 													handleEditCell(
 														rowIndex,
 														cellIndex,
-														cell.CriteriaId,
+														cell.DiamondPriceId,
 														e.target.value
 													)
 												}
-												min={0}
+												min={-1}
 												step={1000}
 												className="w-full text-center border rounded"
 											/>
 											<input
 												type="checkbox"
-												checked={selectedPrices.includes(cell.CriteriaId)}
+												checked={selectedPrices.includes(
+													cell.DiamondPriceId
+												)}
 												onChange={() =>
-													handleCheckboxChange(cell.CriteriaId)
+													handleCheckboxChange(cell.DiamondPriceId)
 												}
 												className="mr-2"
 											/>
@@ -332,33 +573,81 @@ const SideDiamondPricePage = () => {
 	if (!priceBoard || !priceBoard.PriceTables || priceBoard.PriceTables.length === 0) {
 		return (
 			<div className="container mx-auto p-6 bg-offWhite rounded-lg shadow-lg">
-				<h1 className="text-5xl font-bold mb-6 text-center text-blue-600">
-					Bảng Giá Kim Cương Tấm
+				<h1 className="text-5xl font-bold text-center text-blue-600">
+					Bảng Giá Kim Cương Tấm{' '}
 				</h1>
-				<div className="flex flex-wrap gap-4 items-center justify-between p-4 ">
+				<div className="flex flex-wrap gap-4 items-center justify-between p-4 bg-offWhite rounded-lg shadow-md">
+					{/* Shape Selection */}
+					<div className="flex sm:flex-row items-center gap-2">
+						<label htmlFor="cutSelect" className="text-lg font-semibold text-gray-800">
+							Hình Dáng:
+						</label>
+						<select
+							id="cutSelect"
+							value={shapeId}
+							onChange={handleShapeChange}
+							className="border border-gray-300 p-2 rounded shadow focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200 bg-white text-gray-700"
+							aria-label="Select Shape"
+						>
+							<option value="1">Round</option>
+							<option value="2">Princess</option>
+							<option value="3">Cushion</option>
+							<option value="4">Emerald</option>
+							<option value="5">Oval</option>
+							<option value="6">Radiant</option>
+							<option value="7">Asscher</option>
+							<option value="8">Marquise</option>
+							<option value="9">Heart</option>
+							<option value="10">Pear</option>
+						</select>
+					</div>
+
 					{/* Lab Diamond Checkbox */}
 					<div className="flex items-center gap-2">
 						<input
 							type="checkbox"
 							checked={isLabDiamond}
 							onChange={handleLabDiamondChange}
-							className="rounded focus:ring-blue-500"
+							className="rounded text-blue focus:ring-blue-500 hover:ring-2 transition duration-200"
+							aria-label="Lab Diamond"
 						/>
-						<label className="text-lg font-semibold">Kim Cương Nhân Tạo</label>
+						<label className="text-lg font-semibold text-gray-800">
+							Kim Cương Nhân Tạo
+						</label>
 					</div>
+
+					{/* Cut Selection */}
+					<div className="flex sm:flex-row items-center gap-2">
+						<label htmlFor="cutSelect" className="text-lg font-semibold text-gray-800">
+							Cut:
+						</label>
+						<select
+							id="cutSelect"
+							value={cut}
+							onChange={handleCutChange}
+							className="border border-gray-300 p-2 rounded shadow focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200 bg-white text-gray-700"
+							aria-label="Select Cut"
+						>
+							<option value="1">Good</option>
+							<option value="2">Very Good</option>
+							<option value="3">Excellent</option>
+						</select>
+					</div>
+					{/* )} */}
 
 					{/* Clear Filters Button */}
 					<div>
 						<button
 							onClick={clearFilters}
-							className="bg-red-500 text-black px-4 py-2 rounded hover:bg-red-600 hover:text-red-200 transition duration-200 font-semibold"
+							className="bg-red text-white px-4 py-2 rounded hover:bg-redLight transition duration-200 font-semibold shadow hover:scale-105"
+							aria-label="Clear Filters"
 						>
 							Xóa bộ lọc
 						</button>
 					</div>
 				</div>
 				<div className="flex flex-wrap gap-4 items-center justify-between p-4">
-					Bảng giá không có sẵn
+					No price data available.
 				</div>
 			</div>
 		);
@@ -366,8 +655,35 @@ const SideDiamondPricePage = () => {
 
 	return (
 		<div className="container gap-4 mx-auto p-6 bg-white rounded-lg shadow-lg">
-			<h1 className="text-5xl font-bold text-center text-blue-600">Bảng Giá Kim Cương Tấm</h1>
+			<h1 className="text-5xl font-bold text-center text-blue-600">
+				Bảng Giá Kim Cương Tấm{' '}
+			</h1>
 			<div className="flex flex-wrap gap-4 items-center justify-between p-4 bg-offWhite rounded-lg shadow-md">
+				{/* Shape Selection */}
+				<div className="flex sm:flex-row items-center gap-2">
+					<label htmlFor="cutSelect" className="text-lg font-semibold text-gray-800">
+						Hình Dáng:
+					</label>
+					<select
+						id="cutSelect"
+						value={shapeId}
+						onChange={handleShapeChange}
+						className="border border-gray-300 p-2 rounded shadow focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200 bg-white text-gray-700"
+						aria-label="Select Shape"
+					>
+						<option value="1">Round</option>
+						<option value="2">Princess</option>
+						<option value="3">Cushion</option>
+						<option value="4">Emerald</option>
+						<option value="5">Oval</option>
+						<option value="6">Radiant</option>
+						<option value="7">Asscher</option>
+						<option value="8">Marquise</option>
+						<option value="9">Heart</option>
+						<option value="10">Pear</option>
+					</select>
+				</div>
+
 				{/* Lab Diamond Checkbox */}
 				<div className="flex items-center gap-2">
 					<input
@@ -382,14 +698,39 @@ const SideDiamondPricePage = () => {
 					</label>
 				</div>
 
+				{/* Cut Selection */}
+				<div className="flex sm:flex-row items-center gap-2">
+					<label htmlFor="cutSelect" className="text-lg font-semibold text-gray-800">
+						Cut:
+					</label>
+					<select
+						id="cutSelect"
+						value={cut}
+						onChange={handleCutChange}
+						className="border border-gray-300 p-2 rounded shadow focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200 bg-white text-gray-700"
+						aria-label="Select Cut"
+					>
+						<option value="1">Good</option>
+						<option value="2">Very Good</option>
+						<option value="3">Excellent</option>
+					</select>
+				</div>
+				{/* )} */}
+
 				{/* Clear Filters Button */}
-				<div>
+				<div className="flex gap-4">
 					<button
 						onClick={clearFilters}
 						className="bg-red text-white px-4 py-2 rounded hover:bg-redLight transition duration-200 font-semibold shadow hover:scale-105"
 						aria-label="Clear Filters"
 					>
 						Xóa bộ lọc
+					</button>
+					<button
+						onClick={() => setIsCreateRangeModalVisible(true)}
+						className=" bg-green text-black px-4 py-2 rounded hover:bg-darkGreen hover:text-white transition duration-200 font-semibold right-1"
+					>
+						Tạo Phạm Vi Carat Mới
 					</button>
 				</div>
 			</div>
@@ -402,7 +743,7 @@ const SideDiamondPricePage = () => {
 							className="border-2 bg-primary text-black px-8 py-3 rounded-lg hover:bg-primaryLight transition duration-200 font-semibold shadow-md hover:scale-105 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
 							aria-label="Save Changes"
 						>
-							lưu
+							Lưu
 						</button>
 					</div>
 				)}
@@ -415,7 +756,7 @@ const SideDiamondPricePage = () => {
 								: 'border-green bg-green text-black hover:bg-greenLight'
 						} font-semibold shadow-md`}
 					>
-						{isCreating ? 'Hủy' : 'Tạo Giá Mới'}
+						{isCreating ? 'Hủy' : 'Thêm Giá Mới'}
 					</button>
 				</div>
 				{isEditing && (
@@ -425,7 +766,7 @@ const SideDiamondPricePage = () => {
 							className="border-2 bg-red text-white px-8 py-3 rounded-lg hover:bg-redLight transition duration-200 font-semibold shadow-md hover:scale-105 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
 							aria-label="Delete Selected"
 						>
-							Xóa những ô được chọn
+							Xóa Những Ô Được Chọn
 						</button>
 						{editedCells.length > 0 && (
 							<button
@@ -445,7 +786,7 @@ const SideDiamondPricePage = () => {
 							? 'border-red bg-red text-white hover:bg-redLight'
 							: 'border-green bg-green text-black hover:bg-greenLight'
 					} font-semibold shadow-md`}
-					aria-label={isEditing ? 'Cancel Editing' : 'Edit Prices'}
+					aria-label={isEditing ? 'Hủy' : 'Cập Nhật Giá'}
 				>
 					{isEditing ? 'Hủy' : 'Cập Nhật Giá'}
 				</button>
@@ -456,7 +797,7 @@ const SideDiamondPricePage = () => {
 				<div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
 					<div className="bg-white p-6 rounded shadow-lg">
 						<h2 className="text-xl font-semibold mb-4">Xác Nhận Xóa Giá Kim Cương</h2>
-						<p>Bạn có muốn xóa giá những ô được chọn?</p>
+						<p>Bạn có muốn xóa giá của những ô này không?</p>
 						<div className="flex justify-between mt-6">
 							<button
 								onClick={confirmDelete}
@@ -475,6 +816,8 @@ const SideDiamondPricePage = () => {
 				</div>
 			)}
 			{/* Table Rendering */}
+			{renderMissingRangesAlert()}
+
 			<div className="overflow-x-auto">
 				<table className="min-w-full border border-gray-300 text-sm w-full">
 					<thead className="bg-primary">
@@ -502,6 +845,23 @@ const SideDiamondPricePage = () => {
 										colSpan={Object.keys(table.ClarityRange).length + 1}
 									>
 										{table.CaratFrom} - {table.CaratTo} Carat
+										<div className="flex justify-end">
+											<button
+												onClick={() => {
+													setSelectedRange(table);
+													setIsUpdateRangeModalVisible(true);
+												}}
+												className="ml-4 bg-primaryDark text-black px-2 py-1 rounded hover:bg-blue transition duration-200 text-xs"
+											>
+												Sửa
+											</button>
+											<button
+												onClick={() => setCriteriaRangeToDelete(table)}
+												className="bg-red text-white px-2 py-1 rounded hover:bg-red-600 transition duration-200 text-xs"
+											>
+												Xóa
+											</button>
+										</div>
 									</td>
 								</tr>
 								{renderPriceRows(
@@ -541,7 +901,7 @@ const SideDiamondPricePage = () => {
 							onClick={savePrices}
 							className="border-2 bg-blue text-black px-6 py-2 rounded hover:bg-blue-600 transition duration-200 font-semibold"
 						>
-							Lưu{' '}
+							Lưu
 						</button>
 					) : (
 						<button
@@ -553,6 +913,9 @@ const SideDiamondPricePage = () => {
 					)}
 				</div>
 			)}
+			<CreateRangeModal />
+			<UpdateRangeModal />
+			<DeleteCriteriaRangeModal />
 		</div>
 	);
 };

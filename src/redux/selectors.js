@@ -18,6 +18,9 @@ export const getPaymentStatusDetailSelector = (state) => state.orderSlice.orderP
 export const getOrderLogsDetailSelector = (state) => state.orderSlice.orderLogs;
 export const getOrderLogsSelector = (state) => state.orderSlice.orderLogsDetail;
 export const getOrderChildLogSelector = (state) => state.orderSlice.orderChildLogDetail;
+export const getOrderTransferSelector = (state) => state.paymentSlice.transfer;
+export const getOrderTransferStaffSelector = (state) => state.orderSlice.transfer;
+export const getOrderCompletedSelector = (state) => state.paymentSlice.completed;
 
 //LOG
 export const getOrderChildLogListSelector = (state) => state.logSlice.orderChildLogList;
@@ -139,5 +142,9 @@ export const GetAllSellingJewelrySelector = (state) => state.dashboardSlice.topS
 export const selectDiamondRule = (state) => state?.config?.diamondRule;
 export const selectFrontendDisplayRule = (state) => state?.config?.frontendDisplayRule;
 export const selectPromotionRule = (state) => state?.config?.promotionRule;
-export const selectIsLoading = (state) => state?.config?.isLoading; 
+export const selectIsLoading = (state) => state?.config?.isLoading;
 export const selectConfigError = (state) => state?.config?.error;
+//CRITERIA 
+export const selectCriterias = (state) => state.criteriaRangeSlice.criterias;
+export const selectCriteriaLoading = (state) => state.criteriaRangeSlice.loading;
+export const selectCriteriaError = (state) => state.criteriaRangeSlice.error;

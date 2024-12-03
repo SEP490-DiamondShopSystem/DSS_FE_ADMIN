@@ -92,15 +92,15 @@ export const getOrderCustomizeStatus = (status) => {
 export const getOrderStatusTag = (status) => {
 	switch (status) {
 		case 1:
-			return {name: 'Paid All', color: 'cyan'};
+			return {name: 'Chờ Xử Lý', color: 'cyan'};
 		case 2:
-			return {name: 'Deposited', color: 'blue'};
+			return {name: 'Đã Đặt Cọc', color: 'blue'};
 		case 3:
-			return {name: 'Refunding', color: 'red'};
+			return {name: 'Trả Hết', color: 'red'};
 		case 4:
-			return {name: 'Refunded', color: 'red'};
+			return {name: 'Chờ Hoàn Tiền', color: 'red'};
 		case 5:
-			return {name: 'Pending', color: 'orange'};
+			return {name: 'Đã Hoàn Tiền', color: 'orange'};
 		case 6:
 
 		default:

@@ -27,7 +27,7 @@ import {dashboardSlice} from './slices/dashboard';
 import {fileSlice} from './slices/filesSlice';
 import {logSlice} from './slices/logSlice';
 import {configSlice} from './slices/configSlice';
-
+import { criteriaRangeSlice } from './slices/criteriaRangeSlice';
 const rootPersistConfig = {
 	key: 'root',
 	storage,
@@ -60,6 +60,7 @@ const rootReducer = combineReducers({
 	fileSlice: fileSlice.reducer,
 	logSlice: logSlice.reducer,
 	configSlice: configSlice.reducer,
+	criteriaRangeSlice: criteriaRangeSlice.reducer,
 });
 
 const persistedReducer = persistReducer(rootPersistConfig, rootReducer);
@@ -69,6 +70,7 @@ export const store = configureStore({
 	middleware: (getDefaultMiddleware) =>
 		getDefaultMiddleware({
 			serializableCheck: false,
+			// immutableCheck: false,
 		}),
 });
 

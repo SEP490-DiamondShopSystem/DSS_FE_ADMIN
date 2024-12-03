@@ -43,11 +43,11 @@ const statusMapping = {
 };
 
 const statusPaymentMapping = {
-	1: {label: 'Trả Hết', color: 'geekblue'},
-	2: {label: 'Trả Trước', color: 'blue'},
-	3: {label: 'Chờ Hoàn Tiền', color: 'orange'},
-	4: {label: 'Đã Hoàn Tiền', color: 'volcano'},
-	5: {label: 'Chờ Xử Lý', color: 'green'},
+	1: {label: 'Chờ Xử Lý', color: 'geekblue'},
+	2: {label: 'Trả Góp', color: 'blue'},
+	3: {label: 'Trả Hết', color: 'green'},
+	4: {label: 'Chờ Hoàn Tiền', color: 'volcano'},
+	5: {label: 'Đã Hoàn Tiền', color: 'red'},
 };
 
 const delivererStatusList = [
@@ -71,7 +71,7 @@ const OrderPage = () => {
 	const [searchText, setSearchText] = useState('');
 	const [selectOrder, setSelectOrder] = useState('');
 	const [orders, setOrders] = useState([]);
-	const [pageSize, setPageSize] = useState(10);
+	const [pageSize, setPageSize] = useState(5);
 	const [current, setCurrent] = useState(1);
 	const [delivererRole, setDelivererRole] = useState(false);
 	const [orderList, setOrderList] = useState();
@@ -82,7 +82,7 @@ const OrderPage = () => {
 		const handleResize = () => {
 			setIsMobile(window.innerWidth <= 768);
 			// Adjust page size based on screen size
-			setPageSize(window.innerWidth <= 768 ? 5 : 10);
+			setPageSize(window.innerWidth <= 768 ? 5 : 5);
 		};
 
 		window.addEventListener('resize', handleResize);
@@ -158,7 +158,7 @@ const OrderPage = () => {
 						{record.orderTime}
 					</div>
 					<div className="flex items-center">
-						<span className="mr-2">TT Thanh Toán:</span>
+						<span className="mr-2">PT Thanh Toán:</span>
 						{rendePaymentStatus(record.paymentMethod)}
 					</div>
 

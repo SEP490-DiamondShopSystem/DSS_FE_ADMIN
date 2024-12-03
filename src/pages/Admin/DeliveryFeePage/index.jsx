@@ -63,6 +63,19 @@ const DeliveryFeePage = () => {
 			.catch((error) => {
 				message.error(error?.data?.title || error?.detail);
 			});
+		await dispatch(fetchDeliveryFees({isLocation: true}));
+	};
+	const HandleActiveDeliveryFee = async (id, updatePayload) => {
+		dispatch(setActiveDeliveryFee(id))
+			.unwrap()
+			.then(() => {
+				message.success('Trạng thái giá vận chuyển được cập nhật thành công!');
+				dispatch(updateDeliveryFee(updatePayload)); // Assuming this action updates the Redux store
+			})
+			.catch((error) => {
+				message.error(error?.data?.title || error?.detail || 'Đã xảy ra lỗi!');
+			});
+		await dispatch(fetchDeliveryFees({isLocation: true}));
 	};
 
 	const handleSubmit = async (values) => {
@@ -143,12 +156,15 @@ const DeliveryFeePage = () => {
 						Edit
 					</Button>
 					<Button
-						onClick={() => handleDeleteDeliveryFee(record.Id)}
+						onClick={() => HandleActiveDeliveryFee(record.Id)}
 						type="link"
-						danger
-						className="text-red hover:text-redLight"
+						className={
+							record.IsEnabled
+								? 'text-red hover:text-redLight'
+								: 'text-green hover:text-greenDark'
+						}
 					>
-						Delete
+						{record.IsEnabled ? 'Deactivate' : 'Activate'}
 					</Button>
 				</div>
 			),
