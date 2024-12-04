@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from 'react';
 
-import {ArrowLeftOutlined, PlusOutlined} from '@ant-design/icons';
+import {ArrowLeftOutlined, CreditCardOutlined, PlusOutlined} from '@ant-design/icons';
 import {
 	Button,
 	Col,
@@ -14,15 +14,22 @@ import {
 	Tag,
 	Typography,
 	Upload,
+	Spin,
+	Carousel,
 } from 'antd';
 
 import {useDispatch, useSelector} from 'react-redux';
 import {useNavigate} from 'react-router-dom';
-import {LoadingOrderSelector} from '../../../../../redux/selectors';
+import {
+	LoadingOrderSelector,
+	selectOrderFilesLoading,
+	selectOrderFilesError,
+} from '../../../../../redux/selectors';
 import {
 	handleOrderLogDeliver,
 	handleOrderLogProcessing,
 } from '../../../../../redux/slices/orderSlice';
+import {fetchOrderFiles} from '../../../../../redux/slices/orderFileSlice';
 import {
 	formatPrice,
 	getOrderItemStatusTag,
@@ -52,6 +59,9 @@ const InformationOrder = ({orders, statusOrder, paymentStatusOrder, userDetail})
 	const [imageFiles, setImageFiles] = useState([]);
 	const [delivererRole, setDelivererRole] = useState();
 
+	const [orderFiles, setOrderFiles] = useState(null);
+	const orderFilesLoading = useSelector(selectOrderFilesLoading);
+	const orderFilesError = useSelector(selectOrderFilesError);
 	console.log('order', orders);
 
 	useEffect(() => {
@@ -60,7 +70,18 @@ const InformationOrder = ({orders, statusOrder, paymentStatusOrder, userDetail})
 			setDelivererRole(isDeliverer);
 		}
 	}, []);
-
+	useEffect(() => {
+		if (statusOrder === 8 && orders?.Id) {
+			dispatch(fetchOrderFiles(orders.Id))
+				.unwrap()
+				.then((files) => {
+					setOrderFiles(files);
+				})
+				.catch((error) => {
+					message.error('Không thể tải chứng từ');
+				});
+		}
+	}, [statusOrder, orders?.Id, dispatch]);
 	// Responsive check
 	useEffect(() => {
 		const handleResize = () => {
@@ -409,25 +430,47 @@ const InformationOrder = ({orders, statusOrder, paymentStatusOrder, userDetail})
 			<Row gutter={[16, 16]} justify="center" align="middle" className="my-3">
 				<Col xs={12} sm={12} lg={12}>
 					<Text strong style={{fontSize: 18}}>
-						Chứng Từ Đã Gửi
+						Chứng Từ
 					</Text>
 					{orders?.Transactions?.length > 0 ? (
 						<>
 							<br />
-							{orders?.Transactions?.map((transaction, index) =>
-								transaction.Evidence?.MediaPath ? (
-									<Image
-										key={index}
-										src={transaction.Evidence.MediaPath}
-										alt={`evidence-${index}`}
-										className="mt-5"
-										style={{width: 600, marginBottom: 10}}
-									/>
-								) : null
-							)}
+							<div className="image-slider-container">
+								<Carousel
+									dots={false}
+									slidesToShow={isMobile ? 1 : 3}
+									swipeToSlide={true}
+									draggable
+									responsive={[
+										{
+											breakpoint: 768,
+											settings: {
+												slidesToShow: 1,
+												slidesToScroll: 1,
+											},
+										},
+									]}
+									className="order-delivery-carousel"
+								>
+									{orders?.Transactions?.map((transaction, index) =>
+										transaction.Evidence?.MediaPath ? (
+											<Image
+												key={index}
+												src={transaction.Evidence.MediaPath}
+												alt={`evidence-${index}`}
+												className="mt-5"
+												style={{height: 600, marginBottom: 10}}
+											/>
+										) : null
+									)}
+								</Carousel>
+							</div>
 						</>
 					) : (
-						<Text>Không có chứng từ hợp lệ</Text>
+						<>
+							<br />
+							<Text>Không có chứng từ hợp lệ</Text>
+						</>
 					)}
 				</Col>
 
@@ -535,195 +578,315 @@ const InformationOrder = ({orders, statusOrder, paymentStatusOrder, userDetail})
 					</Button>
 				</>
 			)}
+			{/* New section for order files when status is 8 */}
 
+			{statusOrder === 8 && orderFiles && (
+				<div>
+					<Text strong style={{fontSize: 18}}>
+						Hình Ảnh Xác Nhận Giao Hàng
+					</Text>
+					{orderFiles.OrderDeliveryConfirmationImages?.length > 0 && (
+						<div className="image-slider-container">
+							<Carousel
+								dots={false}
+								slidesToShow={isMobile ? 1 : 3}
+								swipeToSlide={true}
+								draggable
+								responsive={[
+									{
+										breakpoint: 768,
+										settings: {
+											slidesToShow: 1,
+											slidesToScroll: 1,
+										},
+									},
+								]}
+								className="order-delivery-carousel"
+							>
+								{orderFiles.OrderDeliveryConfirmationImages.map((img, index) => (
+									<div
+										key={`delivery-img-${index}`}
+										className="flex justify-center items-center p-2"
+									>
+										<div className="relative w-full max-w-[250px] aspect-square">
+											<Image
+												src={img.MediaPath}
+												alt={`Delivery image ${index + 1}`}
+												fill
+												className="rounded-lg object-cover shadow-md hover:scale-105 transition-transform duration-300"
+												sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+											/>
+										</div>
+									</div>
+								))}
+							</Carousel>
+						</div>
+					)}
+
+					{/* Delivery Confirmation Video */}
+					{orderFiles.OrderDeliveryConfirmationVideo && (
+						<>
+							<Text strong style={{fontSize: 18}}>
+								Video Xác Nhận Giao Hàng
+							</Text>
+							<video controls className="mt-5" style={{width: 600, marginBottom: 10}}>
+								<source
+									src={orderFiles.OrderDeliveryConfirmationVideo.MediaPath} // Use the filename for the video
+									type={orderFiles.OrderDeliveryConfirmationVideo.ContentType}
+								/>
+								Trình duyệt của bạn không được hỗ trợ, hãy lên một thiết bị hoặc
+								trình duyệt khác và tiếp tục.
+							</video>
+						</>
+					)}
+
+					{orderFiles.OrderTransactionImages.length > 0 && (
+						<>
+							<Text strong style={{fontSize: 18}}>
+								Hình Ảnh Giao Dịch Của Đơn Hàng
+							</Text>
+							<div className="image-slider-container">
+								<Carousel
+									dots={false}
+									slidesToShow={isMobile ? 1 : 3}
+									swipeToSlide={true}
+									draggable
+									responsive={[
+										{
+											breakpoint: 768,
+											settings: {
+												slidesToShow: 1,
+												slidesToScroll: 1,
+											},
+										},
+									]}
+									className="order-delivery-carousel"
+								>
+									{Object.values(orderFiles.OrderTransactionImages || {})
+										.flat()
+										.map((img, index) => (
+											<Image
+												key={`log-img-${index}`}
+												src={img.MediaPath} // Use the filename for the log images
+												alt={`log-image-${index}`}
+												className="mt-5"
+												style={{width: 600, marginBottom: 10}}
+											/>
+										))}
+								</Carousel>
+							</div>
+						</>
+					)}
+
+					{/* Order Log Images */}
+					<Text strong style={{fontSize: 18}}>
+						Các Hình Ảnh Trong Quá Trình Giao Hàng
+					</Text>
+					<div className="image-slider-container">
+						<Carousel
+							dots={false}
+							slidesToShow={isMobile ? 1 : 3}
+							swipeToSlide={true}
+							draggable
+							responsive={[
+								{
+									breakpoint: 768,
+									settings: {
+										slidesToShow: 1,
+										slidesToScroll: 1,
+									},
+								},
+							]}
+							className="order-delivery-carousel"
+						>
+							{Object.values(orderFiles.OrderLogImages || {})
+								.flat()
+								.map((img, index) => (
+									<Image
+										key={`log-img-${index}`}
+										src={img.MediaPath} // Use the filename for the log images
+										alt={`log-image-${index}`}
+										className="mt-5"
+										style={{width: 600, marginBottom: 10}}
+									/>
+								))}
+						</Carousel>
+					</div>
+				</div>
+			)}
+
+			{statusOrder === 8 && orderFilesLoading && <Spin />}
+			{statusOrder === 8 && orderFilesError && (
+				<Text type="danger">Không thể tải chứng từ</Text>
+			)}
 			<div className="">
-				{!delivererRole && orders?.Transactions?.length > 0 && (
-					<>
-						<Row>
-							<Col span={24}>
-								<Title level={4}>Chi Tiết Giao Dịch</Title>
-							</Col>
-						</Row>
-						{orders?.Transactions?.map((transaction, index) => (
-							<React.Fragment key={transaction?.Id}>
-								<Row>
-									<Col span={24}>
-										<Title level={5}>Thông tin giao dịch</Title>
-									</Col>
-								</Row>
-								<Row
-									gutter={[16, 16]}
-									justify="center"
-									align="middle"
-									className="my-3"
+				<div className="p-6 bg-gray-50 rounded-lg shadow-lg my-5">
+					{!delivererRole && orders?.Transactions?.length > 0 && (
+						<>
+							<Row>
+								<Col span={24}>
+									<h4 className="text-xl font-bold text-gray-700">
+										Chi Tiết Giao Dịch
+									</h4>
+								</Col>
+							</Row>
+							{orders?.Transactions?.map((transaction) => (
+								<div
+									key={transaction?.Id}
+									className="bg-white rounded-lg shadow-md p-4 my-4"
 								>
-									<Col xs={12} sm={12} lg={12}>
-										<Text strong style={{fontSize: 18}}>
-											Mã giao dịch
-										</Text>
-										<br />
-										<Text className="flex items-center">
-											<span className="font-semibold">
+									<Row>
+										<Col span={24}>
+											<h5 className="text-lg font-semibold text-gray-600">
+												<CreditCardOutlined className="mr-2" />
+												Thông tin giao dịch
+											</h5>
+										</Col>
+									</Row>
+									<Row gutter={[16, 16]} className="mt-4">
+										<Col xs={12}>
+											<p className="text-gray-600 font-medium">
+												Mã giao dịch
+											</p>
+											<p className="text-lg font-semibold text-blue-600">
 												{transaction?.AppTransactionCode}
-											</span>
-										</Text>
-									</Col>
-									<Col xs={12} sm={12} lg={12}>
-										<Text strong style={{fontSize: 18}}>
-											Mô tả giao dịch
-										</Text>
-										<br />
-										<Text>{transaction?.Description}</Text>
-									</Col>
-								</Row>
-								<Row
-									gutter={[16, 16]}
-									justify="center"
-									align="middle"
-									className="my-3"
-								>
-									<Col xs={12} sm={12} lg={12}>
-										<Text strong style={{fontSize: 18}}>
-											Ngày tạo
-										</Text>
-										<br />
-										<Text>{transaction?.InitDate}</Text>
-									</Col>
-									<Col xs={12} sm={12} lg={12}>
-										<Text strong style={{fontSize: 18}}>
-											Số tiền giao dịch
-										</Text>
-										<br />
-										<Text>{formatPrice(transaction?.TransactionAmount)}</Text>
-									</Col>
-								</Row>
-								<Row
-									gutter={[16, 16]}
-									justify="center"
-									align="middle"
-									className="my-3"
-								>
-									<Col xs={12} sm={12} lg={12}>
-										<>
-											<Text strong style={{fontSize: 18}}>
+											</p>
+										</Col>
+										<Col xs={12}>
+											<p className="text-gray-600 font-medium">
+												Mô tả giao dịch
+											</p>
+											<p className="text-gray-800">
+												{transaction?.Description}
+											</p>
+										</Col>
+									</Row>
+									<Row gutter={[16, 16]} className="mt-4">
+										<Col xs={12}>
+											<p className="text-gray-600 font-medium">Ngày tạo</p>
+											<p className="text-gray-800">{transaction?.InitDate}</p>
+										</Col>
+										<Col xs={12}>
+											<p className="text-gray-600 font-medium">
+												Số tiền giao dịch
+											</p>
+											<p className="text-lg font-semibold text-green-600">
+												{formatPrice(transaction?.TransactionAmount)}
+											</p>
+										</Col>
+									</Row>
+									<Row gutter={[16, 16]} className="mt-4">
+										<Col xs={12}>
+											<p className="text-gray-600 font-medium">
 												Ngày xác nhận
-											</Text>
-											<br />
-											<Text>
-												{transaction?.VerifiedDate
-													? transaction?.VerifiedDate
-													: 'Chưa được xác nhận'}
-											</Text>
-										</>
-									</Col>
-									<Col xs={12} sm={12} lg={12}>
-										{transaction?.FineAmount !== 0 && (
-											<>
-												<Text strong style={{fontSize: 18}}>
-													Số tiền phạt
-												</Text>
-												<br />
-												<Text>{formatPrice(transaction?.FineAmount)}</Text>
-											</>
-										)}
-									</Col>
-								</Row>
-								<Row>
-									<Col span={24}>
-										<Title level={5}>Thông tin phương thức thanh toán</Title>
-									</Col>
-								</Row>
-								<Row
-									gutter={[16, 16]}
-									justify="center"
-									align="middle"
-									className="my-3"
-								>
-									<Col xs={12} sm={12} lg={12}>
-										<Text strong style={{fontSize: 18}}>
-											Phương thức
-										</Text>
-										<br />
-										<Text className="flex items-center">
-											<Tag color="blue" className="font-semibold">
-												{transaction?.PayMethod?.MethodName}
+											</p>
+											<p className="text-gray-800">
+												{transaction?.VerifiedDate || 'Chưa được xác nhận'}
+											</p>
+										</Col>
+										<Col xs={12}>
+											{transaction?.FineAmount !== 0 && (
+												<>
+													<p className="text-gray-600 font-medium">
+														Số tiền phạt
+													</p>
+													<p className="text-lg font-semibold text-red-600">
+														{formatPrice(transaction?.FineAmount)}
+													</p>
+												</>
+											)}
+										</Col>
+									</Row>
+									<Row gutter={[16, 16]} className="mt-4">
+										<Col xs={12}>
+											<p className="text-gray-600 font-medium">
+												Trạng thái giao dịch
+											</p>
+											<Tag
+												color={
+													transaction?.Status === 1
+														? 'orange'
+														: transaction?.Status === 2
+														? 'green'
+														: 'red'
+												}
+												className="font-semibold text-sm"
+											>
+												{transaction?.Status === 1
+													? 'CHỜ XỬ LÝ'
+													: transaction?.Status === 2
+													? 'HỢP LỆ'
+													: 'KHÔNG HỢP LỆ'}
 											</Tag>
-										</Text>
-									</Col>
-									<Col xs={12} sm={12} lg={12}>
-										<Text strong style={{fontSize: 18}}>
-											Mã giao dịch Paygate
-										</Text>
-										<br />
-										<Text>{transaction?.PaygateTransactionCode}</Text>
-									</Col>
-								</Row>
-								<Row>
-									<Col span={24}>
-										<Title level={5}>Thông tin giao dịch khác</Title>
-									</Col>
-								</Row>
-								<Row
-									gutter={[16, 16]}
-									justify="center"
-									align="middle"
-									className="my-3"
-								>
-									<Col xs={12} sm={12} lg={12}>
-										<Text strong style={{fontSize: 18}}>
-											Loại giao dịch
-										</Text>
-										<br />
-										<Text
-											className={`font-semibold ${
-												transaction?.TransactionType === 1
-													? 'text-darkGreen'
-													: 'text-red'
-											}`}
-										>
-											{transaction?.TransactionType === 1
-												? 'Thanh Toán'
-												: 'Hoàn Tiền'}
-										</Text>
-									</Col>
-									<Col xs={12} sm={12} lg={12}></Col>
-								</Row>
-								<Divider style={{borderColor: '#d9d9d9'}} />
-							</React.Fragment>
-						))}
-					</>
-				)}
+										</Col>
+									</Row>
+									<Divider className="my-4" />
+									<Row>
+										<Col span={24}>
+											<h5 className="text-lg font-semibold text-gray-600">
+												Thông tin thanh toán
+											</h5>
+										</Col>
+									</Row>
+									<Row gutter={[16, 16]} className="mt-4">
+										<Col xs={12}>
+											<p className="text-gray-600 font-medium">Phương thức</p>
+											<Tag color="blue" className="font-semibold text-sm">
+												{transaction?.PayMethod?.MethodName?.replace(
+													'BANK_TRANSFER',
+													'Chuyển Khoản'
+												).toUpperCase()}
+											</Tag>
+										</Col>
+										<Col xs={12}>
+											{transaction?.PaygateTransactionCode && (
+												<>
+													<p className="text-gray-600 font-medium">
+														Mã giao dịch Paygate
+													</p>
+													<p className="text-gray-800">
+														{transaction?.PaygateTransactionCode}
+													</p>
+												</>
+											)}
+										</Col>
+									</Row>
+								</div>
+							))}
+						</>
+					)}
+				</div>
+
+				<Row>
+					<Col span={24}>
+						<Title level={4}>Chi Tiết Sản Phẩm</Title>
+					</Col>
+				</Row>
+
+				<div className="font-semibold w-full py-10 bg-white rounded-lg">
+					<Table
+						dataSource={dataSource}
+						columns={isMobile ? mobileColumns : columns} // Conditionally render columns
+						size="large"
+						pagination={{pageSize: 5}}
+						className="custom-table-header"
+						rowKey="orderId"
+						expandedRowRender={expandedRowRender}
+						loading={loading}
+						responsive="sm"
+					/>
+				</div>
+
+				<Modal
+					open={previewOpen}
+					title={previewTitle}
+					footer={null}
+					onCancel={handleCancel}
+					className="sm:w-full"
+				>
+					<img alt="example" style={{width: '100%'}} src={previewImage} />
+				</Modal>
 			</div>
-
-			<Row>
-				<Col span={24}>
-					<Title level={4}>Chi Tiết Sản Phẩm</Title>
-				</Col>
-			</Row>
-
-			<div className="font-semibold w-full py-10 bg-white rounded-lg">
-				<Table
-					dataSource={dataSource}
-					columns={isMobile ? mobileColumns : columns} // Conditionally render columns
-					size="large"
-					pagination={{pageSize: 5}}
-					className="custom-table-header"
-					rowKey="orderId"
-					expandedRowRender={expandedRowRender}
-					loading={loading}
-					responsive="sm"
-				/>
-			</div>
-
-			<Modal
-				open={previewOpen}
-				title={previewTitle}
-				footer={null}
-				onCancel={handleCancel}
-				className="sm:w-full"
-			>
-				<img alt="example" style={{width: '100%'}} src={previewImage} />
-			</Modal>
 		</div>
 	);
 };

@@ -27,7 +27,8 @@ import {dashboardSlice} from './slices/dashboard';
 import {fileSlice} from './slices/filesSlice';
 import {logSlice} from './slices/logSlice';
 import {configSlice} from './slices/configSlice';
-import { criteriaRangeSlice } from './slices/criteriaRangeSlice';
+import {criteriaRangeSlice} from './slices/criteriaRangeSlice';
+import {orderFileSlice} from './slices/orderFileSlice';
 const rootPersistConfig = {
 	key: 'root',
 	storage,
@@ -58,6 +59,7 @@ const rootReducer = combineReducers({
 	blogSlice: blogSlice.reducer,
 	dashboardSlice: dashboardSlice.reducer,
 	fileSlice: fileSlice.reducer,
+	orderFileSlice: orderFileSlice.reducer,
 	logSlice: logSlice.reducer,
 	configSlice: configSlice.reducer,
 	criteriaRangeSlice: criteriaRangeSlice.reducer,
