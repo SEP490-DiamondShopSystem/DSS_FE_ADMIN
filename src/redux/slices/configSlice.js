@@ -8,7 +8,7 @@ export const fetchAccountRule = createAsyncThunk(
 			const response = await api.get('/Configuration/AccountRule');
 			return response;
 		} catch (error) {
-			return rejectWithValue(error.response || error.message);
+			return rejectWithValue(error);
 		}
 	}
 );
@@ -20,7 +20,7 @@ export const fetchDiamondRule = createAsyncThunk(
 			const response = await api.get('/Configuration/DiamondRule');
 			return response;
 		} catch (error) {
-			return rejectWithValue(error.response || error.message);
+			return rejectWithValue(error);
 		}
 	}
 );
@@ -32,7 +32,7 @@ export const fetchFrontendDisplayRule = createAsyncThunk(
 			const response = await api.get('/Configuration/FrontendDisplayRule');
 			return response;
 		} catch (error) {
-			return rejectWithValue(error.response || error.message);
+			return rejectWithValue(error);
 		}
 	}
 );
@@ -44,7 +44,7 @@ export const fetchPromotionRule = createAsyncThunk(
 			const response = await api.get('/Configuration/PromotionRule');
 			return response;
 		} catch (error) {
-			return rejectWithValue(error.response || error.message);
+			return rejectWithValue(error);
 		}
 	}
 );
@@ -100,7 +100,7 @@ export const updateAccountRule = createAsyncThunk(
 			const response = await api.post('/Configuration/AccountRule', data);
 			return response;
 		} catch (error) {
-			return rejectWithValue(error.response || error.message);
+			return rejectWithValue(error);
 		}
 	}
 );
@@ -113,7 +113,7 @@ export const updateDiamondRule = createAsyncThunk(
 			const response = await api.post('/Configuration/DiamondRule', data);
 			return response;
 		} catch (error) {
-			return rejectWithValue(error.response || error.message);
+			return rejectWithValue(error);
 		}
 	}
 );
@@ -125,7 +125,7 @@ export const updateFrontendDisplayRule = createAsyncThunk(
 			const response = await api.post('/Configuration/FrontendDisplayRule', data);
 			return response;
 		} catch (error) {
-			return rejectWithValue(error.response || error.message);
+			return rejectWithValue(error);
 		}
 	}
 );
@@ -170,7 +170,7 @@ export const updatePromotionRule = createAsyncThunk(
 			const response = await api.post('/Configuration/PromotionRule', data);
 			return response;
 		} catch (error) {
-			return rejectWithValue(error.response || error.message);
+			return rejectWithValue(error);
 		}
 	}
 );

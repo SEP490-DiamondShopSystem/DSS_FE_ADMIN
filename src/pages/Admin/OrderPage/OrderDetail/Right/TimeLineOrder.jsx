@@ -5,11 +5,13 @@ import {
 	ClockCircleOutlined,
 	CloseCircleOutlined,
 	InboxOutlined,
+	InfoCircleOutlined,
 	UploadOutlined,
 } from '@ant-design/icons';
 import CircleIcon from '@mui/icons-material/Circle';
 import {
 	Button,
+	Card,
 	Form,
 	Input,
 	InputNumber,
@@ -17,6 +19,7 @@ import {
 	Modal,
 	Select,
 	Space,
+	Tooltip,
 	Typography,
 	Upload,
 } from 'antd';
@@ -24,6 +27,7 @@ import {useDispatch, useSelector} from 'react-redux';
 import Loading from '../../../../../components/Loading';
 import {getAllDelivererSelector, GetUserDetailSelector} from '../../../../../redux/selectors';
 import {
+	handleAddMethodInShop,
 	handleConfirmTransfer,
 	handleConfirmTransferStaff,
 	handleDeliveryFailed,
@@ -37,8 +41,10 @@ import {getDelivererAccount} from '../../../../../redux/slices/userSlice';
 import {getOrderStatus} from '../../../../../utils';
 import {TimeLine} from './TimeLine';
 import {
+	getAllPayment,
 	handleAddTransfer,
 	handleChangeEvidence,
+	handleCompletedOrderAtShop,
 	handleOrder,
 } from '../../../../../redux/slices/paymentSlice';
 
@@ -50,7 +56,7 @@ const ORDER_STATUS_TEXTS = {
 	Processing: 'Đang Xử Lý',
 	Rejected: 'Đã Từ Chối',
 	Cancelled: 'Đã Hủy Đơn',
-	Prepared: 'Chuẩn Bị Đơn Hàng',
+	Prepared: 'Đã Chuẩn Bị Hàng',
 	Prepared_1: 'Đơn Hàng Được Chuyển Giao',
 	Delivering: 'Đang Vận Chuyển',
 	Delivery_Failed: 'Giao Hàng Thất Bại',
@@ -83,11 +89,15 @@ const TimeLineOrder = ({
 	const [fileList, setFileList] = useState([]);
 	const [images, setImages] = useState([]);
 	const [video, setVideo] = useState(null);
+	const [paymentMethod, setPaymentMethod] = useState();
+	const [paymentMethodSelected, setPaymentMethodSelected] = useState();
 
-	console.log('video', video);
-
-	const resultTransaction = orders?.Transactions?.filter((obj) =>
+	const transactionOrderDelivering = orders?.Transactions?.filter((obj) =>
 		obj?.Description?.includes('Chuyển tiền còn lại')
+	);
+
+	const transactionOrderPending = orders?.Transactions?.filter((obj) =>
+		obj?.Description?.includes('Cọc trước')
 	);
 
 	useEffect(() => {
@@ -113,6 +123,15 @@ const TimeLineOrder = ({
 	}, [delivererList]);
 
 	useEffect(() => {
+		dispatch(getAllPayment())
+			.unwrap()
+			.then((res) => {
+				setPaymentMethod(res);
+				// setPaymentMethodSelected(res[0]?.Id);
+			});
+	}, []);
+
+	useEffect(() => {
 		if (statusOrder !== undefined) {
 			const newStatus = getOrderStatus(statusOrder);
 			setStatus(newStatus);
@@ -124,8 +143,6 @@ const TimeLineOrder = ({
 	};
 
 	const handleVideoChange = (info) => {
-		console.log('info', info);
-
 		if (info.fileList && info.fileList.length > 0) {
 			const latestFile = info.fileList[info.fileList.length - 1]; // Lấy file cuối cùng
 			if (latestFile.originFileObj) {
@@ -168,7 +185,6 @@ const TimeLineOrder = ({
 
 		if (transaction) {
 			const {Id: transactionId} = transaction; // Destructure to get the transaction Id
-			console.log('transactionId', transactionId);
 
 			dispatch(
 				handleConfirmTransfer({orderId: orders.Id, transactionId, amount, transactionCode})
@@ -208,7 +224,6 @@ const TimeLineOrder = ({
 
 		if (transaction) {
 			const {Id: transactionId} = transaction;
-			console.log('transactionId', transactionId);
 
 			dispatch(
 				handleConfirmTransferStaff({
@@ -232,6 +247,35 @@ const TimeLineOrder = ({
 		}
 	};
 
+	const handleCompletedAtShop = () => {
+		Modal.confirm({
+			title: 'Hoàn tất đơn đặt hàng này',
+			okText: 'Xác nhận',
+			cancelText: 'Hủy',
+			okType: 'primary',
+			onOk: handleCompletedAtShopStatus,
+		});
+	};
+
+	const handleCompletedAtShopStatus = async () => {
+		const confirmImages = images.map((file) => file.originFileObj);
+		dispatch(
+			handleCompletedOrderAtShop({
+				id: orders.Id,
+				confirmerId: userDetail?.Id,
+				confirmImages,
+				confirmVideo: video,
+			})
+		)
+			.unwrap()
+			.then((res) => {
+				message.success('Chuẩn bị hàng hoàn tất!');
+				setCompleted(res);
+			})
+			.catch((error) => {
+				message.error(error?.detail || error?.data?.title);
+			});
+	};
 	const handlePrepared = () => {
 		Modal.confirm({
 			title: 'Hoàn tất chuẩn bị đơn đặt hàng này',
@@ -300,6 +344,37 @@ const TimeLineOrder = ({
 			});
 	};
 
+	const handleMethod = () => {
+		if (!paymentMethodSelected) {
+			message.error('Vui lòng chọn phương thức thanh toán để xác nhận!');
+			return;
+		}
+		Modal.confirm({
+			title: 'Xác nhận với phương thức thanh toán này',
+			okText: 'Xác nhận',
+			okType: 'primary',
+			cancelText: 'Hủy',
+			onOk: handleMethodStatus,
+		});
+	};
+
+	const handleMethodStatus = () => {
+		dispatch(
+			handleAddMethodInShop({
+				verifierId: userDetail?.Id,
+				orderId: orders?.Id,
+				paymentMethodId: paymentMethodSelected,
+			})
+		)
+			.unwrap()
+			.then((res) => {
+				message.success('Thanh toán thành công!');
+				setCompleted(res);
+			})
+			.catch((error) => {
+				message.error(error?.detail || error?.data?.title);
+			});
+	};
 	const handleDelivered = () => {
 		Modal.confirm({
 			title: 'Xác nhận giao hàng thành công đơn đặt hàng này',
@@ -368,16 +443,35 @@ const TimeLineOrder = ({
 	};
 
 	const handleRejectEvidenceStatus = () => {
-		dispatch(
-			handleRejectTransfer({transactionId: resultTransaction[0]?.Id, orderId: orders?.Id})
-		)
-			.unwrap()
-			.then((res) => {
-				message.warning('Chứng từ không hợp lệ, đã từ chối!');
-			})
-			.catch((error) => {
-				message.error(error?.detail || error?.data?.title);
-			});
+		if (paymentStatusOrder === 1) {
+			dispatch(
+				handleRejectTransfer({
+					transactionId: transactionOrderPending[0]?.Id,
+					orderId: orders?.Id,
+				})
+			)
+				.unwrap()
+				.then((res) => {
+					message.success('Chứng từ không hợp lệ, đã từ chối!');
+				})
+				.catch((error) => {
+					message.error(error?.detail);
+				});
+		} else {
+			dispatch(
+				handleRejectTransfer({
+					transactionId: transactionOrderDelivering[0]?.Id,
+					orderId: orders?.Id,
+				})
+			)
+				.unwrap()
+				.then((res) => {
+					message.warning('Chứng từ không hợp lệ, đã từ chối!');
+				})
+				.catch((error) => {
+					message.error(error?.detail || error?.data?.title);
+				});
+		}
 	};
 
 	const handleRefund = () => {
@@ -423,6 +517,10 @@ const TimeLineOrder = ({
 
 	const handleChange = (value) => {
 		setSelectedShipper(value);
+	};
+
+	const handleChangePaymentMethod = (value) => {
+		setPaymentMethodSelected(value);
 	};
 
 	const handleCancelOrder = () => {
@@ -496,7 +594,12 @@ const TimeLineOrder = ({
 	};
 
 	const handleChangeBtn = () => {
-		dispatch(handleChangeEvidence({TransactionId: resultTransaction[0].Id, Evidence: fileList}))
+		dispatch(
+			handleChangeEvidence({
+				TransactionId: transactionOrderDelivering[0].Id,
+				Evidence: fileList,
+			})
+		)
 			.unwrap()
 			.then((res) => {
 				message.success('Thay đổi chứng từ thành công!');
@@ -571,14 +674,14 @@ const TimeLineOrder = ({
 										>
 											Xác nhận
 										</Button>
-										<Button
+										{/* <Button
 											type="text"
 											className="bg-red font-semibold w-32 rounded-full"
-											onClick={handleCancelOrder}
+											onClick={handleRejectEvidence}
 											disabled={loading}
 										>
 											Hủy đơn
-										</Button>
+										</Button> */}
 									</div>
 								</>
 							) : (
@@ -610,7 +713,7 @@ const TimeLineOrder = ({
 								</p>
 							</div>
 							<div className="my-5">
-								<Title level={5}>Xác Nhận Thông Tin Giao Dịch Từ Ngân Hàng</Title>
+								<Title level={5}>Xác Thực Thông Tin Giao Dịch Từ Ngân Hàng</Title>
 
 								<div className="my-2">
 									<label className="font-semibold text-base">Số Tiền</label>
@@ -678,7 +781,9 @@ const TimeLineOrder = ({
 									<CloseCircleOutlined /> {ORDER_STATUS_TEXTS.Rejected}
 								</p>
 							</div>
-							<div>Chờ Quản Lý Xác Nhận Hoàn Tiền</div>
+							<p className="mt-3 text-center font-semibold text-primary">
+								Chờ Quản Lý Xác Nhận Hoàn Tiền
+							</p>
 						</div>
 					)}
 					{status === 'Rejected' && paymentStatusOrder === 5 && (
@@ -700,7 +805,7 @@ const TimeLineOrder = ({
 								</p>
 							</div>
 							<div className="my-5">
-								<Title level={5}>Xác Nhận Thông Tin Giao Dịch Từ Ngân Hàng</Title>
+								<Title level={5}>Xác Thực Thông Tin Giao Dịch Từ Ngân Hàng</Title>
 
 								<div className="my-2">
 									<label className="font-semibold text-base">Số Tiền</label>
@@ -767,7 +872,9 @@ const TimeLineOrder = ({
 									<CloseCircleOutlined /> {ORDER_STATUS_TEXTS.Cancelled}
 								</p>
 							</div>
-							<div>Chờ Quản Lý Xác Nhận Hoàn Tiền</div>
+							<p className="mt-3 text-center font-semibold text-primary text-lg">
+								Chờ Quản Lý Xác Nhận Hoàn Tiền
+							</p>
 						</div>
 					)}
 					{status === 'Cancelled' && paymentStatusOrder === 5 && (
@@ -810,7 +917,188 @@ const TimeLineOrder = ({
 						</div>
 					)}
 
-					{status === 'Prepared' && !userRoleDeliverer && (
+					{status === 'Prepared' &&
+						!userRoleDeliverer &&
+						orders?.IsCollectAtShop &&
+						orders?.Transactions?.length === 1 && (
+							<div className="border rounded-lg border-primary bg-tintWhite p-5 mb-5">
+								<div className="flex items-center" style={{fontSize: 16}}>
+									<p className="font-semibold">Trạng thái đơn hàng:</p>
+									<p className="ml-5 text-darkGreen font-semibold">
+										<CheckCircleOutlined /> {ORDER_STATUS_TEXTS.Prepared}
+									</p>
+								</div>
+
+								<>
+									<div className="flex mt-2">
+										<p className="text-red mr-1">*</p>
+										<p>Chọn phương thức thanh toán</p>
+									</div>
+									<Select
+										defaultValue={paymentMethodSelected}
+										className="w-full mb-5"
+										onChange={handleChangePaymentMethod}
+									>
+										{paymentMethod &&
+											paymentMethod.map((payment) => (
+												<Option key={payment?.Id} value={payment?.Id}>
+													<div className="">{payment?.MappedName}</div>
+												</Option>
+											))}
+									</Select>
+
+									<div className="flex justify-around">
+										<Button
+											type="text"
+											className="bg-primary font-semibold rounded-full w-full"
+											onClick={handleMethod}
+										>
+											Chọn Phương Thức Thanh Toán
+										</Button>
+									</div>
+								</>
+							</div>
+						)}
+
+					{status === 'Prepared' &&
+						!userRoleDeliverer &&
+						orders?.IsCollectAtShop &&
+						orders?.Transactions?.length === 2 &&
+						paymentStatusOrder === 2 && (
+							<div className="border rounded-lg border-primary bg-tintWhite p-5 mb-5">
+								<div className="flex items-center" style={{fontSize: 16}}>
+									<p className="font-semibold">Trạng thái đơn hàng:</p>
+									<p className="ml-5 text-darkGreen font-semibold">
+										<CheckCircleOutlined /> {ORDER_STATUS_TEXTS.Prepared}
+									</p>
+								</div>
+
+								<>
+									<div className="my-5">
+										<Title level={5}>
+											Xác Thực Thông Tin Giao Dịch Từ Ngân Hàng
+										</Title>
+
+										<div className="my-2">
+											<label className="font-semibold text-base">
+												Số Tiền
+											</label>
+											<InputNumber
+												className="w-full"
+												value={amount}
+												onChange={handleAmountChange}
+												min={0} // Đảm bảo số không âm
+												placeholder="Nhập số tiền"
+											/>
+										</div>
+
+										<div className="my-2">
+											<label className="font-semibold text-base">
+												Mã Giao Dịch
+											</label>
+											<Input
+												value={transactionCode}
+												onChange={handleTransactionCodeChange}
+												placeholder="Nhập mã giao dịch"
+											/>
+										</div>
+									</div>
+
+									<Space className="mt-5 flex items-center justify-center">
+										<Button
+											type="text"
+											className="font-semibold w-full rounded-full bg-primary"
+											onClick={handleAcceptDelivered}
+											loading={loading}
+										>
+											Xác Nhận Thành Công
+										</Button>
+										<Button
+											danger
+											className="font-semibold w-full rounded-full"
+											onClick={handleRejectEvidence}
+										>
+											Từ Chối
+										</Button>
+									</Space>
+								</>
+							</div>
+						)}
+
+					{status === 'Prepared' &&
+						!userRoleDeliverer &&
+						orders?.IsCollectAtShop &&
+						paymentStatusOrder === 3 && (
+							<div className="border rounded-lg border-primary bg-tintWhite p-5 mb-5">
+								<div className="flex items-center" style={{fontSize: 16}}>
+									<p className="font-semibold">Trạng thái đơn hàng:</p>
+									<p className="ml-5 text-darkGreen font-semibold">
+										<CheckCircleOutlined /> {ORDER_STATUS_TEXTS.Prepared}
+									</p>
+								</div>
+
+								<div className="mt-5">
+									<div className="rounded-md border-2 border-dashed p-6 transition duration-300 mb-5">
+										<Upload.Dragger
+											listType="picture-card"
+											name="images"
+											multiple
+											beforeUpload={() => false} // Không tự động upload
+											onChange={handleImageChange}
+											accept="image/*"
+											capture="environment"
+											className="flex flex-col items-center justify-center h-full"
+										>
+											<div className="text-center">
+												<InboxOutlined className="text-4xl text-blue mb-4" />
+												<p className="font-semibold text-lg text-blue-600">
+													Kéo thả hoặc bấm để chọn ảnh
+												</p>
+												<p className="text-sm text-gray">
+													Hỗ trợ định dạng: PNG, JPG, JPEG. Bạn có thể tải
+													lên nhiều ảnh cùng lúc.
+												</p>
+											</div>
+										</Upload.Dragger>
+									</div>
+
+									{/* Khu vực kéo thả video */}
+									<div className="rounded-md border-2 border-dashed transition p-6 duration-300">
+										<Upload.Dragger
+											listType="picture-card"
+											name="videos"
+											beforeUpload={() => false} // Không tự động upload
+											onChange={handleVideoChange}
+											accept="video/*"
+											className="flex flex-col items-center justify-center h-full"
+										>
+											<div className="text-center">
+												<InboxOutlined className="text-4xl mb-4" />
+												<p className="font-semibold text-lg text-green-600">
+													Kéo thả hoặc bấm để chọn video
+												</p>
+												<p className="text-sm text-gray0">
+													Hỗ trợ định dạng: MP4, AVI, MOV. Dung lượng tối
+													đa: 100MB.
+												</p>
+											</div>
+										</Upload.Dragger>
+									</div>
+									<Space className="mt-5 flex items-center justify-center">
+										<Button
+											type="text"
+											className="font-semibold w-full rounded-full bg-primary"
+											onClick={handleCompletedAtShop}
+											loading={loading}
+										>
+											Xác Nhận
+										</Button>
+									</Space>
+								</div>
+							</div>
+						)}
+
+					{status === 'Prepared' && !userRoleDeliverer && !orders?.IsCollectAtShop && (
 						<div className="border rounded-lg border-primary bg-tintWhite p-5 mb-5">
 							<div className="flex items-center" style={{fontSize: 16}}>
 								<p className="font-semibold">Trạng thái đơn hàng:</p>
@@ -882,7 +1170,7 @@ const TimeLineOrder = ({
 						</div>
 					)}
 
-					{status === 'Prepared' && userRoleDeliverer && (
+					{status === 'Prepared' && userRoleDeliverer && !orders?.IsCollectAtShop && (
 						<div className="border rounded-lg border-primary bg-tintWhite p-5 mb-5">
 							<div className="flex items-center mb-5" style={{fontSize: 16}}>
 								<p className="font-semibold">Trạng thái đơn hàng:</p>
@@ -921,23 +1209,51 @@ const TimeLineOrder = ({
 								)}
 								{userRoleDeliverer && (
 									<div className="">
-										<Upload
-											listType="picture-card"
-											multiple
-											beforeUpload={() => false} // Để không tự động upload, chỉ lấy file
-											onChange={handleImageChange}
-										>
-											<Button icon={<UploadOutlined />}>Upload Ảnh</Button>
-										</Upload>
+										<div className="rounded-md border-2 border-dashed p-6 transition duration-300 mb-5">
+											<Upload.Dragger
+												listType="picture-card"
+												name="images"
+												multiple
+												beforeUpload={() => false} // Không tự động upload
+												onChange={handleImageChange}
+												accept="image/*"
+												className="flex flex-col items-center justify-center h-full"
+											>
+												<div className="text-center">
+													<InboxOutlined className="text-4xl text-blue mb-4" />
+													<p className="font-semibold text-lg text-blue-600">
+														Kéo thả hoặc bấm để chọn ảnh
+													</p>
+													<p className="text-sm text-gray">
+														Hỗ trợ định dạng: PNG, JPG, JPEG. Bạn có thể
+														tải lên nhiều ảnh cùng lúc.
+													</p>
+												</div>
+											</Upload.Dragger>
+										</div>
 
-										<Upload
-											listType="text"
-											beforeUpload={() => false}
-											onChange={handleVideoChange}
-											accept="video/*"
-										>
-											<Button icon={<UploadOutlined />}>Upload Video</Button>
-										</Upload>
+										{/* Khu vực kéo thả video */}
+										<div className="rounded-md border-2 border-dashed transition p-6 duration-300">
+											<Upload.Dragger
+												listType="picture-card"
+												name="videos"
+												beforeUpload={() => false} // Không tự động upload
+												onChange={handleVideoChange}
+												accept="video/*"
+												className="flex flex-col items-center justify-center h-full"
+											>
+												<div className="text-center">
+													<InboxOutlined className="text-4xl mb-4" />
+													<p className="font-semibold text-lg text-green-600">
+														Kéo thả hoặc bấm để chọn video
+													</p>
+													<p className="text-sm text-gray0">
+														Hỗ trợ định dạng: MP4, AVI, MOV. Dung lượng
+														tối đa: 100MB.
+													</p>
+												</div>
+											</Upload.Dragger>
+										</div>
 										<Space className="mt-5 flex items-center justify-center">
 											<Button
 												type="text"
@@ -975,7 +1291,7 @@ const TimeLineOrder = ({
 											<>
 												<div className="my-5">
 													<Title level={5}>
-														Xác Nhận Thông Tin Giao Dịch Từ Ngân Hàng
+														Xác Thực Thông Tin Giao Dịch Từ Ngân Hàng
 													</Title>
 
 													<div className="my-2">
@@ -1122,6 +1438,13 @@ const TimeLineOrder = ({
 														loading={loading}
 													>
 														Gửi
+													</Button>
+													<Button
+														danger
+														className="font-semibold w-full rounded-full"
+														onClick={handleFailedDelivered}
+													>
+														Giao Hàng Thất Bại
 													</Button>
 												</Space>
 											</>
