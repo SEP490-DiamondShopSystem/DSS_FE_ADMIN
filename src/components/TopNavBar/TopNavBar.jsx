@@ -83,7 +83,6 @@ const TopNavbar = () => {
 	} else if (role?.some((role) => role.RoleDescription === 'deliverer')) {
 		avatarImage = delivererImage;
 	}
-
 	const roles = userDetail?.Roles?.map((role) => role.RoleName);
 	console.log(roles);
 	return (
