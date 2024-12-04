@@ -271,7 +271,11 @@ const ConfigurationPage = () => {
 							{['Gold', 'Silver', 'Bronze'].map((rank) => (
 								<Card
 									key={rank}
-									title={`Quyền lợi hạng ${rank}`}
+									title={
+										<div className="bg-primary text-black px-6 py-2 rounded">
+											Quyền lợi hạng {rank}
+										</div>
+									}
 									className="mt-4 shadow-md"
 									type="inner"
 								>
@@ -355,7 +359,6 @@ const ConfigurationPage = () => {
 						</Form>
 					</Card>
 				</Tabs.TabPane>
-
 				<Tabs.TabPane tab="Quy Tắc Kim Cương" key="diamond">
 					<Card className="shadow-lg">
 						<Form
@@ -603,7 +606,6 @@ const ConfigurationPage = () => {
 						</Form>
 					</Card>
 				</Tabs.TabPane>
-
 				<Tabs.TabPane tab="Quy Tắc Hiển thị Giao diện" key="frontend">
 					<Card className="shadow-lg">
 						<Form
@@ -664,6 +666,17 @@ const ConfigurationPage = () => {
 							key={JSON.stringify(shopBankAccountRule)}
 						>
 							<Row gutter={[16, 16]} wrap>
+								<Col xs={24} sm={12} md={6}>
+									<Form.Item
+										name="BankName"
+										label="Tên ngân hàng"
+										rules={[
+											{required: true, message: 'Trường này là bắt buộc'},
+										]}
+									>
+										<InputNumber className="w-full" />
+									</Form.Item>
+								</Col>
 								<Col xs={24} sm={12} md={6}>
 									<Form.Item
 										name="AccountNumber"
@@ -758,7 +771,7 @@ const ConfigurationPage = () => {
 										<Input className="w-full" />
 									</Form.Item>
 								</Col>
-								<Col xs={24} sm={12} md={6}>
+								<Col xs={24} sm={24} md={24}>
 									<Form.Item
 										name="OriginalLocationName"
 										label="Địa chỉ đầy đủ của shop"
@@ -845,6 +858,17 @@ const ConfigurationPage = () => {
 									<Form.Item
 										name="MaxOrderAmountForCustomerToPlace"
 										label="Số lượng đơn hàng đang xử lý tối đa cho một tài khoản"
+										rules={[
+											{required: true, message: 'Trường này là bắt buộc'},
+										]}
+									>
+										<InputNumber className="w-full" />
+									</Form.Item>
+								</Col>
+								<Col xs={24} sm={12} md={6}>
+									<Form.Item
+										name="MaxRedelivery"
+										label="Số lần giao lại cho phép trước khi hủy"
 										rules={[
 											{required: true, message: 'Trường này là bắt buộc'},
 										]}
