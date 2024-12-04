@@ -81,7 +81,6 @@ const TopNavbar = () => {
 	} else if (role?.some((role) => role.RoleDescription === 'deliverer')) {
 		avatarImage = delivererImage;
 	}
-
 	const roles = userDetail?.Roles?.map((role) => role.RoleName);
 	return (
 		<div className={styles.topNavbar}>

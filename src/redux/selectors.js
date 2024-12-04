@@ -130,7 +130,10 @@ export const selectBlogTotalPage = (state) => state.blogSlice.totalPage;
 export const selectDiamondFiles = (state) => state.fileSlice.files;
 export const selectFileLoading = (state) => state.fileSlice.loading;
 export const selectFileError = (state) => state.fileSlice.error;
-
+//ORDER FILES
+export const selectOrderFiles = (state) => state.orderFileSlice.files;
+export const selectOrderFilesLoading = (state) => state.orderFileSlice.loading;
+export const selectOrderFilesError = (state) => state.orderFileSlice.error;
 //DASHBOARD
 export const GetAllTopSellingDiamondSelector = (state) => state.dashboardSlice.shapeSelling;
 export const GetAllDashboardSelector = (state) => state.dashboardSlice.dashboard;
@@ -142,6 +145,10 @@ export const GetAllSellingJewelrySelector = (state) => state.dashboardSlice.topS
 export const selectDiamondRule = (state) => state?.config?.diamondRule;
 export const selectFrontendDisplayRule = (state) => state?.config?.frontendDisplayRule;
 export const selectPromotionRule = (state) => state?.config?.promotionRule;
+export const selectLocationRule = (state) => state?.config?.locationRule;
+export const selectOrderRule = (state) => state?.config?.orderRule;
+export const selectOrderPaymentRule = (state) => state?.config?.orderPaymentRule;
+export const selectShopBankAccountRule = (state) => state?.config?.shopBankAccountRule;
 export const selectIsLoading = (state) => state?.config?.isLoading;
 export const selectConfigError = (state) => state?.config?.error;
 //CRITERIA 

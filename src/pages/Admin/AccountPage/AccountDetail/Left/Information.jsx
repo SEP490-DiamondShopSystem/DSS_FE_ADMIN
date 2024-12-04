@@ -11,6 +11,10 @@ import {
 } from '@ant-design/icons';
 import {Button, Image, message} from 'antd';
 import React, {useState} from 'react';
+import CustomerImage from '../../../../../components/TopNavBar/customer.jpg';
+import staffImage from '../../../../../components/TopNavBar/profileImage.jpg';
+import adminImage from '../../../../../components/TopNavBar/admin_avatar.jpg';
+import delivererImage from '../../../../../components/TopNavBar/deliverer_avatar.png';
 
 export const Information = ({
 	user,
@@ -25,6 +29,33 @@ export const Information = ({
 		navigator.clipboard.writeText(user.Id);
 		message.success('Đã sao chép!');
 	};
+	const getAvatarForRole = (roles) => {
+		// Define role priority
+		const rolePriority = {
+			admin: 3, // Highest priority
+			deliverer: 2,
+			customer: 1, // Lowest priority
+		};
+
+		// Sort roles based on priority and select the highest-priority role
+		const highestRole = roles
+			?.slice() // Create a shallow copy to avoid mutating the original array
+			.sort(
+				(a, b) => (rolePriority[b?.RoleName] || 0) - (rolePriority[a?.RoleName] || 0)
+			)[0]?.RoleName;
+
+		// Return avatar based on the highest-priority role
+		switch (highestRole) {
+			case 'admin':
+				return adminImage;
+			case 'deliverer':
+				return delivererImage;
+			case 'customer':
+				return CustomerImage;
+			default:
+				return staffImage; // Default fallback avatar
+		}
+	};
 
 	return (
 		<div className="m-5">
@@ -35,6 +66,7 @@ export const Information = ({
 					height={70}
 					alt="Small Image"
 					className="border rounded-full"
+					src={user?.Avatar || getAvatarForRole(user?.Roles)}
 				/>
 			</div>
 			<p className="font-semibold text-lg my-2">{user?.Email}</p>
