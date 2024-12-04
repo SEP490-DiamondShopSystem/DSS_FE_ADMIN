@@ -193,6 +193,7 @@ const ConfigurationPage = () => {
 							initialValues={accountRule}
 							onFinish={handleAccountSubmit}
 							layout="vertical"
+							key={JSON.stringify(accountRule)}
 						>
 							<Row gutter={[16, 16]} wrap>
 								<Col xs={24} sm={12} md={6}>
@@ -203,7 +204,10 @@ const ConfigurationPage = () => {
 											{required: true, message: 'Trường này là bắt buộc'},
 										]}
 									>
-										<InputNumber className="w-full" />
+										<InputNumber
+											placeholder={accountRule?.MaxAddress}
+											className="w-full"
+										/>
 									</Form.Item>
 								</Col>
 								<Col xs={24} sm={12} md={6}>
@@ -214,7 +218,10 @@ const ConfigurationPage = () => {
 											{required: true, message: 'Trường này là bắt buộc'},
 										]}
 									>
-										<InputNumber className="w-full" />
+										<InputNumber
+											placeholder={accountRule?.VndPerPoint}
+											className="w-full"
+										/>
 									</Form.Item>
 								</Col>
 								<Col xs={24} sm={12} md={6}>
@@ -225,7 +232,10 @@ const ConfigurationPage = () => {
 											{required: true, message: 'Trường này là bắt buộc'},
 										]}
 									>
-										<InputNumber className="w-full" />
+										<InputNumber
+											placeholder={accountRule?.TotalPointToBronze}
+											className="w-full"
+										/>
 									</Form.Item>
 								</Col>
 								<Col xs={24} sm={12} md={6}>
@@ -236,7 +246,10 @@ const ConfigurationPage = () => {
 											{required: true, message: 'Trường này là bắt buộc'},
 										]}
 									>
-										<InputNumber className="w-full" />
+										<InputNumber
+											placeholder={accountRule?.TotalPointToSilver}
+											className="w-full"
+										/>
 									</Form.Item>
 								</Col>
 								<Col xs={24} sm={12} md={6}>
@@ -247,7 +260,10 @@ const ConfigurationPage = () => {
 											{required: true, message: 'Trường này là bắt buộc'},
 										]}
 									>
-										<InputNumber className="w-full" />
+										<InputNumber
+											placeholder={accountRule?.TotalPointToGold}
+											className="w-full"
+										/>
 									</Form.Item>
 								</Col>
 							</Row>
@@ -274,7 +290,13 @@ const ConfigurationPage = () => {
 													},
 												]}
 											>
-												<InputNumber className="w-full" />
+												<InputNumber
+													placeholder={
+														accountRule?.[`${rank}RankBenefit`]
+															?.RankDiscountPercentOnOrder
+													}
+													className="w-full"
+												/>
 											</Form.Item>
 										</Col>
 										<Col xs={24} sm={12} md={6}>
@@ -291,7 +313,13 @@ const ConfigurationPage = () => {
 													},
 												]}
 											>
-												<InputNumber className="w-full" />
+												<InputNumber
+													placeholder={
+														accountRule?.[`${rank}RankBenefit`]
+															?.MaxAmountDiscountOnOrder
+													}
+													className="w-full"
+												/>
 											</Form.Item>
 										</Col>
 										<Col xs={24} sm={12} md={6}>
@@ -308,7 +336,13 @@ const ConfigurationPage = () => {
 													},
 												]}
 											>
-												<InputNumber className="w-full" />
+												<InputNumber
+													placeholder={
+														accountRule?.[`${rank}RankBenefit`]
+															?.RankDiscountPercentOnShipping
+													}
+													className="w-full"
+												/>
 											</Form.Item>
 										</Col>
 									</Row>
