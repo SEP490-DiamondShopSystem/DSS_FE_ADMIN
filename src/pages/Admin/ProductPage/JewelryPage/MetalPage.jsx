@@ -25,8 +25,8 @@ const MetalPage = () => {
 		}));
 	};
 
-	const handleSave = (metal) => {
-		dispatch(updateMetalPrice({id: metal.Id, price: parseInt(editPrice[metal.Id], 10)}))
+	const handleSave = async (metal) => {
+		await dispatch(updateMetalPrice({id: metal.Id, price: parseInt(editPrice[metal.Id], 10)}))
 			.unwrap()
 			.then(() => {
 				setEditPrice((prevState) => ({...prevState, [metal.Id]: ''}));
@@ -34,6 +34,7 @@ const MetalPage = () => {
 			.catch((error) => {
 				message.error(error?.data?.title || error?.detail);
 			});
+		await dispatch(fetchAllMetals());
 	};
 
 	if (loading) return <p className="text-xl text-blue-500">Đang Tải Giá Kim Loại...</p>;
@@ -47,15 +48,13 @@ const MetalPage = () => {
 				<thead>
 					<tr className="bg-gray-100">
 						<th className="border p-3 text-left text-sm text-gray-700">Tên</th>
-						<th className="border p-3 text-left text-sm text-gray-700">
-							Giá Hiện Tại
-						</th>
+						<th className="border p-3 text-left text-sm text-gray-700">Giá Hiện Tại</th>
 						<th className="border p-3 text-left text-sm text-gray-700">Giá Mới</th>
 						<th className="border p-3 text-left text-sm text-gray-700">-</th>
 					</tr>
 				</thead>
 				<tbody>
-					{metals.map((metal) => (
+					{metals?.map((metal) => (
 						<tr key={metal.Id} className="border-b">
 							<td className="border p-3 text-sm text-gray-700">{metal.Name}</td>
 							<td className="border p-3 text-sm text-gray-700">
