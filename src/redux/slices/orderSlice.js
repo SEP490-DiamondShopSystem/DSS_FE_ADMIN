@@ -252,6 +252,19 @@ export const handleRejectTransfer = createAsyncThunk(
 	}
 );
 
+export const handleAddMethodInShop = createAsyncThunk(
+	'orderSlice/handleAddMethodInShop',
+	async (body, {rejectWithValue}) => {
+		try {
+			const response = await api.post(`/Order/Transaction/Staff/Add`, body);
+			return response;
+		} catch (error) {
+			console.log('Error: ', JSON.stringify(error));
+			return rejectWithValue(error);
+		}
+	}
+);
+
 export const orderSlice = createSlice({
 	name: 'orderSlice',
 	initialState: {
@@ -444,6 +457,16 @@ export const orderSlice = createSlice({
 				state.transfer = action.payload;
 			})
 			.addCase(handleRejectTransfer.rejected, (state, action) => {
+				state.loading = false;
+				state.error = action.payload;
+			})
+			.addCase(handleAddMethodInShop.pending, (state) => {
+				state.loading = true;
+			})
+			.addCase(handleAddMethodInShop.fulfilled, (state, action) => {
+				state.loading = false;
+			})
+			.addCase(handleAddMethodInShop.rejected, (state, action) => {
 				state.loading = false;
 				state.error = action.payload;
 			});
