@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from 'react';
 
-import {ArrowLeftOutlined, PlusOutlined} from '@ant-design/icons';
+import {ArrowLeftOutlined, CreditCardOutlined, PlusOutlined} from '@ant-design/icons';
 import {
 	Button,
 	Col,
@@ -409,7 +409,7 @@ const InformationOrder = ({orders, statusOrder, paymentStatusOrder, userDetail})
 			<Row gutter={[16, 16]} justify="center" align="middle" className="my-3">
 				<Col xs={12} sm={12} lg={12}>
 					<Text strong style={{fontSize: 18}}>
-						Chứng Từ Đã Gửi
+						Chứng Từ
 					</Text>
 					{orders?.Transactions?.length > 0 ? (
 						<>
@@ -427,7 +427,10 @@ const InformationOrder = ({orders, statusOrder, paymentStatusOrder, userDetail})
 							)}
 						</>
 					) : (
-						<Text>Không có chứng từ hợp lệ</Text>
+						<>
+							<br />
+							<Text>Không có chứng từ hợp lệ</Text>
+						</>
 					)}
 				</Col>
 
@@ -536,160 +539,130 @@ const InformationOrder = ({orders, statusOrder, paymentStatusOrder, userDetail})
 				</>
 			)}
 
-			<div className="">
+			<div className="p-6 bg-gray-50 rounded-lg shadow-lg my-5">
 				{!delivererRole && orders?.Transactions?.length > 0 && (
 					<>
 						<Row>
 							<Col span={24}>
-								<Title level={4}>Chi Tiết Giao Dịch</Title>
+								<h4 className="text-xl font-bold text-gray-700">
+									Chi Tiết Giao Dịch
+								</h4>
 							</Col>
 						</Row>
-						{orders?.Transactions?.map((transaction, index) => (
-							<React.Fragment key={transaction?.Id}>
+						{orders?.Transactions?.map((transaction) => (
+							<div
+								key={transaction?.Id}
+								className="bg-white rounded-lg shadow-md p-4 my-4"
+							>
 								<Row>
 									<Col span={24}>
-										<Title level={5}>Thông tin giao dịch</Title>
+										<h5 className="text-lg font-semibold text-gray-600">
+											<CreditCardOutlined className="mr-2" />
+											Thông tin giao dịch
+										</h5>
 									</Col>
 								</Row>
-								<Row
-									gutter={[16, 16]}
-									justify="center"
-									align="middle"
-									className="my-3"
-								>
-									<Col xs={12} sm={12} lg={12}>
-										<Text strong style={{fontSize: 18}}>
-											Mã giao dịch
-										</Text>
-										<br />
-										<Text className="flex items-center">
-											<span className="font-semibold">
-												{transaction?.AppTransactionCode}
-											</span>
-										</Text>
+								<Row gutter={[16, 16]} className="mt-4">
+									<Col xs={12}>
+										<p className="text-gray-600 font-medium">Mã giao dịch</p>
+										<p className="text-lg font-semibold text-blue-600">
+											{transaction?.AppTransactionCode}
+										</p>
 									</Col>
-									<Col xs={12} sm={12} lg={12}>
-										<Text strong style={{fontSize: 18}}>
-											Mô tả giao dịch
-										</Text>
-										<br />
-										<Text>{transaction?.Description}</Text>
+									<Col xs={12}>
+										<p className="text-gray-600 font-medium">Mô tả giao dịch</p>
+										<p className="text-gray-800">{transaction?.Description}</p>
 									</Col>
 								</Row>
-								<Row
-									gutter={[16, 16]}
-									justify="center"
-									align="middle"
-									className="my-3"
-								>
-									<Col xs={12} sm={12} lg={12}>
-										<Text strong style={{fontSize: 18}}>
-											Ngày tạo
-										</Text>
-										<br />
-										<Text>{transaction?.InitDate}</Text>
+								<Row gutter={[16, 16]} className="mt-4">
+									<Col xs={12}>
+										<p className="text-gray-600 font-medium">Ngày tạo</p>
+										<p className="text-gray-800">{transaction?.InitDate}</p>
 									</Col>
-									<Col xs={12} sm={12} lg={12}>
-										<Text strong style={{fontSize: 18}}>
+									<Col xs={12}>
+										<p className="text-gray-600 font-medium">
 											Số tiền giao dịch
-										</Text>
-										<br />
-										<Text>{formatPrice(transaction?.TransactionAmount)}</Text>
+										</p>
+										<p className="text-lg font-semibold text-green-600">
+											{formatPrice(transaction?.TransactionAmount)}
+										</p>
 									</Col>
 								</Row>
-								<Row
-									gutter={[16, 16]}
-									justify="center"
-									align="middle"
-									className="my-3"
-								>
-									<Col xs={12} sm={12} lg={12}>
-										<>
-											<Text strong style={{fontSize: 18}}>
-												Ngày xác nhận
-											</Text>
-											<br />
-											<Text>
-												{transaction?.VerifiedDate
-													? transaction?.VerifiedDate
-													: 'Chưa được xác nhận'}
-											</Text>
-										</>
+								<Row gutter={[16, 16]} className="mt-4">
+									<Col xs={12}>
+										<p className="text-gray-600 font-medium">Ngày xác nhận</p>
+										<p className="text-gray-800">
+											{transaction?.VerifiedDate || 'Chưa được xác nhận'}
+										</p>
 									</Col>
-									<Col xs={12} sm={12} lg={12}>
+									<Col xs={12}>
 										{transaction?.FineAmount !== 0 && (
 											<>
-												<Text strong style={{fontSize: 18}}>
+												<p className="text-gray-600 font-medium">
 													Số tiền phạt
-												</Text>
-												<br />
-												<Text>{formatPrice(transaction?.FineAmount)}</Text>
+												</p>
+												<p className="text-lg font-semibold text-red-600">
+													{formatPrice(transaction?.FineAmount)}
+												</p>
 											</>
 										)}
 									</Col>
 								</Row>
-								<Row>
-									<Col span={24}>
-										<Title level={5}>Thông tin phương thức thanh toán</Title>
-									</Col>
-								</Row>
-								<Row
-									gutter={[16, 16]}
-									justify="center"
-									align="middle"
-									className="my-3"
-								>
-									<Col xs={12} sm={12} lg={12}>
-										<Text strong style={{fontSize: 18}}>
-											Phương thức
-										</Text>
-										<br />
-										<Text className="flex items-center">
-											<Tag color="blue" className="font-semibold">
-												{transaction?.PayMethod?.MethodName}
-											</Tag>
-										</Text>
-									</Col>
-									<Col xs={12} sm={12} lg={12}>
-										<Text strong style={{fontSize: 18}}>
-											Mã giao dịch Paygate
-										</Text>
-										<br />
-										<Text>{transaction?.PaygateTransactionCode}</Text>
-									</Col>
-								</Row>
-								<Row>
-									<Col span={24}>
-										<Title level={5}>Thông tin giao dịch khác</Title>
-									</Col>
-								</Row>
-								<Row
-									gutter={[16, 16]}
-									justify="center"
-									align="middle"
-									className="my-3"
-								>
-									<Col xs={12} sm={12} lg={12}>
-										<Text strong style={{fontSize: 18}}>
-											Loại giao dịch
-										</Text>
-										<br />
-										<Text
-											className={`font-semibold ${
-												transaction?.TransactionType === 1
-													? 'text-darkGreen'
-													: 'text-red'
-											}`}
+								<Row gutter={[16, 16]} className="mt-4">
+									<Col xs={12}>
+										<p className="text-gray-600 font-medium">
+											Trạng thái giao dịch
+										</p>
+										<Tag
+											color={
+												transaction?.Status === 1
+													? 'orange'
+													: transaction?.Status === 2
+													? 'green'
+													: 'red'
+											}
+											className="font-semibold text-sm"
 										>
-											{transaction?.TransactionType === 1
-												? 'Thanh Toán'
-												: 'Hoàn Tiền'}
-										</Text>
+											{transaction?.Status === 1
+												? 'CHỜ XỬ LÝ'
+												: transaction?.Status === 2
+												? 'HỢP LỆ'
+												: 'KHÔNG HỢP LỆ'}
+										</Tag>
 									</Col>
-									<Col xs={12} sm={12} lg={12}></Col>
 								</Row>
-								<Divider style={{borderColor: '#d9d9d9'}} />
-							</React.Fragment>
+								<Divider className="my-4" />
+								<Row>
+									<Col span={24}>
+										<h5 className="text-lg font-semibold text-gray-600">
+											Thông tin thanh toán
+										</h5>
+									</Col>
+								</Row>
+								<Row gutter={[16, 16]} className="mt-4">
+									<Col xs={12}>
+										<p className="text-gray-600 font-medium">Phương thức</p>
+										<Tag color="blue" className="font-semibold text-sm">
+											{transaction?.PayMethod?.MethodName?.replace(
+												'BANK_TRANSFER',
+												'Chuyển Khoản'
+											).toUpperCase()}
+										</Tag>
+									</Col>
+									<Col xs={12}>
+										{transaction?.PaygateTransactionCode && (
+											<>
+												<p className="text-gray-600 font-medium">
+													Mã giao dịch Paygate
+												</p>
+												<p className="text-gray-800">
+													{transaction?.PaygateTransactionCode}
+												</p>
+											</>
+										)}
+									</Col>
+								</Row>
+							</div>
 						))}
 					</>
 				)}

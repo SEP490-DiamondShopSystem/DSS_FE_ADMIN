@@ -110,7 +110,37 @@ export const handleOrder = createAsyncThunk(
 			return response.data;
 		} catch (error) {
 			console.error(error);
-			return rejectWithValue(error.response?.data || error.message);
+			return rejectWithValue(error);
+		}
+	}
+);
+
+export const handleCompletedOrderAtShop = createAsyncThunk(
+	'paymentSlice/handleCompletedOrderAtShop',
+	async ({id, confirmerId, confirmImages, confirmVideo}, {rejectWithValue}) => {
+		try {
+			const formData = new FormData();
+			formData.append('orderId', id);
+			formData.append('confirmerId', confirmerId);
+			// Thêm hình ảnh vào form data
+			if (confirmImages) {
+				confirmImages.forEach((image, index) => {
+					formData.append(`evidences.confirmImages`, image);
+				});
+			}
+
+			// Thêm video vào form data
+			if (confirmVideo) {
+				formData.append('evidences.confirmVideo', confirmVideo);
+			}
+
+			const response = await api.post(`/Order/Staff/CompleteAtShopOrder`, formData, {
+				headers: {'Content-Type': 'multipart/form-data'},
+			});
+			return response.data;
+		} catch (error) {
+			console.error(error);
+			return rejectWithValue(error);
 		}
 	}
 );
@@ -146,6 +176,17 @@ export const paymentSlice = createSlice({
 				state.completed = action.payload;
 			})
 			.addCase(handleOrder.rejected, (state, action) => {
+				state.loading = false;
+				state.error = action.payload;
+			})
+			.addCase(handleCompletedOrderAtShop.pending, (state) => {
+				state.loading = true;
+			})
+			.addCase(handleCompletedOrderAtShop.fulfilled, (state, action) => {
+				state.loading = false;
+				state.completed = action.payload;
+			})
+			.addCase(handleCompletedOrderAtShop.rejected, (state, action) => {
 				state.loading = false;
 				state.error = action.payload;
 			})
