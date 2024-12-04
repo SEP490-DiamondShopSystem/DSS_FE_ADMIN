@@ -14,15 +14,22 @@ import {
 	Tag,
 	Typography,
 	Upload,
+	Spin,
+	Carousel,
 } from 'antd';
 
 import {useDispatch, useSelector} from 'react-redux';
 import {useNavigate} from 'react-router-dom';
-import {LoadingOrderSelector} from '../../../../../redux/selectors';
+import {
+	LoadingOrderSelector,
+	selectOrderFilesLoading,
+	selectOrderFilesError,
+} from '../../../../../redux/selectors';
 import {
 	handleOrderLogDeliver,
 	handleOrderLogProcessing,
 } from '../../../../../redux/slices/orderSlice';
+import {fetchOrderFiles} from '../../../../../redux/slices/orderFileSlice';
 import {
 	formatPrice,
 	getOrderItemStatusTag,
@@ -52,6 +59,9 @@ const InformationOrder = ({orders, statusOrder, paymentStatusOrder, userDetail})
 	const [imageFiles, setImageFiles] = useState([]);
 	const [delivererRole, setDelivererRole] = useState();
 
+	const [orderFiles, setOrderFiles] = useState(null);
+	const orderFilesLoading = useSelector(selectOrderFilesLoading);
+	const orderFilesError = useSelector(selectOrderFilesError);
 	console.log('order', orders);
 
 	useEffect(() => {
@@ -60,7 +70,18 @@ const InformationOrder = ({orders, statusOrder, paymentStatusOrder, userDetail})
 			setDelivererRole(isDeliverer);
 		}
 	}, []);
-
+	useEffect(() => {
+		if (statusOrder === 8 && orders?.Id) {
+			dispatch(fetchOrderFiles(orders.Id))
+				.unwrap()
+				.then((files) => {
+					setOrderFiles(files);
+				})
+				.catch((error) => {
+					message.error('Không thể tải chứng từ');
+				});
+		}
+	}, [statusOrder, orders?.Id, dispatch]);
 	// Responsive check
 	useEffect(() => {
 		const handleResize = () => {
@@ -414,17 +435,36 @@ const InformationOrder = ({orders, statusOrder, paymentStatusOrder, userDetail})
 					{orders?.Transactions?.length > 0 ? (
 						<>
 							<br />
-							{orders?.Transactions?.map((transaction, index) =>
-								transaction.Evidence?.MediaPath ? (
-									<Image
-										key={index}
-										src={transaction.Evidence.MediaPath}
-										alt={`evidence-${index}`}
-										className="mt-5"
-										style={{width: 600, marginBottom: 10}}
-									/>
-								) : null
-							)}
+							<div className="image-slider-container">
+								<Carousel
+									dots={false}
+									slidesToShow={isMobile ? 1 : 3}
+									swipeToSlide={true}
+									draggable
+									responsive={[
+										{
+											breakpoint: 768,
+											settings: {
+												slidesToShow: 1,
+												slidesToScroll: 1,
+											},
+										},
+									]}
+									className="order-delivery-carousel"
+								>
+									{orders?.Transactions?.map((transaction, index) =>
+										transaction.Evidence?.MediaPath ? (
+											<Image
+												key={index}
+												src={transaction.Evidence.MediaPath}
+												alt={`evidence-${index}`}
+												className="mt-5"
+												style={{height: 600, marginBottom: 10}}
+											/>
+										) : null
+									)}
+								</Carousel>
+							</div>
 						</>
 					) : (
 						<Text>Không có chứng từ hợp lệ</Text>
@@ -535,7 +575,147 @@ const InformationOrder = ({orders, statusOrder, paymentStatusOrder, userDetail})
 					</Button>
 				</>
 			)}
+			{/* New section for order files when status is 8 */}
 
+			{statusOrder === 8 && orderFiles && (
+				<div>
+					<Text strong style={{fontSize: 18}}>
+						Hình Ảnh Xác Nhận Giao Hàng
+					</Text>
+					{orderFiles.OrderDeliveryConfirmationImages?.length > 0 && (
+						<div className="image-slider-container">
+							<Carousel
+								dots={false}
+								slidesToShow={isMobile ? 1 : 3}
+								swipeToSlide={true}
+								draggable
+								responsive={[
+									{
+										breakpoint: 768,
+										settings: {
+											slidesToShow: 1,
+											slidesToScroll: 1,
+										},
+									},
+								]}
+								className="order-delivery-carousel"
+							>
+								{orderFiles.OrderDeliveryConfirmationImages.map((img, index) => (
+									<div
+										key={`delivery-img-${index}`}
+										className="flex justify-center items-center p-2"
+									>
+										<div className="relative w-full max-w-[250px] aspect-square">
+											<Image
+												src={img.MediaPath}
+												alt={`Delivery image ${index + 1}`}
+												fill
+												className="rounded-lg object-cover shadow-md hover:scale-105 transition-transform duration-300"
+												sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+											/>
+										</div>
+									</div>
+								))}
+							</Carousel>
+						</div>
+					)}
+
+					{/* Delivery Confirmation Video */}
+					{orderFiles.OrderDeliveryConfirmationVideo && (
+						<>
+							<Text strong style={{fontSize: 18}}>
+								Video Xác Nhận Giao Hàng
+							</Text>
+							<video controls className="mt-5" style={{width: 600, marginBottom: 10}}>
+								<source
+									src={orderFiles.OrderDeliveryConfirmationVideo.MediaPath} // Use the filename for the video
+									type={orderFiles.OrderDeliveryConfirmationVideo.ContentType}
+								/>
+								Trình duyệt của bạn không được hỗ trợ, hãy lên một thiết bị hoặc
+								trình duyệt khác và tiếp tục.
+							</video>
+						</>
+					)}
+
+					{orderFiles.OrderTransactionImages.length>0 && (
+						<>
+							<Text strong style={{fontSize: 18}}>
+								Hình Ảnh Giao Dịch Của Đơn Hàng
+							</Text>
+							<div className="image-slider-container">
+								<Carousel
+									dots={false}
+									slidesToShow={isMobile ? 1 : 3}
+									swipeToSlide={true}
+									draggable
+									responsive={[
+										{
+											breakpoint: 768,
+											settings: {
+												slidesToShow: 1,
+												slidesToScroll: 1,
+											},
+										},
+									]}
+									className="order-delivery-carousel"
+								>
+									{Object.values(orderFiles.OrderTransactionImages || {})
+										.flat()
+										.map((img, index) => (
+											<Image
+												key={`log-img-${index}`}
+												src={img.MediaPath} // Use the filename for the log images
+												alt={`log-image-${index}`}
+												className="mt-5"
+												style={{width: 600, marginBottom: 10}}
+											/>
+										))}
+								</Carousel>
+							</div>
+						</>
+					)}
+
+					{/* Order Log Images */}
+					<Text strong style={{fontSize: 18}}>
+						Các Hình Ảnh Trong Quá Trình Giao Hàng
+					</Text>
+					<div className="image-slider-container">
+						<Carousel
+							dots={false}
+							slidesToShow={isMobile ? 1 : 3}
+							swipeToSlide={true}
+							draggable
+							responsive={[
+								{
+									breakpoint: 768,
+									settings: {
+										slidesToShow: 1,
+										slidesToScroll: 1,
+									},
+								},
+							]}
+							className="order-delivery-carousel"
+						>
+							{Object.values(orderFiles.OrderLogImages || {})
+								.flat()
+								.map((img, index) => (
+									<Image
+										key={`log-img-${index}`}
+										src={img.MediaPath} // Use the filename for the log images
+										alt={`log-image-${index}`}
+										className="mt-5"
+										style={{width: 600, marginBottom: 10}}
+									/>
+								))}
+						</Carousel>
+					</div>
+				</div>
+			)}
+
+			{statusOrder === 8 && orderFilesLoading && <Spin />}
+			{statusOrder === 8 && orderFilesError && (
+				<Text type="danger">Không thể tải chứng từ</Text>
+			)}
 			<div className="">
 				{!delivererRole && orders?.Transactions?.length > 0 && (
 					<>
