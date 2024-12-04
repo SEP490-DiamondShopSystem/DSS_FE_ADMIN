@@ -24,11 +24,6 @@ import {selectIsLoading, selectConfigError} from '../../../redux/selectors';
 
 const ConfigurationPage = () => {
 	const dispatch = useDispatch();
-	const paymentMethods = [
-		{value: 1, label: 'Chuyển Khoản Ngân Hàng'},
-		{value: 2, label: 'ZaloPay'},
-		{value: 3, label: 'Tiền Mặt'},
-	];
 	const [accountRule, setAccountRule] = useState(null);
 	const [diamondRule, setDiamondRule] = useState(null);
 	const [frontendDisplayRule, setFrontendDisplayRule] = useState(null);
@@ -37,8 +32,10 @@ const ConfigurationPage = () => {
 	const [orderRule, setOrderRule] = useState(null);
 	const [orderPaymentRule, setOrderPaymentRule] = useState(null);
 	const [shopBankAccountRule, setShopBankAccountRule] = useState(null);
+
 	const isLoading = useSelector(selectIsLoading);
 	const error = useSelector(selectConfigError);
+
 	const [accountForm] = Form.useForm();
 	const [diamondForm] = Form.useForm();
 	const [frontendForm] = Form.useForm();
@@ -47,6 +44,13 @@ const ConfigurationPage = () => {
 	const [orderForm] = Form.useForm();
 	const [paymentForm] = Form.useForm();
 	const [bankForm] = Form.useForm();
+
+	const paymentMethods = [
+		{value: 1, label: 'Chuyển Khoản Ngân Hàng'},
+		{value: 2, label: 'ZaloPay'},
+		{value: 3, label: 'Tiền Mặt'},
+	];
+
 	useEffect(() => {
 		const fetchData = async () => {
 			try {
@@ -61,16 +65,14 @@ const ConfigurationPage = () => {
 						dispatch(fetchOrderRulePayment()).unwrap(),
 						dispatch(fetchShopBankAccountRule()).unwrap(),
 					]);
-				const transformedPayment = {
-					...payment,
-					LockedPaymentMethodOnCustomer: payment.LockedPaymentMethodOnCustomer
-						? payment.LockedPaymentMethodOnCustomer.map((methodValue) => {
-								const method = paymentMethods.find((m) => m.value === methodValue);
-								return method ? method.label : methodValue;
-						  })
-						: [],
-				};
 
+					const transformedPayment = {
+						...payment,
+						LockedPaymentMethodOnCustomer: payment.LockedPaymentMethodOnCustomer.map((methodValue) => {
+						  const method = paymentMethods.find((m) => m.value.toString() === methodValue);
+						  return method ? method.value : methodValue; // Use value for Select compatibility
+						}),
+					  };
 				setAccountRule(account);
 				setDiamondRule(diamond);
 				setFrontendDisplayRule(frontend);
@@ -134,24 +136,24 @@ const ConfigurationPage = () => {
 			});
 	};
 	const handleOrderPaymentSubmit = (values) => {
-		const paymentMethodValues = values.LockedPaymentMethodOnCustomer.map((label) => {
-			const method = paymentMethods.find((method) => method.label === label);
-			return method ? method.value : label;
+		const paymentMethodValues = values.LockedPaymentMethodOnCustomer.map((value) => {
+		  const method = paymentMethods.find((method) => method.value === value);
+		  return method ? method.value : value; // Send value to API
 		});
-
+	  
 		const updatedValues = {
-			...values,
-			LockedPaymentMethodOnCustomer: paymentMethodValues,
+		  ...values,
+		  LockedPaymentMethodOnCustomer: paymentMethodValues,
 		};
-
+	  
 		dispatch(updateOrderRulePayment(updatedValues))
-			.unwrap()
-			.then(() => handleSuccess('Cập Nhật Quy Định Thanh Toán Thành Công!'))
-			.catch((error) => {
-				message.error(error?.data?.title || error?.title);
-			});
-	};
-
+		  .unwrap()
+		  .then(() => handleSuccess('Cập Nhật Quy Định Thanh Toán Thành Công!'))
+		  .catch((error) => {
+			message.error(error?.data?.title || error?.title);
+		  });
+	  };
+	  
 	const handleBankAccountSubmit = (values) => {
 		dispatch(updateShopBankAccountRule(values))
 			.unwrap()
