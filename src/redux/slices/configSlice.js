@@ -48,7 +48,50 @@ export const fetchPromotionRule = createAsyncThunk(
 		}
 	}
 );
-
+export const fetchLocationRule = createAsyncThunk(
+	'config/fetchLocationRule',
+	async (_, {rejectWithValue}) => {
+		try {
+			const response = await api.get('/Configuration/LocationRules');
+			return response;
+		} catch (error) {
+			return rejectWithValue(error.response || error.message);
+		}
+	}
+);
+export const fetchOrderRule = createAsyncThunk(
+	'config/fetchOrderRule',
+	async (_, {rejectWithValue}) => {
+		try {
+			const response = await api.get('/Configuration/OrderRule');
+			return response;
+		} catch (error) {
+			return rejectWithValue(error.response || error.message);
+		}
+	}
+);
+export const fetchOrderRulePayment = createAsyncThunk(
+	'config/fetchOrderRulePayment',
+	async (_, {rejectWithValue}) => {
+		try {
+			const response = await api.get('/Configuration/OrderRule/Payment');
+			return response;
+		} catch (error) {
+			return rejectWithValue(error.response || error.message);
+		}
+	}
+);
+export const fetchShopBankAccountRule = createAsyncThunk(
+	'config/fetchShopBankAccountRule',
+	async (_, {rejectWithValue}) => {
+		try {
+			const response = await api.get('/Configuration/ShopBankAccountRule');
+			return response;
+		} catch (error) {
+			return rejectWithValue(error.response || error.message);
+		}
+	}
+);
 // Async thunks for updating configuration data
 export const updateAccountRule = createAsyncThunk(
 	'config/updateAccountRule',
@@ -86,6 +129,39 @@ export const updateFrontendDisplayRule = createAsyncThunk(
 		}
 	}
 );
+export const updateLocationRules = createAsyncThunk(
+	'config/updateLocationRules',
+	async (data, {rejectWithValue}) => {
+		try {
+			const response = await api.post('/Configuration/LocationRules', data);
+			return response;
+		} catch (error) {
+			return rejectWithValue(error.response || error.message);
+		}
+	}
+);
+export const updateOrderRule = createAsyncThunk(
+	'config/updateOrderRule',
+	async (data, {rejectWithValue}) => {
+		try {
+			const response = await api.post('/Configuration/OrderRule', data);
+			return response;
+		} catch (error) {
+			return rejectWithValue(error.response || error.message);
+		}
+	}
+);
+export const updateOrderRulePayment = createAsyncThunk(
+	'config/updateOrderRulePayment',
+	async (data, {rejectWithValue}) => {
+		try {
+			const response = await api.post('/Configuration/OrderRule/Payment', data);
+			return response;
+		} catch (error) {
+			return rejectWithValue(error.response || error.message);
+		}
+	}
+);
 
 export const updatePromotionRule = createAsyncThunk(
 	'config/updatePromotionRule',
@@ -99,6 +175,17 @@ export const updatePromotionRule = createAsyncThunk(
 	}
 );
 
+export const updateShopBankAccountRule = createAsyncThunk(
+	'config/updateShopBankAccountRule',
+	async (data, {rejectWithValue}) => {
+		try {
+			const response = await api.post('/Configuration/ShopBankAccountRule', data);
+			return response;
+		} catch (error) {
+			return rejectWithValue(error.response || error.message);
+		}
+	}
+);
 // Slice
 export const configSlice = createSlice({
 	name: 'config',
@@ -107,6 +194,11 @@ export const configSlice = createSlice({
 		diamondRule: {},
 		frontendDisplayRule: {},
 		promotionRule: {},
+		locationRule: {},
+		orderRule: {},
+		orderPaymentRule: {},
+		orderPaymentRule: {},
+
 		isLoading: false,
 		error: null,
 	},
@@ -153,6 +245,54 @@ export const configSlice = createSlice({
 				state.isLoading = false;
 				state.error = action.payload;
 			})
+			.addCase(fetchLocationRule.pending, (state) => {
+				state.isLoading = true;
+				state.error = null;
+			})
+			.addCase(fetchLocationRule.fulfilled, (state, action) => {
+				state.isLoading = false;
+				state.locationRule = action.payload;
+			})
+			.addCase(fetchLocationRule.rejected, (state, action) => {
+				state.isLoading = false;
+				state.error = action.payload;
+			})
+			.addCase(fetchOrderRule.pending, (state) => {
+				state.isLoading = true;
+				state.error = null;
+			})
+			.addCase(fetchOrderRule.fulfilled, (state, action) => {
+				state.isLoading = false;
+				state.orderRule = action.payload;
+			})
+			.addCase(fetchOrderRule.rejected, (state, action) => {
+				state.isLoading = false;
+				state.error = action.payload;
+			})
+			.addCase(fetchOrderRulePayment.pending, (state) => {
+				state.isLoading = true;
+				state.error = null;
+			})
+			.addCase(fetchOrderRulePayment.fulfilled, (state, action) => {
+				state.isLoading = false;
+				state.orderPaymentRule = action.payload;
+			})
+			.addCase(fetchOrderRulePayment.rejected, (state, action) => {
+				state.isLoading = false;
+				state.error = action.payload;
+			})
+			.addCase(fetchShopBankAccountRule.pending, (state) => {
+				state.isLoading = true;
+				state.error = null;
+			})
+			.addCase(fetchShopBankAccountRule.fulfilled, (state, action) => {
+				state.isLoading = false;
+				state.shopBankAccountRule = action.payload;
+			})
+			.addCase(fetchShopBankAccountRule.rejected, (state, action) => {
+				state.isLoading = false;
+				state.error = action.payload;
+			})
 			.addCase(fetchPromotionRule.pending, (state) => {
 				state.isLoading = true;
 				state.error = null;
@@ -195,6 +335,50 @@ export const configSlice = createSlice({
 				state.isLoading = false;
 			})
 			.addCase(updateFrontendDisplayRule.rejected, (state, action) => {
+				state.isLoading = false;
+				state.error = action.payload;
+			})
+			.addCase(updateLocationRules.pending, (state) => {
+				state.isLoading = true;
+				state.error = null;
+			})
+			.addCase(updateLocationRules.fulfilled, (state) => {
+				state.isLoading = false;
+			})
+			.addCase(updateLocationRules.rejected, (state, action) => {
+				state.isLoading = false;
+				state.error = action.payload;
+			})
+			.addCase(updateOrderRule.pending, (state) => {
+				state.isLoading = true;
+				state.error = null;
+			})
+			.addCase(updateOrderRule.fulfilled, (state) => {
+				state.isLoading = false;
+			})
+			.addCase(updateOrderRule.rejected, (state, action) => {
+				state.isLoading = false;
+				state.error = action.payload;
+			})
+			.addCase(updateOrderRulePayment.pending, (state) => {
+				state.isLoading = true;
+				state.error = null;
+			})
+			.addCase(updateOrderRulePayment.fulfilled, (state) => {
+				state.isLoading = false;
+			})
+			.addCase(updateOrderRulePayment.rejected, (state, action) => {
+				state.isLoading = false;
+				state.error = action.payload;
+			})
+			.addCase(updateShopBankAccountRule.pending, (state) => {
+				state.isLoading = true;
+				state.error = null;
+			})
+			.addCase(updateShopBankAccountRule.fulfilled, (state) => {
+				state.isLoading = false;
+			})
+			.addCase(updateShopBankAccountRule.rejected, (state, action) => {
 				state.isLoading = false;
 				state.error = action.payload;
 			})
