@@ -29,8 +29,6 @@ const TopNavbar = () => {
 	const signOutRef = useRef(null);
 	const [role, setRole] = useState();
 
-	console.log('role', role);
-
 	useEffect(() => {
 		dispatch(getUserDetail(userId))
 			.unwrap()
@@ -85,7 +83,6 @@ const TopNavbar = () => {
 	}
 
 	const roles = userDetail?.Roles?.map((role) => role.RoleName);
-	console.log(roles);
 	return (
 		<div className={styles.topNavbar}>
 			<div className={styles.rightSection}>

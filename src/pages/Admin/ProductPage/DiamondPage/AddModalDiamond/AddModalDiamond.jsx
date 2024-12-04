@@ -1,4 +1,4 @@
-import {Form, Input, InputNumber, Modal, Select, Switch, message} from 'antd';
+import {Form, Input, InputNumber, Modal, Select, Switch, Tooltip, message} from 'antd';
 import React, {useEffect, useState} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
 import {getAllShapeSelector} from '../../../../../redux/selectors';
@@ -7,6 +7,8 @@ import {
 	handleAddDiamond,
 	handleEstimatePriceDiamond,
 } from '../../../../../redux/slices/diamondSlice';
+import {fetchDiamondRule} from '../../../../../redux/slices/configSlice';
+import {InfoCircleOutlined} from '@ant-design/icons';
 
 const {Option} = Select;
 
@@ -18,40 +20,59 @@ export const AddModalDiamond = ({setShowModal, showModal}) => {
 
 	const [isLabDiamond, setIsLabDiamond] = useState(false);
 	const [estimatePrice, setEstimatePrice] = useState();
+	const [diamondParams, setDiamondParams] = useState(null);
+	const [diamond, setDiamond] = useState(null);
+	const [rule, setRule] = useState();
 
-	console.log('estimatePrice', estimatePrice);
+	console.log('rule', rule);
 
 	useEffect(() => {
 		dispatch(getDiamondShape());
 	}, []);
 
-	const handleAddDiamondForm = (values) => {
-		const {cut, color, clarity, carat, priceOffset, shapeId} = values;
-		console.log('priceOffset', priceOffset);
-
-		const diamond_4C = {
-			cut,
-			color,
-			clarity,
-			carat,
-			isLabDiamond: isLabDiamond,
-		};
-
-		dispatch(
-			handleEstimatePriceDiamond({
-				shapeId,
-				priceOffset: priceOffset === undefined ? 0 : priceOffset,
-				diamond_4C,
-			})
-		)
+	useEffect(() => {
+		dispatch(fetchDiamondRule())
 			.unwrap()
 			.then((res) => {
-				console.log('res', res);
+				setRule(res);
+			});
+	}, [dispatch]);
+
+	const handleAddDiamondForm = (values) => {
+		const {cut, color, clarity, carat, priceOffset, shapeId} = values;
+		setDiamond(values);
+
+		// Lưu thông tin vào state
+		setDiamondParams({
+			shapeId,
+			priceOffset: priceOffset === undefined ? 0 : priceOffset,
+			diamond_4C: {
+				cut,
+				color,
+				clarity,
+				carat,
+				isLabDiamond: isLabDiamond,
+			},
+		});
+	};
+
+	// Dispatch khi diamondParams thay đổi
+	useEffect(() => {
+		if (!diamondParams) return;
+
+		dispatch(handleEstimatePriceDiamond(diamondParams))
+			.unwrap()
+			.then((res) => {
 				setEstimatePrice(res);
 			})
 			.catch((error) => {
 				message.error(error?.data?.title || error?.title);
 			});
+	}, [diamondParams, dispatch]);
+
+	// Hiển thị Modal khi estimatePrice thay đổi
+	useEffect(() => {
+		if (!estimatePrice) return;
 
 		const {
 			CorrectPrice,
@@ -60,7 +81,6 @@ export const AddModalDiamond = ({setShowModal, showModal}) => {
 			IsPriceKnown,
 			IsValid,
 			Message,
-			Price,
 			PriceFound,
 			SuggestedOffsetTobeAdded,
 		} = estimatePrice;
@@ -99,9 +119,9 @@ export const AddModalDiamond = ({setShowModal, showModal}) => {
 			),
 			okText: 'Xác nhận',
 			cancelText: 'Hủy',
-			onOk: () => handleOk(estimatePrice),
+			onOk: handleOk,
 		});
-	};
+	}, [estimatePrice]);
 
 	const handleCancel = () => {
 		setShowModal(false);
@@ -125,8 +145,7 @@ export const AddModalDiamond = ({setShowModal, showModal}) => {
 		console.log(checked);
 	};
 
-	const handleOk = (values) => {
-		console.log('Form Values:', values);
+	const handleOk = () => {
 		const {
 			cut,
 			color,
@@ -143,7 +162,7 @@ export const AddModalDiamond = ({setShowModal, showModal}) => {
 			table,
 			withLenghtRatio,
 			culet,
-		} = values;
+		} = diamond;
 		const diamond4c = {
 			cut,
 			color,
@@ -235,13 +254,46 @@ export const AddModalDiamond = ({setShowModal, showModal}) => {
 						</Select>
 					</Form.Item>
 
-					<Form.Item name="carat" label="Carat" className="w-1/5">
+					<Form.Item
+						name="carat"
+						label="Carat"
+						className="w-1/5"
+						rules={[
+							{
+								required: true,
+								message: 'Vui lòng nhập giá trị Carat!',
+							},
+							({getFieldValue}) => ({
+								validator(_, value) {
+									if (
+										!value ||
+										(value >= rule?.MinCaratRange &&
+											value <= rule?.MaxCaratRange)
+									) {
+										return Promise.resolve();
+									}
+									return Promise.reject(
+										new Error(
+											`Giá trị phải nằm trong khoảng ${rule?.MinCaratRange} đến ${rule?.MaxCaratRange}!`
+										)
+									);
+								},
+							}),
+						]}
+					>
 						<InputNumber
 							step={0.01}
 							placeholder="Chọn Carat Weight"
 							className="w-full"
-							min={0.18}
-							max={30}
+							min={rule?.MinCaratRange}
+							max={rule?.MaxCaratRange}
+							addonBefore={
+								<Tooltip
+									title={`Nhập giá trị từ ${rule?.MinCaratRange} đến ${rule?.MaxCaratRange}`}
+								>
+									<InfoCircleOutlined style={{color: '#1890ff'}} />
+								</Tooltip>
+							}
 						/>
 					</Form.Item>
 				</div>

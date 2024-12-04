@@ -35,6 +35,8 @@ const AccountPage = () => {
 	const [role, setRole] = useState();
 	const [searchText, setSearchText] = useState('');
 
+	console.log('userList', userList);
+
 	const columns = [
 		{
 			title: 'Họ',
@@ -62,35 +64,32 @@ const AccountPage = () => {
 			render: (_, record) => (
 				<>
 					{record.Roles.map((role) => {
-						let color;
-						switch (role.RoleName) {
-							case 'customer':
-								color = 'green';
-								break;
-							case 'customer_bronze':
-								color = '#cd7f32';
-								break;
-							case 'customer_silver':
-								color = '#c0c0c0';
-								break;
-							case 'customer_gold':
-								color = '#ffd700';
-								break;
-							case 'admin':
-								color = 'red';
-								break;
-							case 'staff':
-								color = 'orange';
-								break;
-							case 'manager':
-								color = 'blue';
-								break;
-							default:
-								color = 'default';
-						}
+						const roleNameMapping = {
+							1: 'Thành viên',
+							2: 'Thành viên đồng',
+							3: 'Thành viên bạc',
+							4: 'Thành viên vàng',
+							11: 'Nhân Viên',
+							22: 'Quản Lý',
+							33: 'Admin',
+							44: 'Nhân Viên Giao Hàng',
+						};
+
+						// Gán màu dựa trên role?.Id
+						const colorMapping = {
+							1: 'green',
+							2: '#cd7f32', // Màu đồng
+							3: '#c0c0c0', // Màu bạc
+							4: '#ccab00', // Màu vàng
+							11: 'blue',
+							22: 'purple',
+							33: 'red',
+							44: 'orange',
+						};
+
 						return (
-							<Tag color={color} key={role?.Id}>
-								{role.RoleName.toUpperCase()?.replace('_', ' ')}
+							<Tag color={colorMapping[role?.Id] || 'default'} key={role?.Id}>
+								{roleNameMapping[role?.Id] || 'Không xác định'}
 							</Tag>
 						);
 					})}

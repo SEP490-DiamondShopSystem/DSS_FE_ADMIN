@@ -126,12 +126,16 @@ const OrderPage = () => {
 				paymentMethod: data?.PaymentStatus,
 				OrderCode: data?.OrderCode,
 				CustomizeRequestId: data?.CustomizeRequestId,
+				IsCollectAtShop: data?.IsCollectAtShop,
 			});
 			const mappedData = orderList?.Values?.map((order) => mapAttributes(order));
 
 			setOrders(mappedData);
 		}
 	}, [orderList, enums]);
+
+	console.log('orderList', orderList);
+
 	// Helper function to render status
 	const renderStatus = (status) => {
 		const {label, color} = statusMapping[status] || {label: 'Unknown', color: 'gray'};
@@ -156,6 +160,10 @@ const OrderPage = () => {
 					<div className="flex items-center">
 						<span className="mr-2">Ngày Đặt Đơn:</span>
 						{record.orderTime}
+					</div>
+					<div className="flex items-center">
+						<span className="mr-2">HT Giao hàng:</span>
+						{record.IsCollectAtShop ? 'Nhận Tại Cửa Hàng' : 'Giao Hàng Tận Nơi'}
 					</div>
 					<div className="flex items-center">
 						<span className="mr-2">PT Thanh Toán:</span>
@@ -197,6 +205,14 @@ const OrderPage = () => {
 			key: 'orderTime',
 			align: 'center',
 		},
+
+		{
+			title: 'Loại Đơn Hàng',
+			key: 'CustomizeRequestId',
+			dataIndex: 'CustomizeRequestId',
+			align: 'center',
+			render: (CustomizeRequestId) => (CustomizeRequestId ? 'Đơn Thiết Kế' : 'Đơn Thường'),
+		},
 		{
 			title: 'Giá',
 			key: 'totalAmount',
@@ -204,11 +220,12 @@ const OrderPage = () => {
 			align: 'center',
 		},
 		{
-			title: 'Loại Đơn Hàng',
-			key: 'CustomizeRequestId',
-			dataIndex: 'CustomizeRequestId',
+			title: 'HT Giao Hàng',
+			key: 'IsCollectAtShop',
+			dataIndex: 'IsCollectAtShop',
 			align: 'center',
-			render: (CustomizeRequestId) => (CustomizeRequestId ? 'Đơn Thiết Kế' : 'Đơn Thường'),
+			render: (IsCollectAtShop) =>
+				IsCollectAtShop ? 'Nhận Tại Cửa Hàng' : 'Giao Hàng Tận Nơi',
 		},
 		{
 			title: 'PT Thanh Toán',

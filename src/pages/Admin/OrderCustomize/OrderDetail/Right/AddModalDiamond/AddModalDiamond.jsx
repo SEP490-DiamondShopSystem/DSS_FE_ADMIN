@@ -1,10 +1,11 @@
 import {InfoCircleOutlined} from '@ant-design/icons';
 import {Form, Input, InputNumber, message, Modal, Popover, Select, Switch, Tooltip} from 'antd';
-import React, {useEffect} from 'react';
+import React, {useEffect, useState} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
 import {getAllShapeSelector} from '../../../../../../redux/selectors';
 import {handleAddDiamondCustomize} from '../../../../../../redux/slices/customizeSlice';
 import {getDiamondShape} from '../../../../../../redux/slices/diamondSlice';
+import {fetchDiamondRule} from '../../../../../../redux/slices/configSlice';
 
 const {Option} = Select;
 
@@ -622,9 +623,6 @@ export const AddModalDiamond = ({
 							step={0.1}
 							placeholder="Nhập Giá Offset"
 							className="w-full"
-							defaultValue={0.0}
-							formatter={(value) => `${Number(value || 0).toFixed(1)}`} // Hiển thị 1 chữ số sau dấu chấm
-							parser={(value) => parseFloat(value || 0)} // Phân tích giá trị đầu vào
 						/>
 					</Form.Item>
 				</div>

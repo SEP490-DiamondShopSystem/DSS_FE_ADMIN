@@ -84,8 +84,6 @@ const TimeLineOrder = ({
 	const [images, setImages] = useState([]);
 	const [video, setVideo] = useState(null);
 
-	console.log('video', video);
-
 	const resultTransaction = orders?.Transactions?.filter((obj) =>
 		obj?.Description?.includes('Chuyển tiền còn lại')
 	);
@@ -610,7 +608,7 @@ const TimeLineOrder = ({
 								</p>
 							</div>
 							<div className="my-5">
-								<Title level={5}>Xác Nhận Thông Tin Giao Dịch Từ Ngân Hàng</Title>
+								<Title level={5}>Xác Thực Thông Tin Giao Dịch Từ Ngân Hàng</Title>
 
 								<div className="my-2">
 									<label className="font-semibold text-base">Số Tiền</label>
@@ -700,7 +698,7 @@ const TimeLineOrder = ({
 								</p>
 							</div>
 							<div className="my-5">
-								<Title level={5}>Xác Nhận Thông Tin Giao Dịch Từ Ngân Hàng</Title>
+								<Title level={5}>Xác Thực Thông Tin Giao Dịch Từ Ngân Hàng</Title>
 
 								<div className="my-2">
 									<label className="font-semibold text-base">Số Tiền</label>
@@ -975,7 +973,7 @@ const TimeLineOrder = ({
 											<>
 												<div className="my-5">
 													<Title level={5}>
-														Xác Nhận Thông Tin Giao Dịch Từ Ngân Hàng
+														Xác Thực Thông Tin Giao Dịch Từ Ngân Hàng
 													</Title>
 
 													<div className="my-2">
@@ -1122,6 +1120,13 @@ const TimeLineOrder = ({
 														loading={loading}
 													>
 														Gửi
+													</Button>
+													<Button
+														danger
+														className="font-semibold w-full rounded-full"
+														onClick={handleFailedDelivered}
+													>
+														Giao Hàng Thất Bại
 													</Button>
 												</Space>
 											</>
