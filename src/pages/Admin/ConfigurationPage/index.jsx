@@ -66,13 +66,17 @@ const ConfigurationPage = () => {
 						dispatch(fetchShopBankAccountRule()).unwrap(),
 					]);
 
-					const transformedPayment = {
-						...payment,
-						LockedPaymentMethodOnCustomer: payment.LockedPaymentMethodOnCustomer.map((methodValue) => {
-						  const method = paymentMethods.find((m) => m.value.toString() === methodValue);
-						  return method ? method.value : methodValue; // Use value for Select compatibility
-						}),
-					  };
+				const transformedPayment = {
+					...payment,
+					LockedPaymentMethodOnCustomer: payment.LockedPaymentMethodOnCustomer.map(
+						(methodValue) => {
+							const method = paymentMethods.find(
+								(m) => m.value.toString() === methodValue
+							);
+							return method ? method.value : methodValue; // Use value for Select compatibility
+						}
+					),
+				};
 				setAccountRule(account);
 				setDiamondRule(diamond);
 				setFrontendDisplayRule(frontend);
@@ -137,23 +141,23 @@ const ConfigurationPage = () => {
 	};
 	const handleOrderPaymentSubmit = (values) => {
 		const paymentMethodValues = values.LockedPaymentMethodOnCustomer.map((value) => {
-		  const method = paymentMethods.find((method) => method.value === value);
-		  return method ? method.value : value; // Send value to API
+			const method = paymentMethods.find((method) => method.value === value);
+			return method ? method.value : value; // Send value to API
 		});
-	  
+
 		const updatedValues = {
-		  ...values,
-		  LockedPaymentMethodOnCustomer: paymentMethodValues,
+			...values,
+			LockedPaymentMethodOnCustomer: paymentMethodValues,
 		};
-	  
+
 		dispatch(updateOrderRulePayment(updatedValues))
-		  .unwrap()
-		  .then(() => handleSuccess('Cập Nhật Quy Định Thanh Toán Thành Công!'))
-		  .catch((error) => {
-			message.error(error?.data?.title || error?.title);
-		  });
-	  };
-	  
+			.unwrap()
+			.then(() => handleSuccess('Cập Nhật Quy Định Thanh Toán Thành Công!'))
+			.catch((error) => {
+				message.error(error?.data?.title || error?.title);
+			});
+	};
+
 	const handleBankAccountSubmit = (values) => {
 		dispatch(updateShopBankAccountRule(values))
 			.unwrap()
@@ -189,9 +193,7 @@ const ConfigurationPage = () => {
 							initialValues={accountRule}
 							onFinish={handleAccountSubmit}
 							layout="vertical"
-							key={JSON.stringify(accountRule)}
 						>
-							{' '}
 							<Row gutter={[16, 16]} wrap>
 								<Col xs={24} sm={12} md={6}>
 									<Form.Item
@@ -202,7 +204,7 @@ const ConfigurationPage = () => {
 										]}
 									>
 										<InputNumber className="w-full" />
-									</Form.Item>{' '}
+									</Form.Item>
 								</Col>
 								<Col xs={24} sm={12} md={6}>
 									<Form.Item
@@ -213,7 +215,7 @@ const ConfigurationPage = () => {
 										]}
 									>
 										<InputNumber className="w-full" />
-									</Form.Item>{' '}
+									</Form.Item>
 								</Col>
 								<Col xs={24} sm={12} md={6}>
 									<Form.Item
@@ -224,7 +226,7 @@ const ConfigurationPage = () => {
 										]}
 									>
 										<InputNumber className="w-full" />
-									</Form.Item>{' '}
+									</Form.Item>
 								</Col>
 								<Col xs={24} sm={12} md={6}>
 									<Form.Item
@@ -235,7 +237,7 @@ const ConfigurationPage = () => {
 										]}
 									>
 										<InputNumber className="w-full" />
-									</Form.Item>{' '}
+									</Form.Item>
 								</Col>
 								<Col xs={24} sm={12} md={6}>
 									<Form.Item
@@ -246,10 +248,74 @@ const ConfigurationPage = () => {
 										]}
 									>
 										<InputNumber className="w-full" />
-									</Form.Item>{' '}
+									</Form.Item>
 								</Col>
 							</Row>
-							<Button type="primary" htmlType="submit">
+
+							{['Gold', 'Silver', 'Bronze'].map((rank) => (
+								<Card
+									key={rank}
+									title={`Quyền lợi hạng ${rank}`}
+									className="mt-4 shadow-md"
+									type="inner"
+								>
+									<Row gutter={[16, 16]} wrap>
+										<Col xs={24} sm={12} md={6}>
+											<Form.Item
+												name={[
+													`${rank}RankBenefit`,
+													'RankDiscountPercentOnOrder',
+												]}
+												label={`Phần trăm giảm giá đơn hàng (${rank})`}
+												rules={[
+													{
+														required: true,
+														message: 'Trường này là bắt buộc',
+													},
+												]}
+											>
+												<InputNumber className="w-full" />
+											</Form.Item>
+										</Col>
+										<Col xs={24} sm={12} md={6}>
+											<Form.Item
+												name={[
+													`${rank}RankBenefit`,
+													'MaxAmountDiscountOnOrder',
+												]}
+												label={`Số tiền giảm tối đa cho đơn hàng (${rank})`}
+												rules={[
+													{
+														required: true,
+														message: 'Trường này là bắt buộc',
+													},
+												]}
+											>
+												<InputNumber className="w-full" />
+											</Form.Item>
+										</Col>
+										<Col xs={24} sm={12} md={6}>
+											<Form.Item
+												name={[
+													`${rank}RankBenefit`,
+													'RankDiscountPercentOnShipping',
+												]}
+												label={`Phần trăm giảm giá vận chuyển (${rank})`}
+												rules={[
+													{
+														required: true,
+														message: 'Trường này là bắt buộc',
+													},
+												]}
+											>
+												<InputNumber className="w-full" />
+											</Form.Item>
+										</Col>
+									</Row>
+								</Card>
+							))}
+
+							<Button type="primary" htmlType="submit" className="mt-4">
 								Lưu
 							</Button>
 						</Form>
