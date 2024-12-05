@@ -2767,3 +2767,15 @@ video {
 .border-dashed {
 	border-style: dashed;
 }
+
+@media (min-width: 768px) {
+	.md\:w-\[100px\] {
+		width: 100px;
+	}
+}
+
+@media (min-width: 768px) {
+	.md\:w-\[600px\] {
+		width: 600px;
+	}
+}
