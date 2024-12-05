@@ -40,6 +40,21 @@ export const handleBeginDelivery = createAsyncThunk(
 	}
 );
 
+export const handleDeliveryFailed = createAsyncThunk(
+	'orderSlice/handleDeliveryFailed',
+	async ({id, IsShopFault}, {rejectWithValue}) => {
+		try {
+			const data = await api.put(
+				`/Order/DeliverFail?orderId=${id}&IsShopFault=${IsShopFault}`
+			);
+			return data;
+		} catch (error) {
+			console.error(error);
+			return rejectWithValue(error);
+		}
+	}
+);
+
 export const deliverySlice = createSlice({
 	name: 'deliverySlice',
 	initialState: {
@@ -78,6 +93,16 @@ export const deliverySlice = createSlice({
 				state.loading = false;
 			})
 			.addCase(handleBeginDelivery.rejected, (state, action) => {
+				state.loading = false;
+				state.error = action.payload;
+			})
+			.addCase(handleDeliveryFailed.pending, (state) => {
+				state.loading = true;
+			})
+			.addCase(handleDeliveryFailed.fulfilled, (state, action) => {
+				state.loading = false;
+			})
+			.addCase(handleDeliveryFailed.rejected, (state, action) => {
 				state.loading = false;
 				state.error = action.payload;
 			});

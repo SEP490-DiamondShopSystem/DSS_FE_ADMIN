@@ -16,6 +16,7 @@ import {
 	Upload,
 	Spin,
 	Carousel,
+	Space,
 } from 'antd';
 
 import {useDispatch, useSelector} from 'react-redux';
@@ -269,11 +270,6 @@ const InformationOrder = ({orders, statusOrder, paymentStatusOrder, userDetail})
 	};
 
 	const handleLogDeliver = () => {
-		if (!fileList || fileList.length === 0) {
-			message.error('Vui lòng chọn ít nhất một tệp hình ảnh!');
-			return;
-		}
-
 		dispatch(
 			handleOrderLogDeliver({
 				orderId: orders?.Id,
@@ -428,43 +424,25 @@ const InformationOrder = ({orders, statusOrder, paymentStatusOrder, userDetail})
 				</Col>
 			</Row>
 			<Row gutter={[16, 16]} justify="center" align="middle" className="my-3">
-				<Col xs={12} sm={12} lg={12}>
+				<Col xs={24} lg={12}>
 					<Text strong style={{fontSize: 18}}>
-						Chứng Từ
+						Các Chứng Từ
 					</Text>
 					{orders?.Transactions?.length > 0 ? (
 						<>
 							<br />
-							<div className="image-slider-container">
-								<Carousel
-									dots={false}
-									slidesToShow={isMobile ? 1 : 3}
-									swipeToSlide={true}
-									draggable
-									responsive={[
-										{
-											breakpoint: 768,
-											settings: {
-												slidesToShow: 1,
-												slidesToScroll: 1,
-											},
-										},
-									]}
-									className="order-delivery-carousel"
-								>
-									{orders?.Transactions?.map((transaction, index) =>
-										transaction.Evidence?.MediaPath ? (
-											<Image
-												key={index}
-												src={transaction.Evidence.MediaPath}
-												alt={`evidence-${index}`}
-												className="mt-5"
-												style={{height: 600, marginBottom: 10}}
-											/>
-										) : null
-									)}
-								</Carousel>
-							</div>
+							<Space wrap>
+								{orders?.Transactions?.map((transaction, index) =>
+									transaction.Evidence?.MediaPath ? (
+										<Image
+											key={index}
+											src={transaction.Evidence.MediaPath}
+											alt={`evidence-${index}`}
+											className="mt-5 w-full md:w-[600px]"
+										/>
+									) : null
+								)}
+							</Space>
 						</>
 					) : (
 						<>
@@ -473,8 +451,7 @@ const InformationOrder = ({orders, statusOrder, paymentStatusOrder, userDetail})
 						</>
 					)}
 				</Col>
-
-				<Col xs={12} sm={12} lg={12}></Col>
+				<Col xs={0} lg={12}></Col>
 			</Row>
 
 			<Divider style={{borderColor: '#d9d9d9'}} />
@@ -523,7 +500,16 @@ const InformationOrder = ({orders, statusOrder, paymentStatusOrder, userDetail})
 							</Upload>
 						</Col>
 					</div>
-					<Button type="primary" className="mt-5 w-1/2" onClick={handleLogProcessing}>
+					<Button
+						type="primary"
+						className="mt-5 w-1/2"
+						onClick={handleLogProcessing}
+						disabled={
+							messageProcessing === null ||
+							messageProcessing === undefined ||
+							messageProcessing === ''
+						}
+					>
 						Gửi
 					</Button>
 					<Divider style={{borderColor: '#d9d9d9'}} />
@@ -573,7 +559,16 @@ const InformationOrder = ({orders, statusOrder, paymentStatusOrder, userDetail})
 							</Upload>
 						</Col>
 					</div>
-					<Button type="primary" className="mt-5 w-1/2" onClick={handleLogDeliver}>
+					<Button
+						type="primary"
+						className="mt-5 w-1/2"
+						onClick={handleLogDeliver}
+						disabled={
+							messageProcessing === null ||
+							messageProcessing === undefined ||
+							messageProcessing === ''
+						}
+					>
 						Gửi
 					</Button>
 				</>
@@ -677,41 +672,6 @@ const InformationOrder = ({orders, statusOrder, paymentStatusOrder, userDetail})
 							</div>
 						</>
 					)}
-
-					{/* Order Log Images */}
-					<Text strong style={{fontSize: 18}}>
-						Các Hình Ảnh Trong Quá Trình Giao Hàng
-					</Text>
-					<div className="image-slider-container">
-						<Carousel
-							dots={false}
-							slidesToShow={isMobile ? 1 : 3}
-							swipeToSlide={true}
-							draggable
-							responsive={[
-								{
-									breakpoint: 768,
-									settings: {
-										slidesToShow: 1,
-										slidesToScroll: 1,
-									},
-								},
-							]}
-							className="order-delivery-carousel"
-						>
-							{Object.values(orderFiles.OrderLogImages || {})
-								.flat()
-								.map((img, index) => (
-									<Image
-										key={`log-img-${index}`}
-										src={img.MediaPath} // Use the filename for the log images
-										alt={`log-image-${index}`}
-										className="mt-5"
-										style={{width: 600, marginBottom: 10}}
-									/>
-								))}
-						</Carousel>
-					</div>
 				</div>
 			)}
 

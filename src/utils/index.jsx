@@ -96,13 +96,13 @@ export const getOrderStatusTag = (status) => {
 		case 2:
 			return {name: 'Đã Đặt Cọc', color: 'blue'};
 		case 3:
-			return {name: 'Trả Hết', color: 'red'};
+			return {name: 'Trả Hết', color: 'green'};
 		case 4:
 			return {name: 'Chờ Hoàn Tiền', color: 'red'};
 		case 5:
 			return {name: 'Đã Hoàn Tiền', color: 'orange'};
 		case 6:
-
+			return {name: 'Không Hoàn Tiền', color: 'volcano'};
 		default:
 			return {name: 'Unknown', color: 'grey'};
 	}
