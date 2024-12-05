@@ -618,10 +618,7 @@ const InformationOrder = ({orders, statusOrder, paymentStatusOrder, userDetail})
 									>
 										<div className="relative w-full max-w-[250px] aspect-square">
 											<Image
-												src={
-													'https://diamondshopblobs.blob.core.windows.net/dev/' +
-													img.MediaPath
-												}
+												src={img.MediaPath}
 												alt={`Delivery image ${index + 1}`}
 												fill
 												className="rounded-lg object-cover shadow-md hover:scale-105 transition-transform duration-300"
@@ -649,10 +646,7 @@ const InformationOrder = ({orders, statusOrder, paymentStatusOrder, userDetail})
 								style={{width: 600, marginBottom: 10}}
 							>
 								<source
-									src={
-										'https://diamondshopblobs.blob.core.windows.net/dev/' +
-										orderFiles.OrderDeliveryConfirmationVideo.MediaPath
-									}
+									src={orderFiles.OrderDeliveryConfirmationVideo.MediaPath}
 									type={orderFiles.OrderDeliveryConfirmationVideo.ContentType}
 								/>
 								Trình duyệt của bạn không được hỗ trợ, hãy lên một thiết bị hoặc
@@ -694,10 +688,7 @@ const InformationOrder = ({orders, statusOrder, paymentStatusOrder, userDetail})
 												<div className="relative w-full max-w-[250px] aspect-square">
 													<Image
 														key={`log-img-${index}`}
-														src={
-															'https://diamondshopblobs.blob.core.windows.net/dev/' +
-															img.MediaPath
-														} // Use the filename for the log images
+														src={img.MediaPath} // Use the filename for the log images
 														alt={`log-image-${index}`}
 														className="rounded-lg object-cover shadow-md hover:scale-105 transition-transform duration-300"
 														sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
@@ -743,10 +734,7 @@ const InformationOrder = ({orders, statusOrder, paymentStatusOrder, userDetail})
 										<div className="relative w-full max-w-[250px] aspect-square">
 											<Image
 												key={`log-img-${index}-${img.MediaPath}`}
-												src={
-													'https://diamondshopblobs.blob.core.windows.net/dev/' +
-														img.MediaPath || '/placeholder-image.png'
-												} // Fallback for missing paths
+												src={img.MediaPath || '/placeholder-image.png'} // Fallback for missing paths
 												alt={`Log image ${index}`}
 												className="rounded-lg object-cover shadow-md hover:scale-105 transition-transform duration-300"
 												sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
