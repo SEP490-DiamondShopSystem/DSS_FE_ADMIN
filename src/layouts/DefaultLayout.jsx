@@ -12,6 +12,7 @@ import {
 	MenuUnfoldOutlined,
 	LogoutOutlined,
 	SettingOutlined,
+	SlidersOutlined,
 } from '@ant-design/icons';
 import {DiamondOutlined} from '@mui/icons-material';
 import {Breadcrumb, message, Layout, Menu, Drawer, Button, Tooltip} from 'antd';
@@ -117,7 +118,7 @@ const DefaultLayout = () => {
 			getItem('Quản Lí Đặt Hàng', '/orders', <OrderedListOutlined />),
 
 		(managerRole || staffRole) &&
-			getItem('Quản Lí Yêu Cầu Thiết Kế', '/request-customize', <OrderedListOutlined />),
+			getItem('Các Yêu Cầu Thiết Kế', '/request-customize', <SlidersOutlined />),
 
 		(managerRole || staffRole) && getItem('Quản Lí Khuyến Mãi', '/promotion', <GiftOutlined />),
 		(managerRole || staffRole) && getItem('Quản Lí Giảm Giá', '/discount', <TagOutlined />),

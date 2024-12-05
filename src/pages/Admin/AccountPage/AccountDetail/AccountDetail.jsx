@@ -7,10 +7,11 @@ import {
 	handleAddRole,
 	handleBanAccount,
 	handleRemoveRole,
+	handleUpdateAccount,
 } from '../../../../redux/slices/userSlice';
 import {useNavigate, useParams} from 'react-router-dom';
 import {getDetailUserSelector, GetUserDetailSelector} from '../../../../redux/selectors';
-import {Button, Modal, Select, message} from 'antd';
+import {Button, Modal, Select, message, Spin} from 'antd';
 
 const {Option} = Select;
 
@@ -31,22 +32,51 @@ const AccountDetail = () => {
 		Email: userDetail?.Email || '',
 		FirstName: userDetail?.FirstName || '',
 		LastName: userDetail?.LastName || '',
+		PhoneNumber: userDetail?.PhoneNumber || '',
 		Id: userDetail?.Id || '',
 		Addresses: userDetail?.Addresses || [],
 	});
-
+	const [addressChanges, setAddressChanges] = useState({
+		addedAddress: [],
+		updatedAddress: {},
+		removedAddressId: [],
+	});
 	const [roleLevel, setRoleLevel] = useState(0);
+	const [loading, setLoading] = useState(true); // Add loading state
 
 	useEffect(() => {
-		dispatch(getUserAccountDetail(id));
-	}, [dispatch, id]);
-
-	useEffect(() => {
-		if (userDetail) {
-			setUser(userDetail);
+		if (id) {
+		  // Reset state on id change to avoid mixing data between profiles
+		  setUserInfo({
+			Email: '',
+			FirstName: '',
+			LastName: '',
+			PhoneNumber: '',
+			Id: '',
+			Addresses: [],
+		  });
+		  setUser({}); // Clear previous user data
+		  setLoading(true); // Show loading indicator when fetching new data
+	
+		  dispatch(getUserAccountDetail(id))  // Fetch new user's data based on id
+			.then(() => setLoading(false))  // Set loading to false after data is fetched
+			.catch(() => setLoading(false));  // Set loading to false in case of error
 		}
-	}, [userDetail]);
-
+	  }, [dispatch, id]);  // Only trigger when the id changes
+	
+	  useEffect(() => {
+		if (userDetail) {
+		  setUser(userDetail); // Set user data when it's fetched
+		  setUserInfo({
+			Email: userDetail?.Email || '',
+			FirstName: userDetail?.FirstName || '',
+			LastName: userDetail?.LastName || '',
+			PhoneNumber: userDetail?.PhoneNumber || '',
+			Id: userDetail?.Id || '',
+			Addresses: userDetail?.Addresses || [],
+		  });
+		}
+	  }, [userDetail]);
 	useEffect(() => {
 		if (userDetailCurrent?.Roles) {
 			const roles = userDetailCurrent.Roles.map((role) => role?.RoleName);
@@ -64,9 +94,63 @@ const AccountDetail = () => {
 	const handleEditing = () => {
 		setEditing(!editing);
 	};
+	const preparePayload = () => {
+		const {addedAddress, updatedAddress, removedAddressId, newDefaultAddressId} =
+			addressChanges;
 
-	const handleUpdate = () => {
-		console.log();
+		const filteredAddedAddress = addedAddress
+			.filter((addr) => addr && addr.province && addr.district && addr.ward && addr.street)
+			.map((addr) => ({
+				province: addr.province,
+				district: addr.district,
+				ward: addr.ward,
+				street: addr.street,
+			}));
+
+		const payload = {
+			changedFullName: {
+				firstName: userInfo?.FirstName?.trim(),
+				lastName: userInfo?.LastName?.trim(),
+			},
+			changedAddress: {},
+			newDefaultAddressId: newDefaultAddressId || userInfo?.newDefaultAddressId || '', // Use addressChanges as fallback
+			newPhoneNumber: userInfo?.PhoneNumber?.trim(),
+		};
+
+		if (filteredAddedAddress.length > 0) {
+			payload.changedAddress.addedAddress = filteredAddedAddress;
+		}
+
+		if (Object.keys(updatedAddress).length > 0) {
+			payload.changedAddress.updatedAddress = updatedAddress;
+		}
+
+		if (removedAddressId.length > 0) {
+			payload.changedAddress.removedAddressId = removedAddressId;
+		}
+
+		if (Object.keys(payload.changedAddress).length === 0) {
+			delete payload.changedAddress;
+		}
+
+		console.log('Prepared payload:', payload);
+		return payload;
+	};
+
+	const handleUpdate = async () => {
+		const payload = preparePayload();
+		console.log('Sending payload:', payload);
+
+		await dispatch(handleUpdateAccount({id: userInfo.Id, payload}))
+			.unwrap()
+			.then(() => {
+				message.success('Cập nhật thông tin tài khoản thành công!');
+				setEditing(false); // Disable editing mode
+			})
+			.catch((error) => {
+				message.error(error?.data?.title || error?.detail || 'Đã xảy ra lỗi!');
+			});
+		await dispatch(getUserAccountDetail(id));
 	};
 
 	const onChange = (e) => {
@@ -91,7 +175,7 @@ const AccountDetail = () => {
 		setSelectedOption(value);
 	};
 
-	const handleOk = () => {
+	const handleOk = async () => {
 		const accId = {
 			value: userId,
 		};
@@ -100,7 +184,7 @@ const AccountDetail = () => {
 			value: selectedOption,
 		};
 
-		dispatch(handleAddRole({accId, roleId}))
+		await dispatch(handleAddRole({accId, roleId}))
 			.unwrap()
 			.then(() => {
 				message.success('Thêm vai trò thành công!');
@@ -109,8 +193,9 @@ const AccountDetail = () => {
 			.catch((error) => {
 				message.error(error?.data?.title || error?.detail);
 			});
+		await dispatch(getUserAccountDetail(id));
 	};
-	const handleRemove = () => {
+	const handleRemove = async () => {
 		const accId = {
 			value: userId,
 		};
@@ -119,7 +204,7 @@ const AccountDetail = () => {
 			value: selectedOption,
 		};
 
-		dispatch(handleRemoveRole({accId, roleId}))
+		await dispatch(handleRemoveRole({accId, roleId}))
 			.unwrap()
 			.then(() => {
 				message.success('Xóa vai trò thành công!');
@@ -128,11 +213,13 @@ const AccountDetail = () => {
 			.catch((error) => {
 				message.error(error?.data?.title || error?.detail);
 			});
+
+		await dispatch(getUserAccountDetail(id));
 		setIsModalVisible(false);
 	};
 
-	const handleBan = () => {
-		dispatch(handleBanAccount(userDetail?.IdentityId))
+	const handleBan = async () => {
+		await dispatch(handleBanAccount(userDetail?.IdentityId))
 			.unwrap()
 			.then(() => {
 				message.message(`Cấm tài khoản ${userDetail.Id} thành công`);
@@ -141,6 +228,7 @@ const AccountDetail = () => {
 			.catch((error) => {
 				message.error(error?.data?.title || error?.detail);
 			});
+		await dispatch(getUserAccountDetail(id));
 	};
 
 	const handleCancel = () => {
@@ -150,8 +238,9 @@ const AccountDetail = () => {
 		setIsModalRemoveRoleVisible(false);
 	};
 
-	console.log('userDetail', userDetail);
-
+	if (loading) {
+		return <Spin size="large" className="loading-spinner" />; // Show spinner while loading
+	}
 	return (
 		<div>
 			<div className="">
@@ -166,6 +255,9 @@ const AccountDetail = () => {
 							onChange={onChange}
 							userInfo={userInfo}
 							userDetail={userDetail}
+							addressChanges={addressChanges}
+							setAddressChanges={setAddressChanges}
+							setUserInfo={setUserInfo}
 						/>
 					</div>
 					<div style={{width: '40%'}}>

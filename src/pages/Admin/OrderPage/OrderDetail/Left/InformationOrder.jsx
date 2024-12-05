@@ -16,6 +16,7 @@ import {
 	Upload,
 	Spin,
 	Carousel,
+	Space,
 } from 'antd';
 
 import {useDispatch, useSelector} from 'react-redux';
@@ -269,11 +270,6 @@ const InformationOrder = ({orders, statusOrder, paymentStatusOrder, userDetail})
 	};
 
 	const handleLogDeliver = () => {
-		if (!fileList || fileList.length === 0) {
-			message.error('Vui lòng chọn ít nhất một tệp hình ảnh!');
-			return;
-		}
-
 		dispatch(
 			handleOrderLogDeliver({
 				orderId: orders?.Id,
@@ -428,52 +424,25 @@ const InformationOrder = ({orders, statusOrder, paymentStatusOrder, userDetail})
 				</Col>
 			</Row>
 			<Row gutter={[16, 16]} justify="center" align="middle" className="my-3">
-				<Col xs={12} sm={12} lg={24}>
+				<Col xs={24} lg={12}>
 					<Text strong style={{fontSize: 18}}>
-						Chứng Từ
+						Các Chứng Từ
 					</Text>
 					{orders?.Transactions?.length > 0 ? (
 						<>
 							<br />
-							<div className="image-slider-container">
-								<Carousel
-									dots={true}
-									slidesToShow={isMobile ? 1 : 3}
-									swipeToSlide={true}
-									draggable
-									arrows
-									responsive={[
-										{
-											breakpoint: 768,
-											settings: {
-												slidesToShow: 1,
-												slidesToScroll: 1,
-											},
-										},
-									]}
-									className="order-delivery-carousel rounded-lg bg-primary"
-								>
-									{orders?.Transactions?.map((transaction, index) =>
-										transaction.Evidence?.MediaPath ? (
-											<div
-												key={`delivery-img-${index}`}
-												className="flex justify-center items-center p-2"
-											>
-												<div className="relative w-full max-w-[250px] aspect-square">
-													<Image
-														key={index}
-														src={transaction.Evidence.MediaPath}
-														alt={`evidence-${index}`}
-														className="rounded-lg object-cover shadow-md hover:scale-105 transition-transform duration-300"
-														sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-														loading="lazy" // Lazy load images
-													/>
-												</div>
-											</div>
-										) : null
-									)}
-								</Carousel>
-							</div>
+							<Space wrap>
+								{orders?.Transactions?.map((transaction, index) =>
+									transaction.Evidence?.MediaPath ? (
+										<Image
+											key={index}
+											src={transaction.Evidence.MediaPath}
+											alt={`evidence-${index}`}
+											className="mt-5 w-full md:w-[600px]"
+										/>
+									) : null
+								)}
+							</Space>
 						</>
 					) : (
 						<>
@@ -482,6 +451,7 @@ const InformationOrder = ({orders, statusOrder, paymentStatusOrder, userDetail})
 						</>
 					)}
 				</Col>
+				<Col xs={0} lg={12}></Col>
 			</Row>
 
 			<Divider style={{borderColor: '#d9d9d9'}} />
@@ -530,7 +500,16 @@ const InformationOrder = ({orders, statusOrder, paymentStatusOrder, userDetail})
 							</Upload>
 						</Col>
 					</div>
-					<Button type="primary" className="mt-5 w-1/2" onClick={handleLogProcessing}>
+					<Button
+						type="primary"
+						className="mt-5 w-1/2"
+						onClick={handleLogProcessing}
+						disabled={
+							messageProcessing === null ||
+							messageProcessing === undefined ||
+							messageProcessing === ''
+						}
+					>
 						Gửi
 					</Button>
 					<Divider style={{borderColor: '#d9d9d9'}} />
@@ -580,7 +559,16 @@ const InformationOrder = ({orders, statusOrder, paymentStatusOrder, userDetail})
 							</Upload>
 						</Col>
 					</div>
-					<Button type="primary" className="mt-5 w-1/2" onClick={handleLogDeliver}>
+					<Button
+						type="primary"
+						className="mt-5 w-1/2"
+						onClick={handleLogDeliver}
+						disabled={
+							messageProcessing === null ||
+							messageProcessing === undefined ||
+							messageProcessing === ''
+						}
+					>
 						Gửi
 					</Button>
 				</>
@@ -618,10 +606,7 @@ const InformationOrder = ({orders, statusOrder, paymentStatusOrder, userDetail})
 									>
 										<div className="relative w-full max-w-[250px] aspect-square">
 											<Image
-												src={
-													'https://diamondshopblobs.blob.core.windows.net/dev/' +
-													img.MediaPath
-												}
+												src={img.MediaPath}
 												alt={`Delivery image ${index + 1}`}
 												fill
 												className="rounded-lg object-cover shadow-md hover:scale-105 transition-transform duration-300"
@@ -649,10 +634,7 @@ const InformationOrder = ({orders, statusOrder, paymentStatusOrder, userDetail})
 								style={{width: 600, marginBottom: 10}}
 							>
 								<source
-									src={
-										'https://diamondshopblobs.blob.core.windows.net/dev/' +
-										orderFiles.OrderDeliveryConfirmationVideo.MediaPath
-									}
+									src={orderFiles.OrderDeliveryConfirmationVideo.MediaPath}
 									type={orderFiles.OrderDeliveryConfirmationVideo.ContentType}
 								/>
 								Trình duyệt của bạn không được hỗ trợ, hãy lên một thiết bị hoặc
@@ -694,10 +676,7 @@ const InformationOrder = ({orders, statusOrder, paymentStatusOrder, userDetail})
 												<div className="relative w-full max-w-[250px] aspect-square">
 													<Image
 														key={`log-img-${index}`}
-														src={
-															'https://diamondshopblobs.blob.core.windows.net/dev/' +
-															img.MediaPath
-														} // Use the filename for the log images
+														src={img.MediaPath} // Use the filename for the log images
 														alt={`log-image-${index}`}
 														className="rounded-lg object-cover shadow-md hover:scale-105 transition-transform duration-300"
 														sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
@@ -710,53 +689,6 @@ const InformationOrder = ({orders, statusOrder, paymentStatusOrder, userDetail})
 							</div>
 						</>
 					)}
-
-					{/* Order Log Images */}
-					<Text strong style={{fontSize: 18}}>
-						Các Hình Ảnh Trong Quá Trình Giao Hàng
-					</Text>
-					<div className="image-slider-container">
-						<Carousel
-							dots={true}
-							slidesToShow={isMobile ? 1 : 3}
-							swipeToSlide={true}
-							draggable
-							arrows
-							responsive={[
-								{
-									breakpoint: 768,
-									settings: {
-										slidesToShow: 1,
-										slidesToScroll: 1,
-									},
-								},
-							]}
-							className="order-delivery-carousel rounded-lg bg-primary"
-						>
-							{Object.values(orderFiles.OrderLogImages || {})
-								.flat()
-								.map((img, index) => (
-									<div
-										key={`delivery-img-${index}`}
-										className="flex justify-center items-center p-2"
-									>
-										<div className="relative w-full max-w-[250px] aspect-square">
-											<Image
-												key={`log-img-${index}-${img.MediaPath}`}
-												src={
-													'https://diamondshopblobs.blob.core.windows.net/dev/' +
-														img.MediaPath || '/placeholder-image.png'
-												} // Fallback for missing paths
-												alt={`Log image ${index}`}
-												className="rounded-lg object-cover shadow-md hover:scale-105 transition-transform duration-300"
-												sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-												loading="lazy" // Lazy load images
-											/>
-										</div>
-									</div>
-								))}
-						</Carousel>
-					</div>
 				</div>
 			)}
 
