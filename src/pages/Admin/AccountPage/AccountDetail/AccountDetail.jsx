@@ -71,9 +71,9 @@ const AccountDetail = () => {
 		setEditing(!editing);
 	};
 	const preparePayload = () => {
-		const {addedAddress, updatedAddress, removedAddressId} = addressChanges;
+		const {addedAddress, updatedAddress, removedAddressId, newDefaultAddressId} =
+			addressChanges;
 
-		// Update the filter to handle potential undefined addresses
 		const filteredAddedAddress = addedAddress
 			.filter((addr) => addr && addr.province && addr.district && addr.ward && addr.street)
 			.map((addr) => ({
@@ -89,7 +89,7 @@ const AccountDetail = () => {
 				lastName: userInfo?.LastName?.trim(),
 			},
 			changedAddress: {},
-			newDefaultAddressId: userInfo?.newDefaultAddressId || '',
+			newDefaultAddressId: newDefaultAddressId || userInfo?.newDefaultAddressId || '', // Use addressChanges as fallback
 			newPhoneNumber: userInfo?.PhoneNumber?.trim(),
 		};
 
@@ -109,14 +109,15 @@ const AccountDetail = () => {
 			delete payload.changedAddress;
 		}
 
+		console.log('Prepared payload:', payload);
 		return payload;
 	};
 
-	const handleUpdate = () => {
+	const handleUpdate = async () => {
 		const payload = preparePayload();
 		console.log('Sending payload:', payload);
 
-		dispatch(handleUpdateAccount({id: userInfo.Id, payload}))
+		await dispatch(handleUpdateAccount({id: userInfo.Id, payload}))
 			.unwrap()
 			.then(() => {
 				message.success('Cập nhật thông tin tài khoản thành công!');
@@ -125,6 +126,7 @@ const AccountDetail = () => {
 			.catch((error) => {
 				message.error(error?.data?.title || error?.detail || 'Đã xảy ra lỗi!');
 			});
+		await dispatch(getUserAccountDetail(id));
 	};
 
 	const onChange = (e) => {
@@ -149,7 +151,7 @@ const AccountDetail = () => {
 		setSelectedOption(value);
 	};
 
-	const handleOk = () => {
+	const handleOk = async () => {
 		const accId = {
 			value: userId,
 		};
@@ -158,7 +160,7 @@ const AccountDetail = () => {
 			value: selectedOption,
 		};
 
-		dispatch(handleAddRole({accId, roleId}))
+		await dispatch(handleAddRole({accId, roleId}))
 			.unwrap()
 			.then(() => {
 				message.success('Thêm vai trò thành công!');
@@ -167,8 +169,9 @@ const AccountDetail = () => {
 			.catch((error) => {
 				message.error(error?.data?.title || error?.detail);
 			});
+		await dispatch(getUserAccountDetail(id));
 	};
-	const handleRemove = () => {
+	const handleRemove = async () => {
 		const accId = {
 			value: userId,
 		};
@@ -177,7 +180,7 @@ const AccountDetail = () => {
 			value: selectedOption,
 		};
 
-		dispatch(handleRemoveRole({accId, roleId}))
+		await dispatch(handleRemoveRole({accId, roleId}))
 			.unwrap()
 			.then(() => {
 				message.success('Xóa vai trò thành công!');
@@ -186,11 +189,13 @@ const AccountDetail = () => {
 			.catch((error) => {
 				message.error(error?.data?.title || error?.detail);
 			});
+
+		await dispatch(getUserAccountDetail(id));
 		setIsModalVisible(false);
 	};
 
-	const handleBan = () => {
-		dispatch(handleBanAccount(userDetail?.IdentityId))
+	const handleBan = async () => {
+		await dispatch(handleBanAccount(userDetail?.IdentityId))
 			.unwrap()
 			.then(() => {
 				message.message(`Cấm tài khoản ${userDetail.Id} thành công`);
@@ -199,6 +204,7 @@ const AccountDetail = () => {
 			.catch((error) => {
 				message.error(error?.data?.title || error?.detail);
 			});
+		await dispatch(getUserAccountDetail(id));
 	};
 
 	const handleCancel = () => {
@@ -223,6 +229,7 @@ const AccountDetail = () => {
 							userDetail={userDetail}
 							addressChanges={addressChanges}
 							setAddressChanges={setAddressChanges}
+							setUserInfo={setUserInfo}
 						/>
 					</div>
 					<div style={{width: '40%'}}>

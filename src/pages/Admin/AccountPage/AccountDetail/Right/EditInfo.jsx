@@ -1,4 +1,4 @@
-import {Input, Button} from 'antd';
+import {Tooltip, Input, Button} from 'antd';
 import React, {useState} from 'react';
 
 export const EditInfo = ({
@@ -6,6 +6,7 @@ export const EditInfo = ({
 	editing,
 	onChange,
 	userInfo,
+	setUserInfo,
 	addressChanges,
 	setAddressChanges,
 }) => {
@@ -57,6 +58,12 @@ export const EditInfo = ({
 			target: {
 				name: 'Addresses',
 				value: updatedAddresses,
+			},
+		});
+		onChange({
+			target: {
+				name: 'newDefaultAddressId',
+				value: newDefaultAddressId,
 			},
 		});
 	};
@@ -116,23 +123,46 @@ export const EditInfo = ({
 		onChange({target: {name: 'Addresses', value: updatedAddresses}});
 	};
 	const handleSetDefaultAddress = (index) => {
+		console.log('Setting default address for index:', index);
+
 		const updatedAddresses = userInfo.Addresses.map((addr, i) => ({
 			...addr,
-			IsDefault: i === index,
+			IsDefault: i === index, // Only the selected address becomes default
 		}));
 
+		console.log('Updated Addresses after setting default:', updatedAddresses);
+
+		const newDefaultAddressId = updatedAddresses[index]?.Id || '';
+		console.log('New Default Address ID:', newDefaultAddressId);
+
+		// Update addressChanges
 		setAddressChanges((prev) => ({
 			...prev,
-			newDefaultAddressId: updatedAddresses[index]?.Id || '',
+			newDefaultAddressId,
 		}));
 
+		// Update userInfo
+		setUserInfo((prev) => ({
+			...prev,
+			Addresses: updatedAddresses,
+			newDefaultAddressId, // Ensure this is included
+		}));
+
+		// Sync with parent
 		onChange({
 			target: {
-				name: 'Addresses',
-				value: updatedAddresses,
+				name: 'UserInfo',
+				value: {
+					...userInfo,
+					Addresses: updatedAddresses,
+					newDefaultAddressId, // Pass this to parent as well
+				},
 			},
 		});
+
+		console.log('handleSetDefaultAddress completed.');
 	};
+
 	return (
 		<div className="m-5">
 			{/* Personal Information */}
@@ -257,11 +287,18 @@ export const EditInfo = ({
 								</div>
 							) : (
 								<>
-									<Input
-										className="font-semibold text-lg mb-2"
-										disabled={true}
-										value={`${address.Street}, ${address.Ward}, ${address.District}, ${address.Province}`}
-									/>
+									<Tooltip
+										title={address.IsDefault ? 'Địa chỉ mặc định' : ''}
+										mouseEnterDelay={0.3}
+									>
+										<Input
+											className={`font-thin text-lg mb-2 ${
+												address.IsDefault ? 'bg-primary font-bold' : ''
+											}`}
+											readOnly={true}
+											value={`${address.Street}, ${address.Ward}, ${address.District}, ${address.Province}`}
+										/>
+									</Tooltip>
 								</>
 							)}
 						</div>
