@@ -7,6 +7,7 @@ import {
 	handleAddRole,
 	handleBanAccount,
 	handleRemoveRole,
+	handleUpdateAccount,
 } from '../../../../redux/slices/userSlice';
 import {useNavigate, useParams} from 'react-router-dom';
 import {getDetailUserSelector, GetUserDetailSelector} from '../../../../redux/selectors';
@@ -31,10 +32,15 @@ const AccountDetail = () => {
 		Email: userDetail?.Email || '',
 		FirstName: userDetail?.FirstName || '',
 		LastName: userDetail?.LastName || '',
+		PhoneNumber: userDetail?.PhoneNumber || '',
 		Id: userDetail?.Id || '',
 		Addresses: userDetail?.Addresses || [],
 	});
-
+	const [addressChanges, setAddressChanges] = useState({
+		addedAddress: [],
+		updatedAddress: {},
+		removedAddressId: [],
+	});
 	const [roleLevel, setRoleLevel] = useState(0);
 
 	useEffect(() => {
@@ -64,9 +70,61 @@ const AccountDetail = () => {
 	const handleEditing = () => {
 		setEditing(!editing);
 	};
+	const preparePayload = () => {
+		const {addedAddress, updatedAddress, removedAddressId} = addressChanges;
+
+		// Update the filter to handle potential undefined addresses
+		const filteredAddedAddress = addedAddress
+			.filter((addr) => addr && addr.province && addr.district && addr.ward && addr.street)
+			.map((addr) => ({
+				province: addr.province,
+				district: addr.district,
+				ward: addr.ward,
+				street: addr.street,
+			}));
+
+		const payload = {
+			changedFullName: {
+				firstName: userInfo?.FirstName?.trim(),
+				lastName: userInfo?.LastName?.trim(),
+			},
+			changedAddress: {},
+			newDefaultAddressId: userInfo?.newDefaultAddressId || '',
+			newPhoneNumber: userInfo?.PhoneNumber?.trim(),
+		};
+
+		if (filteredAddedAddress.length > 0) {
+			payload.changedAddress.addedAddress = filteredAddedAddress;
+		}
+
+		if (Object.keys(updatedAddress).length > 0) {
+			payload.changedAddress.updatedAddress = updatedAddress;
+		}
+
+		if (removedAddressId.length > 0) {
+			payload.changedAddress.removedAddressId = removedAddressId;
+		}
+
+		if (Object.keys(payload.changedAddress).length === 0) {
+			delete payload.changedAddress;
+		}
+
+		return payload;
+	};
 
 	const handleUpdate = () => {
-		console.log();
+		const payload = preparePayload();
+		console.log('Sending payload:', payload);
+
+		dispatch(handleUpdateAccount({id: userInfo.Id, payload}))
+			.unwrap()
+			.then(() => {
+				message.success('Cập nhật thông tin tài khoản thành công!');
+				setEditing(false); // Disable editing mode
+			})
+			.catch((error) => {
+				message.error(error?.data?.title || error?.detail || 'Đã xảy ra lỗi!');
+			});
 	};
 
 	const onChange = (e) => {
@@ -149,9 +207,6 @@ const AccountDetail = () => {
 	const handleRemoveCancel = () => {
 		setIsModalRemoveRoleVisible(false);
 	};
-
-	console.log('userDetail', userDetail);
-
 	return (
 		<div>
 			<div className="">
@@ -166,6 +221,8 @@ const AccountDetail = () => {
 							onChange={onChange}
 							userInfo={userInfo}
 							userDetail={userDetail}
+							addressChanges={addressChanges}
+							setAddressChanges={setAddressChanges}
 						/>
 					</div>
 					<div style={{width: '40%'}}>
