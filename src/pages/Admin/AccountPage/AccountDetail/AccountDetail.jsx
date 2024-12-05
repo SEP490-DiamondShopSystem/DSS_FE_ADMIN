@@ -11,7 +11,7 @@ import {
 } from '../../../../redux/slices/userSlice';
 import {useNavigate, useParams} from 'react-router-dom';
 import {getDetailUserSelector, GetUserDetailSelector} from '../../../../redux/selectors';
-import {Button, Modal, Select, message} from 'antd';
+import {Button, Modal, Select, message, Spin} from 'antd';
 
 const {Option} = Select;
 
@@ -42,17 +42,41 @@ const AccountDetail = () => {
 		removedAddressId: [],
 	});
 	const [roleLevel, setRoleLevel] = useState(0);
+	const [loading, setLoading] = useState(true); // Add loading state
 
 	useEffect(() => {
-		dispatch(getUserAccountDetail(id));
-	}, [dispatch, id]);
-
-	useEffect(() => {
-		if (userDetail) {
-			setUser(userDetail);
+		if (id) {
+		  // Reset state on id change to avoid mixing data between profiles
+		  setUserInfo({
+			Email: '',
+			FirstName: '',
+			LastName: '',
+			PhoneNumber: '',
+			Id: '',
+			Addresses: [],
+		  });
+		  setUser({}); // Clear previous user data
+		  setLoading(true); // Show loading indicator when fetching new data
+	
+		  dispatch(getUserAccountDetail(id))  // Fetch new user's data based on id
+			.then(() => setLoading(false))  // Set loading to false after data is fetched
+			.catch(() => setLoading(false));  // Set loading to false in case of error
 		}
-	}, [userDetail]);
-
+	  }, [dispatch, id]);  // Only trigger when the id changes
+	
+	  useEffect(() => {
+		if (userDetail) {
+		  setUser(userDetail); // Set user data when it's fetched
+		  setUserInfo({
+			Email: userDetail?.Email || '',
+			FirstName: userDetail?.FirstName || '',
+			LastName: userDetail?.LastName || '',
+			PhoneNumber: userDetail?.PhoneNumber || '',
+			Id: userDetail?.Id || '',
+			Addresses: userDetail?.Addresses || [],
+		  });
+		}
+	  }, [userDetail]);
 	useEffect(() => {
 		if (userDetailCurrent?.Roles) {
 			const roles = userDetailCurrent.Roles.map((role) => role?.RoleName);
@@ -213,6 +237,10 @@ const AccountDetail = () => {
 	const handleRemoveCancel = () => {
 		setIsModalRemoveRoleVisible(false);
 	};
+
+	if (loading) {
+		return <Spin size="large" className="loading-spinner" />; // Show spinner while loading
+	}
 	return (
 		<div>
 			<div className="">
