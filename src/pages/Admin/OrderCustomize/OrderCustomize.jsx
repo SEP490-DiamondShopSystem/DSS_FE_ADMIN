@@ -193,9 +193,9 @@ const OrderCustomizePage = () => {
 	return (
 		<div className="mx-20 my-10">
 			<Helmet>
-				<title>Danh Sách Đơn Thiết Kế</title>
+				<title>Yêu Cầu Thiết Kế</title>
 			</Helmet>
-			<Title level={3}>Danh Sách Đơn Thiết Kế</Title>
+			<Title level={3}>Danh Sách Yêu Cầu Thiết Kế</Title>
 			<Filter
 				filter={statusList}
 				handleStatusBtn={handleStatusChange}

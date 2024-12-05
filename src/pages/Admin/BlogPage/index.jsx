@@ -14,14 +14,36 @@ import {
 	selectBlogTotalPage,
 	selectBlogDetail,
 } from '../../../redux/selectors';
-import {Table, Button, Modal, Form, Input, Tag, Select, Upload, message, Image} from 'antd';
-import {PlusOutlined, UploadOutlined} from '@ant-design/icons';
+import {
+	Table,
+	Button,
+	Modal,
+	Form,
+	Input,
+	Tag,
+	message,
+	Upload,
+	Image,
+	Tooltip,
+	Typography,
+	Card,
+	Space,
+} from 'antd';
+import {
+	PlusOutlined,
+	UploadOutlined,
+	EditOutlined,
+	DeleteOutlined,
+	EyeOutlined,
+} from '@ant-design/icons';
+
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
-import 'react-quill/dist/quill.bubble.css';
-import 'tailwindcss/tailwind.css';
+import QuillTable from 'quill-table';
 import DOMPurify from 'dompurify';
 import ReactHtmlParser from 'html-react-parser';
+
+const {Title, Text} = Typography;
 
 const BlogPage = () => {
 	const dispatch = useDispatch();
@@ -29,7 +51,7 @@ const BlogPage = () => {
 	const loading = useSelector(selectBlogLoading);
 	const error = useSelector(selectBlogError);
 	const blogDetail = useSelector(selectBlogDetail); // Assuming the state holds blog details
-
+	ReactQuill.Quill.register('modules/table', QuillTable);
 	const [isModalVisible, setIsModalVisible] = useState(false);
 	const [isEditMode, setIsEditMode] = useState(false);
 	const [selectedBlog, setSelectedBlog] = useState(null);
@@ -229,16 +251,10 @@ const BlogPage = () => {
 			dataIndex: 'Thumbnail',
 			key: 'Thumbnail',
 			render: (thumbnail) => (
-				<img
+				<Image
 					src={thumbnail?.MediaPath}
 					alt="Thumbnail"
-					style={{
-						width: 50,
-						height: 50,
-						objectFit: 'cover',
-						borderRadius: '8px',
-						boxShadow: '0 0 10px rgba(0,0,0,0.1)',
-					}}
+					className="w-16 h-16 object-cover rounded-lg shadow-md transition-transform duration-300 hover:scale-110"
 				/>
 			),
 		},
@@ -246,90 +262,132 @@ const BlogPage = () => {
 			title: 'Tiêu Đề',
 			dataIndex: 'Title',
 			key: 'Title',
+			render: (title) => (
+				<Text className="font-semibold text-gray-800 hover:text-blue-600 transition-colors">
+					{title}
+				</Text>
+			),
 		},
 		{
 			title: 'Nhãn',
 			dataIndex: 'Tags',
 			key: 'Tags',
-			render: (tags) =>
-				tags.map((tag, index) => (
-					<Tag
-						key={index}
-						color="blue"
-						className="transition-all duration-300 ease-in-out"
-					>
-						{tag}
-					</Tag>
-				)),
+			render: (tags) => (
+				<Space size={[0, 8]} wrap>
+					{tags.map((tag, index) => (
+						<Tag
+							key={index}
+							color="geekblue"
+							className="transform transition-all duration-300 hover:scale-105"
+						>
+							{tag}
+						</Tag>
+					))}
+				</Space>
+			),
 		},
 		{
-			title: 'Actions',
+			title: 'Hành Động',
 			key: 'actions',
 			render: (_, record) => (
-				<div className="flex gap-2">
-					<Button
-						type="primary"
-						onClick={() => handleEdit(record)}
-						className="transition-all duration-300 ease-in-out hover:bg-blue-500"
-					>
-						Chỉnh Sửa
-					</Button>
-					<Button
-						danger
-						onClick={() => handleDelete(record.Id)}
-						className="transition-all duration-300 ease-in-out hover:bg-red-500"
-					>
-						Xóa
-					</Button>
-				</div>
+				<Space>
+					<Tooltip title="Chỉnh Sửa">
+						<Button
+							type="primary"
+							icon={<EditOutlined />}
+							onClick={() => handleEdit(record)}
+							className="bg-blue-500 hover:bg-blue-600 transition-colors"
+						>
+							Sửa
+						</Button>
+					</Tooltip>
+					<Tooltip title="Xóa">
+						<Button
+							danger
+							icon={<DeleteOutlined />}
+							onClick={() => handleDelete(record.Id)}
+							className="hover:bg-red-600 transition-colors"
+						>
+							Xóa
+						</Button>
+					</Tooltip>
+				</Space>
 			),
 		},
 	];
 
 	return (
-		<div className="w-4/5 mx-auto p-6">
-			<div className="flex justify-between items-center mb-4">
-				<h1 className="text-xl font-bold">Quản Lý Bài Đăng</h1>
-				<Button
-					type="primary"
-					icon={<PlusOutlined />}
-					onClick={() => setIsModalVisible(true)}
-					className="transition-all duration-300 ease-in-out hover:bg-green-500"
-				>
-					Tạo Bài Đăng
-				</Button>
-			</div>
-
-			<Table
-				dataSource={Array.isArray(blogs) ? blogs : []}
-				columns={columns}
-				rowKey={(record) => record.Id}
-				loading={loading}
-				className="rounded-lg shadow-lg"
-			/>
+		<div className="container mx-auto px-4 py-6 bg-gray-50 min-h-screen">
+			<Card
+				className="shadow-lg rounded-xl"
+				title={
+					<div className="flex justify-between items-center">
+						<Title level={3} className="text-gray-800 m-0">
+							Quản Lý Bài Đăng
+						</Title>
+						<Button
+							type="primary"
+							icon={<PlusOutlined />}
+							onClick={() => setIsModalVisible(true)}
+							className="bg-green-500 hover:bg-green-600 transition-colors"
+						>
+							Tạo Bài Đăng Mới
+						</Button>
+					</div>
+				}
+			>
+				<Table
+					dataSource={Array.isArray(blogs) ? blogs : []}
+					columns={columns}
+					rowKey={(record) => record.Id}
+					loading={loading}
+					pagination={{
+						current: currentPage,
+						total: totalPage * pageSize,
+						pageSize: pageSize,
+						onChange: (page) => setCurrentPage(page),
+						showSizeChanger: true,
+						className: 'flex justify-center',
+					}}
+					className="bg-white rounded-lg shadow-md"
+				/>
+			</Card>
 
 			<Modal
-				title={isEditMode ? 'Cập Nhật Bài Đăng' : 'Tạo Bài Đăng Mới'}
+				title={
+					<Title level={4} className="text-gray-800">
+						{isEditMode ? 'Cập Nhật Bài Đăng' : 'Tạo Bài Đăng Mới'}
+					</Title>
+				}
 				visible={isModalVisible}
 				onOk={handleCreateOrUpdate}
 				onCancel={onCancel}
-				width={900} // Make the modal wider
-				className="rounded-lg p-6"
+				width={800}
+				className="rounded-xl"
+				okButtonProps={{
+					className: 'bg-blue-500 hover:bg-blue-600',
+				}}
+				cancelButtonProps={{
+					className: 'hover:bg-gray-200',
+				}}
 			>
-				<Form layout="vertical" form={form} style={{width: '100%'}}>
+				<Form layout="vertical" form={form} className="space-y-4">
 					<Form.Item
 						name="title"
-						label="Tiêu Đề"
+						label={<Text strong>Tiêu Đề</Text>}
 						rules={[{required: true, message: 'Vui lòng nhập tiêu đề bài đăng!'}]}
-						className="mb-4"
 					>
 						<Input
-							placeholder="Enter blog title"
-							className="p-3 rounded-lg border-gray-300"
+							placeholder="Nhập tiêu đề bài đăng"
+							className="rounded-lg border-gray-300 focus:border-blue-500 transition-colors"
 						/>
 					</Form.Item>
 
-					<Form.Item name="tags" label="Nhãn" className="mb-4">
+					<Form.Item
+						name="tags"
+						label={<Text strong>Nhãn</Text>}
+						rules={[{required: true, message: 'Vui lòng nhập nhãn bài đăng!'}]}
+					>
 						<div>
 							<Input
 								value={tagsInput}
@@ -341,7 +399,7 @@ const BlogPage = () => {
 									}
 								}}
 								placeholder="Nhấn Enter để thêm nhãn"
-								className="p-3 rounded-lg border-gray-300 mb-2"
+								className="rounded-lg border-tintWhite focus:border-blue transition-colors"
 							/>
 							<div>
 								{tags.map((tag, index) => (
@@ -446,9 +504,10 @@ const BlogPage = () => {
 											[{color: []}, {background: []}],
 											[{list: 'ordered'}, {list: 'bullet'}],
 											[{align: []}],
-											['link', 'image', 'video'],
+											['link', 'image', 'video', 'table'],
 											['clean'],
 										],
+										
 									}}
 								/>
 								<Button

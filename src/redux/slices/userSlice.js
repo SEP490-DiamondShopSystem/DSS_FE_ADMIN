@@ -70,6 +70,20 @@ export const handleBanAccount = createAsyncThunk('userSlice/handleBanAccount', a
 	}
 });
 
+export const handleUpdateAccount = createAsyncThunk(
+	'userSlice/handleUpdateAccount', // Updated function name
+	async ({id, payload}, {rejectWithValue}) => {
+		try {
+			const data = await api.put(`/Account/${id}/Profile`, payload);
+			console.log(data);
+			return data; // Return the API response
+		} catch (error) {
+			console.error(error);
+			return rejectWithValue(error.response?.data || error.message); // Reject with API error details or generic message
+		}
+	}
+);
+
 export const getUserAccountDetail = createAsyncThunk(
 	'userSlice/getUserAccountDetail',
 	async (id, {rejectWithValue}) => {

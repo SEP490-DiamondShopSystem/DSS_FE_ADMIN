@@ -14,7 +14,7 @@ export const fetchAllMetals = createAsyncThunk('metals/fetchAll', async (_, { re
 
 // Async thunk to update the price of a metal
 export const updateMetalPrice = createAsyncThunk('metals/updatePrice', async (metal) => {
-  const response = await api.put('/UpdatePrice', {
+  const response = await api.put('/JewelryModel/Metal/UpdatePrice', {
     id: metal.id,
     price: metal.price,
   });

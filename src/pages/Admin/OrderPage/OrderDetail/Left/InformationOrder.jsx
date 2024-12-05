@@ -583,10 +583,11 @@ const InformationOrder = ({orders, statusOrder, paymentStatusOrder, userDetail})
 					{orderFiles.OrderDeliveryConfirmationImages?.length > 0 && (
 						<div className="image-slider-container">
 							<Carousel
-								dots={false}
+								dots={true}
 								slidesToShow={isMobile ? 1 : 3}
 								swipeToSlide={true}
 								draggable
+								arrows
 								responsive={[
 									{
 										breakpoint: 768,
@@ -596,7 +597,7 @@ const InformationOrder = ({orders, statusOrder, paymentStatusOrder, userDetail})
 										},
 									},
 								]}
-								className="order-delivery-carousel"
+								className="order-delivery-carousel rounded-lg bg-primary"
 							>
 								{orderFiles.OrderDeliveryConfirmationImages.map((img, index) => (
 									<div
@@ -610,6 +611,7 @@ const InformationOrder = ({orders, statusOrder, paymentStatusOrder, userDetail})
 												fill
 												className="rounded-lg object-cover shadow-md hover:scale-105 transition-transform duration-300"
 												sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+												loading="lazy" // Lazy load images
 											/>
 										</div>
 									</div>
@@ -624,9 +626,15 @@ const InformationOrder = ({orders, statusOrder, paymentStatusOrder, userDetail})
 							<Text strong style={{fontSize: 18}}>
 								Video Xác Nhận Giao Hàng
 							</Text>
-							<video controls className="mt-5" style={{width: 600, marginBottom: 10}}>
+							<video
+								controls
+								preload="metadata" // Load only metadata initially to support seeking
+								controlsList="nodownload" // Optional: Disable downloading if needed
+								className="mt-5"
+								style={{width: 600, marginBottom: 10}}
+							>
 								<source
-									src={orderFiles.OrderDeliveryConfirmationVideo.MediaPath} // Use the filename for the video
+									src={orderFiles.OrderDeliveryConfirmationVideo.MediaPath}
 									type={orderFiles.OrderDeliveryConfirmationVideo.ContentType}
 								/>
 								Trình duyệt của bạn không được hỗ trợ, hãy lên một thiết bị hoặc
@@ -642,10 +650,11 @@ const InformationOrder = ({orders, statusOrder, paymentStatusOrder, userDetail})
 							</Text>
 							<div className="image-slider-container">
 								<Carousel
-									dots={false}
+									dots={true}
 									slidesToShow={isMobile ? 1 : 3}
 									swipeToSlide={true}
 									draggable
+									arrows
 									responsive={[
 										{
 											breakpoint: 768,
@@ -655,18 +664,26 @@ const InformationOrder = ({orders, statusOrder, paymentStatusOrder, userDetail})
 											},
 										},
 									]}
-									className="order-delivery-carousel"
+									className="order-delivery-carousel rounded-lg bg-primary"
 								>
 									{Object.values(orderFiles.OrderTransactionImages || {})
 										.flat()
 										.map((img, index) => (
-											<Image
-												key={`log-img-${index}`}
-												src={img.MediaPath} // Use the filename for the log images
-												alt={`log-image-${index}`}
-												className="mt-5"
-												style={{width: 600, marginBottom: 10}}
-											/>
+											<div
+												key={`delivery-img-${index}`}
+												className="flex justify-center items-center p-2"
+											>
+												<div className="relative w-full max-w-[250px] aspect-square">
+													<Image
+														key={`log-img-${index}`}
+														src={img.MediaPath} // Use the filename for the log images
+														alt={`log-image-${index}`}
+														className="rounded-lg object-cover shadow-md hover:scale-105 transition-transform duration-300"
+														sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+														loading="lazy" // Lazy load images
+													/>
+												</div>
+											</div>
 										))}
 								</Carousel>
 							</div>
