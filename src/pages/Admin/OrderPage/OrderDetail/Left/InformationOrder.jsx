@@ -344,11 +344,11 @@ const InformationOrder = ({orders, statusOrder, paymentStatusOrder, userDetail})
 							<Text>{orders?.CancelledDate}</Text>
 						</Col>
 						<Col xs={12} sm={12} lg={12}>
-							<Text strong className="mb-5" style={{fontSize: 18}}>
+							{/* <Text strong className="mb-5" style={{fontSize: 18}}>
 								Trạng Thái
 							</Text>
 							<br />
-							<Tag color={orderStatus.color}>{orderStatus.name.toUpperCase()}</Tag>
+							<Tag color={orderStatus.color}>{orderStatus.name.toUpperCase()}</Tag> */}
 						</Col>
 					</Row>
 				</>
@@ -422,6 +422,17 @@ const InformationOrder = ({orders, statusOrder, paymentStatusOrder, userDetail})
 						</>
 					)}
 				</Col>
+			</Row>
+			<Row gutter={[16, 16]} justify="center" align="middle" className="my-3">
+				<Col xs={12} sm={12} lg={12}>
+					<Text strong className="mb-5" style={{fontSize: 18}}>
+						Trạng Thái Thanh Toán
+					</Text>
+					<br />
+					<Tag color={orderStatus.color}>{orderStatus.name.toUpperCase()}</Tag>
+				</Col>
+
+				<Col xs={12} sm={12} lg={12}></Col>
 			</Row>
 			<Row gutter={[16, 16]} justify="center" align="middle" className="my-3">
 				<Col xs={24} lg={12}>

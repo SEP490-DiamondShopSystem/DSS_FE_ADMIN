@@ -188,7 +188,7 @@ const OrderPage = () => {
 	// Desktop columns
 	const desktopColumns = [
 		{
-			title: 'ID Đơn Hàng',
+			title: 'Mã Đơn Hàng',
 			dataIndex: 'OrderCode',
 			key: 'OrderCode',
 			align: 'center',

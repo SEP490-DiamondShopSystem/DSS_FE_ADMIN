@@ -461,7 +461,7 @@ const TimeLineOrder = ({
 						placeholder="Chọn lý do hủy"
 						onChange={handleSelectFault}
 					>
-						<Option value="false">Khách hàng yêu cầu</Option>
+						<Option value="false">Khách hàng yêu cầu/Vấn đề của khách hàng</Option>
 						<Option value="true">Vấn đề của cửa hàng</Option>
 					</Select>
 				</div>
@@ -475,8 +475,7 @@ const TimeLineOrder = ({
 
 	const handleRejectEvidence = () => {
 		Modal.confirm({
-			title: 'Xác nhận hủy giao đơn đặt hàng này',
-			content: 'Bạn có chắc chắn muốn tiếp tục?',
+			title: 'Xác nhận từ chối chứng từ',
 			okText: 'Xác nhận',
 			cancelText: 'Hủy',
 			okType: 'danger',
@@ -961,6 +960,16 @@ const TimeLineOrder = ({
 							</div>
 						</div>
 					)}
+					{status === 'Cancelled' && paymentStatusOrder === 6 && (
+						<div className="border rounded-lg border-primary bg-tintWhite p-5 mb-5">
+							<div className="flex items-center " style={{fontSize: 16}}>
+								<p className="font-semibold">Trạng thái đơn hàng:</p>
+								<p className="ml-5 text-red font-semibold">
+									<CloseCircleOutlined /> {ORDER_STATUS_TEXTS.Cancelled}
+								</p>
+							</div>
+						</div>
+					)}
 
 					{status === 'Processing' && (
 						<div className="border rounded-lg border-primary bg-tintWhite p-5 mb-5">
@@ -994,6 +1003,7 @@ const TimeLineOrder = ({
 					{status === 'Prepared' &&
 						!userRoleDeliverer &&
 						orders?.IsCollectAtShop &&
+						paymentStatusOrder === 2 &&
 						orders?.Transactions?.length === 1 && (
 							<div className="border rounded-lg border-primary bg-tintWhite p-5 mb-5">
 								<div className="flex items-center" style={{fontSize: 16}}>
@@ -1236,7 +1246,7 @@ const TimeLineOrder = ({
 								</>
 							) : (
 								<div>
-									<p className="mt-3 text-center font-semibold text-primary">
+									<p className="mt-3 text-center font-semibold text-darkBlue">
 										Đơn Hàng Đã Chuyển Giao Cho Nhân Viên Giao Hàng
 									</p>
 								</div>
@@ -1277,7 +1287,7 @@ const TimeLineOrder = ({
 							</div>
 							<div className="flex justify-around">
 								{!userRoleDeliverer && (
-									<div className="font-semibold text-base text-darkBlue">
+									<div className="font-semibold text-base text-center text-darkBlue">
 										Chờ Nhân Viên Giao Hàng Xác Nhận
 									</div>
 								)}
@@ -1361,7 +1371,8 @@ const TimeLineOrder = ({
 							<div className="">
 								{!userRoleDeliverer && (
 									<div className="">
-										{orders?.PaymentStatus === 2 ? (
+										{orders?.PaymentStatus === 2 &&
+										!transactionStatusInvalid ? (
 											<>
 												<div className="my-5">
 													<Title level={5} className="text-center">
@@ -1396,7 +1407,7 @@ const TimeLineOrder = ({
 												<Space className="mt-5 flex items-center justify-center">
 													<Button
 														type="text"
-														className="font-semibold w-32 rounded-full bg-primary"
+														className="font-semibold rounded-full bg-primary"
 														onClick={handleAcceptDelivered}
 														loading={loading}
 													>
@@ -1412,7 +1423,7 @@ const TimeLineOrder = ({
 												</Space>
 											</>
 										) : (
-											<div className="font-semibold text-base text-darkBlue">
+											<div className="font-semibold text-base text-center text-darkBlue">
 												Chờ Nhân Viên Giao Hàng Xác Nhận
 											</div>
 										)}
@@ -1619,7 +1630,8 @@ const TimeLineOrder = ({
 					{status === 'Delivery_Failed' &&
 						!userRoleDeliverer &&
 						orders?.HasDelivererReturned &&
-						!transactionStatusPending && (
+						!transactionStatusPending &&
+						!transactionStatusInvalid && (
 							<div className="border rounded-lg border-primary bg-tintWhite p-5 mb-5">
 								<div className="flex items-center mb-5" style={{fontSize: 16}}>
 									<p className="font-semibold">Trạng thái đơn hàng:</p>
@@ -1756,7 +1768,7 @@ const TimeLineOrder = ({
 												</Space>
 											</>
 										) : (
-											<div className="font-semibold text-base text-darkBlue">
+											<div className="font-semibold text-base text-darkBlue text-center">
 												Chờ Nhân Viên Giao Hàng Xác Nhận
 											</div>
 										)}
@@ -1776,7 +1788,7 @@ const TimeLineOrder = ({
 									</p>
 								</div>
 								<div className="flex my-5 items-center justify-center">
-									<p className="text-base font-semibold text-primary ">
+									<p className="text-base font-semibold text-darkBlue ">
 										Nhân Viên Giao Hàng Đang Quay Về Cửa Hàng
 									</p>
 								</div>
@@ -1805,13 +1817,13 @@ const TimeLineOrder = ({
 								</div>
 
 								<div className="flex justify-around">
-									<Button
+									{/* <Button
 										type="text"
 										className="bg-primary font-semibold w-32 rounded-full"
 										onClick={handleRedeliverBtn}
 									>
 										Giao Lại
-									</Button>
+									</Button> */}
 									<Button
 										type="text"
 										className="bg-red font-semibold w-32 rounded-full"

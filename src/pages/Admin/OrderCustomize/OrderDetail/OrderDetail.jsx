@@ -33,10 +33,7 @@ const OrderCustomizeDetail = () => {
 	const [isModalAddVisible, setIsModalAddVisible] = useState(false);
 	const [changeDiamond, setChangeDiamond] = useState(null);
 	const [selectedDiamond, setSelectedDiamond] = useState({});
-
-	const diamondRequests = orders?.DiamondRequests?.filter(
-		(request) => request.DiamondId === null
-	);
+	const [diamondRequests, setDiamondRequests] = useState(null);
 
 	const allDiamondRequests = orders?.DiamondRequests;
 
@@ -46,6 +43,17 @@ const OrderCustomizeDetail = () => {
 	const filteredRequests = allDiamondRequests?.filter(
 		(request) => selectedDiamond?.DiamondRequestId === request?.DiamondRequestId
 	);
+
+	useEffect(() => {
+		if (orders?.DiamondRequests) {
+			const filteredDiamondRequests = orders?.DiamondRequests?.filter(
+				(request) => request.DiamondId === null
+			);
+			setDiamondRequests(filteredDiamondRequests);
+		}
+	}, [orders?.DiamondRequests]);
+
+	// Xóa giá trị nếu không còn trong danh sách mới
 
 	useEffect(() => {
 		dispatch(getOrderCustomizeDetail({RequestId: id, AccountId: order?.AccountId}));
