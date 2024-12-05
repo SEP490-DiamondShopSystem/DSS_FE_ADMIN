@@ -373,7 +373,7 @@ const TimeLineOrder = ({
 				.unwrap()
 				.then(() => {
 					message.success('Xác nhận kim cương cho yêu cầu thành công!');
-					setIsModalVisible(!isModalVisible);
+					setIsModalVisible(false);
 				})
 				.catch((error) => {
 					message.error(error?.data?.title || error?.detail);
@@ -548,16 +548,6 @@ const TimeLineOrder = ({
 									<CloseCircleOutlined /> {ORDER_STATUS_TEXTS.Shop_Rejected}
 								</p>
 							</div>
-							{/* <div className="flex justify-around">
-								<Button
-									type="text"
-									className="bg-primary font-semibold w-full rounded-full"
-									onClick={handleRefund}
-									disabled={loading}
-								>
-									Xác nhận hoàn tiền
-								</Button>
-							</div> */}
 						</div>
 					)}
 					{status === 'Shop_Rejected' && paymentStatusOrder === 4 && (
@@ -685,15 +675,11 @@ const TimeLineOrder = ({
 							onChange={handleSelectChange}
 							allowClear
 							className="w-full"
-							// style={{width: 200}}
 						>
 							{orders?.Status === 1
-								? diamondRequests?.map((request) => (
-										<Select.Option
-											key={request.DiamondRequestId}
-											value={request.DiamondRequestId}
-										>
-											{`Yêu Cầu ${request.DiamondRequestId}`}
+								? diamondRequests?.map((request, i) => (
+										<Select.Option key={request.DiamondRequestId}>
+											{`Mã Yêu Cầu #${request.DiamondRequestId}`}
 										</Select.Option>
 								  ))
 								: filteredRequests?.map((request) => (
@@ -701,13 +687,13 @@ const TimeLineOrder = ({
 											key={request.DiamondRequestId}
 											value={request.DiamondRequestId}
 										>
-											{`Yêu Cầu ${request.DiamondRequestId}`}
+											{`Yêu Cầu #${request.DiamondRequestId}`}
 										</Select.Option>
 								  ))}
 						</Select>
 						<Button
 							className="ml-5"
-							disabled={selectedRequest === null}
+							disabled={selectedRequest === null || selectedRequest === undefined}
 							onClick={showModalAdd}
 						>
 							Tạo Kim Cương Theo Yêu Cầu
@@ -738,13 +724,13 @@ const TimeLineOrder = ({
 								columns={[
 									{
 										title: 'Yêu Cầu',
-										dataIndex: 'DiamondRequestId', // or any unique identifier for the request
+										dataIndex: 'DiamondRequestId',
 										key: 'diamondRequestId',
 										render: (text) => <span>{text}</span>,
 									},
 									{
 										title: 'Kim Cương',
-										dataIndex: 'Title', // or use diamond?.Diamond?.Title if you need to fallback to Diamond.Title
+										dataIndex: 'Title',
 										key: 'title',
 										render: (text, record) => (
 											<span>{text || record?.Diamond?.Title}</span>
@@ -752,8 +738,8 @@ const TimeLineOrder = ({
 									},
 								]}
 								dataSource={filteredDiamondRequests}
-								rowKey="DiamondRequestId" // unique key for each row
-								pagination={false} // Optional: disable pagination if needed
+								rowKey="DiamondRequestId"
+								pagination={false}
 								className="my-5"
 							/>
 						</>
@@ -825,6 +811,7 @@ const TimeLineOrder = ({
 				setChangeDiamond={setChangeDiamond}
 				selectedDiamond={selectedDiamond}
 				filteredRequests={filteredRequests}
+				setIsModalVisible={setIsModalVisible}
 			/>
 		</div>
 	);

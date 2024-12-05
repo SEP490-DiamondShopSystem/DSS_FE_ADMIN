@@ -5,7 +5,6 @@ import {useDispatch, useSelector} from 'react-redux';
 import {getAllShapeSelector} from '../../../../../../redux/selectors';
 import {handleAddDiamondCustomize} from '../../../../../../redux/slices/customizeSlice';
 import {getDiamondShape} from '../../../../../../redux/slices/diamondSlice';
-import {fetchDiamondRule} from '../../../../../../redux/slices/configSlice';
 
 const {Option} = Select;
 
@@ -14,12 +13,11 @@ export const AddModalDiamond = ({
 	setShowModal,
 	showModal,
 	selectedRequest,
-	handleSaveDiamond,
-	handleDiamondSelectChange,
 	generateRandomSKU,
 	changeDiamond,
 	setChangeDiamond,
 	filteredRequests,
+	setIsModalVisible,
 }) => {
 	const [form] = Form.useForm();
 	const dispatch = useDispatch();
@@ -116,6 +114,7 @@ export const AddModalDiamond = ({
 				.then(() => {
 					message.success('Thêm Cương Kim Thành Công!');
 					setShowModal(false);
+					setIsModalVisible(false);
 					form.resetFields();
 				})
 				.catch((error) => {
@@ -415,9 +414,17 @@ export const AddModalDiamond = ({
 								required: true,
 								message: 'Vui lòng nhập Measurement!',
 							},
+							{
+								pattern: /^\d+(\.\d+)?\s*x\s*\d+(\.\d+)?\s*x\s*\d+(\.\d+)?$/,
+								message:
+									'Vui lòng nhập đúng định dạng A x B x C (vd: 10 x 20 x 30)',
+							},
 						]}
 					>
-						<Input placeholder="Nhập Measurement" className="w-full" />
+						<Input
+							placeholder="Nhập Measurement (vd: 10 x 20 x 30)"
+							className="w-full"
+						/>
 					</Form.Item>
 				</div>
 
@@ -480,7 +487,6 @@ export const AddModalDiamond = ({
 							<Option value={1}>None</Option>
 							<Option value={2}>Faint</Option>
 							<Option value={3}>Medium</Option>
-							<Option value={4}>Strong</Option>
 						</Select>
 					</Form.Item>
 
@@ -532,17 +538,19 @@ export const AddModalDiamond = ({
 				<div className="flex flex-wrap gap-4">
 					<Form.Item
 						name="withLenghtRatio"
-						label="Width-Length Ratio"
+						label="Tỷ lệ chiều rộng-chiều dài"
 						className="w-1/4"
-						rules={[{required: true, message: 'Vui lòng nhập Width-Length Ratio'}]}
+						rules={[
+							{
+								required: true,
+								message: 'Vui lòng nhập tỷ lệ chiều rộng-chiều dài',
+							},
+						]}
 					>
 						<InputNumber
-							placeholder="Enter Width-Length Ratio (%)"
+							placeholder="Nhập Tỷ lệ chiều rộng-chiều dài"
 							className="w-full"
-							min={0}
-							max={100}
-							formatter={(value) => `${value}%`}
-							parser={(value) => value.replace('%', '')}
+							step={0.01}
 						/>
 					</Form.Item>
 
@@ -619,7 +627,7 @@ export const AddModalDiamond = ({
 
 					<Form.Item name="priceOffset" label="Giá Offset" className="w-1/3">
 						<InputNumber
-							min={0.0}
+							min={0}
 							step={0.1}
 							placeholder="Nhập Giá Offset"
 							className="w-full"
