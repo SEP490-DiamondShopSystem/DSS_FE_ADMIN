@@ -8,7 +8,7 @@ import {
 	DeleteOutlined,
 	SwapOutlined,
 } from '@ant-design/icons';
-import {Button, Col, Divider, Modal, Row, Table, Tag, Tooltip, Typography} from 'antd';
+import {Button, Col, Divider, message, Modal, Row, Table, Tag, Tooltip, Typography} from 'antd';
 import {useDispatch, useSelector} from 'react-redux';
 import {useNavigate} from 'react-router-dom';
 import {LoadingOrderSelector} from '../../../../../redux/selectors';
@@ -47,6 +47,7 @@ const InformationOrder = ({
 	changeDiamond,
 	selectedDiamond,
 	filteredRequests,
+	setFetchRequest,
 }) => {
 	const navigate = useNavigate();
 	const dispatch = useDispatch();
@@ -324,9 +325,9 @@ const InformationOrder = ({
 		},
 		{
 			title: 'Nguồn Gốc',
-			dataIndex: 'IsLabGrown',
-			key: 'IsLabGrown',
-			render: (shape) => (shape ? 'Nhân Tạo' : 'Tự Nhiên'),
+			dataIndex: 'IsLabDiamond',
+			key: 'IsLabDiamond',
+			render: (diamond) => (diamond ? 'Nhân Tạo' : 'Tự Nhiên'),
 		},
 		// {
 		// 	title: 'Trạng Thái',
@@ -403,7 +404,7 @@ const InformationOrder = ({
 	// 			message.success(`Đã xác nhận yêu cầu!.`);
 	// 		})
 	// 		.catch((error) => {
-	// 			message.error(error?.data?.title || error?.detail);
+	// 			message.error( error?.detail);
 	// 		});
 	// };
 
@@ -420,7 +421,6 @@ const InformationOrder = ({
 
 	const handleDeleteConfirm = (request) => {
 		try {
-			console.log('request', request);
 			dispatch(
 				handleDeleteDiamondCustomize({
 					diamondId: request?.DiamondId,
@@ -430,13 +430,14 @@ const InformationOrder = ({
 			)
 				.unwrap()
 				.then((res) => {
-					message.success(`Xóa yêu cầu thành công!.`);
+					message.success(`Xóa kim cương thành công!.`);
+					setFetchRequest(res);
 				})
 				.catch((error) => {
-					message.error(error?.data?.title || error?.detail);
+					message.error(error?.detail);
 				});
 		} catch (error) {
-			message.error(error?.data?.title || error?.detail);
+			message.error(error?.detail);
 		}
 	};
 
@@ -489,17 +490,17 @@ const InformationOrder = ({
 					<Row gutter={[16, 16]} justify="center" align="middle" className="my-3">
 						<Col span={12}>
 							<Text strong style={{fontSize: 18}}>
+								Số Điện Thoại
+							</Text>
+							<br />
+							<Text strong>{orders?.Account?.PhoneNumber}</Text>
+						</Col>
+						<Col span={12}>
+							<Text strong style={{fontSize: 18}}>
 								Ngày Tạo Yêu Cầu
 							</Text>
 							<br />
 							<Text>{orders?.CreatedDate}</Text>
-						</Col>
-						<Col span={12}>
-							<Text strong style={{fontSize: 18}}>
-								Ngày Hết Hạn
-							</Text>
-							<br />
-							<Text>{orders?.ExpiredDate}</Text>
 						</Col>
 					</Row>
 				</div>

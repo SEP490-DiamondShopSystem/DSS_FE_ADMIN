@@ -48,6 +48,7 @@ const statusPaymentMapping = {
 	3: {label: 'Trả Hết', color: 'green'},
 	4: {label: 'Chờ Hoàn Tiền', color: 'volcano'},
 	5: {label: 'Đã Hoàn Tiền', color: 'red'},
+	6: {label: 'Không Hoàn Tiền', color: 'magenta'},
 };
 
 const delivererStatusList = [

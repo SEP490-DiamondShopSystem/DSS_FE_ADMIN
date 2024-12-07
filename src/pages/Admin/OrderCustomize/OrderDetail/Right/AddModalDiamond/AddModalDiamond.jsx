@@ -18,6 +18,7 @@ export const AddModalDiamond = ({
 	setChangeDiamond,
 	filteredRequests,
 	setIsModalVisible,
+	setSelectedRequest,
 }) => {
 	const [form] = Form.useForm();
 	const dispatch = useDispatch();
@@ -27,6 +28,13 @@ export const AddModalDiamond = ({
 	useEffect(() => {
 		dispatch(getDiamondShape());
 	}, []);
+
+	useEffect(() => {
+		form.setFieldsValue({
+			isLabDiamond: selectedRequest?.IsLabGrown,
+			priceOffset: 0,
+		});
+	}, [selectedRequest, form]);
 
 	const handleAddDiamondForm = (values) => {
 		Modal.confirm({
@@ -40,7 +48,7 @@ export const AddModalDiamond = ({
 
 	const handleCancel = () => {
 		setShowModal(false);
-		// form.resetFields();
+		form.resetFields();
 	};
 
 	const handleOk = (values) => {
@@ -65,8 +73,7 @@ export const AddModalDiamond = ({
 			lockPrice,
 			culet,
 		} = values;
-
-		console.log('priceOffset', priceOffset);
+		console.log('isLabDiamond', isLabDiamond);
 
 		const diamond4c = {
 			cut,
@@ -98,7 +105,7 @@ export const AddModalDiamond = ({
 			shapeId,
 			sku: generateRandomSKU(16),
 			certificate: 1,
-			priceOffset: priceOffset === 0 ? 0.0 : priceOffset,
+			priceOffset,
 		};
 
 		if (orders?.Status === 1) {
@@ -114,11 +121,11 @@ export const AddModalDiamond = ({
 				.then(() => {
 					message.success('Thêm Cương Kim Thành Công!');
 					setShowModal(false);
-					setIsModalVisible(false);
+					setSelectedRequest(null);
 					form.resetFields();
 				})
 				.catch((error) => {
-					message.error(error?.data?.title || error?.detail);
+					message.error(error?.detail);
 				});
 		} else {
 			const updatedChangeDiamond = filteredRequests?.reduce((acc, diamond) => {
@@ -127,6 +134,7 @@ export const AddModalDiamond = ({
 					acc[diamond.DiamondRequestId] = {
 						CustomizeRequestId: diamond?.CustomizeRequestId,
 						DiamondRequestId: diamond?.DiamondRequestId,
+						Position: diamond.Position,
 						Cut: cut,
 						Color: color,
 						Clarity: clarity,
@@ -175,7 +183,6 @@ export const AddModalDiamond = ({
 			width={800}
 		>
 			<Form form={form} layout="vertical" onFinish={handleAddDiamondForm}>
-				{/* Diamond 4C Row */}
 				<label className="font-semibold">Thêm 4C</label>
 				<div className="flex flex-wrap gap-4">
 					<Form.Item
@@ -663,14 +670,13 @@ export const AddModalDiamond = ({
 						name="isLabDiamond"
 						label="Nguồn Gốc Kim Cương"
 						valuePropName="checked"
-						initialValue={!!selectedRequest?.IsLabGrown} // Mặc định null thành false
 						className="w-1/3 flex items-center"
 					>
 						<span>Tự Nhiên</span>
 						<Switch
 							className="mx-5"
-							disabled // Luôn vô hiệu hóa
-							checked={!!selectedRequest?.IsLabGrown} // Gán trạng thái: null => false, true/false giữ nguyên
+							disabled
+							checked={selectedRequest?.IsLabGrown === true}
 						/>
 						<span>Nhân Tạo</span>
 					</Form.Item>

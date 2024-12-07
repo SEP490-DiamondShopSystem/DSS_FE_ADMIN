@@ -218,8 +218,6 @@ const TimeLineOrder = ({
 	};
 
 	const handleDiamondSelectChange = (diamond) => {
-		console.log('diamondSelect', diamond);
-
 		setCurrentDiamondId(diamond);
 	};
 
@@ -362,7 +360,6 @@ const TimeLineOrder = ({
 				};
 			});
 
-			console.log('diamondAssigning', diamondAssigning);
 			dispatch(
 				handleCustomizeOrder({
 					requestId: orders?.Id,
@@ -376,7 +373,7 @@ const TimeLineOrder = ({
 					setIsModalVisible(false);
 				})
 				.catch((error) => {
-					message.error(error?.data?.title || error?.detail);
+					message.error(error?.detail);
 				});
 		} else {
 			const diamondData = changeDiamond
@@ -423,10 +420,11 @@ const TimeLineOrder = ({
 				.then(() => {
 					message.success('Kim cương đã được cập nhật thành công!');
 					setIsModalVisible(!isModalVisible);
+					setSelectedRequest(null);
 					setChangeDiamond(null);
 				})
 				.catch((error) => {
-					message.error(error?.data?.title || error?.detail);
+					message.error(error?.detail);
 				});
 		}
 	};
@@ -455,7 +453,7 @@ const TimeLineOrder = ({
 				setIsModalVisible(false);
 			})
 			.catch((error) => {
-				message.error(error?.data?.title || error?.detail);
+				message.error(error?.detail);
 			});
 	};
 
@@ -479,7 +477,7 @@ const TimeLineOrder = ({
 				setIsModalVisible(false);
 			})
 			.catch((error) => {
-				message.error(error?.data?.title || error?.detail);
+				message.error(error?.detail);
 			});
 	};
 
@@ -490,12 +488,10 @@ const TimeLineOrder = ({
 				message.success('Từ chối thành công!');
 			})
 			.catch((error) => {
-				message.error(error?.data?.title || error?.detail);
+				message.error(error?.detail);
 			});
 		setIsCancelModalVisible(false);
 	};
-
-	console.log('selectedRequest', selectedRequest);
 
 	return (
 		<div>
@@ -600,7 +596,7 @@ const TimeLineOrder = ({
 									<CheckCircleOutlined /> {ORDER_STATUS_TEXTS.Priced}
 								</p>
 							</div>
-							<div className="flex justify-around font-semibold text-primary text-lg">
+							<div className="flex justify-around font-semibold text-darkBlue text-lg">
 								Chờ Khách Hàng Xác Nhận
 							</div>
 						</div>
@@ -673,21 +669,19 @@ const TimeLineOrder = ({
 						<Select
 							placeholder="Chọn Yêu Cầu"
 							onChange={handleSelectChange}
+							value={selectedRequest?.DiamondRequestId || undefined}
 							allowClear
 							className="w-full"
 						>
 							{orders?.Status === 1
 								? diamondRequests?.map((request, i) => (
 										<Select.Option key={request.DiamondRequestId}>
-											{`Mã Yêu Cầu #${request.DiamondRequestId}`}
+											{`Yêu Cầu #${request?.Position}`}
 										</Select.Option>
 								  ))
 								: filteredRequests?.map((request) => (
-										<Select.Option
-											key={request.DiamondRequestId}
-											value={request.DiamondRequestId}
-										>
-											{`Yêu Cầu #${request.DiamondRequestId}`}
+										<Select.Option key={request.DiamondRequestId}>
+											{`Yêu Cầu #${request?.Position}`}
 										</Select.Option>
 								  ))}
 						</Select>
@@ -724,8 +718,8 @@ const TimeLineOrder = ({
 								columns={[
 									{
 										title: 'Yêu Cầu',
-										dataIndex: 'DiamondRequestId',
-										key: 'diamondRequestId',
+										dataIndex: 'Position',
+										key: 'position',
 										render: (text) => <span>{text}</span>,
 									},
 									{
@@ -754,8 +748,8 @@ const TimeLineOrder = ({
 								columns={[
 									{
 										title: 'Yêu Cầu',
-										dataIndex: 'DiamondRequestId',
-										key: 'diamondRequestId',
+										dataIndex: 'Position',
+										key: 'position',
 										// align: 'center',
 										render: (text) => <span>{text}</span>,
 									},
@@ -791,7 +785,7 @@ const TimeLineOrder = ({
 										? [changeDiamond[selectedRequest?.DiamondRequestId]]
 										: []
 								}
-								rowKey="DiamondRequestId" // unique key for each row
+								rowKey="Position" // unique key for each row
 								pagination={false} // Optional: disable pagination if needed
 								className="my-5"
 							/>
@@ -812,6 +806,7 @@ const TimeLineOrder = ({
 				selectedDiamond={selectedDiamond}
 				filteredRequests={filteredRequests}
 				setIsModalVisible={setIsModalVisible}
+				setSelectedRequest={setSelectedRequest}
 			/>
 		</div>
 	);
