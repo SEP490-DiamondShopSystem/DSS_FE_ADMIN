@@ -43,7 +43,6 @@ const DiamondDetailPage = () => {
 	};
 
 	const handleLockDiamondSubmit = (values) => {
-		console.log('Form values:', values);
 		dispatch(handleLockDiamond(values))
 			.unwrap()
 			.then((res) => {
