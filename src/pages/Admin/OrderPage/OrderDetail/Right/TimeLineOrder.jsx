@@ -69,6 +69,7 @@ const TimeLineOrder = ({
 	id,
 	userDetail,
 	setCompleted,
+	loadingPayment,
 }) => {
 	const dispatch = useDispatch();
 	const isShopFaultRef = useRef(null);
@@ -833,7 +834,7 @@ const TimeLineOrder = ({
 							<div className="flex justify-around">
 								<Button
 									type="text"
-									className="bg-primary font-semibold w-32 rounded-full"
+									className="bg-primary font-semibold rounded-full"
 									onClick={handleRefund}
 									disabled={loading}
 								>
@@ -1340,7 +1341,7 @@ const TimeLineOrder = ({
 												type="text"
 												className="font-semibold w-full rounded-full bg-primary"
 												onClick={handleDelivered}
-												loading={loading}
+												loading={loadingPayment}
 											>
 												Giao Hàng Thành Công
 											</Button>
@@ -1348,6 +1349,7 @@ const TimeLineOrder = ({
 												danger
 												className="font-semibold w-full rounded-full"
 												onClick={handleFailedDelivered}
+												loading={loading}
 											>
 												Giao Hàng Thất Bại
 											</Button>
@@ -1592,7 +1594,7 @@ const TimeLineOrder = ({
 														type="text"
 														className="font-semibold w-full rounded-full bg-primary"
 														onClick={handleDelivered}
-														loading={loading}
+														loading={loadingPayment}
 													>
 														Giao Hàng Thành Công
 													</Button>
@@ -1600,6 +1602,7 @@ const TimeLineOrder = ({
 														danger
 														className="font-semibold w-full rounded-full"
 														onClick={handleFailedDelivered}
+														loading={loading}
 													>
 														Giao Hàng Thất Bại
 													</Button>

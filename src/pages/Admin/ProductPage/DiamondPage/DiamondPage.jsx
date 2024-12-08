@@ -1,5 +1,6 @@
 import {
 	DeleteFilled,
+	EyeFilled,
 	LockOutlined,
 	PlusOutlined,
 	UnlockFilled,
@@ -187,7 +188,10 @@ const DiamondPage = () => {
 			render: (status) => {
 				console.log('status', status);
 
-				const {label, color} = statusMapping[status] || {label: 'Unknown', color: 'gray'};
+				const {label, color} = statusMapping[status] || {
+					label: 'Không Biết',
+					color: 'gray',
+				};
 				return <Tag color={color}>{label?.toUpperCase()}</Tag>;
 			},
 		},
@@ -197,14 +201,19 @@ const DiamondPage = () => {
 			align: 'center',
 			render: (_, record) => (
 				<Space size="middle">
-					<Tooltip title="Thêm Ảnh">
+					{/* <Tooltip title="Thêm Ảnh">
 						<Button type="primary" onClick={() => handleView(record.Id)}>
 							<UploadOutlined />
 						</Button>
-					</Tooltip>
-					<Tooltip title="Khóa Kim Cương">
+					</Tooltip> */}
+					{/* <Tooltip title="Khóa Kim Cương">
 						<Button type="default" onClick={() => handleLockDiamondView(record)}>
 							{record?.ProductLock === null ? <UnlockOutlined /> : <LockOutlined />}
+						</Button>
+					</Tooltip> */}
+					<Tooltip title="Chi Tiết Kim Cương">
+						<Button onClick={() => navigate(`/products/diamond-list/${record.Id}`)}>
+							<EyeFilled />
 						</Button>
 					</Tooltip>
 					<Tooltip title="Xóa Kim Cương">
@@ -422,43 +431,19 @@ const DiamondPage = () => {
 							))}
 					</Select>
 				</div>
-				<div className="ml-10 min-w-96">
+				<div className="ml-10 min-w-[600px]">
 					<p className="mb-4">Giá:</p>
 					<Slider
 						range
 						marks={{
-							[filterLimits?.Price?.Min]: `${formatPrice(filterLimits?.Price?.Min)}`, // Mốc đầu
-							[filterLimits?.Price?.Min +
-							(filterLimits?.Price?.Max - filterLimits?.Price?.Min) * 0.25]: {
-								style: {color: '#000', marginTop: '-30px'},
-								label: `${formatPrice(
-									Math.floor(
-										filterLimits?.Price?.Min +
-											(filterLimits?.Price?.Max - filterLimits?.Price?.Min) *
-												0.25
-									)
-								)}`,
-							}, // 25%
-							[(filterLimits?.Price?.Max + filterLimits?.Price?.Min) / 2]: {
-								label: `${formatPrice(
-									Math.floor(
-										(filterLimits?.Price?.Max + filterLimits?.Price?.Min) / 2
-									)
-								)}`,
-							},
-							[filterLimits?.Price?.Min +
-							(filterLimits?.Price?.Max - filterLimits?.Price?.Min) * 0.75]: {
-								style: {color: '#000', marginTop: '-30px'},
-								label: `${formatPrice(
-									Math.floor(
-										filterLimits?.Price?.Min +
-											(filterLimits?.Price?.Max - filterLimits?.Price?.Min) *
-												0.75
-									)
-								)}`,
-							}, // 75%
-							[filterLimits?.Price?.Max]: `${formatPrice(filterLimits?.Price?.Max)}`, // Mốc cuối
+							0: '0',
+							1000000000: '100M',
+							5000000000: '500M',
+							10000000000: '1000M',
+							15000000000: '15000M',
+							20000000000: '20000M',
 						}}
+						step={null}
 						value={[filters?.price?.minPrice, filters?.price?.maxPrice]}
 						min={filterLimits?.Price?.Min}
 						max={filterLimits?.Price?.Max}
@@ -470,7 +455,7 @@ const DiamondPage = () => {
 				{/* Carat Range Slider */}
 
 				<div className="ml-10 min-w-44">
-					<p className="mb-4">Carat:</p>
+					<p className="mb-4">Ly (Carat):</p>
 					<Slider
 						range
 						value={[filters?.carat?.minCarat, filters?.carat?.maxCarat]}
@@ -482,7 +467,7 @@ const DiamondPage = () => {
 				</div>
 
 				<div className="ml-10 min-w-72">
-					<p className="my-4">Color:</p>
+					<p className="my-4">Màu Sắc (Color):</p>
 					<Slider
 						range
 						marks={marks}
@@ -493,7 +478,7 @@ const DiamondPage = () => {
 					/>
 				</div>
 				<div className="ml-10 min-w-72">
-					<p className="my-4">Clarity:</p>
+					<p className="my-4">Độ Tinh Khiết (Clarity):</p>
 					<Slider
 						range
 						marks={marksClarity}
@@ -504,7 +489,7 @@ const DiamondPage = () => {
 					/>
 				</div>
 				<div className="ml-10 min-w-72">
-					<p className="my-4">Cut:</p>
+					<p className="my-4">Giác cắt (Cut):</p>
 					<Slider
 						range
 						marks={marksCut}
@@ -559,7 +544,7 @@ const DiamondPage = () => {
 							<div>
 								<Search
 									className="w-full sm:w-60"
-									placeholder="Tìm theo email"
+									placeholder="Tìm theo SKU"
 									allowClear
 									onSearch={onSearch}
 								/>
@@ -573,7 +558,7 @@ const DiamondPage = () => {
 							icon={<PlusOutlined />}
 							onClick={showModelAdd}
 						>
-							Thêm
+							Thêm Kim Cương
 						</Button>
 					</div>
 				</div>
