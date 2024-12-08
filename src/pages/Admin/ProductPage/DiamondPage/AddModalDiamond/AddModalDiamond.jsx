@@ -38,6 +38,12 @@ export const AddModalDiamond = ({setShowModal, showModal}) => {
 			});
 	}, [dispatch]);
 
+	useEffect(() => {
+		form.setFieldsValue({
+			priceOffset: 0,
+		});
+	}, [form]);
+
 	const handleAddDiamondForm = (values) => {
 		const {cut, color, clarity, carat, priceOffset, shapeId} = values;
 		setDiamond(values);
@@ -301,7 +307,17 @@ export const AddModalDiamond = ({setShowModal, showModal}) => {
 				{/* Details Row */}
 				<label className="font-semibold">Thêm Nâng Cao</label>
 				<div className="flex flex-wrap gap-4">
-					<Form.Item name="polish" label="Polish" className="w-1/4">
+					<Form.Item
+						name="polish"
+						label="Polish"
+						className="w-1/4"
+						rules={[
+							{
+								required: true,
+								message: 'Vui lòng chọn Polish!',
+							},
+						]}
+					>
 						<Select placeholder="Chọn Polish">
 							<Option value={1}>Poor</Option>
 							<Option value={2}>Fair</Option>
@@ -311,7 +327,17 @@ export const AddModalDiamond = ({setShowModal, showModal}) => {
 						</Select>
 					</Form.Item>
 
-					<Form.Item name="symmetry" label="Symmetry" className="w-1/4">
+					<Form.Item
+						name="symmetry"
+						label="Symmetry"
+						className="w-1/4"
+						rules={[
+							{
+								required: true,
+								message: 'Vui lòng chọn Symmetry!',
+							},
+						]}
+					>
 						<Select placeholder="Chọn Symmetry">
 							<Option value={1}>Poor</Option>
 							<Option value={2}>Fair</Option>
@@ -321,12 +347,37 @@ export const AddModalDiamond = ({setShowModal, showModal}) => {
 						</Select>
 					</Form.Item>
 
-					<Form.Item name="measurement" label="Measurement" className="w-1/4">
+					<Form.Item
+						name="measurement"
+						label="Measurement"
+						className="w-1/4"
+						rules={[
+							{
+								required: true,
+								message: 'Vui lòng nhập Measurement!',
+							},
+							{
+								pattern: /^\d+(\.\d+)?\s*x\s*\d+(\.\d+)?\s*x\s*\d+(\.\d+)?$/,
+								message:
+									'Vui lòng nhập đúng định dạng A x B x C (vd: 10 x 20 x 30)',
+							},
+						]}
+					>
 						<Input placeholder="Chọn Measurement" className="w-full" />
 					</Form.Item>
 				</div>
 				<div className="flex flex-wrap gap-4">
-					<Form.Item name="girdle" label="Girdle" className="w-1/4">
+					<Form.Item
+						name="girdle"
+						label="Girdle"
+						className="w-1/4"
+						rules={[
+							{
+								required: true,
+								message: 'Vui lòng chọn Girdle!',
+							},
+						]}
+					>
 						<Select placeholder="Chọn Girdle">
 							<Option value={1}>Extremely Thin</Option>
 							<Option value={2}>Very Thin</Option>
@@ -339,7 +390,17 @@ export const AddModalDiamond = ({setShowModal, showModal}) => {
 						</Select>
 					</Form.Item>
 
-					<Form.Item name="fluorescence" label="Fluorescence" className="w-1/4">
+					<Form.Item
+						name="fluorescence"
+						label="Fluorescence"
+						className="w-1/4"
+						rules={[
+							{
+								required: true,
+								message: 'Vui lòng chọn Fluorescence!',
+							},
+						]}
+					>
 						<Select placeholder="Chọn Fluorescence">
 							<Option value={1}>None</Option>
 							<Option value={2}>Faint</Option>
@@ -348,7 +409,17 @@ export const AddModalDiamond = ({setShowModal, showModal}) => {
 						</Select>
 					</Form.Item>
 
-					<Form.Item name="culet" label="Culet" className="w-1/4">
+					<Form.Item
+						name="culet"
+						label="Culet"
+						className="w-1/4"
+						rules={[
+							{
+								required: true,
+								message: 'Vui lòng chọn Culet!',
+							},
+						]}
+					>
 						<Select placeholder="Chọn Culet">
 							<Option value={1}>None</Option>
 							<Option value={2}>Very Small</Option>
@@ -366,17 +437,19 @@ export const AddModalDiamond = ({setShowModal, showModal}) => {
 				<div className="flex flex-wrap gap-4">
 					<Form.Item
 						name="withLenghtRatio"
-						label="Width-Length Ratio"
+						label="Tỷ lệ chiều rộng-chiều dài"
 						className="w-1/4"
-						rules={[{required: true, message: 'Vui lòng nhập Width-Length Ratio'}]}
+						rules={[
+							{
+								required: true,
+								message: 'Vui lòng nhập tỷ lệ chiều rộng-chiều dài',
+							},
+						]}
 					>
 						<InputNumber
-							placeholder="Enter Width-Length Ratio (%)"
+							placeholder="Nhập Tỷ lệ chiều rộng-chiều dài"
 							className="w-full"
-							min={0}
-							max={100}
-							formatter={(value) => `${value}%`}
-							parser={(value) => value.replace('%', '')}
+							step={0.01}
 						/>
 					</Form.Item>
 

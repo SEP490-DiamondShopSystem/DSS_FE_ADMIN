@@ -69,6 +69,7 @@ const TimeLineOrder = ({
 	id,
 	userDetail,
 	setCompleted,
+	loadingPayment,
 }) => {
 	const dispatch = useDispatch();
 	const isShopFaultRef = useRef(null);
@@ -333,8 +334,9 @@ const TimeLineOrder = ({
 	const handleAssignDelivererStatus = async () => {
 		dispatch(handleOrderAssignDeliverer({orderId: orders.Id, delivererId: selectedShipper}))
 			.unwrap()
-			.then(() => {
+			.then((res) => {
 				message.success('Đã chuyển giao cho nhân viên vận chuyển!');
+				setCompleted(res);
 			})
 			.catch((error) => {
 				message.error(error.data.detail || error?.detail);
@@ -429,9 +431,6 @@ const TimeLineOrder = ({
 				message.error(error.data.detail || error?.detail);
 			});
 	};
-
-	console.log('transactionStatusPending', transactionStatusPending);
-	console.log('transactionStatusInvalid', transactionStatusInvalid);
 
 	const handleFailedDeliveredStatus = () => {
 		if (isShopFaultRef.current === null || isShopFaultRef.current === undefined) {
@@ -610,8 +609,6 @@ const TimeLineOrder = ({
 				message.success('Đã chuyển giao cho nhân viên vận chuyển!');
 			})
 			.catch((error) => {
-				console.log(error);
-
 				message.error(error.data.detail || error?.detail);
 			});
 	};
@@ -621,7 +618,7 @@ const TimeLineOrder = ({
 			handleOrderReject({
 				orderId: orders.Id,
 				reason: values.reason,
-				IsForUser: values?.canceledBy,
+				IsForUser: values?.canceledBy ? values?.canceledBy : false,
 			})
 		)
 			.unwrap()
@@ -837,7 +834,7 @@ const TimeLineOrder = ({
 							<div className="flex justify-around">
 								<Button
 									type="text"
-									className="bg-primary font-semibold w-32 rounded-full"
+									className="bg-primary font-semibold rounded-full"
 									onClick={handleRefund}
 									disabled={loading}
 								>
@@ -1246,8 +1243,9 @@ const TimeLineOrder = ({
 								</>
 							) : (
 								<div>
-									<p className="mt-3 text-center font-semibold text-darkBlue">
-										Đơn Hàng Đã Chuyển Giao Cho Nhân Viên Giao Hàng
+									<p className="mt-3 text-center font-semibold text-darkBlue text-base">
+										Đơn Hàng Đã Chuyển Giao Cho {orders?.Deliverer?.FirstName}{' '}
+										{orders?.Deliverer?.LastName}
 									</p>
 								</div>
 							)}
@@ -1343,7 +1341,7 @@ const TimeLineOrder = ({
 												type="text"
 												className="font-semibold w-full rounded-full bg-primary"
 												onClick={handleDelivered}
-												loading={loading}
+												loading={loadingPayment}
 											>
 												Giao Hàng Thành Công
 											</Button>
@@ -1351,6 +1349,7 @@ const TimeLineOrder = ({
 												danger
 												className="font-semibold w-full rounded-full"
 												onClick={handleFailedDelivered}
+												loading={loading}
 											>
 												Giao Hàng Thất Bại
 											</Button>
@@ -1595,7 +1594,7 @@ const TimeLineOrder = ({
 														type="text"
 														className="font-semibold w-full rounded-full bg-primary"
 														onClick={handleDelivered}
-														loading={loading}
+														loading={loadingPayment}
 													>
 														Giao Hàng Thành Công
 													</Button>
@@ -1603,6 +1602,7 @@ const TimeLineOrder = ({
 														danger
 														className="font-semibold w-full rounded-full"
 														onClick={handleFailedDelivered}
+														loading={loading}
 													>
 														Giao Hàng Thất Bại
 													</Button>

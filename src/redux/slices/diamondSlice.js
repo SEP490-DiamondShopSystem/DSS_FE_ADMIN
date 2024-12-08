@@ -163,8 +163,7 @@ export const handleLockDiamond = createAsyncThunk(
 
 			return response;
 		} catch (error) {
-			console.log('Error: ', JSON.stringify(error));
-			return rejectWithValue(error);
+			return rejectWithValue(error.data);
 		}
 	}
 );

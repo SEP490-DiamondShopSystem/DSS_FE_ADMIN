@@ -5,9 +5,7 @@ export const getOrderCustomizeDetail = createAsyncThunk(
 	'customizeSlice/getOrderCustomizeDetail',
 	async ({RequestId, AccountId}, {rejectWithValue}) => {
 		try {
-			const data = await api.get(
-				`/CustomizeRequest/Staff/Detail?RequestId=${RequestId}&AccountId=${AccountId}`
-			);
+			const data = await api.get(`/CustomizeRequest/Staff/Detail?RequestId=${RequestId}`);
 			return data;
 		} catch (error) {
 			console.error(error);
@@ -104,7 +102,7 @@ export const handleDeleteDiamondCustomize = createAsyncThunk(
 			return response;
 		} catch (error) {
 			console.log('Error: ', JSON.stringify(error));
-			return rejectWithValue(error || error.message);
+			return rejectWithValue(error);
 		}
 	}
 );
@@ -119,7 +117,7 @@ export const handleChangeDiamondCustomize = createAsyncThunk(
 			return response;
 		} catch (error) {
 			console.log('Error: ', JSON.stringify(error));
-			return rejectWithValue(error || error.message);
+			return rejectWithValue(error);
 		}
 	}
 );

@@ -11,6 +11,7 @@ import {
 	getPaymentStatusDetailSelector,
 	GetUserDetailSelector,
 	LoadingOrderSelector,
+	LoadingPaymentSelector,
 } from '../../../../redux/selectors';
 import {getOrderDetail, getOrderLog} from '../../../../redux/slices/orderSlice';
 import InformationOrder from './Left/InformationOrder';
@@ -24,6 +25,7 @@ const OrderDetail = () => {
 	const dispatch = useDispatch();
 	const orderDetail = useSelector(getOrderDetailSelector);
 	const loading = useSelector(LoadingOrderSelector);
+	const loadingPayment = useSelector(LoadingPaymentSelector);
 	const paymentStatusOrder = useSelector(getPaymentStatusDetailSelector);
 	const childLogOrder = useSelector(getOrderChildLogSelector);
 	const userDetail = useSelector(GetUserDetailSelector);
@@ -113,6 +115,7 @@ const OrderDetail = () => {
 							loading={loading}
 							id={id}
 							setCompleted={setCompleted}
+							loadingPayment={loadingPayment}
 						/>
 					</div>
 				</div>

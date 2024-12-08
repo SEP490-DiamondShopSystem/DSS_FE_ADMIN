@@ -289,7 +289,7 @@ const InformationOrder = ({orders, statusOrder, paymentStatusOrder, userDetail})
 	};
 
 	return (
-		<div>
+		<div className="mr-5">
 			<div className="mb-4">
 				<Button
 					icon={<ArrowLeftOutlined />}
@@ -300,170 +300,231 @@ const InformationOrder = ({orders, statusOrder, paymentStatusOrder, userDetail})
 					Quay lại
 				</Button>
 			</div>
-			<Row>
-				<Col span={24}>
-					<Title level={3}>Chi Tiết Đơn Hàng</Title>
-				</Col>
-			</Row>
-			{orders && orders?.CancelledReason !== null && (
-				<>
-					<Divider style={{borderColor: '#d9d9d9'}} />
-					<Row>
-						<Col span={24}>
-							<Title level={4}>
-								{status === 'Cancelled' ? 'Đơn Hàng Bị Hủy' : 'Đơn Hàng Bị Từ Chối'}
-							</Title>
-						</Col>
-					</Row>
-					<Row gutter={[16, 16]} justify="center" align="middle" className="my-3">
-						<Col xs={12} sm={12} lg={12}>
-							<Text strong style={{fontSize: 18}}>
-								Tiêu Đề
-							</Text>
-							<br />
-							<Text>
-								{status === 'Cancelled'
-									? 'Người Đặt Hủy Đặt Hàng'
-									: 'Shop Từ Chối Đặt Hàng'}
-							</Text>
-						</Col>
-						<Col xs={12} sm={12} lg={12}>
-							<Text strong style={{fontSize: 18}}>
-								Lý Do
-							</Text>
-							<br />
-							<Text>{orders?.CancelledReason}</Text>
-						</Col>
-					</Row>
-					<Row gutter={[16, 16]} justify="center" align="middle" className="my-3">
-						<Col xs={12} sm={12} lg={12}>
-							<Text strong style={{fontSize: 18}}>
-								{status === 'Cancelled' ? 'Thời Gian Hủy' : 'Thời Gian Từ Chối'}
-							</Text>
-							<br />
-							<Text>{orders?.CancelledDate}</Text>
-						</Col>
-						<Col xs={12} sm={12} lg={12}>
-							{/* <Text strong className="mb-5" style={{fontSize: 18}}>
+			<div className="shadow-lg p-5">
+				<Row>
+					<Col span={24}>
+						<Title level={3}>Chi Tiết Đơn Hàng</Title>
+					</Col>
+				</Row>
+				{orders && orders?.CancelledReason !== null && (
+					<>
+						<Divider style={{borderColor: '#d9d9d9'}} />
+						<Row>
+							<Col span={24}>
+								<Title level={4}>
+									{status === 'Cancelled'
+										? 'Đơn Hàng Bị Hủy'
+										: 'Đơn Hàng Bị Từ Chối'}
+								</Title>
+							</Col>
+						</Row>
+						<Row gutter={[16, 16]} justify="center" align="middle" className="my-3">
+							<Col xs={12} sm={12} lg={12}>
+								<Text strong style={{fontSize: 18}}>
+									Tiêu Đề
+								</Text>
+								<br />
+								<Text>
+									{status === 'Cancelled'
+										? 'Người Đặt Hủy Đặt Hàng'
+										: 'Shop Từ Chối Đặt Hàng'}
+								</Text>
+							</Col>
+							<Col xs={12} sm={12} lg={12}>
+								<Text strong style={{fontSize: 18}}>
+									Lý Do
+								</Text>
+								<br />
+								<Text>{orders?.CancelledReason}</Text>
+							</Col>
+						</Row>
+						<Row gutter={[16, 16]} justify="center" align="middle" className="my-3">
+							<Col xs={12} sm={12} lg={12}>
+								<Text strong style={{fontSize: 18}}>
+									{status === 'Cancelled' ? 'Thời Gian Hủy' : 'Thời Gian Từ Chối'}
+								</Text>
+								<br />
+								<Text>{orders?.CancelledDate}</Text>
+							</Col>
+							<Col xs={12} sm={12} lg={12}>
+								{/* <Text strong className="mb-5" style={{fontSize: 18}}>
 								Trạng Thái
 							</Text>
 							<br />
 							<Tag color={orderStatus.color}>{orderStatus.name.toUpperCase()}</Tag> */}
-						</Col>
-					</Row>
-				</>
-			)}
+							</Col>
+						</Row>
+					</>
+				)}
 
-			<Divider style={{borderColor: '#d9d9d9'}} />
-			<Row>
-				<Col span={24}>
-					<Title level={4}>Thông Tin Chung</Title>
-				</Col>
-			</Row>
-			<Row gutter={[16, 16]} justify="center" align="middle" className="my-3">
-				{/* Loại Đơn Hàng */}
-				<Col xs={12} sm={12} lg={12}>
-					<Text strong style={{fontSize: 18}}>
-						Loại Đơn Hàng
-					</Text>
-					<br />
-					<Text className="flex items-center">
-						<p className="font-semibold">
-							{orders?.CustomizeRequestId ? 'Đơn hàng thiết kế' : 'Đơn hàng thường'}
-						</p>
-					</Text>
-				</Col>
+				<Divider style={{borderColor: '#d9d9d9'}} />
+				<Row>
+					<Col span={24}>
+						<Title level={4}>Thông Tin Chung</Title>
+					</Col>
+				</Row>
+				<Row gutter={[16, 16]} justify="center" align="middle" className="my-3">
+					{/* Loại Đơn Hàng */}
+					<Col xs={12} sm={12} lg={12}>
+						<Text strong style={{fontSize: 18}}>
+							Loại Đơn Hàng
+						</Text>
+						<br />
+						<Text className="flex items-center">
+							<p className="font-semibold text-lg">
+								{orders?.CustomizeRequestId
+									? 'Đơn hàng thiết kế'
+									: 'Đơn hàng thường'}
+							</p>
+						</Text>
+					</Col>
 
-				{/* Khách Hàng */}
-				<Col xs={12} sm={12} lg={12}>
-					<Text strong style={{fontSize: 18}}>
-						Khách hàng
-					</Text>
-					<br />
-					<Text>
-						{orders?.Account?.FirstName} {orders?.Account?.LastName}
-					</Text>
-				</Col>
-			</Row>
-			<Row gutter={[16, 16]} justify="center" align="middle" className="my-3">
-				<Col xs={12} sm={12} lg={12}>
-					<Text strong style={{fontSize: 18}}>
-						Email
-					</Text>
-					<br />
-					<Text>{orders?.Account?.Email}</Text>
-				</Col>
-				<Col xs={12} sm={12} lg={12}>
-					<Text strong style={{fontSize: 18}}>
-						Địa Chỉ
-					</Text>
-					<br />
-					<Text>{orders?.ShippingAddress}</Text>
-				</Col>
-			</Row>
+					{/* Khách Hàng */}
+					<Col xs={12} sm={12} lg={12}>
+						<Text strong style={{fontSize: 18}}>
+							Khách hàng
+						</Text>
+						<br />
+						<Text className="text-lg">
+							{orders?.Account?.FirstName} {orders?.Account?.LastName}
+						</Text>
+					</Col>
+				</Row>
+				<Row gutter={[16, 16]} justify="center" align="middle" className="my-3">
+					<Col xs={12} sm={12} lg={12}>
+						<Text strong style={{fontSize: 18}}>
+							Email
+						</Text>
+						<br />
+						<Text className="text-lg">{orders?.Account?.Email}</Text>
+					</Col>
+					<Col xs={12} sm={12} lg={12}>
+						<Text strong style={{fontSize: 18}}>
+							Địa Chỉ
+						</Text>
+						<br />
+						<Text className="text-lg">{orders?.ShippingAddress}</Text>
+					</Col>
+				</Row>
 
-			<Row gutter={[16, 16]} justify="center" align="middle" className="my-3">
-				<Col xs={12} sm={12} lg={12}>
-					<Text strong style={{fontSize: 18}}>
-						Thời Gian Đặt Hàng
-					</Text>
-					<br />
-					<Text>{orders?.CreatedDate}</Text>
-				</Col>
+				<Row gutter={[16, 16]} justify="center" align="middle" className="my-3">
+					<Col xs={12} sm={12} lg={12}>
+						<Text strong style={{fontSize: 18}}>
+							Số Điện Thoại
+						</Text>
+						<br />
+						<Text className="font-semibold text-lg">
+							{orders?.Account?.PhoneNumber}
+						</Text>
+					</Col>
 
-				<Col xs={12} sm={12} lg={12}>
-					{orders && orders?.CancelledReason === null && (
-						<>
-							<Text strong className="mb-5" style={{fontSize: 18}}>
-								Phương Thức Thanh Toán
-							</Text>
-							<br />
-							{orders?.PaymentMethod?.MappedName}
-						</>
-					)}
-				</Col>
-			</Row>
-			<Row gutter={[16, 16]} justify="center" align="middle" className="my-3">
-				<Col xs={12} sm={12} lg={12}>
-					<Text strong className="mb-5" style={{fontSize: 18}}>
-						Trạng Thái Thanh Toán
-					</Text>
-					<br />
-					<Tag color={orderStatus.color}>{orderStatus.name.toUpperCase()}</Tag>
-				</Col>
+					<Col xs={12} sm={12} lg={12}>
+						<Text strong style={{fontSize: 18}}>
+							Thời Gian Đặt Hàng
+						</Text>
+						<br />
+						<Text className="text-lg">{orders?.CreatedDate}</Text>
+					</Col>
+				</Row>
+				<Row gutter={[16, 16]} justify="center" align="middle" className="my-3">
+					<Col xs={12} sm={12} lg={12}>
+						<Text strong className="mb-5" style={{fontSize: 18}}>
+							Trạng Thái Thanh Toán
+						</Text>
+						<br />
+						<Tag color={orderStatus.color} className="text-base">
+							{orderStatus.name.toUpperCase()}
+						</Tag>
+					</Col>
 
-				<Col xs={12} sm={12} lg={12}></Col>
-			</Row>
-			<Row gutter={[16, 16]} justify="center" align="middle" className="my-3">
-				<Col xs={24} lg={12}>
-					<Text strong style={{fontSize: 18}}>
-						Các Chứng Từ
-					</Text>
-					{orders?.Transactions?.length > 0 ? (
-						<>
-							<br />
-							<Space wrap>
-								{orders?.Transactions?.map((transaction, index) =>
-									transaction.Evidence?.MediaPath ? (
-										<Image
-											key={index}
-											src={transaction.Evidence.MediaPath}
-											alt={`evidence-${index}`}
-											className="mt-5 w-full md:w-[600px]"
-										/>
-									) : null
-								)}
-							</Space>
-						</>
-					) : (
-						<>
-							<br />
-							<Text>Không có chứng từ hợp lệ</Text>
-						</>
-					)}
-				</Col>
-				<Col xs={0} lg={12}></Col>
-			</Row>
+					<Col xs={12} sm={12} lg={12}>
+						{orders && orders?.CancelledReason === null && (
+							<>
+								<Text strong className="mb-5" style={{fontSize: 18}}>
+									Phương Thức Thanh Toán
+								</Text>
+								<br />
+								<Text className="text-lg">{orders?.PaymentMethod?.MappedName}</Text>
+							</>
+						)}
+					</Col>
+				</Row>
+				<Row gutter={[16, 16]} justify="center" align="middle" className="my-3">
+					<Col xs={24} lg={12}>
+						<Text strong style={{fontSize: 18}}>
+							Các Chứng Từ
+						</Text>
+						{orders?.Transactions?.length > 0 ? (
+							<>
+								<br />
+								<Space wrap>
+									{orders?.Transactions?.map((transaction, index) =>
+										transaction.Evidence?.MediaPath ? (
+											<Image
+												key={index}
+												src={transaction.Evidence.MediaPath}
+												alt={`evidence-${index}`}
+												className="mt-5 w-full md:w-[600px]"
+											/>
+										) : null
+									)}
+								</Space>
+							</>
+						) : (
+							<>
+								<br />
+								<Text>Không có chứng từ hợp lệ</Text>
+							</>
+						)}
+					</Col>
+					<Col xs={0} lg={12}></Col>
+				</Row>
+
+				{orders?.Deliverer && (
+					<>
+						<Row className="mt-10">
+							<Col span={24}>
+								<Title level={4}>Thông Tin Nhân Viên Giao Hàng</Title>
+							</Col>
+						</Row>
+
+						<Row gutter={[16, 16]} justify="center" align="middle" className="my-3">
+							<Col xs={12} sm={12} lg={12}>
+								<Text strong style={{fontSize: 18}}>
+									Email
+								</Text>
+								<br />
+								<Text className="text-lg">{orders?.Deliverer?.Email}</Text>
+							</Col>
+							<Col xs={12} sm={12} lg={12}>
+								<Text strong style={{fontSize: 18}}>
+									Họ Tên
+								</Text>
+								<br />
+								<Text className="text-lg">
+									{orders?.Deliverer?.FirstName} {orders?.Deliverer?.LastName}
+								</Text>
+							</Col>
+						</Row>
+
+						<Row gutter={[16, 16]} justify="center" align="middle" className="my-3">
+							<Col xs={12} sm={12} lg={12}>
+								<Text strong style={{fontSize: 18}}>
+									Số Điện Thoại
+								</Text>
+								<br />
+								<Text className="font-semibold text-lg">
+									{orders?.Deliverer?.PhoneNumber
+										? orders?.Deliverer?.PhoneNumber
+										: 'Chưa có số điện thoại'}
+								</Text>
+							</Col>
+
+							<Col xs={12} sm={12} lg={12}></Col>
+						</Row>
+					</>
+				)}
+			</div>
 
 			<Divider style={{borderColor: '#d9d9d9'}} />
 			{statusOrder === 2 && (
@@ -564,7 +625,7 @@ const InformationOrder = ({orders, statusOrder, paymentStatusOrder, userDetail})
 								<div>
 									<PlusOutlined />
 									<div style={{marginTop: 8}} className="text-sm">
-										Upload
+										Tải lên
 									</div>
 								</div>
 							</Upload>
@@ -584,10 +645,9 @@ const InformationOrder = ({orders, statusOrder, paymentStatusOrder, userDetail})
 					</Button>
 				</>
 			)}
-			{/* New section for order files when status is 8 */}
 
 			{statusOrder === 8 && orderFiles && (
-				<div>
+				<div className="shadow-lg p-5">
 					<Text strong style={{fontSize: 18}}>
 						Hình Ảnh Xác Nhận Giao Hàng
 					</Text>
@@ -708,9 +768,9 @@ const InformationOrder = ({orders, statusOrder, paymentStatusOrder, userDetail})
 				<Text type="danger">Không thể tải chứng từ</Text>
 			)}
 			<div className="">
-				<div className="p-6 bg-gray-50 rounded-lg shadow-lg my-5">
+				<div>
 					{!delivererRole && orders?.Transactions?.length > 0 && (
-						<>
+						<div className="p-6 bg-gray-50 rounded-lg shadow-lg my-5">
 							<Row>
 								<Col span={24}>
 									<h4 className="text-xl font-bold text-gray-700">
@@ -841,7 +901,7 @@ const InformationOrder = ({orders, statusOrder, paymentStatusOrder, userDetail})
 									</Row>
 								</div>
 							))}
-						</>
+						</div>
 					)}
 				</div>
 

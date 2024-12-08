@@ -1,8 +1,9 @@
-import {Checkbox, Form, Input, InputNumber, Modal, Radio, Select} from 'antd';
+import {Checkbox, Form, Input, InputNumber, Modal, Popover, Radio, Select} from 'antd';
 import React, {useEffect, useState} from 'react';
 import {getAllUser} from '../../../../../redux/slices/userSlice';
 import {useDispatch, useSelector} from 'react-redux';
 import {getAllUserSelector} from '../../../../../redux/selectors';
+import {InfoCircleOutlined} from '@ant-design/icons';
 
 export const LockDiamondModal = ({isOpen, onCancel, onSubmit, lockDiamondId, form}) => {
 	const dispatch = useDispatch();
@@ -42,6 +43,13 @@ export const LockDiamondModal = ({isOpen, onCancel, onSubmit, lockDiamondId, for
 
 	const filteredCustomers = customers?.filter((customer) =>
 		customer?.Email?.toLowerCase().includes(searchValue.toLowerCase())
+	);
+
+	const popoverContent = (
+		<div>
+			<p>Giá kim cương ở đây là giá đã được xác định là chính xác.</p>
+			<p>Nếu chưa chắc chắn, vui lòng không nhập.</p>
+		</div>
 	);
 
 	return (
@@ -91,21 +99,48 @@ export const LockDiamondModal = ({isOpen, onCancel, onSubmit, lockDiamondId, for
 					</Radio.Group>
 				</Form.Item>
 
-				<Form.Item
-					name="lockHour"
-					label="Thời gian khóa (Giờ)"
-					rules={[{required: true, message: 'Vui lòng nhập thời gian khóa!'}]}
-				>
-					<InputNumber min={1} max={24} placeholder="Nhập số giờ" className="w-full" />
-				</Form.Item>
+				{lockDiamondId?.ProductLock === null && (
+					<>
+						<Form.Item
+							name="lockHour"
+							label="Thời gian khóa (Giờ)"
+							rules={[{required: true, message: 'Vui lòng nhập thời gian khóa!'}]}
+						>
+							<InputNumber
+								min={1}
+								max={24}
+								placeholder="Nhập số giờ"
+								className="w-full"
+							/>
+						</Form.Item>
 
-				<Form.Item
-					name="lockedPriceForCustomer"
-					label="Giá Khóa Cho Khách Hàng"
-					// rules={[{required: true, message: 'Vui lòng nhập giá!'}]}
-				>
-					<InputNumber min={0} placeholder="Nhập giá khóa" className="w-full" />
-				</Form.Item>
+						<Form.Item
+							name="lockedPriceForCustomer"
+							label="Giá Khóa Cho Khách Hàng"
+							rules={[{required: true, message: 'Vui lòng nhập giá!'}]}
+						>
+							<InputNumber
+								min={0}
+								placeholder="Nhập giá khóa"
+								className="w-full"
+								formatter={(value) =>
+									`${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')
+								}
+								parser={(value) => value.replace(/,/g, '')}
+								addonAfter={
+									<Popover
+										content={popoverContent}
+										title="Thông tin giá kim cương"
+									>
+										<InfoCircleOutlined
+											style={{color: '#1890ff', cursor: 'pointer'}}
+										/>
+									</Popover>
+								}
+							/>
+						</Form.Item>
+					</>
+				)}
 			</Form>
 		</Modal>
 	);
