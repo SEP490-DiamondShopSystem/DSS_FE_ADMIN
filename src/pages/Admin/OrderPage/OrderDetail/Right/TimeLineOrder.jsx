@@ -42,7 +42,7 @@ import {
 	handleOrder,
 } from '../../../../../redux/slices/paymentSlice';
 import {getDelivererAccount} from '../../../../../redux/slices/userSlice';
-import {getOrderStatus} from '../../../../../utils';
+import {formatPrice, formatPriceCeilFloor, getOrderStatus} from '../../../../../utils';
 import {TimeLine} from './TimeLine';
 
 const {Title, Text} = Typography;
@@ -92,18 +92,33 @@ const TimeLineOrder = ({
 	const [isShopFault, setIsShopFault] = useState();
 	const [transactionStatusPending, setTransactionStatusPending] = useState(false);
 	const [transactionStatusInvalid, setTransactionStatusInvalid] = useState(false);
+	const [transactionOrderDelivering, setTransactionOrderDelivering] = useState();
+	const [transactionOrderPending, setTransactionOrderPending] = useState();
+	const [transactionOrderPendingPayAll, setTransactionOrderPendingPayAll] = useState();
 
-	const transactionOrderDelivering = orders?.Transactions?.filter((obj) =>
-		obj?.Description?.includes('Chuyển tiền còn lại')
-	);
+	console.log('transactionOrderDelivering', transactionOrderDelivering);
+	console.log('transactionOrderPending', transactionOrderPending);
+	console.log('transactionOrderPendingPayAll', transactionOrderPendingPayAll);
 
-	const transactionOrderPending = orders?.Transactions?.filter((obj) =>
-		obj?.Description?.includes('Cọc trước')
-	);
+	useEffect(() => {
+		if (orders?.Transactions?.length > 0) {
+			const transactionOrderDelivering = orders?.Transactions?.filter((obj) =>
+				obj?.Description?.includes('Chuyển tiền còn lại')
+			);
 
-	const transactionOrderPendingPayAll = orders?.Transactions?.filter((obj) =>
-		obj?.Description?.includes('Trả hết')
-	);
+			const transactionOrderPending = orders?.Transactions?.filter((obj) =>
+				obj?.Description?.includes('Cọc trước')
+			);
+
+			const transactionOrderPendingPayAll = orders?.Transactions?.filter((obj) =>
+				obj?.Description?.includes('Trả hết')
+			);
+
+			setTransactionOrderDelivering(transactionOrderDelivering);
+			setTransactionOrderPending(transactionOrderPending);
+			setTransactionOrderPendingPayAll(transactionOrderPendingPayAll);
+		}
+	}, [orders?.Transactions]);
 
 	useEffect(() => {
 		if (orders?.Transactions.length > 0) {
@@ -713,7 +728,12 @@ const TimeLineOrder = ({
 
 										<div className="my-2">
 											<label className="font-semibold text-base">
-												Số Tiền
+												Số Tiền Cần Xác Thực -{' '}
+												{formatPriceCeilFloor(
+													transactionOrderPending[0]?.TransactionAmount ||
+														transactionOrderPendingPayAll[0]
+															?.TransactionAmount
+												)}
 											</label>
 											<InputNumber
 												className="w-full"
@@ -742,7 +762,7 @@ const TimeLineOrder = ({
 											onClick={handleAccept}
 											disabled={loading}
 										>
-											Xác nhận
+											Xác thực
 										</Button>
 										<Button
 											type="text"
@@ -783,10 +803,34 @@ const TimeLineOrder = ({
 								</p>
 							</div>
 							<div className="my-5">
-								<Title level={5}>Xác Thực Thông Tin Giao Dịch Từ Ngân Hàng</Title>
+								<Title level={5} className="text-center">
+									Xác Thực Thông Tin Giao Dịch Từ Ngân Hàng
+								</Title>
 
 								<div className="my-2">
-									<label className="font-semibold text-base">Số Tiền</label>
+									<label className="font-semibold text-base">
+										Số Tiền Cần Hoàn Trả -{' '}
+										{transactionOrderPending[0]?.Status === 2 &&
+										orders?.Transactions?.length === 1
+											? formatPriceCeilFloor(
+													transactionOrderPending[0]?.TransactionAmount
+											  )
+											: transactionOrderDelivering[0]?.Status === 2 &&
+											  orders?.Transactions?.length === 2
+											? formatPrice(orders?.TotalPrice)
+											: transactionOrderPendingPayAll[0]?.Status === 2 &&
+											  orders?.Transactions?.length === 1
+											? formatPrice(
+													transactionOrderPendingPayAll[0]
+														?.TransactionAmount
+											  )
+											: transactionOrderDelivering[0]?.Status === 3 &&
+											  orders?.Transactions?.length === 2
+											? formatPrice(
+													transactionOrderPending[0]?.TransactionAmount
+											  )
+											: 'Không'}
+									</label>
 									<InputNumber
 										className="w-full"
 										value={amount}
@@ -852,7 +896,7 @@ const TimeLineOrder = ({
 								</p>
 							</div>
 							<p className="mt-3 text-center font-semibold text-primary">
-								Chờ Quản Lý Xác Nhận Hoàn Tiền
+								Vui Lòng Chờ Quản Lý Xác Nhận Hoàn Tiền
 							</p>
 						</div>
 					)}
@@ -878,7 +922,19 @@ const TimeLineOrder = ({
 								<Title level={5}>Xác Thực Thông Tin Giao Dịch Từ Ngân Hàng</Title>
 
 								<div className="my-2">
-									<label className="font-semibold text-base">Số Tiền</label>
+									<label className="font-semibold text-base">
+										Số Tiền Cần Hoàn Trả -{' '}
+										{transactionOrderDelivering[0]?.Status === 2 &&
+										orders?.Transactions?.length === 2
+											? transactionOrderDelivering[0]?.TransactionAmount
+											: transactionOrderPendingPayAll[0]?.Status === 2 &&
+											  orders?.Transactions?.length === 1
+											? formatPriceCeilFloor(
+													transactionOrderPendingPayAll[0]
+														?.TransactionAmount * 0.9
+											  )
+											: 'Không'}
+									</label>
 									<InputNumber
 										className="w-full"
 										value={amount}
@@ -1045,7 +1101,8 @@ const TimeLineOrder = ({
 						!userRoleDeliverer &&
 						orders?.IsCollectAtShop &&
 						orders?.Transactions?.length === 2 &&
-						paymentStatusOrder === 2 && (
+						paymentStatusOrder === 2 &&
+						transactionOrderDelivering[0]?.Status === 1 && (
 							<div className="border rounded-lg border-primary bg-tintWhite p-5 mb-5">
 								<div className="flex items-center" style={{fontSize: 16}}>
 									<p className="font-semibold">Trạng thái đơn hàng:</p>
@@ -1062,7 +1119,13 @@ const TimeLineOrder = ({
 
 										<div className="my-2">
 											<label className="font-semibold text-base">
-												Số Tiền
+												Số Tiền Cần Xác Thực -{' '}
+												{transactionOrderDelivering[0]?.Status === 1 &&
+													orders?.Transactions?.length === 2 &&
+													formatPrice(
+														transactionOrderDelivering[0]
+															?.TransactionAmount
+													)}
 											</label>
 											<InputNumber
 												className="w-full"
@@ -1092,7 +1155,7 @@ const TimeLineOrder = ({
 											onClick={handleAcceptDelivered}
 											loading={loading}
 										>
-											Xác Nhận Thành Công
+											Xác Thực
 										</Button>
 										<Button
 											danger
@@ -1103,6 +1166,40 @@ const TimeLineOrder = ({
 										</Button>
 									</Space>
 								</>
+							</div>
+						)}
+
+					{status === 'Prepared' &&
+						!userRoleDeliverer &&
+						orders?.IsCollectAtShop &&
+						orders?.Transactions?.length === 2 &&
+						paymentStatusOrder === 2 &&
+						transactionOrderDelivering[0]?.Status === 3 && (
+							<div className="border rounded-lg border-primary bg-tintWhite p-5 mb-5">
+								<div className="flex items-center mb-5" style={{fontSize: 16}}>
+									<p className="font-semibold">Trạng thái đơn hàng:</p>
+									<p className="ml-5 text-darkGreen font-semibold">
+										<CheckCircleOutlined /> {ORDER_STATUS_TEXTS.Prepared}
+									</p>
+								</div>
+
+								<div className="flex justify-around">
+									{/* <Button
+										type="text"
+										className="bg-primary font-semibold w-32 rounded-full"
+										onClick={handleRedeliverBtn}
+									>
+										Giao Lại
+									</Button> */}
+									<Button
+										type="text"
+										className="bg-red font-semibold w-32 rounded-full"
+										onClick={handleCancelOrder}
+										disabled={loading}
+									>
+										Hủy đơn
+									</Button>
+								</div>
 							</div>
 						)}
 
@@ -1170,7 +1267,7 @@ const TimeLineOrder = ({
 											type="text"
 											className="font-semibold w-32 rounded-full bg-primary"
 											onClick={handleCompletedAtShop}
-											loading={loading}
+											loading={loadingPayment}
 										>
 											Xác Nhận
 										</Button>
@@ -1380,7 +1477,15 @@ const TimeLineOrder = ({
 
 													<div className="my-2">
 														<label className="font-semibold text-base">
-															Số Tiền
+															Số Tiền Cần Xác Thực -{' '}
+															{transactionOrderDelivering[0]
+																?.Status === 1 &&
+																orders?.Transactions?.length ===
+																	2 &&
+																formatPrice(
+																	transactionOrderDelivering[0]
+																		?.TransactionAmount
+																)}
 														</label>
 														<InputNumber
 															className="w-full"
@@ -1410,7 +1515,7 @@ const TimeLineOrder = ({
 														onClick={handleAcceptDelivered}
 														loading={loading}
 													>
-														Xác Nhận Thành Công
+														Xác Thực
 													</Button>
 													<Button
 														danger
@@ -1423,7 +1528,9 @@ const TimeLineOrder = ({
 											</>
 										) : (
 											<div className="font-semibold text-base text-center text-darkBlue">
-												Chờ Nhân Viên Giao Hàng Xác Nhận
+												Vui Lòng Chờ Nhân Viên Giao Hàng{' '}
+												{orders?.Deliverer?.FirstName}{' '}
+												{orders?.Deliverer?.LastName} Xác Nhận
 											</div>
 										)}
 									</div>
@@ -1726,7 +1833,15 @@ const TimeLineOrder = ({
 
 													<div className="my-2">
 														<label className="font-semibold text-base">
-															Số Tiền
+															Số Tiền Cần Xác Thực -{' '}
+															{transactionOrderDelivering[0]
+																?.Status === 1 &&
+																orders?.Transactions?.length ===
+																	2 &&
+																formatPrice(
+																	transactionOrderDelivering[0]
+																		?.TransactionAmount
+																)}
 														</label>
 														<InputNumber
 															className="w-full"
@@ -1889,6 +2004,18 @@ const TimeLineOrder = ({
 			>
 				<Form onFinish={submitCancelOrder}>
 					{status === 'Delivery_Failed' && orders?.HasDelivererReturned && (
+						<Form.Item
+							label="Người hủy đơn"
+							name="canceledBy"
+							rules={[{required: true, message: 'Vui lòng chọn người hủy đơn'}]}
+						>
+							<Select placeholder="Chọn người hủy đơn">
+								<Select.Option value="true">Khách hàng</Select.Option>
+								<Select.Option value="false">Cửa hàng</Select.Option>
+							</Select>
+						</Form.Item>
+					)}
+					{orders?.IsCollectAtShop && orders?.HasDelivererReturned && (
 						<Form.Item
 							label="Người hủy đơn"
 							name="canceledBy"
