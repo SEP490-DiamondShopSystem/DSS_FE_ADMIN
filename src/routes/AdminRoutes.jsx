@@ -26,6 +26,7 @@ import OrderCustomizeDetail from '../pages/Admin/OrderCustomize/OrderDetail/Orde
 import SideDiamondPricePage from '../pages/Admin/DiamondPricePage/SideDiamondPricePage';
 import BlogPage from '../pages/Admin/BlogPage';
 import ConfigurationPage from '../pages/Admin/ConfigurationPage';
+import DiamondDetailPage from '../pages/Admin/ProductPage/DiamondPage/DiamondDetail';
 export const AdminRouters = () => {
 	return (
 		<Routes>
@@ -136,6 +137,15 @@ export const AdminRouters = () => {
 					element={
 						<PrivateRoute roles={['staff', 'admin', 'manager']}>
 							<DiamondPage />
+						</PrivateRoute>
+					}
+				/>
+
+				<Route
+					path="/products/diamond-list/:id"
+					element={
+						<PrivateRoute roles={['staff', 'admin', 'manager']}>
+							<DiamondDetailPage />
 						</PrivateRoute>
 					}
 				/>

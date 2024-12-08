@@ -34,6 +34,7 @@ const OrderCustomizeDetail = () => {
 	const [changeDiamond, setChangeDiamond] = useState(null);
 	const [selectedDiamond, setSelectedDiamond] = useState({});
 	const [diamondRequests, setDiamondRequests] = useState(null);
+	const [fetchRequest, setFetchRequest] = useState(null);
 
 	const allDiamondRequests = orders?.DiamondRequests;
 
@@ -56,8 +57,12 @@ const OrderCustomizeDetail = () => {
 	// Xóa giá trị nếu không còn trong danh sách mới
 
 	useEffect(() => {
-		dispatch(getOrderCustomizeDetail({RequestId: id, AccountId: order?.AccountId}));
-	}, [diamondUnAvailable, id, order]);
+		dispatch(getOrderCustomizeDetail({RequestId: id}))
+			.unwrap()
+			.then(() => {
+				setFetchRequest(null);
+			});
+	}, [diamondUnAvailable, id, order, fetchRequest]);
 
 	useEffect(() => {
 		if (orderDetail) {
@@ -108,6 +113,7 @@ const OrderCustomizeDetail = () => {
 							changeDiamond={changeDiamond}
 							selectedDiamond={selectedDiamond}
 							filteredRequests={filteredRequests}
+							setFetchRequest={setFetchRequest}
 						/>
 					</div>
 				</div>

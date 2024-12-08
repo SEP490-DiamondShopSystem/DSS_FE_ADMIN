@@ -186,6 +186,24 @@ export const updateShopBankAccountRule = createAsyncThunk(
 		}
 	}
 );
+export const updateShopBankQRRule = createAsyncThunk(
+	'config/updateShopBankQRRule',
+	async (formFile, {rejectWithValue}) => {
+		try {
+			const formData = new FormData();
+			formData.append('newQrImage', formFile); // Use the correct field name here
+			const response = await api.put('/Configuration/ShopBankAccountRule', formData, {
+				headers: {
+					'Content-Type': 'multipart/form-data',
+				},
+			});
+			return response;
+		} catch (error) {
+			return rejectWithValue(error.response || error.message);
+		}
+	}
+);
+
 // Slice
 export const configSlice = createSlice({
 	name: 'config',
@@ -198,7 +216,6 @@ export const configSlice = createSlice({
 		orderRule: {},
 		orderPaymentRule: {},
 		orderPaymentRule: {},
-
 		isLoading: false,
 		error: null,
 	},
@@ -379,6 +396,17 @@ export const configSlice = createSlice({
 				state.isLoading = false;
 			})
 			.addCase(updateShopBankAccountRule.rejected, (state, action) => {
+				state.isLoading = false;
+				state.error = action.payload;
+			})
+			.addCase(updateShopBankQRRule.pending, (state) => {
+				state.isLoading = true;
+				state.error = null;
+			})
+			.addCase(updateShopBankQRRule.fulfilled, (state) => {
+				state.isLoading = false;
+			})
+			.addCase(updateShopBankQRRule.rejected, (state, action) => {
 				state.isLoading = false;
 				state.error = action.payload;
 			})

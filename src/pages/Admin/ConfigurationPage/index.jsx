@@ -1,6 +1,20 @@
 import React, {useEffect, useState} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
-import {Button, Form, InputNumber, Tabs, Card, Spin, message, Col, Row, Input, Select} from 'antd';
+import {
+	Button,
+	Image,
+	Form,
+	InputNumber,
+	Tabs,
+	Card,
+	Spin,
+	message,
+	Col,
+	Row,
+	Input,
+	Select,
+	Upload,
+} from 'antd';
 import {
 	fetchAccountRule,
 	fetchDiamondRule,
@@ -18,6 +32,7 @@ import {
 	updateOrderRule,
 	updateOrderRulePayment,
 	updateShopBankAccountRule,
+	updateShopBankQRRule,
 } from '../../../redux/slices/configSlice';
 
 import {selectIsLoading, selectConfigError} from '../../../redux/selectors';
@@ -51,48 +66,52 @@ const ConfigurationPage = () => {
 		{value: 3, label: 'Tiền Mặt'},
 	];
 
-	useEffect(() => {
-		const fetchData = async () => {
-			try {
-				const [account, diamond, frontend, promotion, location, order, payment, bank] =
-					await Promise.all([
-						dispatch(fetchAccountRule()).unwrap(),
-						dispatch(fetchDiamondRule()).unwrap(),
-						dispatch(fetchFrontendDisplayRule()).unwrap(),
-						dispatch(fetchPromotionRule()).unwrap(),
-						dispatch(fetchLocationRule()).unwrap(),
-						dispatch(fetchOrderRule()).unwrap(),
-						dispatch(fetchOrderRulePayment()).unwrap(),
-						dispatch(fetchShopBankAccountRule()).unwrap(),
-					]);
+	const fetchData = async () => {
+		try {
+			const [account, diamond, frontend, promotion, location, order, payment, bank] =
+				await Promise.all([
+					dispatch(fetchAccountRule()).unwrap(),
+					dispatch(fetchDiamondRule()).unwrap(),
+					dispatch(fetchFrontendDisplayRule()).unwrap(),
+					dispatch(fetchPromotionRule()).unwrap(),
+					dispatch(fetchLocationRule()).unwrap(),
+					dispatch(fetchOrderRule()).unwrap(),
+					dispatch(fetchOrderRulePayment()).unwrap(),
+					dispatch(fetchShopBankAccountRule()).unwrap(),
+				]);
 
-				const transformedPayment = {
-					...payment,
-					LockedPaymentMethodOnCustomer: payment.LockedPaymentMethodOnCustomer.map(
-						(methodValue) => {
-							const method = paymentMethods.find(
-								(m) => m.value.toString() === methodValue
-							);
-							return method ? method.value : methodValue; // Use value for Select compatibility
-						}
-					),
-				};
-				setAccountRule(account);
-				setDiamondRule(diamond);
-				setFrontendDisplayRule(frontend);
-				setPromotionRule(promotion);
-				setLocationRule(location);
-				setOrderRule(order);
-				setOrderPaymentRule(transformedPayment);
-				setShopBankAccountRule(bank);
-			} catch (error) {
-				message.error('Failed to fetch configuration data.');
-			}
-		};
-		fetchData();
+			const transformedPayment = {
+				...payment,
+				LockedPaymentMethodOnCustomer: payment.LockedPaymentMethodOnCustomer.map(
+					(methodValue) => {
+						const method = paymentMethods.find(
+							(m) => m.value.toString() === methodValue
+						);
+						return method ? method.value : methodValue; // Use value for Select compatibility
+					}
+				),
+			};
+
+			setAccountRule(account);
+			setDiamondRule(diamond);
+			setFrontendDisplayRule(frontend);
+			setPromotionRule(promotion);
+			setLocationRule(location);
+			setOrderRule(order);
+			setOrderPaymentRule(transformedPayment);
+			setShopBankAccountRule(bank);
+		} catch (error) {
+			message.error('Failed to fetch configuration data.');
+		}
+	};
+
+	useEffect(() => {
+		fetchData(); // Call fetchData on component mount
 	}, [dispatch]);
+
 	const handleSuccess = (messageText) => {
 		message.success(messageText);
+		fetchData();
 	};
 
 	useEffect(() => {
@@ -101,7 +120,9 @@ const ConfigurationPage = () => {
 	const handleAccountSubmit = (values) => {
 		dispatch(updateAccountRule(values))
 			.unwrap()
-			.then(() => handleSuccess('Cập Nhật Quy Định Tài Khoản Thành Công!'))
+			.then(() => {
+				handleSuccess('Cập Nhật Quy Định Tài Khoản Thành Công!');
+			})
 			.catch((error) => {
 				message.error(error?.data?.title || error?.title);
 			});
@@ -109,7 +130,9 @@ const ConfigurationPage = () => {
 	const handleDiamondSubmit = (values) => {
 		dispatch(updateDiamondRule(values))
 			.unwrap()
-			.then(() => handleSuccess('Cập Nhật Quy Định Kim Cương Thành Công!'))
+			.then(() => {
+				handleSuccess('Cập Nhật Quy Định Kim Cương Thành Công!');
+			})
 			.catch((error) => {
 				message.error(error?.data?.title || error?.title);
 			});
@@ -118,7 +141,9 @@ const ConfigurationPage = () => {
 	const handleFrontendSubmit = (values) => {
 		dispatch(updateFrontendDisplayRule(values))
 			.unwrap()
-			.then(() => handleSuccess('Cập Nhật Quy Định Hiển Thị Thành Công!'))
+			.then(() => {
+				handleSuccess('Cập Nhật Quy Định Hiển Thị Thành Công!');
+			})
 			.catch((error) => {
 				message.error(error?.data?.title || error?.title);
 			});
@@ -126,7 +151,9 @@ const ConfigurationPage = () => {
 	const handleLocationSubmit = (values) => {
 		dispatch(updateLocationRules(values))
 			.unwrap()
-			.then(() => handleSuccess('Cập Nhật Địa Chỉ Shop Thành Công!'))
+			.then(() => {
+				handleSuccess('Cập Nhật Địa Chỉ Shop Thành Công!');
+			})
 			.catch((error) => {
 				message.error(error?.data?.title || error?.title);
 			});
@@ -134,7 +161,9 @@ const ConfigurationPage = () => {
 	const handleOrderSubmit = (values) => {
 		dispatch(updateOrderRule(values))
 			.unwrap()
-			.then(() => handleSuccess('Cập Nhật Quy Định Đặt Hàng Thành Công!'))
+			.then(() => {
+				handleSuccess('Cập Nhật Quy Định Đặt Hàng Thành Công!');
+			})
 			.catch((error) => {
 				message.error(error?.data?.title || error?.title);
 			});
@@ -152,24 +181,52 @@ const ConfigurationPage = () => {
 
 		dispatch(updateOrderRulePayment(updatedValues))
 			.unwrap()
-			.then(() => handleSuccess('Cập Nhật Quy Định Thanh Toán Thành Công!'))
+			.then(() => {
+				handleSuccess('Cập Nhật Quy Định Thanh Toán Thành Công!');
+			})
 			.catch((error) => {
 				message.error(error?.data?.title || error?.title);
 			});
 	};
 
-	const handleBankAccountSubmit = (values) => {
-		dispatch(updateShopBankAccountRule(values))
+	const handleBankAccountSubmit = async (values) => {
+		let uploadedImageData = null;
+
+		if (values.newQrImage?.[0]) {
+			const file = values.newQrImage[0].originFileObj;
+
+			uploadedImageData = await dispatch(updateShopBankQRRule(file))
+				.unwrap()
+				.then(() => {
+					handleSuccess('Tải lên thành công!');
+				})
+				.catch((error) => {
+					message.error(error?.data?.title || error?.title);
+				});
+		}
+
+		const updatePayload = {
+			accountNumber: values.AccountNumber,
+			accountName: values.AccountName,
+			bankBin: values.BankBin,
+			newQrImage: uploadedImageData?.data || null,
+		};
+		await dispatch(updateShopBankAccountRule(updatePayload))
 			.unwrap()
-			.then(() => handleSuccess('Cập Nhật Tài Khoản Của Shop Thành Công!'))
+			.then(() => {
+				handleSuccess('Cập nhật tài khoản ngân hàng thành công!');
+			})
 			.catch((error) => {
 				message.error(error?.data?.title || error?.title);
 			});
 	};
+
 	const handlePromotionSubmit = (values) => {
 		dispatch(updatePromotionRule(values))
 			.unwrap()
-			.then(() => handleSuccess('Cập Nhật Quy Định Khuyến Mãi Thành Công!'))
+			.then(() => {
+				handleSuccess('Cập Nhật Quy Định Khuyến Mãi Thành Công!');
+			})
 			.catch((error) => {
 				message.error(error?.data?.title || error?.title);
 			});
@@ -674,7 +731,7 @@ const ConfigurationPage = () => {
 											{required: true, message: 'Trường này là bắt buộc'},
 										]}
 									>
-										<InputNumber className="w-full" />
+										<Input className="w-full" />
 									</Form.Item>
 								</Col>
 								<Col xs={24} sm={12} md={6}>
@@ -708,6 +765,40 @@ const ConfigurationPage = () => {
 										]}
 									>
 										<InputNumber className="w-full" />
+									</Form.Item>
+								</Col>
+							</Row>
+							<Row gutter={[16, 16]} wrap>
+								<Col xs={24} sm={12} md={6}>
+									<Image
+										src={shopBankAccountRule?.BankQr?.MediaPath}
+										alt="Current QR Code"
+										style={{
+											width: '100%',
+											height: 'auto',
+											marginBottom: '10px',
+										}}
+										fallback="/placeholder-image.png" // Optional fallback for broken images
+									/>
+									<Form.Item
+										name="newQrImage"
+										label="Tải lên QR Code mới"
+										valuePropName="fileList"
+										getValueFromEvent={(e) =>
+											Array.isArray(e) ? e : e?.fileList
+										}
+										rules={[
+											{required: true, message: 'Trường này là bắt buộc'},
+										]}
+									>
+										<Upload
+											beforeUpload={() => false} // Prevent automatic upload
+											accept="image/*"
+											listType="picture-card"
+											maxCount={1}
+										>
+											<Button>Upload</Button>
+										</Upload>
 									</Form.Item>
 								</Col>
 							</Row>
