@@ -77,7 +77,6 @@ const DiamondPage = () => {
 	const [form] = Form.useForm();
 	const loading = useSelector(LoadingDiamondSelector);
 	const shapes = useSelector(getAllShapeSelector);
-	const filterLimits = useSelector(GetDiamondFilterSelector);
 	const fetch = useSelector(FetchDataSelector);
 
 	const [shape, setShape] = useState();
@@ -97,9 +96,14 @@ const DiamondPage = () => {
 	const [lockDiamondId, setLockDiamondId] = useState();
 	const [activeStatus, setActiveStatus] = useState('');
 	const [searchText, setSearchText] = useState('');
+	const [filterLimits, setFilterLimits] = useState(null);
 
 	useEffect(() => {
-		dispatch(getDiamondFilter());
+		dispatch(getDiamondFilter())
+			.unwrap()
+			.then((res) => {
+				setFilterLimits(res);
+			});
 	}, []);
 
 	useEffect(() => {
@@ -120,9 +124,6 @@ const DiamondPage = () => {
 			});
 		}
 	}, [filterLimits]);
-
-	console.log('diamonds', diamonds);
-	console.log('diamondList', diamondList);
 
 	const columns = [
 		{
