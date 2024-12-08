@@ -37,6 +37,7 @@ import {
 	getOrderStatus,
 	getOrderStatusTag,
 } from '../../../../../utils';
+import {getTransactionByOrderId} from '../../../../../redux/slices/transactionSlice';
 
 const {Title, Text} = Typography;
 
@@ -48,8 +49,10 @@ const InformationOrder = ({orders, statusOrder, paymentStatusOrder, userDetail})
 
 	const orderStatus = getOrderStatusTag(paymentStatusOrder);
 	const status = getOrderStatus(statusOrder);
-	const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
+	const orderFilesLoading = useSelector(selectOrderFilesLoading);
+	const orderFilesError = useSelector(selectOrderFilesError);
 
+	const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
 	const [dataSource, setDataSource] = useState([]);
 	const [description, setDescription] = useState('');
 	const [previewOpen, setPreviewOpen] = useState(false);
@@ -59,11 +62,10 @@ const InformationOrder = ({orders, statusOrder, paymentStatusOrder, userDetail})
 	const [messageProcessing, setMessageProcessing] = useState();
 	const [imageFiles, setImageFiles] = useState([]);
 	const [delivererRole, setDelivererRole] = useState();
-
 	const [orderFiles, setOrderFiles] = useState(null);
-	const orderFilesLoading = useSelector(selectOrderFilesLoading);
-	const orderFilesError = useSelector(selectOrderFilesError);
+	const [transaction, setTransaction] = useState(null);
 	console.log('order', orders);
+	console.log('transaction', transaction);
 
 	useEffect(() => {
 		if (userDetail) {
@@ -121,6 +123,17 @@ const InformationOrder = ({orders, statusOrder, paymentStatusOrder, userDetail})
 			setDataSource(newDataSource);
 		}
 	}, [orders]);
+
+	useEffect(() => {
+		if (orders?.Id) {
+			dispatch(getTransactionByOrderId(orders?.Id))
+				.unwrap()
+				.then((res) => {
+					setTransaction(res?.Transactions);
+				});
+		}
+	}, [orders]);
+
 	const mobileColumns = [
 		{
 			title: 'Đơn Hàng',
@@ -887,13 +900,21 @@ const InformationOrder = ({orders, statusOrder, paymentStatusOrder, userDetail})
 											</Tag>
 										</Col>
 										<Col xs={12}>
-											{transaction?.PaygateTransactionCode && (
+											{transaction?.TransactionType && (
 												<>
 													<p className="text-gray-600 font-medium">
-														Mã giao dịch Paygate
+														Loại giao dịch
 													</p>
-													<p className="text-gray-800">
-														{transaction?.PaygateTransactionCode}
+													<p className="text-gray-800 font-semibold">
+														{transaction.TransactionType === 1 ? (
+															<div className="text-darkGreen text-lg">
+																Thanh Toán
+															</div>
+														) : (
+															<div className="text-red text-lg">
+																Hoàn Tiền
+															</div>
+														)}
 													</p>
 												</>
 											)}

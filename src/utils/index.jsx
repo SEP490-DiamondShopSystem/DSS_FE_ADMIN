@@ -32,6 +32,30 @@ export const formatPrice = (price) => {
 	return `${formattedNumber}₫`; // Gắn lại đơn vị tiền tệ
 };
 
+export const formatPriceCeilFloor = (price) => {
+	// Làm tròn số tiền đến hàng nghìn
+	const roundedPrice =
+		price % 1000 >= 500
+			? Math.ceil(price / 1000) * 1000 // Làm tròn lên
+			: Math.floor(price / 1000) * 1000; // Làm tròn xuống
+
+	// Định dạng số với Intl.NumberFormat
+	const formattedPrice = new Intl.NumberFormat('vi-VN', {
+		style: 'currency',
+		currency: 'VND',
+		minimumFractionDigits: 0,
+		maximumFractionDigits: 0,
+	}).format(roundedPrice);
+
+	// Chuyển đổi dấu phân cách
+	const parts = formattedPrice.split('₫'); // Tách phần số và đơn vị tiền tệ
+	const numberPart = parts[0].trim(); // Phần số (không chứa đơn vị)
+
+	// Chuyển đổi dấu phân cách
+	const formattedNumber = numberPart.replace(/\./g, ','); // Đổi dấu . sang ,
+	return `${formattedNumber}₫`; // Gắn lại đơn vị tiền tệ
+};
+
 export function convertToVietnamDate(utcDateString) {
 	// Create a Date object from the UTC date string
 	const utcDate = new Date(utcDateString);
