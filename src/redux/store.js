@@ -29,6 +29,7 @@ import {logSlice} from './slices/logSlice';
 import {configSlice} from './slices/configSlice';
 import {criteriaRangeSlice} from './slices/criteriaRangeSlice';
 import {orderFileSlice} from './slices/orderFileSlice';
+import {transactionSlice} from './slices/transactionSlice';
 const rootPersistConfig = {
 	key: 'root',
 	storage,
@@ -63,6 +64,7 @@ const rootReducer = combineReducers({
 	logSlice: logSlice.reducer,
 	configSlice: configSlice.reducer,
 	criteriaRangeSlice: criteriaRangeSlice.reducer,
+	transactionSlice: transactionSlice.reducer,
 });
 
 const persistedReducer = persistReducer(rootPersistConfig, rootReducer);
