@@ -86,28 +86,41 @@ export const createSideDiamondOptionForJewelryModel = createAsyncThunk(
 	}
 );
 
-export const updateSizeMetalForJewelryModel = createAsyncThunk(
-	'jewelryModel/updateSizeMetal',
-	async ({modelId, sizeMetals}, thunkAPI) => {
-		const formData = new FormData();
-		formData.append('ModelId', modelId);
-		sizeMetals.forEach((item, index) => {
-			formData.append(`SizeMetals[${index}].sizeId`, item.sizeId);
-			formData.append(`SizeMetals[${index}].metalId`, item.metalId);
-			formData.append(`SizeMetals[${index}].weight`, item.weight);
-		});
-
+export const updateCraftmanFee = createAsyncThunk(
+	'jewelryModel/updateCraftmanFee',
+	async ({modelId, craftmanFee}, thunkAPI) => {
 		try {
-			const response = await api.put('/JewelryModel/Update/SizeMetal', formData, {
+			const formData = new FormData();
+			formData.append('ModelId', modelId);
+			formData.append('CraftmanFee', craftmanFee);
+
+			const response = await api.put('/JewelryModel/Update/CraftmanFee', formData, {
 				headers: {'Content-Type': 'multipart/form-data'},
 			});
-			console.log('updateSizeMetalForJewelryModel response:', response); // Log API response
+			console.log('updateCraftmanFee response:', response); // Log API response
 			return response;
 		} catch (error) {
-			console.error('updateSizeMetalForJewelryModel error:', error.response || error); // Log error
-			return thunkAPI.rejectWithValue(error.response);
+			console.error('updateCraftmanFee error:', error.response || error); // Log error
+			return thunkAPI.rejectWithValue(error.response || 'Failed to update craftsman fee');
 		}
 	}
+);
+
+export const updateSizeMetalForJewelryModel = createAsyncThunk(
+    'jewelryModel/updateSizeMetal',
+    async ({modelId, sizeMetals}, thunkAPI) => {
+        try {
+            const response = await api.put('/JewelryModel/Update/SizeMetal', {
+                modelId: modelId,
+                sizeMetals: sizeMetals
+            });
+            console.log('updateSizeMetalForJewelryModel response:', response);
+            return response;
+        } catch (error) {
+            console.error('updateSizeMetalForJewelryModel error:', error.response || error);
+            return thunkAPI.rejectWithValue(error.response);
+        }
+    }
 );
 
 export const deleteSizeMetalFromJewelryModel = createAsyncThunk(
@@ -126,12 +139,29 @@ export const deleteSizeMetalFromJewelryModel = createAsyncThunk(
 	}
 );
 
+export const deleteJewelryModel = createAsyncThunk(
+	'jewelryModel/deleteJewelryModel',
+	async (modelId, {rejectWithValue}) => {
+		try {
+			const response = await api.delete('/JewelryModel/Delete/JewelryModel', {
+				params: {ModelId: modelId},
+			});
+			console.log('deleteJewelryModel response:', response); // Log API response
+			return response;
+		} catch (error) {
+			console.error('deleteJewelryModel error:', error.response || error); // Log error
+			return rejectWithValue(error.response || 'Failed to delete jewelry model');
+		}
+	}
+);
+
+// Updated deleteSideDiamondOption thunk to match the new API specification
 export const deleteSideDiamondOption = createAsyncThunk(
 	'jewelryModel/deleteSideDiamondOption',
-	async ({modelId, metalId, sizeId}, {rejectWithValue}) => {
+	async (sideDiamondOptId, {rejectWithValue}) => {
 		try {
 			const response = await api.delete(`/JewelryModel/Delete/SideDiamondOption`, {
-				params: {modelId, metalId, sizeId},
+				params: {SideDiamondOptId: sideDiamondOptId},
 			});
 			console.log('deleteSideDiamondOption response:', response); // Log API response
 			return response;
@@ -216,6 +246,27 @@ export const jewelryModelSlice = createSlice({
 				state.error = action.payload;
 				console.error('createSideDiamondOptionForJewelryModel failed:', action.payload); // Log error response
 			})
+			.addCase(updateCraftmanFee.pending, (state) => {
+				state.loading = true;
+				state.error = null;
+				console.log('updateCraftmanFee loading...'); // Log loading state
+			})
+			.addCase(updateCraftmanFee.fulfilled, (state, action) => {
+				state.loading = false;
+				// Optionally update the specific model's craftsman fee in the state
+				const updatedModelIndex = state.models.findIndex(
+					(model) => model.id === action.meta.arg.modelId
+				);
+				if (updatedModelIndex !== -1) {
+					state.models[updatedModelIndex].craftmanFee = action.meta.arg.craftmanFee;
+				}
+				console.log('updateCraftmanFee fulfilled:', action.payload); // Log response data
+			})
+			.addCase(updateCraftmanFee.rejected, (state, action) => {
+				state.loading = false;
+				state.error = action.payload;
+				console.error('updateCraftmanFee failed:', action.payload); // Log error response
+			})
 			.addCase(updateSizeMetalForJewelryModel.pending, (state) => {
 				state.loading = true;
 				state.error = null;
@@ -244,6 +295,24 @@ export const jewelryModelSlice = createSlice({
 				state.error = action.payload;
 				console.error('deleteSizeMetalFromJewelryModel failed:', action.payload); // Log error response
 			})
+			.addCase(deleteJewelryModel.pending, (state) => {
+				state.loading = true;
+				state.error = null;
+				console.log('deleteJewelryModel loading...'); // Log loading state
+			})
+			.addCase(deleteJewelryModel.fulfilled, (state, action) => {
+				state.loading = false;
+				// Optionally remove the deleted model from the state
+				state.models = state.models.filter((model) => model.id !== action.meta.arg);
+				console.log('deleteJewelryModel fulfilled:', action.payload); // Log response data
+			})
+			.addCase(deleteJewelryModel.rejected, (state, action) => {
+				state.loading = false;
+				state.error = action.payload;
+				console.error('deleteJewelryModel failed:', action.payload); // Log error response
+			})
+
+			// Update existing deleteSideDiamondOption case to match the new thunk signature
 			.addCase(deleteSideDiamondOption.pending, (state) => {
 				state.loading = true;
 				state.error = null;

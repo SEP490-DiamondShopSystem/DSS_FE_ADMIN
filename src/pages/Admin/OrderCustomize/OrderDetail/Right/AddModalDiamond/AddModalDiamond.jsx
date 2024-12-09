@@ -2,7 +2,7 @@ import {InfoCircleOutlined} from '@ant-design/icons';
 import {Form, Input, InputNumber, message, Modal, Popover, Select, Switch, Tooltip} from 'antd';
 import React, {useEffect, useState} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
-import {getAllShapeSelector} from '../../../../../../redux/selectors';
+import {getAllShapeSelector, LoadingCustomizeSelector} from '../../../../../../redux/selectors';
 import {handleAddDiamondCustomize} from '../../../../../../redux/slices/customizeSlice';
 import {getDiamondShape} from '../../../../../../redux/slices/diamondSlice';
 
@@ -23,6 +23,7 @@ export const AddModalDiamond = ({
 	const [form] = Form.useForm();
 	const dispatch = useDispatch();
 
+	const loading = useSelector(LoadingCustomizeSelector);
 	const shapes = useSelector(getAllShapeSelector);
 
 	useEffect(() => {
@@ -182,7 +183,7 @@ export const AddModalDiamond = ({
 			onCancel={handleCancel}
 			width={800}
 		>
-			<Form form={form} layout="vertical" onFinish={handleAddDiamondForm}>
+			<Form form={form} layout="vertical" onFinish={handleAddDiamondForm} onLoad={loading}>
 				<label className="font-semibold">Thêm 4C</label>
 				<div className="flex flex-wrap gap-4">
 					<Form.Item

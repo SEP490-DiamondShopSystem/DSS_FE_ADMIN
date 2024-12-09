@@ -159,6 +159,13 @@ const DiamondDetail = ({diamond, handleView, id, handleLockDiamondView}) => {
 							</p>
 						)}
 					</div>
+					{diamond?.ProductLock && (
+						<div className="flex items-center">
+							<p className="text-gray-500 text-base mb-6 font-semibold ">
+								Kim Cương Đã Khóa Cho Khách: {diamond?.ProductLock?.Account?.Email}
+							</p>
+						</div>
+					)}
 				</div>
 			</div>
 

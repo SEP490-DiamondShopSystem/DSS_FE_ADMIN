@@ -438,11 +438,11 @@ const DiamondPage = () => {
 						range
 						marks={{
 							0: '0',
-							1000000000: '100M',
-							5000000000: '500M',
-							10000000000: '1000M',
+							1000000000: '1000M',
+							5000000000: '5000M',
+							10000000000: '10000M',
 							15000000000: '15000M',
-							20000000000: '20000M',
+							20000000000: `20000M`,
 						}}
 						step={null}
 						value={[filters?.price?.minPrice, filters?.price?.maxPrice]}
@@ -460,7 +460,11 @@ const DiamondPage = () => {
 					<Slider
 						range
 						value={[filters?.carat?.minCarat, filters?.carat?.maxCarat]}
-						step={0.1}
+						step={0.01}
+						marks={{
+							[filters?.carat?.minCarat]: `${filters?.carat?.minCarat}`,
+							[filters?.carat?.maxCarat]: `${filters?.carat?.maxCarat}`,
+						}}
 						min={filterLimits?.Carat?.Min}
 						max={filterLimits?.Carat?.Max}
 						onChange={handleCaratChange}

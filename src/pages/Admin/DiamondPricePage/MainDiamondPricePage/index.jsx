@@ -55,7 +55,7 @@ const MainDiamondPricePage = () => {
 	const [criteriaRangeToDelete, setCriteriaRangeToDelete] = useState(null);
 
 	useEffect(() => {
-		dispatch(fetchPriceBoard({shapeId, isLabDiamond, cut, isSideDiamond: false}));
+		dispatch(fetchPriceBoard({shapeId, isLabDiamond, isSideDiamond: false}));
 	}, [dispatch, shapeId, isLabDiamond, cut]);
 
 	const handleShapeChange = (event) => {
@@ -86,7 +86,7 @@ const MainDiamondPricePage = () => {
 		await dispatch(deleteDiamondPrice(payload)); // Wait for delete to finish
 		setSelectedPrices([]);
 		setShowDeleteConfirm(false);
-		await dispatch(fetchPriceBoard({shapeId, isLabDiamond, cut, isSideDiamond: false})); // Fetch updated board
+		await dispatch(fetchPriceBoard({shapeId, isLabDiamond, isSideDiamond: false})); // Fetch updated board
 	};
 
 	const savePrices = async () => {
@@ -114,7 +114,7 @@ const MainDiamondPricePage = () => {
 		setEditedCells([]);
 		setIsCreating(false);
 
-		await dispatch(fetchPriceBoard({shapeId, isLabDiamond, cut, isSideDiamond: false}));
+		await dispatch(fetchPriceBoard({shapeId, isLabDiamond, isSideDiamond: false}));
 	};
 
 	const handleSave = async () => {
@@ -149,7 +149,7 @@ const MainDiamondPricePage = () => {
 
 		setEditedCells([]);
 		setIsEditing(false);
-		await dispatch(fetchPriceBoard({shapeId, isLabDiamond, cut, isSideDiamond: false}));
+		await dispatch(fetchPriceBoard({shapeId, isLabDiamond, isSideDiamond: false}));
 	};
 
 	// Render missing ranges alert
@@ -589,15 +589,7 @@ const MainDiamondPricePage = () => {
 							aria-label="Select Shape"
 						>
 							<option value="1">Round</option>
-							<option value="2">Princess</option>
-							<option value="3">Cushion</option>
-							<option value="4">Emerald</option>
-							<option value="5">Oval</option>
-							<option value="6">Radiant</option>
-							<option value="7">Asscher</option>
-							<option value="8">Marquise</option>
-							<option value="9">Heart</option>
-							<option value="10">Pear</option>
+							<option value="98">Fancy</option>
 						</select>
 					</div>
 
@@ -614,25 +606,6 @@ const MainDiamondPricePage = () => {
 							Kim Cương Nhân Tạo
 						</label>
 					</div>
-
-					{/* Cut Selection */}
-					<div className="flex sm:flex-row items-center gap-2">
-						<label htmlFor="cutSelect" className="text-lg font-semibold text-gray-800">
-							Cut:
-						</label>
-						<select
-							id="cutSelect"
-							value={cut}
-							onChange={handleCutChange}
-							className="border border-gray-300 p-2 rounded shadow focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200 bg-white text-gray-700"
-							aria-label="Select Cut"
-						>
-							<option value="1">Good</option>
-							<option value="2">Very Good</option>
-							<option value="3">Excellent</option>
-						</select>
-					</div>
-					{/* )} */}
 
 					{/* Clear Filters Button */}
 					<div>
@@ -671,15 +644,7 @@ const MainDiamondPricePage = () => {
 						aria-label="Select Shape"
 					>
 						<option value="1">Round</option>
-						<option value="2">Princess</option>
-						<option value="3">Cushion</option>
-						<option value="4">Emerald</option>
-						<option value="5">Oval</option>
-						<option value="6">Radiant</option>
-						<option value="7">Asscher</option>
-						<option value="8">Marquise</option>
-						<option value="9">Heart</option>
-						<option value="10">Pear</option>
+						<option value="98">Fancy</option>
 					</select>
 				</div>
 
@@ -696,25 +661,6 @@ const MainDiamondPricePage = () => {
 						Kim Cương Nhân Tạo
 					</label>
 				</div>
-
-				{/* Cut Selection */}
-				<div className="flex sm:flex-row items-center gap-2">
-					<label htmlFor="cutSelect" className="text-lg font-semibold text-gray-800">
-						Cut:
-					</label>
-					<select
-						id="cutSelect"
-						value={cut}
-						onChange={handleCutChange}
-						className="border border-gray-300 p-2 rounded shadow focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200 bg-white text-gray-700"
-						aria-label="Select Cut"
-					>
-						<option value="1">Good</option>
-						<option value="2">Very Good</option>
-						<option value="3">Excellent</option>
-					</select>
-				</div>
-				{/* )} */}
 
 				{/* Clear Filters Button */}
 				<div className="flex gap-4">
