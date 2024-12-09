@@ -26,7 +26,7 @@ import {
 	CheckCircleOutlined,
 	FilterFilled,
 } from '@ant-design/icons';
-import {fetchAllJewelry, fetchJewelryDetail } from '../../../../redux/slices/jewelry/jewelrySlice';
+import {fetchAllJewelry, fetchJewelryDetail} from '../../../../redux/slices/jewelry/jewelrySlice';
 import JewelryModelList from '../../PromotionPage/JewelryModelList';
 import {
 	selectJewelryList,

@@ -27,6 +27,7 @@ export const getOrderChildLogListSelector = (state) => state.logSlice.orderChild
 
 //CUSTOMIZE
 export const getAllOrderCustomizeSelector = (state) => state.customizeSlice.ordersCustomize;
+export const LoadingCustomizeSelector = (state) => state.customizeSlice.loading;
 export const getOrderDetailCustomizeSelector = (state) => state.customizeSlice.orderDetailCustomize;
 export const getOrderStatusCustomizeDetailSelector = (state) =>
 	state.customizeSlice.orderStatusCustomizeDetail;
@@ -151,7 +152,7 @@ export const selectOrderPaymentRule = (state) => state?.config?.orderPaymentRule
 export const selectShopBankAccountRule = (state) => state?.config?.shopBankAccountRule;
 export const selectIsLoading = (state) => state?.config?.isLoading;
 export const selectConfigError = (state) => state?.config?.error;
-//CRITERIA 
+//CRITERIA
 export const selectCriterias = (state) => state.criteriaRangeSlice.criterias;
 export const selectCriteriaLoading = (state) => state.criteriaRangeSlice.loading;
 export const selectCriteriaError = (state) => state.criteriaRangeSlice.error;
