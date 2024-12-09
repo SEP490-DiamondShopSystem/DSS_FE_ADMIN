@@ -28,9 +28,9 @@ const SideDiamondPricePage = () => {
 	}));
 	const [filters, setFilters] = useState({
 		isSideDiamond: true,
-		shapeId: 1,
+		shapeId: 99,
 		isLabDiamond: false,
-		cut: 1,
+
 	});
 
 	const handleFilterChange = (filterName) => (event) => {
@@ -40,9 +40,10 @@ const SideDiamondPricePage = () => {
 		}));
 	};
 
-	const [shapeId, setShapeId] = useState(1);
+	const [shapeId, setShapeId] = useState(99
+	);
 	const [isLabDiamond, setIsLabDiamond] = useState(false);
-	const [cut, setCut] = useState(1);
+
 	const [editedCells, setEditedCells] = useState([]);
 	const [isEditing, setIsEditing] = useState(false);
 	const [selectedPrices, setSelectedPrices] = useState([]);
@@ -56,8 +57,8 @@ const SideDiamondPricePage = () => {
 	const [criteriaRangeToDelete, setCriteriaRangeToDelete] = useState(null);
 
 	useEffect(() => {
-		dispatch(fetchPriceBoard({shapeId, isLabDiamond, cut, isSideDiamond: true}));
-	}, [dispatch, shapeId, isLabDiamond, cut]);
+		dispatch(fetchPriceBoard({shapeId, isLabDiamond,  isSideDiamond: true}));
+	}, [dispatch, shapeId, isLabDiamond]);
 
 	const handleShapeChange = (event) => {
 		setShapeId(Number(event.target.value));
@@ -87,14 +88,14 @@ const SideDiamondPricePage = () => {
 		await dispatch(deleteDiamondPrice(payload)); // Wait for delete to finish
 		setSelectedPrices([]);
 		setShowDeleteConfirm(false);
-		await dispatch(fetchPriceBoard({shapeId, isLabDiamond, cut, isSideDiamond: true})); // Fetch updated board
+		await dispatch(fetchPriceBoard({shapeId, isLabDiamond,  isSideDiamond: true})); // Fetch updated board
 	};
 
 	const savePrices = async () => {
 		const listPrices = editedCells.map((cell) => ({
 			DiamondCriteriaId: priceBoard.PriceTables[0].CriteriaId,
 			price: Number(cell.price),
-			cut: priceBoard.MainCut,
+			cut: priceBoard.Main,
 			color: Object.keys(priceBoard.PriceTables[0].ColorRange)[cell.rowIndex],
 			clarity: Object.keys(priceBoard.PriceTables[0].ClarityRange)[cell.cellIndex],
 		}));
@@ -115,7 +116,7 @@ const SideDiamondPricePage = () => {
 		setEditedCells([]);
 		setIsCreating(false);
 
-		await dispatch(fetchPriceBoard({shapeId, isLabDiamond, cut, isSideDiamond: true}));
+		await dispatch(fetchPriceBoard({shapeId, isLabDiamond,  isSideDiamond: true}));
 	};
 
 	const handleSave = async () => {
@@ -150,7 +151,7 @@ const SideDiamondPricePage = () => {
 
 		setEditedCells([]);
 		setIsEditing(false);
-		await dispatch(fetchPriceBoard({shapeId, isLabDiamond, cut, isSideDiamond: true}));
+		await dispatch(fetchPriceBoard({shapeId, isLabDiamond,  isSideDiamond: true}));
 	};
 
 	// Render missing ranges alert
@@ -197,7 +198,7 @@ const SideDiamondPricePage = () => {
 			setIsCreateRangeModalVisible(false);
 
 			// Refresh price board after creating range
-			dispatch(fetchPriceBoard({shapeId, isLabDiamond, cut, isSideDiamond: true}));
+			dispatch(fetchPriceBoard({shapeId, isLabDiamond,  isSideDiamond: true}));
 		} catch (error) {
 			message.error(error?.data?.title || 'Không thể tạo phạm vi kim cương');
 		}
@@ -225,7 +226,7 @@ const SideDiamondPricePage = () => {
 			message.success('Xóa phạm vi kim cương thành công!');
 
 			// Refresh price board after deleting range
-			dispatch(fetchPriceBoard({shapeId, isLabDiamond, cut, isSideDiamond: true}));
+			dispatch(fetchPriceBoard({shapeId, isLabDiamond,  isSideDiamond: true}));
 
 			// Reset criteriaRangeToDelete
 			setCriteriaRangeToDelete(null);
@@ -258,7 +259,7 @@ const SideDiamondPricePage = () => {
 			setSelectedRange(null);
 
 			// Refresh price board after updating range
-			dispatch(fetchPriceBoard({shapeId, isLabDiamond, cut, isSideDiamond: true}));
+			dispatch(fetchPriceBoard({shapeId, isLabDiamond,  isSideDiamond: true}));
 		} catch (error) {
 			message.error(error?.data?.title || 'Không thể cập nhật phạm vi kim cương');
 		}
@@ -577,30 +578,7 @@ const SideDiamondPricePage = () => {
 					Bảng Giá Kim Cương Tấm{' '}
 				</h1>
 				<div className="flex flex-wrap gap-4 items-center justify-between p-4 bg-offWhite rounded-lg shadow-md">
-					{/* Shape Selection */}
-					<div className="flex sm:flex-row items-center gap-2">
-						<label htmlFor="cutSelect" className="text-lg font-semibold text-gray-800">
-							Hình Dáng:
-						</label>
-						<select
-							id="cutSelect"
-							value={shapeId}
-							onChange={handleShapeChange}
-							className="border border-gray-300 p-2 rounded shadow focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200 bg-white text-gray-700"
-							aria-label="Select Shape"
-						>
-							<option value="1">Round</option>
-							<option value="2">Princess</option>
-							<option value="3">Cushion</option>
-							<option value="4">Emerald</option>
-							<option value="5">Oval</option>
-							<option value="6">Radiant</option>
-							<option value="7">Asscher</option>
-							<option value="8">Marquise</option>
-							<option value="9">Heart</option>
-							<option value="10">Pear</option>
-						</select>
-					</div>
+
 
 					{/* Lab Diamond Checkbox */}
 					<div className="flex items-center gap-2">
@@ -616,24 +594,6 @@ const SideDiamondPricePage = () => {
 						</label>
 					</div>
 
-					{/* Cut Selection */}
-					<div className="flex sm:flex-row items-center gap-2">
-						<label htmlFor="cutSelect" className="text-lg font-semibold text-gray-800">
-							Cut:
-						</label>
-						<select
-							id="cutSelect"
-							value={cut}
-							onChange={handleCutChange}
-							className="border border-gray-300 p-2 rounded shadow focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200 bg-white text-gray-700"
-							aria-label="Select Cut"
-						>
-							<option value="1">Good</option>
-							<option value="2">Very Good</option>
-							<option value="3">Excellent</option>
-						</select>
-					</div>
-					{/* )} */}
 
 					{/* Clear Filters Button */}
 					<div>
@@ -659,30 +619,7 @@ const SideDiamondPricePage = () => {
 				Bảng Giá Kim Cương Tấm{' '}
 			</h1>
 			<div className="flex flex-wrap gap-4 items-center justify-between p-4 bg-offWhite rounded-lg shadow-md">
-				{/* Shape Selection */}
-				<div className="flex sm:flex-row items-center gap-2">
-					<label htmlFor="cutSelect" className="text-lg font-semibold text-gray-800">
-						Hình Dáng:
-					</label>
-					<select
-						id="cutSelect"
-						value={shapeId}
-						onChange={handleShapeChange}
-						className="border border-gray-300 p-2 rounded shadow focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200 bg-white text-gray-700"
-						aria-label="Select Shape"
-					>
-						<option value="1">Round</option>
-						<option value="2">Princess</option>
-						<option value="3">Cushion</option>
-						<option value="4">Emerald</option>
-						<option value="5">Oval</option>
-						<option value="6">Radiant</option>
-						<option value="7">Asscher</option>
-						<option value="8">Marquise</option>
-						<option value="9">Heart</option>
-						<option value="10">Pear</option>
-					</select>
-				</div>
+
 
 				{/* Lab Diamond Checkbox */}
 				<div className="flex items-center gap-2">
@@ -698,24 +635,6 @@ const SideDiamondPricePage = () => {
 					</label>
 				</div>
 
-				{/* Cut Selection */}
-				<div className="flex sm:flex-row items-center gap-2">
-					<label htmlFor="cutSelect" className="text-lg font-semibold text-gray-800">
-						Cut:
-					</label>
-					<select
-						id="cutSelect"
-						value={cut}
-						onChange={handleCutChange}
-						className="border border-gray-300 p-2 rounded shadow focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200 bg-white text-gray-700"
-						aria-label="Select Cut"
-					>
-						<option value="1">Good</option>
-						<option value="2">Very Good</option>
-						<option value="3">Excellent</option>
-					</select>
-				</div>
-				{/* )} */}
 
 				{/* Clear Filters Button */}
 				<div className="flex gap-4">
