@@ -18,7 +18,7 @@ const JewelryDetail = ({ jewelry, onClose }) => {
 
 				<div className="flex space-x-4">
 					<img
-						src={jewelry.Thumbnail?.MediaPath || '/default-thumbnail.jpg'}
+						src={jewelry.Model.Thumbnail?.MediaPath || '/default-thumbnail.jpg'}
 						alt={jewelry.SerialCode}
 						className="w-40 h-40 object-cover rounded-md border-2 border-gray-300 shadow-sm"
 					/>

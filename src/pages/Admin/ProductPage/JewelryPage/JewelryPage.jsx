@@ -12,8 +12,18 @@ import {
 	notification,
 	Card,
 	Modal,
+	Tag,
+	Tooltip,
 } from 'antd';
-import {SearchOutlined, PlusOutlined} from '@ant-design/icons';
+import {
+	SearchOutlined,
+	PlusOutlined,
+	FilterOutlined,
+	InfoCircleOutlined,
+	DollarOutlined,
+	GoldOutlined,
+	CheckCircleOutlined,
+} from '@ant-design/icons';
 import {fetchAllJewelry} from '../../../../redux/slices/jewelry/jewelrySlice';
 import JewelryModelList from '../../PromotionPage/JewelryModelList';
 import {
@@ -29,20 +39,21 @@ import JewelryCreateForm from './JewelryCreateForm';
 import {fetchAllMetals} from '../../../../redux/slices/jewelry/metalSlice';
 import {fetchAllSizes} from '../../../../redux/slices/jewelry/sizeSlice';
 import {formatPrice} from '../../../../utils';
+
 const JewelryPage = () => {
 	const dispatch = useDispatch();
 	const loading = useSelector(selectJewelryLoading);
 	const error = useSelector(selectJewelryError);
 	const totalPage = useSelector(selectJewelryTotalPage);
 	const [currentPage, setCurrentPage] = useState(1);
-	const [pageSize, setPageSize] = useState(5);
+	const [pageSize, setPageSize] = useState(10);
 
 	const jewelryList = useSelector(selectJewelryList);
 	const [isPopupVisible, setIsPopupVisible] = useState(false);
 	const [selectedModel, setSelectedModel] = useState(null);
-	const [selectedModelId, setSelectedModelId] = useState(null);
 	const [selectedJewelry, setSelectedJewelry] = useState(null);
 	const [isCreateFormOpen, setIsCreateFormOpen] = useState(false);
+	const [isFilterVisible, setIsFilterVisible] = useState(false);
 
 	const [filters, setFilters] = useState({
 		ModelName: '',
@@ -52,32 +63,17 @@ const JewelryPage = () => {
 		HasSideDiamond: false,
 		Status: 1,
 	});
-	const {Meta} = Card;
 
-	const handleSelectModel = (model) => {
-		console.log('Model Selected in Parent:', model);
-		setSelectedModel(model);
-		setIsPopupVisible(false);
-	};
+	const metals = useSelector(getAllMetalsSelector);
+	const sizes = useSelector(getAllSizesSelector);
 
-	const handleFilterChange = (e) => {
-		const {name, value} = e.target;
-		setFilters({...filters, [name]: value});
-	};
-	const metals = useSelector(getAllMetalsSelector); // Selector for getting metals from the store
 	useEffect(() => {
 		dispatch(fetchAllMetals());
-	}, [dispatch]);
-	const sizes = useSelector(getAllSizesSelector); // Selector for getting metals from the store
-	useEffect(() => {
 		dispatch(fetchAllSizes());
 	}, [dispatch]);
-	const handleHasSideDiamondChange = (e) => {
-		setFilters({...filters, HasSideDiamond: e.target.checked});
-	};
+
 	useEffect(() => {
 		if (selectedModel?.Id) {
-			// Fetch jewelry items based on the selected model
 			dispatch(
 				fetchAllJewelry({
 					CurrentPage: currentPage,
@@ -87,328 +83,324 @@ const JewelryPage = () => {
 				})
 			)
 				.unwrap()
-				.then((res) => {
-					console.log('res', res);
-				})
 				.catch((error) => {
 					notification.error({
-						message: 'Error',
+						message: 'Lỗi',
 						description:
-							error?.data?.title || error?.detail || 'Failed to load jewelry items',
-						duration: 3,
+							error?.data?.title ||
+							error?.detail ||
+							'Không thể tải danh sách trang sức',
 					});
 				});
 		}
 	}, [dispatch, selectedModel?.Id, currentPage, pageSize, filters]);
 
-	console.log('jewelryList', jewelryList);
-
-	useEffect(() => {
-		if (error) {
-			notification.error({
-				message: 'Error',
-				description: error,
-				duration: 3,
-			});
-		}
-	}, [error]);
+	const handleSelectModel = (model) => {
+		setSelectedModel(model);
+		setIsPopupVisible(false);
+	};
 
 	const handleJewelryClick = (jewelry) => {
 		setSelectedJewelry(jewelry);
 	};
 
-	const handleAddJewelry = () => {
-		setIsCreateFormOpen(true);
-	};
-
-	const handleCreateFormClose = () => {
-		setIsCreateFormOpen(false);
-	};
-
-	const handlePreviousPage = () => {
-		if (currentPage > 1) {
-			setCurrentPage(currentPage - 1);
-		}
-	};
-
-	const handleNextPage = () => {
-		if (currentPage < totalPage) {
-			setCurrentPage(currentPage + 1);
+	const renderStatusTag = (status) => {
+		switch (status) {
+			case 1:
+				return <Tag color="blue">Hoạt động</Tag>;
+			case 2:
+				return <Tag color="gold">Đã bán</Tag>;
+			case 3:
+				return <Tag color="volcano">Bị khóa</Tag>;
+			case 4:
+				return <Tag color="gray">Không hoạt động</Tag>;
+			case 5:
+				return <Tag color="cyan">Khóa người dùng</Tag>;
+			case 6:
+				return <Tag color="purple">Đặt trước</Tag>;
+			default:
+				return <Tag>Không xác định</Tag>;
 		}
 	};
 
 	return (
-		<div className="container mx-auto px-4">
-			<h1 className="text-4xl font-semibold text-primary mb-10">Danh Sách Trang Sức</h1>
-			<Form.Item
-				label="Mẫu Trang Sức"
-				name="jewelryModelId"
-				rules={[
-					{
-						required: true,
-						message: 'Vui Lòng Chọn Mẫu Trang Sức',
-					},
-				]}
-			>
-				<div className="flex items-center gap-2">
-					<Input readOnly value={selectedModel?.Id} />
-					<Button onClick={() => setIsPopupVisible(true)}>Chọn Mẫu Trang Sức</Button>
+		<div className="container mx-auto px-6 py-8 bg-gray-50 min-h-screen">
+			<div className="bg-white shadow-lg rounded-xl p-8">
+				<div className="flex justify-between items-center mb-8">
+					<h1 className="text-3xl font-bold text-gray-800 flex items-center">
+						<GoldOutlined className="mr-3 text-primary" />
+						Quản Lý Trang Sức
+					</h1>
+					<Button
+						type="primary"
+						icon={<PlusOutlined />}
+						onClick={() => setIsCreateFormOpen(true)}
+						className="bg-primary hover:bg-primary-600 transition-colors"
+					>
+						Thêm Trang Sức
+					</Button>
 				</div>
-			</Form.Item>
-			<Modal
-				open={isPopupVisible}
-				onCancel={() => setIsPopupVisible(false)}
-				footer={null}
-				width="80%"
-			>
-				<JewelryModelList onSelectModel={handleSelectModel} />
-			</Modal>
-			{/* Filter Section */}
-			<div className="filter-section mb-6">
-				<h2 className="text-2xl font-semibold text-primary mb-4">Lọc Theo Tiêu Chí</h2>
-				<Form layout="inline" className="space-y-4">
-					<Row gutter={[60, 16]}>
-						<Col span={12}>
-							<Form.Item label="Metal">
-								<Select
-									name="MetalId"
-									value={filters.MetalId}
-									onChange={(value) => setFilters({...filters, MetalId: value})}
-									className="w-full"
-									placeholder="Select Metal"
-									allowClear
-								>
-									{Array.isArray(metals) &&
-										metals.map((metal) => (
+
+				{/* Model Selection */}
+				<Card
+					className="mb-6 border-primary"
+					title={
+						<div className="flex items-center">
+							<CheckCircleOutlined className="mr-2 text-primary" />
+							Chọn Mẫu Trang Sức
+						</div>
+					}
+				>
+					<Row gutter={16} align="middle">
+						<Col xs={24} md={16}>
+							<Input
+								readOnly
+								value={selectedModel?.Id || 'Chưa chọn mẫu'}
+								placeholder="Chọn mẫu trang sức"
+								prefix={<InfoCircleOutlined className="text-primary" />}
+							/>
+						</Col>
+						<Col xs={24} md={8}>
+							<Button
+								type="default"
+								onClick={() => setIsPopupVisible(true)}
+								className="w-full"
+							>
+								Chọn Mẫu
+							</Button>
+						</Col>
+					</Row>
+				</Card>
+
+				{/* Filters */}
+				<Card
+					className="mb-6 border-primary"
+					title={
+						<div
+							className="flex items-center cursor-pointer"
+							onClick={() => setIsFilterVisible(!isFilterVisible)}
+						>
+							<FilterOutlined className="mr-2 text-primary" />
+							Bộ Lọc {isFilterVisible ? '▼' : '►'}
+						</div>
+					}
+				>
+					{isFilterVisible && (
+						<Row gutter={[16, 16]}>
+							<Col xs={24} md={12} lg={6}>
+								<Form.Item label="Chất Liệu">
+									<Select
+										value={filters.MetalId}
+										onChange={(value) =>
+											setFilters({...filters, MetalId: value})
+										}
+										placeholder="Chọn chất liệu"
+										allowClear
+										className="w-full"
+									>
+										{metals.map((metal) => (
 											<Select.Option key={metal.Id} value={metal.Id}>
 												{metal.Name}
 											</Select.Option>
 										))}
-								</Select>
-							</Form.Item>
-						</Col>
-						<Col span={12}>
-							<Form.Item label="Size">
-								<Select
-									name="SizeId"
-									value={filters.SizeId}
-									onChange={(value) => setFilters({...filters, SizeId: value})}
-									className="w-full"
-									placeholder="Select Size"
-									allowClear
-								>
-									{Array.isArray(sizes) &&
-										sizes.map((size) => (
+									</Select>
+								</Form.Item>
+							</Col>
+							<Col xs={24} md={12} lg={6}>
+								<Form.Item label="Kích Thước">
+									<Select
+										value={filters.SizeId}
+										onChange={(value) =>
+											setFilters({...filters, SizeId: value})
+										}
+										placeholder="Chọn kích thước"
+										allowClear
+										className="w-full"
+									>
+										{sizes.map((size) => (
 											<Select.Option key={size.Id} value={size.Id}>
 												{size.Value} {size.Unit}
 											</Select.Option>
 										))}
-								</Select>
-							</Form.Item>
-						</Col>
-
-						<Col span={12}>
-							<Form.Item label="Has Side Diamond">
-								<Checkbox
-									checked={filters.HasSideDiamond}
-									onChange={handleHasSideDiamondChange}
-									className="w-full"
-								/>
-							</Form.Item>
-						</Col>
-						<Col span={12}>
-							<Form.Item label="Status">
-								<Select
-									name="Status"
-									value={filters.Status}
-									onChange={(value) => setFilters({...filters, Status: value})}
+									</Select>
+								</Form.Item>
+							</Col>
+							<Col xs={24} md={12} lg={6}>
+								<Form.Item label="Kim Cương">
+									<Checkbox
+										checked={filters.HasSideDiamond}
+										onChange={(e) =>
+											setFilters({
+												...filters,
+												HasSideDiamond: e.target.checked,
+											})
+										}
+									>
+										Có Kim Cương
+									</Checkbox>
+								</Form.Item>
+							</Col>
+							<Col xs={24} md={12} lg={6}>
+								<Form.Item label="Trạng Thái">
+									<Select
+										value={filters.Status}
+										onChange={(value) =>
+											setFilters({...filters, Status: value})
+										}
+										className="w-full"
+									>
+										<Select.Option value={1}>Hoạt động</Select.Option>
+										<Select.Option value={2}>Không hoạt động</Select.Option>
+										<Select.Option value={3}>Đã lưu trữ</Select.Option>
+										<Select.Option value={4}>Đã bán</Select.Option>
+										<Select.Option value={5}>Bị khóa</Select.Option>
+										<Select.Option value={6}>Đặt trước</Select.Option>
+									</Select>
+								</Form.Item>
+							</Col>
+							<Col span={24}>
+								<Button
+									type="primary"
+									icon={<SearchOutlined />}
+									onClick={() =>
+										dispatch(
+											fetchAllJewelry({
+												JewelryModelId: selectedModel?.Id,
+												CurrentPage: currentPage,
+												PageSize: pageSize,
+												filters,
+											})
+										)
+									}
 									className="w-full"
 								>
-									<Select.Option value={1}>Active</Select.Option>
-									<Select.Option value={2}>Inactive</Select.Option>
-									<Select.Option value={3}>Archived</Select.Option>
-								</Select>
-							</Form.Item>
-						</Col>
-					</Row>
-					<Form.Item>
-						<Button
-							type="primary"
-							icon={<SearchOutlined />}
-							onClick={() =>
-								dispatch(
-									fetchAllJewelry({
-										JewelryModelId: selectedModel?.Id,
-										CurrentPage: currentPage,
-										PageSize: pageSize,
-										filters,
-									})
-								)
-							}
-							className="bg-primary text-black hover:bg-primaryDark"
-						>
-							Lọc
-						</Button>
-					</Form.Item>
-				</Form>
-			</div>
+									Áp Dụng Bộ Lọc
+								</Button>
+							</Col>
+						</Row>
+					)}
+				</Card>
 
-			{/* Add Jewelry Button */}
-			<div className="flex justify-end mb-5">
-				<Button
-					type="primary"
-					icon={<PlusOutlined />}
-					onClick={handleAddJewelry}
-					className="bg-primary text-black hover:bg-primaryDark"
-				>
-					Add Jewelry
-				</Button>
-			</div>
-
-			{/* Loading, Error and Jewelry List */}
-			{loading && <Spin tip="Loading..." className="flex justify-center mt-5" />}
-			{/* {error && <p className="text-red-500 text-center">{error}</p>} */}
-			{!loading && (
-				<div className="jewelry-list grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-					{Array.isArray(jewelryList) &&
-						jewelryList.map((jewelry) => (
-							<div
+				{/* Jewelry List */}
+				{loading ? (
+					<div className="flex justify-center items-center h-64">
+						<Spin size="large" />
+					</div>
+				) : (
+					<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+						{jewelryList.map((jewelry) => (
+							<Card
 								key={jewelry.Id}
+								hoverable
 								onClick={() => handleJewelryClick(jewelry)}
-								className="jewelry-item bg-white p-6 rounded-lg shadow-lg transition-all transform hover:scale-105 hover:shadow-2xl"
-							>
-								<Card
-									hoverable
-									className="flex flex-col lg:flex-row bg-tintWhite rounded-lg border border-gray-200"
-								>
-									{/* Image Section */}
-									<div className="lg:w-1/3 w-full mb-4 lg:mb-0">
+								className="transform transition-all hover:scale-105 hover:shadow-xl"
+								cover={
+									<div className="h-48 overflow-hidden flex items-center justify-center">
 										<img
 											alt={jewelry.SerialCode}
 											src={
-												jewelry.thumbnail?.mediaPath ||
+												jewelry?.Model?.Thumbnail?.MediaPath ||
 												'/default-thumbnail.jpg'
 											}
-											className="w-full h-48 lg:h-full object-cover rounded-lg"
-											style={{
-												boxShadow: '0 6px 12px rgba(0, 0, 0, 0.1)',
-											}}
-											loading="lazy"
+											className="w-full h-full object-cover"
 										/>
 									</div>
-
-									{/* Description Section */}
-									<div className="lg:w-2/3 w-full lg:pl-4">
-										<Meta
-											title={
-												<h2 className="text-lg font-semibold text-primary mb-2">
-													{jewelry.SerialCode}
-												</h2>
-											}
-											description={
-												<div className="space-y-2">
-													<p className="text-lg text-gray-500 flex items-center">
-														<span className="icon-category mr-2">
-															📦
-														</span>
-														Loại: {jewelry.Model?.CategoryId || 'N/A'}
-													</p>
-													<p className="text-lg text-gray-500 flex items-center">
-														<span className="icon-metal mr-2">🛠️</span>
-														Vật Liệu: {jewelry?.Metal?.Name || 'N/A'}
-													</p>
-													<p className="text-lg text-gray-500 flex items-center">
-														<span className="icon-price mr-2">💰</span>
-														Giá:{' '}
-														{jewelry.TotalPrice > 0
-															? formatPrice(jewelry?.TotalPrice)
-															: 'Liên Hệ'}{' '}
-													</p>
-													<p className="text-lg text-gray-500">
-														Kích thước: {jewelry.Size?.Value}{' '}
-														{jewelry.Size?.Unit}
-													</p>
-													<p className="text-lg text-gray-500">
-														Trọng lượng: {jewelry.Weight}{' '}
-														{jewelry.Size?.Unit}
-													</p>
-													{jewelry.Diamonds &&
-														jewelry.Diamonds.length > 0 && (
-															<p className="text-lg text-gray-500">
-																Kim Cương: {jewelry.Diamonds.length}{' '}
-																Diamond
-																{jewelry.Diamonds.length > 1
-																	? 's'
-																	: ''}
-															</p>
-														)}
-													{jewelry.EngravedText && (
-														<p className="text-sm text-gray-500">
-															Chữ Khắc: {jewelry.EngravedText}
-														</p>
-													)}
-													<p className="text-lg font-semibold text-darkGreen mt-4">
-														Tổng Giá:{' '}
-														{jewelry.TotalPrice > 0
-															? formatPrice(jewelry.TotalPrice)
-															: 'Liên Hệ'}{' '}
-													</p>
-													<button className="mt-4 py-2 px-4 bg-primary text-white rounded-lg hover:bg-primary-dark">
-														Xem Chi Tiết
-													</button>
-												</div>
-											}
-										/>
-									</div>
-								</Card>
-							</div>
+								}
+							>
+								<Card.Meta
+									title={
+										<div className="flex justify-between items-center">
+											<span className="text-lg font-semibold">
+												{jewelry.SerialCode}
+											</span>
+											{renderStatusTag(jewelry.Status)}
+										</div>
+									}
+									description={
+										<div className="space-y-2">
+											<div className="flex items-center">
+												<DollarOutlined className="mr-2 text-primary" />
+												<span>
+													{jewelry.TotalPrice > 0
+														? formatPrice(jewelry.TotalPrice)
+														: 'Liên Hệ Báo Giá'}
+												</span>
+											</div>
+											<div className="flex justify-between text-sm text-gray-500">
+												<Tooltip title="Chất Liệu">
+													<span>{jewelry?.Metal?.Name || 'N/A'}</span>
+												</Tooltip>
+												<Tooltip title="Kích Thước">
+													<span>
+														{jewelry.Size?.Value} {jewelry.Size?.Unit}
+													</span>
+												</Tooltip>
+											</div>
+										</div>
+									}
+								/>
+							</Card>
 						))}
-				</div>
-			)}
+					</div>
+				)}
 
-			{/* Pagination Controls */}
-			<div className="pagination-controls flex justify-center space-x-4 mt-4">
-				<Button
-					onClick={handlePreviousPage}
-					disabled={currentPage === 1}
-					className="bg-primary text-black hover:bg-primaryDark disabled:opacity-50"
-				>
-					Previous
-				</Button>
-				<span className="text-lg">{`Page ${currentPage} of ${totalPage}`}</span>
-				<Button
-					onClick={handleNextPage}
-					disabled={currentPage === totalPage}
-					className="bg-primary text-black hover:bg-primaryDark disabled:opacity-50"
-				>
-					Next
-				</Button>
-				<Select
-					value={pageSize}
-					onChange={(value) => setPageSize(value)}
-					className="form-select p-2 border border-gray rounded-md"
-				>
-					<Select.Option value={5}>5 per page</Select.Option>
-					<Select.Option value={10}>10 per page</Select.Option>
-					<Select.Option value={20}>20 per page</Select.Option>
-				</Select>
-			</div>
+				{/* Pagination */}
+				<div className="flex justify-center items-center mt-12 space-x-6">
+	<Button
+		onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+		disabled={currentPage === 1}
+		className="px-4 py-2"
+	>
+		Previous
+	</Button>
+	<span className="text-lg">
+		Page {currentPage} of {totalPage}
+	</span>
+	<Button
+		onClick={() => setCurrentPage((p) => Math.min(totalPage, p + 1))}
+		disabled={currentPage === totalPage}
+		className="px-4 py-2"
+	>
+		Next
+	</Button>
+	<Select
+		value={pageSize}
+		onChange={setPageSize}
+		style={{ width: 120 }}
+		className="ml-4"
+	>
+		<Select.Option value={5}>5 per page</Select.Option>
+		<Select.Option value={10}>10 per page</Select.Option>
+		<Select.Option value={20}>20 per page</Select.Option>
+	</Select>
+</div>
 
-			{/* Jewelry Detail Modal */}
-			{selectedJewelry && (
-				<JewelryDetail jewelry={selectedJewelry} onClose={() => setSelectedJewelry(null)} />
-			)}
 
-			{/* Jewelry Create Form Modal */}
-			{isCreateFormOpen && (
-				<div className="">
+				{/* Modals */}
+				<Modal
+					open={isPopupVisible}
+					onCancel={() => setIsPopupVisible(false)}
+					footer={null}
+					width="80%"
+				>
+					<JewelryModelList onSelectModel={handleSelectModel} />
+				</Modal>
+
+				{selectedJewelry && (
+					<JewelryDetail
+						jewelry={selectedJewelry}
+						onClose={() => setSelectedJewelry(null)}
+					/>
+				)}
+
+				{isCreateFormOpen && (
 					<JewelryCreateForm
-						onClose={handleCreateFormClose}
+						onClose={() => setIsCreateFormOpen(false)}
 						isCreateFormOpen={isCreateFormOpen}
 						setIsCreateFormOpen={setIsCreateFormOpen}
 					/>
-				</div>
-			)}
+				)}
+			</div>
 		</div>
 	);
 };

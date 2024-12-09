@@ -3,6 +3,12 @@ import {useDispatch, useSelector} from 'react-redux';
 import {
 	fetchAllJewelryModels,
 	createJewelryModel,
+	deleteJewelryModel,
+	deleteSideDiamondOption,
+	deleteSizeMetalFromJewelryModel,
+	createSideDiamondOptionForJewelryModel,
+	createSizeMetalForJewelryModel,
+	updateSizeMetalForJewelryModel,
 } from '../../../../redux/slices/jewelry/jewelryModelSlice';
 import {
 	Button,
@@ -23,6 +29,7 @@ import {fetchAllSizes} from '../../../../redux/slices/jewelry/sizeSlice';
 import {fetchAllShapes} from '../../../../redux/slices/shapeSlice';
 import {fetchAllEnums} from '../../../../redux/slices/jewelry/enumSlice';
 import {fetchAllJewelryModelCategories} from '../../../../redux/slices/jewelry/jewelryModelCategorySlice';
+import JewelryModelEditModal from './JewelryModelEditModal';
 import {
 	getAllJewelryModelsSelector,
 	getJewelryModelDetailSelector,
@@ -46,7 +53,7 @@ const JewelryModelPage = () => {
 	const error = useSelector(JewelryModelErrorSelector);
 	const [selectedJewelryModelId, setSelectedJewelryModelId] = useState();
 	const [isFormVisible, setIsFormVisible] = useState(false); // for controlling the form visibility
-
+	const [isEditModalVisible, setIsEditModalVisible] = useState(false);
 	const [name, setName] = React.useState('');
 	const [category, setCategory] = React.useState('');
 	const [isRhodiumFinished, setIsRhodiumFinished] = React.useState('');
@@ -370,7 +377,32 @@ const JewelryModelPage = () => {
 			})
 		);
 	};
-
+	const handleDeleteModel = async () => {
+		if (selectedModel) {
+			await dispatch(deleteJewelryModel(selectedModel.Id))
+				.unwrap()
+				.then(async () => {
+					message.success('Xóa Mẫu Trang Sức Thành Công!');
+					setShowModal(false);
+					// Refresh the list of jewelry models
+					await dispatch(
+						fetchAllJewelryModels({
+							Currentpage: currentPage,
+							PageSize: pageSize,
+							Name: name,
+							Category: category,
+							IsRhodiumFinished: isRhodiumFinished,
+							IsEngravable: isEngravable,
+						})
+					);
+				})
+				.catch((error) => {
+					message.error(
+						error?.title || error?.detail || 'Mẫu trang sức đang được sử dụng'
+					);
+				});
+		}
+	};
 	const handleClear = () => {
 		setModelSpec(initialModelSpec);
 		setMainDiamondSpecs(initialMainDiamondSpecs);
@@ -390,8 +422,6 @@ const JewelryModelPage = () => {
 			{/* Loading and Error Handling */}
 			{loading ? (
 				<div className="text-xl text-blue">Đang tải các mẫu trang sức...</div>
-			) : error ? (
-				<div className="text-xl text-red">Lỗi: {error}</div>
 			) : (
 				<div>
 					{/* Models List */}
@@ -438,8 +468,6 @@ const JewelryModelPage = () => {
 						</div>
 						{loading ? (
 							<p>Đang tải...</p>
-						) : error ? (
-							<p className="text-red-500">Lỗi khi tải các mẫu trang sức: {error}</p>
 						) : (
 							<ul>
 								{models.map((model) => (
@@ -474,7 +502,7 @@ const JewelryModelPage = () => {
 												{model.Description}
 											</span>
 											<div className="text-sm text-gray-500">
-												Kim cương tấm: {model.SideDiamond ? 'Yes' : 'No'}
+												Option kim cương tấm: {model.SideDiamondOptionCount}
 											</div>
 											{/* Displaying more model details conditionally */}
 											{model.IsEngravable && (
@@ -489,10 +517,7 @@ const JewelryModelPage = () => {
 											)}
 											{model.MainDiamondCount > 0 && (
 												<div className="text-sm text-gray-500">
-													Kim cương chính: {model.MainDiamondCount}{' '}
-													{model.MainDiamondCount > 1
-														? 'stones'
-														: 'stone'}
+													Kim cương chính: {model.MainDiamondCount} viên
 												</div>
 											)}
 											{model.MetalSupported &&
@@ -1210,15 +1235,27 @@ const JewelryModelPage = () => {
 							</div>
 						</div>
 
-						{/* Nút Xem */}
-						<Button
-							type="primary"
-							size="large"
-							onClick={() => handleView(selectedModel.Id)} // Khi nhấn, mở form
-							className="mt-4 w-full"
-						>
-							Xem Mẫu
-						</Button>
+						<div className="flex space-x-4 mt-4">
+							<Button
+								type="primary"
+								size="large"
+								onClick={() => {
+									setSelectedJewelryModelId(selectedModel.Id);
+									setIsEditModalVisible(true);
+								}}
+								className="flex-1"
+							>
+								Sửa Mẫu
+							</Button>
+							<Button
+								type="primary"
+								size="large"
+								onClick={() => handleView(selectedModel.Id)}
+								className="flex-1"
+							>
+								Xem Mẫu
+							</Button>
+						</div>
 
 						{/* Phần Kim Cương Chính */}
 						{selectedModel.MainDiamonds && selectedModel.MainDiamonds.length > 0 && (
@@ -1397,13 +1434,29 @@ const JewelryModelPage = () => {
 							</div>
 						)}
 
-						{/* Nút Đóng */}
-						<Button
-							onClick={handleCloseModal}
-							className="mt-6 w-full bg-gray text-white rounded-md hover:bg-gray-800"
-						>
-							Đóng
-						</Button>
+						{isEditModalVisible && (
+							<JewelryModelEditModal
+								isVisible={isEditModalVisible}
+								onClose={() => setIsEditModalVisible(false)}
+								model={selectedModel}
+							/>
+						)}
+						{/* Nút Xóa và Đóng */}
+						<div className="flex gap-4 mt-6">
+							<Button
+								type="danger"
+								onClick={handleDeleteModel}
+								className="flex-1 bg-red text-white rounded-md hover:bg-red-600"
+							>
+								Xóa Mẫu
+							</Button>
+							<Button
+								onClick={handleCloseModal}
+								className="flex-1 bg-gray text-white rounded-md hover:bg-gray-800"
+							>
+								Đóng
+							</Button>
+						</div>
 					</div>
 				</div>
 			)}
