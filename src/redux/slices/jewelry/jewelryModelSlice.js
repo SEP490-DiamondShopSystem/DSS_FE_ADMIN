@@ -107,20 +107,20 @@ export const updateCraftmanFee = createAsyncThunk(
 );
 
 export const updateSizeMetalForJewelryModel = createAsyncThunk(
-    'jewelryModel/updateSizeMetal',
-    async ({modelId, sizeMetals}, thunkAPI) => {
-        try {
-            const response = await api.put('/JewelryModel/Update/SizeMetal', {
-                modelId: modelId,
-                sizeMetals: sizeMetals
-            });
-            console.log('updateSizeMetalForJewelryModel response:', response);
-            return response;
-        } catch (error) {
-            console.error('updateSizeMetalForJewelryModel error:', error.response || error);
-            return thunkAPI.rejectWithValue(error.response);
-        }
-    }
+	'jewelryModel/updateSizeMetal',
+	async ({modelId, sizeMetals}, thunkAPI) => {
+		try {
+			const response = await api.put('/JewelryModel/Update/SizeMetal', {
+				modelId: modelId,
+				sizeMetals: sizeMetals,
+			});
+			console.log('updateSizeMetalForJewelryModel response:', response);
+			return response;
+		} catch (error) {
+			console.error('updateSizeMetalForJewelryModel error:', error.response || error);
+			return thunkAPI.rejectWithValue(error.response);
+		}
+	}
 );
 
 export const deleteSizeMetalFromJewelryModel = createAsyncThunk(
@@ -154,7 +154,21 @@ export const deleteJewelryModel = createAsyncThunk(
 		}
 	}
 );
-
+export const changeVisibilityJewelryModel = createAsyncThunk(
+	'jewelryModel/changeVisibilityJewelryModel',
+	async (modelId, {rejectWithValue}) => {
+		try {
+			const response = await api.put('/JewelryReview/ChangeVisibility', {
+				params: {ModelId: modelId},
+			});
+			console.log('changeVisibilityJewelryModel response:', response); // Log API response
+			return response;
+		} catch (error) {
+			console.error('changeVisibilityJewelryModel error:', error.response || error); // Log error
+			return rejectWithValue(error.response || 'Failed to toggle review jewelry model víibility');
+		}
+	}
+);
 // Updated deleteSideDiamondOption thunk to match the new API specification
 export const deleteSideDiamondOption = createAsyncThunk(
 	'jewelryModel/deleteSideDiamondOption',

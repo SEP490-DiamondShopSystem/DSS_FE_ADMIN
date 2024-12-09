@@ -49,7 +49,21 @@ export const createJewelry = createAsyncThunk(
 		}
 	}
 );
-
+export const changeJewelryReviewVisibility = createAsyncThunk(
+	'jewelry/changeReviewVisibility',
+	async (jewelryId, thunkAPI) => {
+		try {
+			const response = await api.put('/JewelryReview/ChangeVisibility', null, {
+				params: {JewelryId: jewelryId},
+			});
+			console.log('changeJewelryReviewVisibility response:', response);
+			return response;
+		} catch (error) {
+			console.error('changeJewelryReviewVisibility error:', error.response);
+			return thunkAPI.rejectWithValue(error.response);
+		}
+	}
+);
 // Jewelry slice to manage state
 export const jewelrySlice = createSlice({
 	name: 'jewelrySlice',
@@ -120,6 +134,20 @@ export const jewelrySlice = createSlice({
 				state.loading = false;
 				state.error = action.payload;
 				console.error('createJewelry rejected:', action.payload);
+			})
+			.addCase(changeJewelryReviewVisibility.pending, (state) => {
+				state.loading = true;
+				state.error = null;
+				console.log('changeJewelryReviewVisibility pending');
+			})
+			.addCase(changeJewelryReviewVisibility.fulfilled, (state, action) => {
+				state.loading = false;
+				console.log('changeJewelryReviewVisibility fulfilled:', action.payload);
+			})
+			.addCase(changeJewelryReviewVisibility.rejected, (state, action) => {
+				state.loading = false;
+				state.error = action.payload;
+				console.error('changeJewelryReviewVisibility rejected:', action.payload);
 			});
 	},
 });

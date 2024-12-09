@@ -295,11 +295,11 @@ const JewelryPage = () => {
 						<div className="flex justify-center items-center h-64">
 							<Spin size="large" />
 						</div>
-					) : jewelryList.length === 0 ? (
-						<Empty description="Không có trang sức nào" className="my-12" />
+					) : jewelryList?.length === 0 ? (
+						<Empty description="Không có trang sức nào. Vui lòng chọn mẫu trang sức và tiếp tục" className="my-12" />
 					) : (
 						<div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-							{jewelryList.map((jewelry) => (
+							{jewelryList?.map((jewelry) => (
 								<Card
 									key={jewelry.Id}
 									hoverable

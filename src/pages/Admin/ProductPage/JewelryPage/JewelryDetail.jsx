@@ -1,7 +1,10 @@
 import React, {useEffect, useState} from 'react';
 import {useDispatch} from 'react-redux';
-import {fetchJewelryDetail} from '../../../../redux/slices/jewelry/jewelrySlice';
-import {Camera, Ruler, Star, Info, Diamond, Tag, X} from 'lucide-react';
+import {
+	fetchJewelryDetail,
+	changeJewelryReviewVisibility,
+} from '../../../../redux/slices/jewelry/jewelrySlice';
+import {Camera, Ruler, Star, Info, Diamond, Tag, Eye, EyeOff, X} from 'lucide-react';
 const ClarityEnum = {
 	1: 'SI2',
 	2: 'SI1',
@@ -80,6 +83,31 @@ const JewelryDetail = ({jewelry, onClose}) => {
 	const [activeTab, setActiveTab] = useState('main');
 	const [fetchedJewelry, setJewelry] = useState(jewelry);
 
+	const handleToggleReviewVisibility = async () => {
+		if (fetchedJewelry?.Id) {
+			await dispatch(changeJewelryReviewVisibility(fetchedJewelry.Id))
+				.unwrap()
+				.then((updatedJewelry) => {
+					setJewelry((prevJewelry) => ({
+						...prevJewelry,
+						IsReviewVisible: updatedJewelry.IsReviewVisible,
+					}));
+				})
+				.catch((error) => {
+					console.error('Error toggling review visibility:', error);
+				});
+			await dispatch(fetchJewelryDetail(fetchedJewelry.Id))
+				.unwrap()
+				.then((data) => {
+					setJewelry(data);
+					setLoading(false);
+				})
+				.catch((error) => {
+					console.error('Error fetching jewelry details:', error);
+					setLoading(false);
+				});
+		}
+	};
 	useEffect(() => {
 		if (jewelry?.Id) {
 			setLoading(true);
@@ -332,25 +360,54 @@ const JewelryDetail = ({jewelry, onClose}) => {
 				return (
 					fetchedJewelry.Review && (
 						<div className="bg-gray-50 p-4 rounded-lg">
-							<h3 className="text-xl font-bold text-primary mb-4 flex items-center">
-								<Star className="mr-2" /> Review
-							</h3>
-							<div className="bg-white p-4 rounded-lg shadow-md">
-								<div className="flex items-center mb-3">
-									<Star className="text-yellow-500 mr-2" fill="currentColor" />
-									<span className="font-semibold">Đánh Giá:</span>
-									<span className="ml-2 text-yellow-600">
-										{fetchedJewelry.Review.StarRating} / 5
-									</span>
-								</div>
-								<p className="italic text-gray-600">
-									{fetchedJewelry.Review.Content}
-								</p>
+							<div className="flex justify-between items-center mb-4">
+								<h3 className="text-xl font-bold text-primary flex items-center">
+									<Star className="mr-2" /> Review
+								</h3>
+								{/* Toggle Review Visibility Button */}
+								<button
+									onClick={handleToggleReviewVisibility}
+									className="p-2 bg-gray-100 rounded-full hover:bg-gray-200 transition-colors"
+									aria-label={
+										fetchedJewelry.Review.IsHidden
+											? 'Show Review'
+											: 'Hide Review'
+									}
+								>
+									{!fetchedJewelry.Review.IsHidden ? (
+										<EyeOff className="text-gray-600" size={20} />
+									) : (
+										<Eye className="text-gray-600" size={20} />
+									)}
+								</button>
 							</div>
+							{!fetchedJewelry.Review.IsHidden ? (
+								<div className="bg-white p-4 rounded-lg shadow-md">
+									<div className="flex items-center mb-3">
+										<Star
+											className="text-yellow-500 mr-2"
+											fill="currentColor"
+										/>
+										<span className="font-semibold">Đánh Giá:</span>
+										<span className="ml-2 text-yellow-600">
+											{fetchedJewelry.Review.StarRating} / 5
+										</span>
+									</div>
+									<p className="italic text-gray-600">
+										{fetchedJewelry.Review.Content}
+									</p>
+									<div className="text-sm text-gray-500 mt-2">
+										Ngày: {fetchedJewelry.Review.CreatedDate}
+									</div>
+								</div>
+							) : (
+								<div className="bg-white p-4 rounded-lg shadow-md text-center text-gray-500">
+									Review is currently hidden
+								</div>
+							)}
 						</div>
 					)
 				);
-
 			case 'additional':
 				return (
 					<div className="bg-gray-50 p-4 rounded-lg">
