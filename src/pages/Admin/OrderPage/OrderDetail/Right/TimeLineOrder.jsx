@@ -1336,6 +1336,14 @@ const TimeLineOrder = ({
 										>
 											Chuyển Giao
 										</Button>
+										<Button
+											type="text"
+											className="bg-red font-semibold w-32 rounded-full"
+											onClick={handleCancelOrder}
+											disabled={loading}
+										>
+											Hủy Đơn
+										</Button>
 									</div>
 								</>
 							) : (
