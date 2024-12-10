@@ -97,15 +97,12 @@ const DefaultLayout = () => {
 		(adminRole || managerRole || staffRole) &&
 			getItem('Dashboard', '/dashboard', <DashboardOutlined />),
 		adminRole && getItem('Quản Lí Tài Khoản', '/accounts', <UserOutlined />),
+
 		(managerRole || staffRole) &&
 			getItem('Quản Lý Sản Phẩm', '/products', <ProductOutlined />, [
 				getItem('Danh Sách Trang Sức', '/products/jewelry-list', <RightOutlined />),
 				getItem('Danh Sách Kim Cương', '/products/diamond-list', <DiamondOutlined />),
-				getItem(
-					'Danh Sách Loại Trang Sức',
-					'/products/jewelry-model-category-list',
-					<RightOutlined />
-				),
+
 				getItem(
 					'Danh Sách Mẫu Trang Sức',
 					'/products/jewelry-model-list',
@@ -138,9 +135,11 @@ const DefaultLayout = () => {
 					<TagOutlined />
 				),
 			]),
-		(adminRole || managerRole || staffRole) &&
-			getItem('Quản Lí Bài Viết', '/blogs', <DeliveredProcedureOutlined />),
 
+		(managerRole || staffRole) &&
+			getItem('Quản Lí Bài Viết', '/blogs', <DeliveredProcedureOutlined />),
+		adminRole &&
+			getItem('Danh Sách Loại Trang Sức', '/jewelry-model-category-list', <RightOutlined />),
 		adminRole && getItem('Cài Đặt Hệ Thống', '/config', <SettingOutlined />),
 	];
 

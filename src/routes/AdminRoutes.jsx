@@ -109,9 +109,9 @@ export const AdminRouters = () => {
 					}
 				/>
 				<Route
-					path="/products/jewelry-model-category-list"
+					path="/jewelry-model-category-list"
 					element={
-						<PrivateRoute roles={['deliverer', 'staff', 'admin', 'manager']}>
+						<PrivateRoute roles={['admin']}>
 							<JewelryModelCategoryPage />
 						</PrivateRoute>
 					}
