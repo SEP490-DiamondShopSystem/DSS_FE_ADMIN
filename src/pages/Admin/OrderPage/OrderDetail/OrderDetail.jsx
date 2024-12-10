@@ -32,6 +32,7 @@ const OrderDetail = () => {
 	const statusDetail = useSelector(getOrderStatusDetailSelector);
 	const transfer = useSelector(getOrderTransferSelector);
 	const transferStaff = useSelector(getOrderTransferStaffSelector);
+	const completedOrder = useSelector(getOrderCompletedSelector);
 
 	const [orders, setOrders] = useState();
 	const [statusOrder, setStatusOrder] = useState();
@@ -72,6 +73,7 @@ const OrderDetail = () => {
 		transfer,
 		completed,
 		transferStaff,
+		completedOrder,
 	]);
 
 	// Fetch order log
