@@ -730,9 +730,14 @@ const TimeLineOrder = ({
 											<label className="font-semibold text-base">
 												Số Tiền Cần Xác Thực -{' '}
 												{formatPriceCeilFloor(
-													transactionOrderPending[0]?.TransactionAmount ||
-														transactionOrderPendingPayAll[0]
-															?.TransactionAmount
+													(Array.isArray(transactionOrderPending) &&
+														transactionOrderPending[0]
+															?.TransactionAmount) ||
+														(Array.isArray(
+															transactionOrderPendingPayAll
+														) &&
+															transactionOrderPendingPayAll[0]
+																?.TransactionAmount)
 												)}
 											</label>
 											<InputNumber
@@ -1349,9 +1354,68 @@ const TimeLineOrder = ({
 							) : (
 								<div>
 									<p className="mt-3 text-center font-semibold text-darkBlue text-base">
-										Đơn Hàng Đã Chuyển Giao Cho {orders?.Deliverer?.FirstName}{' '}
-										{orders?.Deliverer?.LastName}
+										Đơn Hàng Đã Phân Công Cho Nhân Viên Giao Hàng{' '}
+										{orders?.Deliverer?.FirstName} {orders?.Deliverer?.LastName}
 									</p>
+									<div className="flex mt-2">
+										<p className="text-red mr-1">*</p>
+										<p>Chọn giao hàng</p>
+									</div>
+									<Select
+										defaultValue=""
+										className="w-full mb-5"
+										onChange={handleChange}
+									>
+										{deliverer &&
+											deliverer.map((user) => (
+												<Option
+													key={user?.Account?.Id}
+													value={user?.Account?.Id}
+													disabled={!user?.IsFree}
+												>
+													<div className="flex ">
+														<div className="mr-3">
+															<CircleIcon
+																style={{
+																	color: user?.IsFree
+																		? 'green'
+																		: 'red',
+																	fontSize: '16px',
+																}}
+															/>
+														</div>
+														<div>
+															<div className="flex items-center">
+																<Space className="font-semibold">
+																	{user?.Account?.FirstName}
+																	{user?.Account?.LastName} •{' '}
+																</Space>
+																{user?.Account?.Email}{' '}
+															</div>
+															{user?.BusyMessage}
+														</div>
+													</div>
+												</Option>
+											))}
+									</Select>
+
+									<div className="flex justify-around">
+										<Button
+											type="text"
+											className="bg-primary font-semibold rounded-full w-32"
+											onClick={handleAssignDeliverer}
+										>
+											Chuyển Giao
+										</Button>
+										<Button
+											type="text"
+											className="bg-red font-semibold w-32 rounded-full"
+											onClick={handleCancelOrder}
+											disabled={loading}
+										>
+											Hủy Đơn
+										</Button>
+									</div>
 								</div>
 							)}
 						</div>
