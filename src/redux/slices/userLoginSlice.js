@@ -77,12 +77,13 @@ export const handleAdminRegister = createAsyncThunk(
 
 export const handleRegisterDeliverer = createAsyncThunk(
 	'userSlice/handleRegisterDeliverer',
-	async ({email, password, fullName}) => {
+	async ({email, password, fullName, phoneNumber}) => {
 		try {
 			const data = await api.post(`/Account/RegisterDeliverer`, {
 				email,
 				password,
 				fullName,
+				phoneNumber,
 			});
 
 			return data;

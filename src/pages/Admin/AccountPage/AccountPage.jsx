@@ -34,8 +34,8 @@ const AccountPage = () => {
 	const [isManager, setIsManager] = useState();
 	const [role, setRole] = useState();
 	const [searchText, setSearchText] = useState('');
-
-	console.log('userList', userList);
+	const [completed, setCompleted] = useState(null);
+	const [selectedRole, setSelectedRole] = useState('');
 
 	const columns = [
 		{
@@ -119,7 +119,7 @@ const AccountPage = () => {
 
 	useEffect(() => {
 		dispatch(getAllUser({current, size: pageSize, roleId: role, emailStr: searchText}));
-	}, [current, pageSize, role, searchText]);
+	}, [current, pageSize, role, searchText, completed]);
 
 	useEffect(() => {
 		if (userDetail) {
@@ -149,38 +149,42 @@ const AccountPage = () => {
 		if (role === 'deliverer') {
 			dispatch(handleRegisterDeliverer({...value, fullName}))
 				.unwrap()
-				.then(() => {
+				.then((res) => {
 					message.success('Tạo thành công tài khoản giao hàng!');
+					setCompleted(res);
 				})
 				.catch((error) => {
-					message.error(error?.data?.title || error?.detail);
+					message.error(error?.data?.detail || error?.detail);
 				});
 		} else if (role === 'manager') {
 			dispatch(handleStaffRegister({...value, fullName, isManager: true}))
 				.unwrap()
-				.then(() => {
+				.then((res) => {
 					message.success('Tạo thành công tài khoản quản lí!');
+					setCompleted(res);
 				})
 				.catch((error) => {
-					message.error(error?.data?.title || error?.detail);
+					message.error(error?.data?.detail || error?.detail);
 				});
 		} else if (role === 'staff') {
 			dispatch(handleStaffRegister({...value, fullName, isManager: false}))
 				.unwrap()
-				.then(() => {
+				.then((res) => {
 					message.success('Tạo thành công tài khoản nhân viên!');
+					setCompleted(res);
 				})
 				.catch((error) => {
-					message.error(error?.data?.title || error?.detail);
+					message.error(error?.data?.detail || error?.detail);
 				});
 		} else if (role === 'admin') {
 			dispatch(handleAdminRegister({...value, fullName}))
 				.unwrap()
-				.then(() => {
+				.then((res) => {
 					message.success('Tạo thành công tài khoản admin!');
+					setCompleted(res);
 				})
 				.catch((error) => {
-					message.error(error?.data?.title || error?.detail);
+					message.error(error?.data?.detail || error?.detail);
 				});
 		}
 		form.resetFields();
@@ -203,6 +207,10 @@ const AccountPage = () => {
 
 	const onSearch = (value) => {
 		setSearchText(value);
+	};
+
+	const handleRoleAddChange = (value) => {
+		setSelectedRole(value);
 	};
 
 	return (
@@ -278,7 +286,7 @@ const AccountPage = () => {
 							name="firstName"
 							rules={[{required: true, message: 'Vui lòng nhập họ'}]}
 						>
-							<Input placeholder="Enter first name" />
+							<Input placeholder="Nhập họ" />
 						</Form.Item>
 
 						<Form.Item
@@ -286,7 +294,7 @@ const AccountPage = () => {
 							name="lastName"
 							rules={[{required: true, message: 'Vui lòng nhập tên'}]}
 						>
-							<Input placeholder="Enter last name" />
+							<Input placeholder="Nhập tên" />
 						</Form.Item>
 
 						<Form.Item
@@ -294,10 +302,10 @@ const AccountPage = () => {
 							name="email"
 							rules={[
 								{required: true, message: 'Vui lòng nhập email'},
-								{type: 'email', message: 'Please enter a valid email'},
+								{type: 'email', message: 'Vui lòng nhập đúng email'},
 							]}
 						>
-							<Input placeholder="Enter email" />
+							<Input placeholder="Nhập email" />
 						</Form.Item>
 
 						<Form.Item
@@ -311,16 +319,38 @@ const AccountPage = () => {
 						<Form.Item
 							label="Vai trò"
 							name="role"
-							rules={[{required: true, message: 'Please select a role'}]}
+							rules={[{required: true, message: 'Vui lòng chọn vai trò'}]}
 						>
-							<Select placeholder="Chọn vai trò" style={{width: '100%'}}>
-								<Option value={'deliverer'}>Deliverer</Option>
-								{/* <Option value={'customer'}>Customer</Option> */}
-								<Option value={'staff'}>Staff</Option>
-								<Option value={'manager'}>Manager</Option>
-								<Option value={'admin'}>Admin</Option>
+							<Select
+								placeholder="Chọn vai trò"
+								style={{width: '100%'}}
+								onChange={handleRoleAddChange}
+							>
+								<Option value="admin">Admin</Option>
+								<Option value="manager">Quản lí</Option>
+								<Option value="staff">Nhân viên</Option>
+								<Option value="deliverer">Nhân viên giao hàng</Option>
+								{/* <Option value="customer">Customer</Option> */}
 							</Select>
 						</Form.Item>
+
+						{/* Chỉ hiện trường PhoneNumber nếu vai trò là deliverer */}
+						{selectedRole === 'deliverer' && (
+							<Form.Item
+								label="Số điện thoại"
+								name="phoneNumber"
+								rules={[
+									{required: true, message: 'Vui lòng nhập số điện thoại'},
+									{
+										pattern: /^0\d{9}$/,
+										message:
+											'Số điện thoại phải bắt đầu bằng 0 và gồm 10 chữ số',
+									},
+								]}
+							>
+								<Input placeholder="Nhập số điện thoại" />
+							</Form.Item>
+						)}
 					</Form>
 				</Modal>
 			</div>

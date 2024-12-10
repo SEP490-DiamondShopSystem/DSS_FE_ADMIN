@@ -210,7 +210,7 @@ export const EditInfo = ({
 					</label>
 					<Input
 						className="font-semibold text-lg"
-						disabled={!editing}
+						disabled
 						name="PhoneNumber"
 						value={userInfo?.PhoneNumber}
 						onChange={onChange}
@@ -224,7 +224,7 @@ export const EditInfo = ({
 				{userInfo?.Addresses?.length > 0 ? (
 					userInfo?.Addresses?.map((address, index) => (
 						<div key={index} className="my-4">
-							{editing ? (
+							{/* {editing ? (
 								<div className="space-y-2">
 									<Input
 										placeholder="Đường"
@@ -285,32 +285,32 @@ export const EditInfo = ({
 										</Button>
 									)}
 								</div>
-							) : (
-								<>
-									<Tooltip
-										title={address.IsDefault ? 'Địa chỉ mặc định' : ''}
-										mouseEnterDelay={0.3}
-									>
-										<Input
-											className={`font-thin text-lg mb-2 ${
-												address.IsDefault ? 'bg-primary font-bold' : ''
-											}`}
-											readOnly={true}
-											value={`${address.Street}, ${address.Ward}, ${address.District}, ${address.Province}`}
-										/>
-									</Tooltip>
-								</>
-							)}
+							) : ( */}
+							<>
+								<Tooltip
+									title={address.IsDefault ? 'Địa chỉ mặc định' : ''}
+									mouseEnterDelay={0.3}
+								>
+									<Input
+										className={`font-thin text-lg mb-2 ${
+											address.IsDefault ? 'bg-primary font-bold' : ''
+										}`}
+										readOnly={true}
+										value={`${address.Street}, ${address.Ward}, ${address.District}, ${address.Province}`}
+									/>
+								</Tooltip>
+							</>
+							{/* )} */}
 						</div>
 					))
 				) : (
 					<div className="font-semibold text-lg my-2">Không Có Địa Chỉ</div>
 				)}
-				{editing && (
+				{/* {editing && (
 					<Button type="dashed" onClick={handleAddAddress}>
 						Thêm Địa Chỉ
 					</Button>
-				)}
+				)} */}
 			</div>
 		</div>
 	);
