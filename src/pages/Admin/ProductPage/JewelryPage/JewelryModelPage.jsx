@@ -9,6 +9,7 @@ import {
 	createSideDiamondOptionForJewelryModel,
 	createSizeMetalForJewelryModel,
 	updateSizeMetalForJewelryModel,
+	changeVisibilityJewelryModel,
 } from '../../../../redux/slices/jewelry/jewelryModelSlice';
 import {
 	Button,
@@ -140,7 +141,7 @@ const JewelryModelPage = () => {
 				PageSize: pageSize,
 				Name: name,
 				Category: category,
-				IsRhodiumFinished: isRhodiumFinished,
+				// IsRhodiumFinished: isRhodiumFinished,
 				IsEngravable: isEngravable,
 			})
 		)
@@ -372,7 +373,7 @@ const JewelryModelPage = () => {
 				PageSize: pageSize,
 				Name: name,
 				Category: category,
-				IsRhodiumFinished: isRhodiumFinished,
+				// IsRhodiumFinished: isRhodiumFinished,
 				IsEngravable: isEngravable,
 			})
 		);
@@ -391,7 +392,7 @@ const JewelryModelPage = () => {
 							PageSize: pageSize,
 							Name: name,
 							Category: category,
-							IsRhodiumFinished: isRhodiumFinished,
+							// IsRhodiumFinished: isRhodiumFinished,
 							IsEngravable: isEngravable,
 						})
 					);
@@ -447,7 +448,7 @@ const JewelryModelPage = () => {
 									</option>
 								))}
 							</select>
-							<select
+							{/* <select
 								value={isRhodiumFinished}
 								onChange={(e) => setIsRhodiumFinished(e.target.value === 'true')}
 								className="form-select p-2 border border-gray-300 rounded-md"
@@ -455,7 +456,7 @@ const JewelryModelPage = () => {
 								<option value="">Rhodium Finished?</option>
 								<option value="true">Yes</option>
 								<option value="false">No</option>
-							</select>
+							</select> */}
 							<select
 								value={isEngravable}
 								onChange={(e) => setIsEngravable(e.target.value === 'true')}
@@ -1224,10 +1225,10 @@ const JewelryModelPage = () => {
 									<strong>Số Lượng Tùy Chọn Kim Cương Phụ:</strong>{' '}
 									{selectedModel.SideDiamondOptionCount}
 								</p>
-								<p className="text-lg font-medium text-gray">
+								{/* <p className="text-lg font-medium text-gray">
 									<strong>Xi Rhodium:</strong>{' '}
 									{selectedModel.IsRhodiumFinish ? 'Có' : 'Không'}
-								</p>
+								</p> */}
 								<p className="text-lg font-medium text-gray">
 									<strong>Kim Loại Hỗ Trợ:</strong>{' '}
 									{selectedModel.MetalSupported.join(', ')}
