@@ -14,6 +14,7 @@ import {useNavigate} from 'react-router-dom';
 import {LoadingOrderSelector} from '../../../../../redux/selectors';
 import {
 	convertToVietnamDate,
+	formatPrice,
 	getOrderCustomizeStatus,
 	getOrderStatusTag,
 } from '../../../../../utils';
@@ -48,6 +49,7 @@ const InformationOrder = ({
 	selectedDiamond,
 	filteredRequests,
 	setFetchRequest,
+	setCompleted,
 }) => {
 	const navigate = useNavigate();
 	const dispatch = useDispatch();
@@ -329,13 +331,13 @@ const InformationOrder = ({
 			key: 'IsLabDiamond',
 			render: (diamond) => (diamond ? 'Nhân Tạo' : 'Tự Nhiên'),
 		},
-		// {
-		// 	title: 'Trạng Thái',
-		// 	dataIndex: 'productStatus',
-		// 	key: 'productStatus',
-		// 	align: 'center',
-		// 	render: (productStatus) => getOrderItemStatusTag(productStatus),
-		// },
+		{
+			title: 'Giá',
+			dataIndex: 'TruePrice',
+			key: 'TruePrice',
+			align: 'center',
+			render: (TruePrice) => formatPrice(TruePrice),
+		},
 	];
 
 	const handleExpand = (expanded, record) => {
@@ -526,6 +528,7 @@ const InformationOrder = ({
 						changeDiamond={changeDiamond}
 						selectedDiamond={selectedDiamond}
 						filteredRequests={filteredRequests}
+						setCompleted={setCompleted}
 					/>
 				</div>
 			</div>
