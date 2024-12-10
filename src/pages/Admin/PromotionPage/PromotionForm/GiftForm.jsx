@@ -12,7 +12,7 @@ export const GiftForm = ({form, shapes, Option, removeGift}) => {
 		form.setFieldsValue({
 			gifts: form
 				.getFieldValue('gifts')
-				.map((gift, index) => (index === fieldKey ? {...gift, itemId: model?.Id} : gift)),
+				.map((gift, index) => (index === fieldKey ? {...gift, itemCode: model?.ModelCode} : gift)),
 		});
 		setIsPopupVisible(false);
 	};
@@ -87,7 +87,7 @@ export const GiftForm = ({form, shapes, Option, removeGift}) => {
 																	value === 3 ? undefined : '',
 																[`gifts[${name}].diamondRequirementSpec`]:
 																	value === 2 ? {} : undefined,
-																[`gifts[${name}].itemId`]:
+																[`gifts[${name}].itemCode`]:
 																	value === 1 ? '' : undefined,
 															});
 														}}
@@ -169,8 +169,8 @@ export const GiftForm = ({form, shapes, Option, removeGift}) => {
 														<Form.Item
 															{...restField}
 															label="Mẫu Trang Sức"
-															name={[name, 'itemId']}
-															fieldKey={[fieldKey, 'itemId']}
+															name={[name, 'itemCode']}
+															fieldKey={[fieldKey, 'itemCode']}
 															rules={[
 																{
 																	required: true,
@@ -184,7 +184,7 @@ export const GiftForm = ({form, shapes, Option, removeGift}) => {
 																value={form.getFieldValue([
 																	'gifts',
 																	name,
-																	'itemId',
+																	'itemCode',
 																])}
 															/>
 														</Form.Item>

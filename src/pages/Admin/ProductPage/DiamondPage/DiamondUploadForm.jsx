@@ -40,7 +40,7 @@ export const DiamondUploadForm = ({diamondId, visible, onClose}) => {
 			dispatch(fetchDiamondFiles(diamondId))
 				.unwrap()
 				.then((response) => {
-						setDiamondFiles(response);
+					setDiamondFiles(response);
 				})
 				.catch((error) => {
 					message.error(error?.data?.title || error?.detail);
@@ -83,12 +83,15 @@ export const DiamondUploadForm = ({diamondId, visible, onClose}) => {
 		if (
 			hasFileListChanged(thumbnailFile, initialFiles.thumbnail) ||
 			hasFileListChanged(certificateFiles, initialFiles.certificates) ||
-			hasFileListChanged(imageFiles, initialFiles.images) ||
+			imageFiles.some((file) => !initialFiles.images.includes(file)) ||
 			removedImagePaths.length > 0
 		) {
 			handleThumbnailUpload();
 			handleCertificatesUpload();
-			handleImageUpload();
+			// Only upload new images
+			if (imageFiles.some((file) => !initialFiles.images.includes(file))) {
+				handleImageUpload();
+			}
 			handleDeleteImages();
 		} else {
 			message.error(error?.data?.title || error?.detail);

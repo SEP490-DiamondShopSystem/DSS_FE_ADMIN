@@ -215,37 +215,37 @@ export const updatePromotionThumbnail = createAsyncThunk(
 		}
 	}
 );
-// Thunk to upload promotion thumbnail
+
+// Thunk to upload promotion thumbnail using multipart/form-data
 export const uploadPromotionThumbnail = createAsyncThunk(
 	'promotion/uploadThumbnail',
-	async ({promotionId, imageFile}, {rejectWithValue}) => {
+	async ({ promotionId, imageFile }, { rejectWithValue }) => {
+	  try {
 		const formData = new FormData();
-		formData.append('imageFile', imageFile);
-
-		try {
-			const response = await axios.put(`/api/Promotion/${promotionId}/Thumbnail`, formData, {
-				headers: {
-					'Content-Type': 'multipart/form-data',
-				},
-			});
-			return response.data;
-		} catch (error) {
-			if (error.response) {
-				// Handle 400 and 500 status codes
-				if (error.response.status === 400) {
-					return rejectWithValue({status: 400, errors: error.errors});
-				} else if (error.response.status === 500) {
-					return rejectWithValue({status: 500, detail: error.detail});
-				}
-			}
-			return rejectWithValue({status: 'unknown', detail: 'An unexpected error occurred.'});
-		}
+		formData.append('imageFile', imageFile); // Key must match the API parameter
+		
+		// Log FormData for debugging (optional, remove in production)
+		console.log('Uploading thumbnail with FormData:', formData);
+  
+		const response = await api.put(`/Promotion/${promotionId}/Thumbnail`, formData, {
+		  headers: {
+			'Content-Type': 'multipart/form-data', // Explicitly set Content-Type
+		  },
+		});
+		return response.data;
+	  } catch (error) {
+		// Improved error handling using helper
+		return rejectWithValue(
+		  error.response?.data || { status: 'unknown', detail: 'Failed to upload thumbnail' }
+		);
+	  }
 	}
-);
+  );
+  
 export const promotionSlice = createSlice({
 	name: 'promotionSlice',
 	initialState: {
-		promotions: null,
+		promotions: [],
 		promotionDetail: null,
 		status: 'idle',
 		loading: false,
@@ -262,7 +262,6 @@ export const promotionSlice = createSlice({
 			.addCase(fetchPromotions.fulfilled, (state, action) => {
 				state.loading = false;
 				state.promotions = action.payload;
-				console.log('Fetching promotions: fulfilled', action.payload);
 			})
 			.addCase(fetchPromotions.rejected, (state, action) => {
 				state.loading = false;
@@ -312,12 +311,6 @@ export const promotionSlice = createSlice({
 			})
 			.addCase(updatePromotionRequirements.fulfilled, (state, action) => {
 				state.loading = false;
-				const index = state.promotions.findIndex(
-					(promo) => promo.Id === action.payload.PromotionId
-				);
-				if (index !== -1) {
-					state.promotions[index].PromoReqs = action.payload.PromoReqs;
-				}
 			})
 			.addCase(updatePromotionRequirements.rejected, (state, action) => {
 				state.loading = false;
@@ -348,6 +341,9 @@ export const promotionSlice = createSlice({
 			})
 			.addCase(updatePromotion.fulfilled, (state, action) => {
 				state.loading = false;
+				if (!Array.isArray(state.promotions)) {
+					state.promotions = [];
+				}
 				const index = state.promotions.findIndex((promo) => promo.Id === action.payload.Id);
 				if (index !== -1) {
 					state.promotions[index] = action.payload;

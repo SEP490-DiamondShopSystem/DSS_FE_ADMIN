@@ -49,7 +49,7 @@ const PromotionForm = ({
 						<Col span={12}>
 							<Form.Item
 								name="name"
-								label="Promotion Name"
+								label="Tên Khuyến Mãi"
 								rules={[{required: true, message: 'Please enter a promotion name'}]}
 								className="mb-0"
 							>
@@ -60,7 +60,7 @@ const PromotionForm = ({
 							</Form.Item>
 							<Form.Item
 								name="promoCode"
-								label="Promotion Code"
+								label="Mã Khuyến Mãi"
 								rules={[{required: true, message: 'Please enter a promotion code'}]}
 								className="mb-0"
 							>
@@ -72,7 +72,7 @@ const PromotionForm = ({
 						</Col>
 						<Col span={12}>
 							<Form.Item
-								label="Valid Date"
+								label="Ngày hoạt động"
 								name="validDate"
 								rules={[
 									{required: true, message: 'Please select a valid date range'},
@@ -86,7 +86,7 @@ const PromotionForm = ({
 							</Form.Item>
 							<Form.Item
 								name="description"
-								label="Description"
+								label="Miêu Tả"
 								rules={[{required: true, message: 'Please enter a description'}]}
 							>
 								<Input
@@ -98,21 +98,22 @@ const PromotionForm = ({
 					</Row>
 				</Form.Item>
 
-				<Form.Item label="Additional Settings" className="mb-0">
+				<Form.Item label="Các Cài Đặt Khác" className="mb-0">
 					<Row gutter={16}>
 						<Col span={8}>
 							<Form.Item
 								name="redemptionMode"
-								label="Redemption Mode"
-								initialValue={1} // Always set to 1
+								label="Chế Độ Sử Dụng"
+								initialValue={1}
 								className="mb-0"
 							>
-								<InputNumber
-									min={1}
-									className="border border-gray-300 rounded-md"
-									placeholder="1"
-									disabled
-								/>
+								<Select
+									className="border border-gray rounded-xl"
+									placeholder="Vui Lòng Chọn Chế Độ Sử Dụng!"
+								>
+									<Select.Option value={1}>Dùng Một Lần</Select.Option>
+									<Select.Option value={2}>Dùng Nhiều Lần</Select.Option>
+								</Select>
 							</Form.Item>
 						</Col>
 
@@ -121,17 +122,17 @@ const PromotionForm = ({
 								name="isExcludeQualifierProduct"
 								label="Exclude Qualifier Product"
 								valuePropName="checked"
-								initialValue={true} // Always set to true
+								initialValue={true}
 								className="mb-0"
 							>
-								<Switch className="text-blue-600" />
+								<Switch className="text-blue" />
 							</Form.Item>
 						</Col>
 
 						<Col span={8}>
 							<Form.Item
 								name="priority"
-								label="Priority"
+								label="Mức Độ Ưu Tiên"
 								initialValue={1} // Always set to 1
 								className="mb-0"
 							>
