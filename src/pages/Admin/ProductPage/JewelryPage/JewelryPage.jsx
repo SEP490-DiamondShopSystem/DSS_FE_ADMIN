@@ -1,5 +1,7 @@
 import React, {useEffect, useState} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
+import {useNavigate} from 'react-router-dom';
+
 import {
 	Form,
 	Input,
@@ -44,6 +46,9 @@ import {formatPrice} from '../../../../utils';
 
 const JewelryPage = () => {
 	const dispatch = useDispatch();
+	const navigate = useNavigate();
+
+
 	const loading = useSelector(selectJewelryLoading);
 	const error = useSelector(selectJewelryError);
 	const totalPage = useSelector(selectJewelryTotalPage);
