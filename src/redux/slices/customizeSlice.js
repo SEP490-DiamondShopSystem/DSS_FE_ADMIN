@@ -156,9 +156,9 @@ export const customizeSlice = createSlice({
 			})
 			.addCase(handleCustomizeOrder.fulfilled, (state, action) => {
 				state.loading = false;
-				state.orderCustomizeDetail = action.payload;
-				state.orderStatusCustomizeDetail = action.payload.Status;
-				state.orderPaymentStatusCustomizeDetail = action.payload.PaymentStatus;
+				// state.orderCustomizeDetail = action.payload;
+				// state.orderStatusCustomizeDetail = action.payload.Status;
+				// state.orderPaymentStatusCustomizeDetail = action.payload.PaymentStatus;
 			})
 			.addCase(handleCustomizeOrder.rejected, (state, action) => {
 				state.loading = false;
