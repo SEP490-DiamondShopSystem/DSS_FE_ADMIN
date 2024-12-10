@@ -243,8 +243,8 @@ export const enumMappings = {
 	Status: {
 		1: 'Đã Lên Lịch',
 		2: 'Đang Hoạt Động',
-		3: 'Hết Hạn',
-		4: 'Đã Tạm Dừng',
+		3: 'Đã Tạm Dừng',
+		4: 'Hết Hạn',
 		5: 'Đã Hủy',
 	},
 	Origin: {

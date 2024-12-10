@@ -1,4 +1,12 @@
-import {CloseOutlined, DeleteFilled, EditFilled, PauseOutlined} from '@ant-design/icons';
+import {
+	CloseOutlined,
+	DeleteFilled,
+	EditFilled,
+	PlayCircleOutlined,
+	PauseOutlined,
+	UploadOutlined,
+	PictureOutlined,
+} from '@ant-design/icons';
 import {Button, Form, message, Popconfirm, Space, Table, Tooltip} from 'antd';
 import moment from 'moment';
 import React, {useEffect, useState} from 'react';
@@ -12,6 +20,7 @@ import {
 	fetchPromotionDetail,
 	updatePromotion,
 	pausePromotion,
+	uploadPromotionThumbnail,
 } from '../../../redux/slices/promotionSlice';
 import {enumMappings} from '../../../utils/constant';
 import PromotionForm from './PromotionForm/PromotionForm';
@@ -32,6 +41,8 @@ const PromotionPage = ({promotionData}) => {
 	const [currentEditingIndex, setCurrentEditingIndex] = useState(null);
 	const [removedRequirements, setRemovedRequirements] = useState([]);
 	const [removedGifts, setRemovedGifts] = useState([]);
+
+	const [originalPromotionData, setOriginalPromotionData] = useState(null);
 
 	useEffect(() => {
 		dispatch(fetchPromotions());
@@ -126,11 +137,11 @@ const PromotionPage = ({promotionData}) => {
 		dispatch(createFullPromotion({createPromotionCommand, requirements, gifts: updatedGifts}))
 			.unwrap()
 			.then(() => {
-				message.success('Promotion created successfully!');
+				message.success('Tạo khuyến mãi thành công!');
 				form.resetFields();
 			})
 			.catch((error) => {
-				message.error(error?.data?.title || error?.detail);
+				message.error(error?.data?.title || error?.detail || 'Lỗi không xác định');
 			});
 
 		// setIsEditing(false);
@@ -139,13 +150,13 @@ const PromotionPage = ({promotionData}) => {
 	const getTextForEnum = (enumType, value) => {
 		return enumMappings[enumType]?.[value] || ' ';
 	};
-	const handleEdit = (promotion, index) => {
+	const handleEdit = async (promotion, index) => {
 		const promotionId = promotion.Id;
 		setEditingPromotionId(promotion.Id);
 		setIsEditing(true);
 		setCurrentEditingIndex(index);
 
-		dispatch(fetchPromotionDetail(promotionId))
+		await dispatch(fetchPromotionDetail(promotionId))
 			.unwrap()
 			.then((res) => {
 				const fetchedPromotion = res;
@@ -155,6 +166,12 @@ const PromotionPage = ({promotionData}) => {
 				const endDate = fetchedPromotion.EndDate
 					? moment(fetchedPromotion.EndDate, 'DD-MM-YYYY HH:mm:ss')
 					: null;
+
+				setOriginalPromotionData({
+					...fetchedPromotion,
+					StartDate: startDate,
+					EndDate: endDate,
+				});
 
 				form.setFieldsValue({
 					name: fetchedPromotion.Name,
@@ -222,7 +239,7 @@ const PromotionPage = ({promotionData}) => {
 							unitType: gift.UnitType,
 							unitValue: gift.UnitValue || 0,
 							amount: gift.Amount || 0,
-							itemId: gift.ItemId || '',
+							itemCode: gift.ItemCode || '',
 							promotionId: gift.PromotionId,
 
 							diamondRequirementSpec: {
@@ -256,7 +273,7 @@ const PromotionPage = ({promotionData}) => {
 				});
 			})
 			.catch((error) => {
-				message.error(error?.data?.title || error?.detail);
+				message.error(error?.data?.title || error?.detail || 'Lỗi không xác định');
 			});
 	};
 
@@ -264,21 +281,25 @@ const PromotionPage = ({promotionData}) => {
 		await dispatch(cancelPromotion(id))
 			.unwrap()
 			.then(() => {
-				message.success(`Promotion with id: ${id} has been canceled.`);
+				message.success(`Khuyến mãi có id: ${id} đã bị hủy.`);
 			})
 			.catch((error) => {
-				message.error(error?.data?.title || error?.detail);
+				message.error(error?.data?.title || error?.detail || 'Lỗi không xác định');
 			});
+		await dispatch(fetchPromotions());
 	};
 	const handlePause = async (id) => {
 		await dispatch(pausePromotion(id))
 			.unwrap()
 			.then(() => {
-				message.success(`Promotion with id: ${id} has been paused.`);
+				message.success(
+					`Khuyến mãi có id: ${id} đã được ${status === 3 ? 'tiếp tục' : 'dừng'}.`
+				);
 			})
 			.catch((error) => {
-				message.error(error?.data?.title || error?.detail);
+				message.error(error?.data?.title || error?.detail || 'Lỗi không xác định');
 			});
+		await dispatch(fetchPromotions());
 	};
 	const handleUpdate = async () => {
 		// Validate the form fields
@@ -291,6 +312,38 @@ const PromotionPage = ({promotionData}) => {
 			return;
 		}
 
+		const isEqual = (val1, val2) => {
+			// Handle moment objects
+			if (moment.isMoment(val1) && moment.isMoment(val2)) {
+				return val1.isSame(val2);
+			}
+
+			// Handle arrays
+			if (Array.isArray(val1) && Array.isArray(val2)) {
+				if (val1.length !== val2.length) return false;
+				return val1.every((item, index) => isEqual(item, val2[index]));
+			}
+
+			// Handle objects
+			if (
+				typeof val1 === 'object' &&
+				typeof val2 === 'object' &&
+				val1 !== null &&
+				val2 !== null
+			) {
+				const keys1 = Object.keys(val1);
+				const keys2 = Object.keys(val2);
+				if (keys1.length !== keys2.length) return false;
+				return keys1.every((key) => isEqual(val1[key], val2[key]));
+			}
+
+			// Simple value comparison
+			return val1 === val2;
+		};
+
+		// Find changed fields
+		const changedFields = {};
+		const originalData = originalPromotionData || {};
 		// Remove fields without values
 		const removeEmptyFields = (obj) => {
 			return Object.fromEntries(
@@ -317,42 +370,147 @@ const PromotionPage = ({promotionData}) => {
 			gifts: filteredGifts,
 		});
 
+		// Check main promotion fields
+		const mainFields = [
+			'name',
+			'promoCode',
+			'description',
+			'redemptionMode',
+			'isExcludeQualifierProduct',
+			'priority',
+			'status',
+		];
+
+		mainFields.forEach((field) => {
+			if (!isEqual(row[field], originalData[field])) {
+				changedFields[field] = row[field];
+			}
+		});
+
+		// Check date range
+		if (
+			!isEqual(row.validDate?.[0], originalData.StartDate) ||
+			!isEqual(row.validDate?.[1], originalData.EndDate)
+		) {
+			changedFields.validDate = [row.validDate?.[0], row.validDate?.[1]];
+		}
+
+		// Process requirements
+		const changedRequirements = (row.requirements || [])
+			.filter((req) => !req.id) // Only new requirements
+			.map((req) => {
+				// Remove any undefined or null fields
+				const cleanedReq = Object.fromEntries(
+					Object.entries(req).filter(([_, v]) => v != null)
+				);
+				return cleanedReq;
+			});
+
+		// Process gifts
+		const changedGifts = (row.gifts || [])
+			.filter((gift) => !gift.id) // Only new gifts
+			.map((gift) => {
+				// Remove any undefined or null fields
+				const cleanedGift = Object.fromEntries(
+					Object.entries(gift).filter(([_, v]) => v != null)
+				);
+				return cleanedGift;
+			});
+
 		// Construct the final promotion data
 		const promotionData = {
-			...cleanedRow,
-			updateStartEndDate: {startDate: formattedStartDate, endDate: formattedEndDate},
-			...(removedRequirements.length > 0 && {removedRequirements}), // Include only if not empty
-			...(removedGifts.length > 0 && {removedGifts}), // Include only if not empty
+			...(row.name !== originalPromotionData.Name && {name: row.name}),
+			...(row.promoCode !== originalPromotionData.PromoCode && {promoCode: row.promoCode}),
+			...(row.description !== originalPromotionData.Description && {
+				description: row.description,
+			}),
+			...(row.redemptionMode !== originalPromotionData.RedemptionMode && {
+				redemptionMode: row.redemptionMode,
+			}),
+			...(row.isExcludeQualifierProduct !==
+				originalPromotionData.IsExcludeQualifierProduct && {
+				isExcludeQualifierProduct: row.isExcludeQualifierProduct,
+			}),
+			...(row.priority !== originalPromotionData.Priority && {priority: row.priority}),
+			// Status is completely removed from this object
 		};
 
+		// Only include date range if it's different
+		if (
+			!moment(row.validDate[0]).isSame(originalPromotionData.StartDate) ||
+			!moment(row.validDate[1]).isSame(originalPromotionData.EndDate)
+		) {
+			promotionData.updateStartEndDate = {
+				startDate: formattedStartDate,
+				endDate: formattedEndDate,
+			};
+		}
+		// Process new requirements (only those without existing ID)
+		const newRequirements = (row.requirements || [])
+			.filter((req) => !req.id)
+			.map((req) => {
+				// Remove any undefined or null fields
+				const cleanedReq = Object.fromEntries(
+					Object.entries(req).filter(([_, v]) => v != null)
+				);
+				return cleanedReq;
+			});
+
+		// Process new gifts (only those without existing ID)
+		const newGifts = (row.gifts || [])
+			.filter((gift) => !gift.id)
+			.map((gift) => {
+				const cleanedGift = Object.fromEntries(
+					Object.entries(gift).filter(([_, v]) => v != null)
+				);
+				return cleanedGift;
+			});
+
+		// Add new requirements and gifts if they exist
+		if (newRequirements.length > 0) {
+			promotionData.requirements = newRequirements;
+		}
+		if (newGifts.length > 0) {
+			promotionData.gifts = newGifts;
+		}
+
+		// Include removed requirements and gifts
+		if (removedRequirements.length > 0) {
+			promotionData.removedRequirements = removedRequirements;
+		}
+		if (removedGifts.length > 0) {
+			promotionData.removedGifts = removedGifts;
+		}
+		console.log('Updating promotion with changed data:', promotionData);
 		console.log('Updating promotion with ID:', editingPromotionId); // Debugging log
 		console.log('Filtered Promotion Data:', promotionData);
-
 		// Dispatch the update action
 		await dispatch(updatePromotion({promotionId: editingPromotionId, promotionData}))
 			.unwrap()
 			.then(() => {
-				message.success('Promotion updated successfully!');
+				message.success('Cập nhật khuyến mãi thành công!');
+				setIsEditing(false);
+				setEditingKey('');
+				setEditingPromotionId(null);
+				form.resetFields();
+				dispatch(fetchPromotions());
 			})
 			.catch((error) => {
-				message.error(error?.data?.title || error?.detail);
+				message.error(error?.data?.title || error?.detail || 'Lỗi không xác định');
 			});
-		setIsEditing(false);
-		setEditingKey('');
-		setEditingPromotionId(null); // Reset editing ID
-		form.resetFields(); // Clear all fields
 		await dispatch(fetchPromotions());
 	};
 
-	const handleDelete = (id) => {
-		dispatch(deletePromotion(id))
+	const handleDelete = async (id) => {
+		await dispatch(deletePromotion(id))
 			.unwrap()
 			.then(() => {
-				message.success(`Deleted promotion with id: ${id}`);
+				message.success(`Đã xóa khuyến mãi có id: ${id}`);
 			})
 			.catch((error) => {
 				message.error(error?.data?.title || error?.detail);
 			});
+		await dispatch(fetchPromotions());
 	};
 
 	const handleCancelEdit = () => {
@@ -378,6 +536,89 @@ const PromotionPage = ({promotionData}) => {
 
 	// Table columns definition for displaying promotions
 	const columns = [
+		{
+			title: 'Thumbnail',
+			key: 'thumbnail',
+			render: (_, record) => {
+				return (
+					<div className="flex flex-col items-center space-y-2">
+						{record.Thumbnail ? (
+							<div className="relative group">
+								<img
+									src={record?.Thumbnail?.MediaPath}
+									alt={record?.Thumbnail?.MediaName}
+									className="w-16 h-16 object-cover rounded-md shadow-sm group-hover:opacity-70 transition-all duration-300"
+									onError={(e) => {
+										console.error('Image load error:', e);
+										e.target.style.display = 'none';
+									}}
+								/>
+								<div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-black bg-opacity-50 rounded-md">
+									<input
+										type="file"
+										accept="image/*"
+										className="hidden"
+										id={`thumbnail-upload-${record.Id}`}
+										onChange={(e) => {
+											const file = e.target.files[0];
+											if (file) {
+												dispatch(
+													uploadPromotionThumbnail({
+														promotionId: record.Id,
+														imageFile: file,
+													})
+												)
+													.unwrap()
+													.then(() => {
+														message.success(
+															'Tải ảnh bìa lên thành công!'
+														);
+														dispatch(fetchPromotions());
+													})
+													.catch((error) => {
+														message.error(
+															error?.data?.title ||
+																error?.detail ||
+																'Tải lên thất bại!'
+														);
+													});
+											}
+										}}
+									/>
+									<Button
+										type="text"
+										className="text-white hover:text-blue-200"
+										onClick={() =>
+											document
+												.getElementById(`thumbnail-upload-${record.Id}`)
+												.click()
+										}
+									>
+										<EditFilled />
+									</Button>
+								</div>
+							</div>
+						) : (
+							<div className="w-16 h-16 flex items-center justify-center border-2 border-dashed border-gray-300 rounded-md">
+								<PictureOutlined className="text-gray-400" />
+							</div>
+						)}
+
+						<Button
+							type="link"
+							size="small"
+							className="text-xs"
+							icon={<UploadOutlined />}
+							onClick={() =>
+								document.getElementById(`thumbnail-upload-${record.Id}`).click()
+							}
+						>
+							Tải ảnh bìa
+						</Button>
+					</div>
+				);
+			},
+		},
 		{
 			title: 'Khuyến Mãi',
 			dataIndex: 'Name',
@@ -448,10 +689,10 @@ const PromotionPage = ({promotionData}) => {
 			render: (_, record) => {
 				const status = record.Status;
 				const isActive = status === 1 || status === 3; // Active status
-				const canPause = status === 2; // Pause status
+				const canPause = status === 2; // Only allow pausing for status 2
+				const canContinue = status === 3; // Allow continuing for status 3
 				const canCancel = status === 1 || status === 3; // Cancel status
 				const canDelete = status === 5 || status === 4; // Delete status
-
 				return (
 					<Space size="middle">
 						{/* Edit Button */}
@@ -462,19 +703,26 @@ const PromotionPage = ({promotionData}) => {
 						</Tooltip>
 
 						{/* Pause Button (only if Status is 2) */}
-						{canPause && (
+						{(canPause || canContinue) && (
 							<Popconfirm
-								title="Bạn có chắc tạm ngưng khuyến mãi này không?"
+								title={
+									canPause
+										? 'Bạn có chắc tạm ngưng khuyến mãi này không?'
+										: 'Bạn có chắc tiếp tục khuyến mãi này không?'
+								}
 								onConfirm={() => handlePause(record.Id)}
 							>
-								<Tooltip title="Tạm Ngưng Khuyến Mãi">
-									<Button type="link" danger>
-										<PauseOutlined />
+								<Tooltip
+									title={
+										canPause ? 'Tạm Ngưng Khuyến Mãi' : 'Tiếp Tục Khuyến Mãi'
+									}
+								>
+									<Button type="link" danger={canPause}>
+										{canPause ? <PauseOutlined /> : <PlayCircleOutlined />}
 									</Button>
 								</Tooltip>
 							</Popconfirm>
 						)}
-
 						{/* Cancel Button (only if Status is 1 or 3) */}
 						{canCancel && (
 							<Popconfirm
@@ -512,7 +760,8 @@ const PromotionPage = ({promotionData}) => {
 		<div className="p-8 bg-white shadow-md rounded-lg">
 			<h2 className="text-2xl font-bold mb-6">
 				{isEditing ? 'Edit Promotion' : 'Create New Promotion'}
-			</h2>
+			</h2>{' '}
+			{/* <PromoForm /> */}
 			<PromotionForm
 				isEditing={isEditing}
 				handleCancelEdit={handleCancelEdit}
@@ -530,10 +779,6 @@ const PromotionPage = ({promotionData}) => {
 				removeRequirement={removeRequirement}
 				removeGift={removeGift}
 			/>
-
-			{/* <PromoForm /> */}
-
-			{/* Display List of Promotions */}
 			<h2 className="text-2xl font-semibold mt-10 mb-6">Danh Sách Khuyến Mãi</h2>
 			<Table
 				columns={columns}
