@@ -70,6 +70,7 @@ const TimeLineOrder = ({
 	changeDiamond,
 	selectedDiamond,
 	filteredRequests,
+	setCompleted,
 }) => {
 	const dispatch = useDispatch();
 	const {id} = useParams();
@@ -87,17 +88,6 @@ const TimeLineOrder = ({
 	const [selectedRequest, setSelectedRequest] = useState(null);
 	const [diamonds, setDiamonds] = useState([]);
 	const [filters, setFilter] = useState({});
-
-	console.log('orders', orders);
-	console.log('diamondRequests', diamondRequests);
-	console.log('allDiamondsHaveId', allDiamondsHaveId);
-	console.log('currentDiamondId', currentDiamondId);
-	console.log('allDiamondRequests', allDiamondRequests);
-	console.log('filteredDiamondRequests', filteredDiamondRequests);
-	console.log('changeDiamond', changeDiamond);
-
-	console.log('status', status);
-	console.log('diamonds', diamonds);
 
 	useEffect(() => {
 		if (allDiamondRequests) {
@@ -368,9 +358,10 @@ const TimeLineOrder = ({
 				})
 			)
 				.unwrap()
-				.then(() => {
+				.then((res) => {
 					message.success('Xác nhận kim cương cho yêu cầu thành công!');
 					setIsModalVisible(false);
+					setCompleted(res);
 				})
 				.catch((error) => {
 					message.error(error?.detail);

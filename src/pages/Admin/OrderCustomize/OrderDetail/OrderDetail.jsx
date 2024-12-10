@@ -1,5 +1,4 @@
 import React, {useEffect, useState} from 'react';
-import Loading from 'react-loading';
 import {useDispatch, useSelector} from 'react-redux';
 import {useLocation, useParams} from 'react-router-dom';
 import {
@@ -8,10 +7,12 @@ import {
 	getOrderCustomizeDetailSelector,
 	getOrderStatusCustomizeDetailSelector,
 	getPaymentStatusCustomizeDetailSelector,
+	LoadingCustomizeSelector,
 	LoadingOrderSelector,
 } from '../../../../redux/selectors';
 import {getOrderCustomizeDetail} from '../../../../redux/slices/customizeSlice';
 import InformationOrder from './Left/InformationOrder';
+import Loading from '../../../../components/Loading';
 
 const OrderCustomizeDetail = () => {
 	const {id} = useParams();
@@ -19,8 +20,7 @@ const OrderCustomizeDetail = () => {
 	const order = location.state?.record;
 	const dispatch = useDispatch();
 
-	const orderDetail = useSelector(getOrderCustomizeDetailSelector);
-	const loading = useSelector(LoadingOrderSelector);
+	const loading = useSelector(LoadingCustomizeSelector);
 	const statusOrder = useSelector(getOrderStatusCustomizeDetailSelector);
 	const paymentStatusOrder = useSelector(getPaymentStatusCustomizeDetailSelector);
 	const diamondUnAvailable = useSelector(GetDiamondUnAvailableSelector);
@@ -35,6 +35,7 @@ const OrderCustomizeDetail = () => {
 	const [selectedDiamond, setSelectedDiamond] = useState({});
 	const [diamondRequests, setDiamondRequests] = useState(null);
 	const [fetchRequest, setFetchRequest] = useState(null);
+	const [completed, setCompleted] = useState(null);
 
 	const allDiamondRequests = orders?.DiamondRequests;
 
@@ -59,16 +60,11 @@ const OrderCustomizeDetail = () => {
 	useEffect(() => {
 		dispatch(getOrderCustomizeDetail({RequestId: id}))
 			.unwrap()
-			.then(() => {
+			.then((res) => {
 				setFetchRequest(null);
+				setOrders(res);
 			});
-	}, [diamondUnAvailable, id, order, fetchRequest]);
-
-	useEffect(() => {
-		if (orderDetail) {
-			setOrders(orderDetail);
-		}
-	}, [orderDetail]);
+	}, [diamondUnAvailable, id, order, fetchRequest, completed]);
 
 	const showModal = (values) => {
 		if (values) {
@@ -80,10 +76,6 @@ const OrderCustomizeDetail = () => {
 	const showModalAdd = () => {
 		setIsModalAddVisible(true);
 	};
-
-	console.log('orderDetail', orderDetail);
-	console.log('statusOrder', statusOrder);
-	console.log('selectedDiamond', selectedDiamond);
 
 	return (
 		<>
@@ -114,6 +106,7 @@ const OrderCustomizeDetail = () => {
 							selectedDiamond={selectedDiamond}
 							filteredRequests={filteredRequests}
 							setFetchRequest={setFetchRequest}
+							setCompleted={setCompleted}
 						/>
 					</div>
 				</div>
