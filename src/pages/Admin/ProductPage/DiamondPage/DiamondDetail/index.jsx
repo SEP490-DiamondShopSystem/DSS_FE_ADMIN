@@ -2,10 +2,15 @@ import React, {useState, useEffect} from 'react';
 import DiamondDetail from './DiamondDetail';
 import {useParams} from 'react-router-dom';
 import {useDispatch} from 'react-redux';
-import {getDiamondDetail, handleLockDiamond} from '../../../../../redux/slices/diamondSlice';
+import {
+	getDiamondDetail,
+	handleAddPrice,
+	handleLockDiamond,
+} from '../../../../../redux/slices/diamondSlice';
 import {DiamondUploadForm} from '../DiamondUploadForm';
 import {LockDiamondModal} from '../LockDiamondModal/LockDiamondModal';
 import {Form, message} from 'antd';
+import {PriceExtraFeeModal} from '../PriceExtraFeeModal/PriceExtraFeeModal';
 
 const DiamondDetailPage = () => {
 	const [form] = Form.useForm();
@@ -17,6 +22,7 @@ const DiamondDetailPage = () => {
 	const [isLockDiamondModalVisible, setIsLockDiamondModalVisible] = useState(false);
 	const [lockDiamondId, setLockDiamondId] = useState();
 	const [fetch, setFetch] = useState();
+	const [isModalVisible, setIsModalVisible] = useState(false);
 
 	console.log('diamond', diamond);
 
@@ -62,6 +68,24 @@ const DiamondDetailPage = () => {
 			});
 	};
 
+	const handleOpenModal = () => {
+		setIsModalVisible(true);
+	};
+
+	const handleCloseModal = () => {
+		setIsModalVisible(false);
+	};
+
+	const handleSubmit = (values) => {
+		console.log('priceOffset:', values);
+		dispatch(handleAddPrice({id, priceOffset: values?.priceOffset, extraFee: values?.extraFee}))
+			.unwrap()
+			.then((res) => {
+				message.success(`Thay Đổi Giá Kim Cương Thành Công`);
+				setFetch(res);
+			});
+	};
+
 	return (
 		<div className="bg-gray-100 min-h-screen py-10">
 			<div className="container mx-auto">
@@ -70,6 +94,7 @@ const DiamondDetailPage = () => {
 					handleView={handleView}
 					id={id}
 					handleLockDiamondView={handleLockDiamondView}
+					handleOpenModal={handleOpenModal}
 				/>
 			</div>
 			<DiamondUploadForm
@@ -83,6 +108,12 @@ const DiamondDetailPage = () => {
 				onSubmit={handleLockDiamondSubmit}
 				lockDiamondId={lockDiamondId}
 				form={form}
+			/>
+			<PriceExtraFeeModal
+				form={form}
+				isVisible={isModalVisible}
+				onClose={handleCloseModal}
+				onSubmit={handleSubmit}
 			/>
 		</div>
 	);

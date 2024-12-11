@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import {Table, Button, Input, Form, Modal, message, Select, Card} from 'antd';
+import {Table, Button, Input, Form, Modal, message, Select, Card, Space} from 'antd';
 import {useDispatch, useSelector} from 'react-redux';
 import {
 	fetchDeliveryFees,
@@ -15,6 +15,7 @@ import {
 	LoadingDeliveryFeeSelector,
 	getAllLocationsSelector,
 } from '../../../redux/selectors';
+import {CheckOutlined, CloseOutlined, EditOutlined} from '@ant-design/icons';
 
 const {Option} = Select;
 
@@ -128,59 +129,66 @@ const DeliveryFeePage = () => {
 
 	const columns = [
 		{
-			title: 'Delivery Method',
+			title: 'Hình Thức Vận Chuyển',
 			dataIndex: 'DeliveryMethod',
 			key: 'DeliveryMethod',
 		},
 		{
-			title: 'Name',
+			title: 'Tỉnh/Thành',
 			dataIndex: 'Name',
 			key: 'Name',
 		},
 		{
-			title: 'Cost',
+			title: 'Chi Phí',
 			dataIndex: 'Cost',
 			key: 'Cost',
 			render: (text) => new Intl.NumberFormat('vi-VN').format(text) + ' VND',
 		},
 		{
-			title: 'Actions',
+			title: '',
 			key: 'actions',
 			render: (_, record) => (
-				<div className="flex space-x-2">
+				<Space className="flex space-x-2">
 					<Button
 						onClick={() => handleEditDeliveryFee(record)}
-						type="link"
-						className="text-primary hover:text-primaryDark"
+						type="text"
+						className="bg-primary"
 					>
-						Edit
+						<EditOutlined />
 					</Button>
 					<Button
 						onClick={() => HandleActiveDeliveryFee(record.Id)}
-						type="link"
+						danger
 						className={
 							record.IsEnabled
 								? 'text-red hover:text-redLight'
 								: 'text-green hover:text-greenDark'
 						}
+						icon={
+							record.IsEnabled ? (
+								<CloseOutlined style={{color: 'red'}} />
+							) : (
+								<CheckOutlined style={{color: 'green'}} />
+							)
+						}
 					>
-						{record.IsEnabled ? 'Deactivate' : 'Activate'}
+						{record.IsEnabled ? 'Hủy kích hoạt' : 'Kích hoạt'}
 					</Button>
-				</div>
+				</Space>
 			),
 		},
 	];
 
 	return (
 		<div className="p-6 bg-offWhite min-h-screen">
-			<h1 className="text-2xl font-semibold mb-4 text-primary">Manage Delivery Fees</h1>
+			<h1 className="text-2xl font-semibold mb-4 text-primary">Quản Lí Phí Vận Chuyển</h1>
 			<Button
 				type="primary"
 				onClick={handleAddDeliveryFee}
 				style={{marginBottom: 20}}
 				className="bg-primary hover:bg-green text-white"
 			>
-				Add New Delivery Fee
+				Thêm Phí Vận Chuyển
 			</Button>
 			{loading && <p>Loading...</p>}
 			{error && <p className="text-red-500">Error: {error}</p>}
@@ -200,7 +208,7 @@ const DeliveryFeePage = () => {
 
 			{/* Modal for adding/editing delivery fees */}
 			<Modal
-				title={editDeliveryFee ? 'Edit Delivery Fee' : 'Add New Delivery Fee'}
+				title={editDeliveryFee ? 'Cập Nhật Phí Vận Chuyển' : 'Thêm Phí Vận Chuyển'}
 				visible={isModalVisible}
 				onCancel={handleCancel}
 				footer={null}
@@ -213,34 +221,34 @@ const DeliveryFeePage = () => {
 					layout="vertical"
 				>
 					<Form.Item
-						label="Delivery Method"
+						label="Hình Thức Vận Chuyển"
 						name="DeliveryMethod"
-						rules={[{required: true, message: 'Please input the delivery method!'}]}
+						rules={[{required: true, message: 'Vui lòng nhập hình thức giao hàng!'}]}
 					>
 						<Input className="border-gray-300" />
 					</Form.Item>
 					<Form.Item
-						label="Name"
+						label="Tỉnh/Thành"
 						name="Name"
-						rules={[{required: true, message: 'Please input the name!'}]}
+						rules={[{required: true, message: 'Vui lòng nhập tỉnh/thành!'}]}
 					>
 						<Input className="border-gray-300" />
 					</Form.Item>
 					<Form.Item
-						label="Cost"
+						label="Chi Phí"
 						name="Cost"
-						rules={[{required: true, message: 'Please input the cost!'}]}
+						rules={[{required: true, message: 'Vui lòng nhập chi phí!'}]}
 					>
 						<Input type="number" className="border-gray-300" />
 					</Form.Item>
 					<Form.Item
-						label="To Location"
+						label="Đến Vị Trí"
 						name="provinceId"
-						rules={[{required: true, message: 'Please select a location!'}]}
+						rules={[{required: true, message: 'Vui lòng chọn một vị trí!'}]}
 						style={{display: editDeliveryFee ? 'none' : 'block'}} // Hide when editing
 					>
 						<Select
-							placeholder="Select a province"
+							placeholder="Chọn Tỉnh"
 							value={editDeliveryFee ? editDeliveryFee.ToLocationId : undefined}
 							className="border-gray-300"
 						>
@@ -262,7 +270,7 @@ const DeliveryFeePage = () => {
 							htmlType="submit"
 							className="w-full bg-primary hover:bg-primaryDark text-white"
 						>
-							{editDeliveryFee ? 'Update' : 'Add'}
+							{editDeliveryFee ? 'Cập Nhật' : 'Thêm'}
 						</Button>
 					</Form.Item>
 				</Form>
