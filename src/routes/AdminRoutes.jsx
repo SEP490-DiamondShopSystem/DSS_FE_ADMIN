@@ -209,7 +209,7 @@ export const AdminRouters = () => {
 				<Route
 					path="/blogs"
 					element={
-						<PrivateRoute roles={['staff', 'admin', 'manager']}>
+						<PrivateRoute roles={['staff', 'manager']}>
 							<BlogPage />
 						</PrivateRoute>
 					}

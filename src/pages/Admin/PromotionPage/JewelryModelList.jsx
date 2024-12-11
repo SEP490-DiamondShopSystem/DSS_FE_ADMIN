@@ -79,33 +79,42 @@ const JewelryModelList = ({onSelectModel}) => {
 		<div
 			key={model.Id}
 			onClick={() => handleModelSelect(model)}
-			className="bg-white rounded-xl shadow-md hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2 cursor-pointer border flex flex-col min-h-[320px]"
+			className="bg-white rounded-xl shadow-md hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2 cursor-pointer border flex min-h-[400px] mt-6"
 		>
+			<div className="absolute top-2 right-2">
+				{model.IsEngravable && (
+					<Tag color="blue" className="mb-1">
+						Khắc được
+					</Tag>
+				)}
+			</div>
 			<div className="relative flex-grow">
 				{model.Thumbnail?.MediaPath ? (
 					<img
 						src={model.Thumbnail.MediaPath}
 						alt={model.Name}
-						className="w-full h-48 object-cover rounded-t-lg"
+						className="w-full h-20 object-cover rounded-t-xl"
 					/>
 				) : (
-					<div className="w-full h-48 flex items-center justify-center rounded-t-lg text-gray-500 bg-tintWhite">
+					<div className="w-full h-20 flex items-center justify-center rounded-t-xl text-gray-500 bg-tintWhite">
 						Chưa có hình ảnh
 					</div>
 				)}
-				<div className="absolute top-2 right-2">
-					{model.IsEngravable && (
-						<Tag color="blue" className="mb-1">
-							Khắc được
-						</Tag>
-					)}
-				</div>
 			</div>
 			<div className="p-4 flex flex-col justify-between flex-grow">
 				<h3 className="text-lg font-semibold text-gray-800 mb-2 truncate">{model.Name}</h3>
+				<p className="text-sm text-gray-600 mb-1">
+					Loại: {model.Category?.Name || 'Không rõ'}
+				</p>
+				<p className="text-sm text-gray-600 mb-1">
+					Kim loại hỗ trợ: {model.MetalSupported?.join(', ') || 'Không rõ'}
+				</p>
+				<p className="text-sm text-gray-600 mb-1">
+					Tùy chọn kim cương phụ: {model.SideDiamondOptionCount || 0}
+				</p>
 				<div className="flex justify-between text-sm text-gray-600">
-					<span>Kim Cương: {model.MainDiamondCount}</span>
-					<span>Phí: {model.CraftmanFee} VND</span>
+					<span>Kim cương chính: {model.MainDiamondCount || 0}</span>
+					<span>Phí gia công: {model.CraftmanFee?.toLocaleString('vi-VN') || '0'} VND</span>
 				</div>
 			</div>
 		</div>
@@ -186,9 +195,7 @@ const JewelryModelList = ({onSelectModel}) => {
 
 	const renderModelDetails = () =>
 		selectedModel && (
-			<div 
-			className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 p-4"
-			>
+			<div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 p-4">
 				<div className="bg-white rounded-2xl w-11/12 md:w-3/4 lg:w-2/3 max-h-3/4 p-6 ">
 					<button
 						onClick={() => setSelectedModel(null)}

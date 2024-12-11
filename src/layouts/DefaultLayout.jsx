@@ -100,8 +100,8 @@ const DefaultLayout = () => {
 
 		(managerRole || staffRole) &&
 			getItem('Quản Lý Sản Phẩm', '/products', <ProductOutlined />, [
-				getItem('Danh Sách Trang Sức', '/products/jewelry-list', <RightOutlined />),
 				getItem('Danh Sách Kim Cương', '/products/diamond-list', <DiamondOutlined />),
+				getItem('Danh Sách Trang Sức', '/products/jewelry-list', <RightOutlined />),
 
 				getItem(
 					'Danh Sách Mẫu Trang Sức',
