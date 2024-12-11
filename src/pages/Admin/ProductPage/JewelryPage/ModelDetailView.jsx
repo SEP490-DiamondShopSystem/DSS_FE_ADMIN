@@ -88,7 +88,7 @@ const ModelDetailsView = ({
         </div>
 
         <h2 className="text-3xl font-bold text-blue-800 text-center mb-8 border-b-4 border-blue-300 pb-4">
-          {selectedModel.Name}
+          {selectedModel?.Name}
         </h2>
 
         <div className="grid grid-cols-2 gap-8">
