@@ -222,19 +222,15 @@ export const uploadPromotionThumbnail = createAsyncThunk(
 	async ({ promotionId, imageFile }, { rejectWithValue }) => {
 	  try {
 		const formData = new FormData();
-		formData.append('imageFile', imageFile); // Key must match the API parameter
-		
-		// Log FormData for debugging (optional, remove in production)
+		formData.append('imageFile', imageFile);
 		console.log('Uploading thumbnail with FormData:', formData);
-  
 		const response = await api.put(`/Promotion/${promotionId}/Thumbnail`, formData, {
 		  headers: {
-			'Content-Type': 'multipart/form-data', // Explicitly set Content-Type
+			'Content-Type': 'multipart/form-data',
 		  },
 		});
 		return response.data;
 	  } catch (error) {
-		// Improved error handling using helper
 		return rejectWithValue(
 		  error.response?.data || { status: 'unknown', detail: 'Failed to upload thumbnail' }
 		);

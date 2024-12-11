@@ -1,6 +1,7 @@
 import React, {useEffect, useState} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
 import {
+	Modal,
 	Button,
 	Image,
 	Form,
@@ -59,7 +60,24 @@ const ConfigurationPage = () => {
 	const [orderForm] = Form.useForm();
 	const [paymentForm] = Form.useForm();
 	const [bankForm] = Form.useForm();
+	const [isModalVisible, setIsModalVisible] = useState(false);
+	const [currentForm, setCurrentForm] = useState(null);
+	const [submitHandler, setSubmitHandler] = useState(null);
 
+	const showConfirm = (form, handler) => {
+		setCurrentForm(form);
+		setSubmitHandler(() => handler); // Save the handler to call after confirmation
+		setIsModalVisible(true);
+	};
+	const handleOk = () => {
+		if (currentForm) {
+			currentForm.submit(); // Submit the form
+		}
+		setIsModalVisible(false);
+	};
+	const handleCancel = () => {
+		setIsModalVisible(false);
+	};
 	const paymentMethods = [
 		{value: 1, label: 'Chuyển Khoản Ngân Hàng'},
 		{value: 2, label: 'ZaloPay'},
@@ -410,7 +428,11 @@ const ConfigurationPage = () => {
 								</Card>
 							))}
 
-							<Button type="primary" htmlType="submit" className="mt-4">
+							<Button
+								type="primary"
+								onClick={() => showConfirm(accountForm, handleAccountSubmit)}
+								className="mt-4"
+							>
 								Lưu
 							</Button>
 						</Form>
@@ -657,7 +679,10 @@ const ConfigurationPage = () => {
 									</Form.Item>
 								</Col>
 							</Row>
-							<Button type="primary" htmlType="submit">
+							<Button
+								type="primary"
+								onClick={() => showConfirm(diamondForm, handleDiamondSubmit)}
+							>
 								Lưu
 							</Button>
 						</Form>
@@ -707,7 +732,10 @@ const ConfigurationPage = () => {
 									</Form.Item>
 								</Col>
 							</Row>
-							<Button type="primary" htmlType="submit">
+							<Button
+								type="primary"
+								onClick={() => showConfirm(frontendForm, handleFrontendSubmit)}
+							>
 								Lưu
 							</Button>
 						</Form>
@@ -802,7 +830,10 @@ const ConfigurationPage = () => {
 									</Form.Item>
 								</Col>
 							</Row>
-							<Button type="primary" htmlType="submit">
+							<Button
+								type="primary"
+								onClick={() => showConfirm(bankForm, handleBankAccountSubmit)}
+							>
 								Lưu
 							</Button>
 						</Form>
@@ -874,7 +905,10 @@ const ConfigurationPage = () => {
 									</Form.Item>
 								</Col>
 							</Row>
-							<Button type="primary" htmlType="submit">
+							<Button
+								type="primary"
+								onClick={() => showConfirm(locationForm, handleLocationSubmit)}
+							>
 								Lưu
 							</Button>
 						</Form>
@@ -968,7 +1002,10 @@ const ConfigurationPage = () => {
 									</Form.Item>
 								</Col>
 							</Row>
-							<Button type="primary" htmlType="submit">
+							<Button
+								type="primary"
+								onClick={() => showConfirm(orderForm, handleOrderSubmit)}
+							>
 								Lưu
 							</Button>
 						</Form>
@@ -1070,7 +1107,10 @@ const ConfigurationPage = () => {
 									</Form.Item>
 								</Col>
 							</Row>
-							<Button type="primary" htmlType="submit">
+							<Button
+								type="primary"
+								onClick={() => showConfirm(paymentForm, handleOrderPaymentSubmit)}
+							>
 								Lưu
 							</Button>
 						</Form>
@@ -1121,13 +1161,27 @@ const ConfigurationPage = () => {
 									</Form.Item>
 								</Col>
 							</Row>
-							<Button type="primary" htmlType="submit">
+							<Button
+								type="primary"
+								onClick={() => showConfirm(promotionForm, handlePromotionSubmit)}
+							>
 								Lưu
 							</Button>
 						</Form>
 					</Card>
 				</Tabs.TabPane>
+				{/* Confirmation Modal */}
 			</Tabs>
+			<Modal
+				title="Xác nhận"
+				visible={isModalVisible}
+				onOk={handleOk}
+				onCancel={handleCancel}
+				okText="Xác nhận"
+				cancelText="Hủy bỏ"
+			>
+				<p>Bạn có chắc chắn muốn lưu thay đổi?</p>
+			</Modal>
 		</div>
 	);
 };

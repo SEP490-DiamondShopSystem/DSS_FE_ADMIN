@@ -30,7 +30,6 @@ const SideDiamondPricePage = () => {
 		isSideDiamond: true,
 		shapeId: 99,
 		isLabDiamond: false,
-
 	});
 
 	const handleFilterChange = (filterName) => (event) => {
@@ -40,8 +39,7 @@ const SideDiamondPricePage = () => {
 		}));
 	};
 
-	const [shapeId, setShapeId] = useState(99
-	);
+	const [shapeId, setShapeId] = useState(99);
 	const [isLabDiamond, setIsLabDiamond] = useState(false);
 
 	const [editedCells, setEditedCells] = useState([]);
@@ -57,7 +55,7 @@ const SideDiamondPricePage = () => {
 	const [criteriaRangeToDelete, setCriteriaRangeToDelete] = useState(null);
 
 	useEffect(() => {
-		dispatch(fetchPriceBoard({shapeId, isLabDiamond,  isSideDiamond: true}));
+		dispatch(fetchPriceBoard({shapeId, isLabDiamond, isSideDiamond: true}));
 	}, [dispatch, shapeId, isLabDiamond]);
 
 	const handleShapeChange = (event) => {
@@ -71,7 +69,7 @@ const SideDiamondPricePage = () => {
 	const handleCheckboxChange = (diamondPriceId) => {
 		setSelectedPrices(
 			(prev) =>
-				prev.includes()
+				prev.includes(diamondPriceId)
 					? prev.filter((id) => id !== diamondPriceId) // Uncheck
 					: [...prev, diamondPriceId] // Check
 		);
@@ -88,22 +86,33 @@ const SideDiamondPricePage = () => {
 		await dispatch(deleteDiamondPrice(payload)); // Wait for delete to finish
 		setSelectedPrices([]);
 		setShowDeleteConfirm(false);
-		await dispatch(fetchPriceBoard({shapeId, isLabDiamond,  isSideDiamond: true})); // Fetch updated board
+		await dispatch(fetchPriceBoard({shapeId, isLabDiamond, isSideDiamond: true})); // Fetch updated board
 	};
 
 	const savePrices = async () => {
-		const listPrices = editedCells.map((cell) => ({
-			DiamondCriteriaId: priceBoard.PriceTables[0].CriteriaId,
-			price: Number(cell.price),
-			cut: priceBoard.Main,
-			color: Object.keys(priceBoard.PriceTables[0].ColorRange)[cell.rowIndex],
-			clarity: Object.keys(priceBoard.PriceTables[0].ClarityRange)[cell.cellIndex],
-		}));
+		const listPrices = editedCells
+			.map((cell) => {
+				// Find the correct price table for this cell
+				const matchingPriceTable = priceBoard.PriceTables.find(
+					(table) =>
+						table.CellMatrix[cell.rowIndex][cell.cellIndex].DiamondPriceId ===
+						cell.diamondPriceId
+				);
+
+				return {
+					DiamondCriteriaId: matchingPriceTable ? matchingPriceTable.CriteriaId : null,
+					price: Number(cell.price),
+					cut: priceBoard.MainCut,
+					color: Object.keys(priceBoard.PriceTables[0].ColorRange)[cell.rowIndex],
+					clarity: Object.keys(priceBoard.PriceTables[0].ClarityRange)[cell.cellIndex],
+				};
+			})
+			.filter((price) => price.DiamondCriteriaId !== null); // Filter out any prices without a matching criteria ID
 
 		if (listPrices.length === 0) return;
 
 		await dispatch(
-			createDiamondPrice({listPrices, shapeId, isLabDiamond, isSideDiamond: true})
+			createDiamondPrice({listPrices, shapeId, isLabDiamond, isSideDiamond: false})
 		)
 			.unwrap()
 			.then(() => {
@@ -116,7 +125,7 @@ const SideDiamondPricePage = () => {
 		setEditedCells([]);
 		setIsCreating(false);
 
-		await dispatch(fetchPriceBoard({shapeId, isLabDiamond,  isSideDiamond: true}));
+		await dispatch(fetchPriceBoard({shapeId, isLabDiamond, isSideDiamond: false}));
 	};
 
 	const handleSave = async () => {
@@ -151,7 +160,7 @@ const SideDiamondPricePage = () => {
 
 		setEditedCells([]);
 		setIsEditing(false);
-		await dispatch(fetchPriceBoard({shapeId, isLabDiamond,  isSideDiamond: true}));
+		await dispatch(fetchPriceBoard({shapeId, isLabDiamond, isSideDiamond: true}));
 	};
 
 	// Render missing ranges alert
@@ -198,7 +207,7 @@ const SideDiamondPricePage = () => {
 			setIsCreateRangeModalVisible(false);
 
 			// Refresh price board after creating range
-			dispatch(fetchPriceBoard({shapeId, isLabDiamond,  isSideDiamond: true}));
+			dispatch(fetchPriceBoard({shapeId, isLabDiamond, isSideDiamond: true}));
 		} catch (error) {
 			message.error(error?.data?.title || 'Không thể tạo phạm vi kim cương');
 		}
@@ -226,7 +235,7 @@ const SideDiamondPricePage = () => {
 			message.success('Xóa phạm vi kim cương thành công!');
 
 			// Refresh price board after deleting range
-			dispatch(fetchPriceBoard({shapeId, isLabDiamond,  isSideDiamond: true}));
+			dispatch(fetchPriceBoard({shapeId, isLabDiamond, isSideDiamond: true}));
 
 			// Reset criteriaRangeToDelete
 			setCriteriaRangeToDelete(null);
@@ -259,7 +268,7 @@ const SideDiamondPricePage = () => {
 			setSelectedRange(null);
 
 			// Refresh price board after updating range
-			dispatch(fetchPriceBoard({shapeId, isLabDiamond,  isSideDiamond: true}));
+			dispatch(fetchPriceBoard({shapeId, isLabDiamond, isSideDiamond: true}));
 		} catch (error) {
 			message.error(error?.data?.title || 'Không thể cập nhật phạm vi kim cương');
 		}
@@ -578,8 +587,6 @@ const SideDiamondPricePage = () => {
 					Bảng Giá Kim Cương Tấm{' '}
 				</h1>
 				<div className="flex flex-wrap gap-4 items-center justify-between p-4 bg-offWhite rounded-lg shadow-md">
-
-
 					{/* Lab Diamond Checkbox */}
 					<div className="flex items-center gap-2">
 						<input
@@ -593,7 +600,6 @@ const SideDiamondPricePage = () => {
 							Kim Cương Nhân Tạo
 						</label>
 					</div>
-
 
 					{/* Clear Filters Button */}
 					<div>
@@ -619,8 +625,6 @@ const SideDiamondPricePage = () => {
 				Bảng Giá Kim Cương Tấm{' '}
 			</h1>
 			<div className="flex flex-wrap gap-4 items-center justify-between p-4 bg-offWhite rounded-lg shadow-md">
-
-
 				{/* Lab Diamond Checkbox */}
 				<div className="flex items-center gap-2">
 					<input
@@ -634,7 +638,6 @@ const SideDiamondPricePage = () => {
 						Kim Cương Nhân Tạo
 					</label>
 				</div>
-
 
 				{/* Clear Filters Button */}
 				<div className="flex gap-4">

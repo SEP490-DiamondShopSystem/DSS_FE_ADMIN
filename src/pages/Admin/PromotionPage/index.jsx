@@ -588,11 +588,22 @@ const PromotionPage = ({promotionData}) => {
 									<Button
 										type="text"
 										className="text-white hover:text-blue-200"
-										onClick={() =>
-											document
-												.getElementById(`thumbnail-upload-${record.Id}`)
-												.click()
-										}
+										onClick={(e) => {
+											// Prevent event propagation
+											e.stopPropagation();
+
+											// Use optional chaining and provide a fallback
+											const fileInput = document.getElementById(
+												`thumbnail-upload-${record.Id}`
+											);
+											if (fileInput) {
+												fileInput.click();
+											} else {
+												message.error(
+													'Không thể tải ảnh. Vui lòng thử lại sau.'
+												);
+											}
+										}}
 									>
 										<EditFilled />
 									</Button>
@@ -603,15 +614,76 @@ const PromotionPage = ({promotionData}) => {
 								<PictureOutlined className="text-gray-400" />
 							</div>
 						)}
+						<div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-black bg-opacity-50 rounded-md">
+							<input
+								type="file"
+								accept="image/*"
+								className="hidden"
+								id={`thumbnail-upload-${record.Id}`}
+								onChange={(e) => {
+									const file = e.target.files[0];
+									if (file) {
+										dispatch(
+											uploadPromotionThumbnail({
+												promotionId: record.Id,
+												imageFile: file,
+											})
+										)
+											.unwrap()
+											.then(() => {
+												message.success('Tải ảnh bìa lên thành công!');
+												dispatch(fetchPromotions());
+											})
+											.catch((error) => {
+												message.error(
+													error?.data?.title ||
+														error?.detail ||
+														'Tải lên thất bại!'
+												);
+											});
+									}
+								}}
+							/>
+							<Button
+								type="text"
+								className="text-white hover:text-blue-200"
+								onClick={(e) => {
+									// Prevent event propagation
+									e.stopPropagation();
 
+									// Use optional chaining and provide a fallback
+									const fileInput = document.getElementById(
+										`thumbnail-upload-${record.Id}`
+									);
+									if (fileInput) {
+										fileInput.click();
+									} else {
+										message.error('Không thể tải ảnh. Vui lòng thử lại sau.');
+									}
+								}}
+							>
+								<EditFilled />
+							</Button>
+						</div>
 						<Button
 							type="link"
 							size="small"
 							className="text-xs"
 							icon={<UploadOutlined />}
-							onClick={() =>
-								document.getElementById(`thumbnail-upload-${record.Id}`).click()
-							}
+							onClick={(e) => {
+								// Prevent event propagation
+								e.stopPropagation();
+
+								// Use optional chaining and provide a fallback
+								const fileInput = document.getElementById(
+									`thumbnail-upload-${record.Id}`
+								);
+								if (fileInput) {
+									fileInput.click();
+								} else {
+									message.error('Không thể tải ảnh. Vui lòng thử lại.');
+								}
+							}}
 						>
 							Tải ảnh bìa
 						</Button>
@@ -653,35 +725,143 @@ const PromotionPage = ({promotionData}) => {
 			render: (text) => getTextForEnum('Status', text),
 		},
 		{
-			title: 'Priority',
-			dataIndex: 'Priority',
-			key: 'priority',
-		},
-		{
-			title: 'Số Tiền',
-			dataIndex: 'moneyAmount',
-			key: 'moneyAmount',
-		},
-		{
 			title: 'Yêu Cầu',
 			key: 'requirements',
-			render: (_, record) =>
-				record.PromoReqs?.map((req, index) => (
-					<div key={index}>
-						<span>{req.Name}</span> - Số Lượng: {req.Quantity}
+			render: (_, record) => {
+				const requirements = record.PromoReqs || [];
+
+				if (requirements.length === 0) return 'Không có yêu cầu';
+
+				return requirements.map((req, index) => (
+					<div key={index} className="text-xs mb-1 bg-gray-50 p-1 rounded">
+						{/* <div className="font-semibold">{req.Name || 'N/A'}</div> */}
+						<div className="flex justify-between">
+							<span>Loại: {getTextForEnum('TargetType', req.TargetType)}</span>
+							{req.Quantity !== null && req.Quantity !== undefined && (
+								<span>SL: {req.Quantity}</span>
+							)}
+						</div>
+						{req.Amount !== null && req.Amount !== undefined && (
+							<div>Số Tiền: {req.Amount.toLocaleString()} VNĐ</div>
+						)}
+						{req.DiamondRequirementSpec && (
+							<div className="text-xs text-gray-600">
+								KĐ:{' '}
+								{[
+									req.DiamondRequirementSpec.Origin &&
+										`Nguồn gốc: ${getTextForEnum(
+											'Origin',
+											req.DiamondRequirementSpec.Origin
+										)}`,
+									req.DiamondRequirementSpec.CaratFrom ||
+										(req.DiamondRequirementSpec.CaratTo &&
+											`Carat: ${req.DiamondRequirementSpec.CaratFrom}-${req.DiamondRequirementSpec.CaratTo}`),
+									req.DiamondRequirementSpec.ClarityFrom &&
+										req.DiamondRequirementSpec.ClarityTo &&
+										`Độ Tinh Khiết: ${getTextForEnum(
+											'Clarity',
+											req.DiamondRequirementSpec.ClarityFrom
+										)}-${getTextForEnum(
+											'Clarity',
+											req.DiamondRequirementSpec.ClarityTo
+										)}`,
+									req.DiamondRequirementSpec.CutFrom &&
+										req.DiamondRequirementSpec.CutTo &&
+										`Giác Cắt: ${getTextForEnum(
+											'Cut',
+											req.DiamondRequirementSpec.CutFrom
+										)}-${getTextForEnum(
+											'Cut',
+											req.DiamondRequirementSpec.CutTo
+										)}`,
+									req.DiamondRequirementSpec.ColorFrom &&
+										req.DiamondRequirementSpec.ColorTo &&
+										`Màu:${getTextForEnum(
+											'Color',
+											req.DiamondRequirementSpec.ColorFrom
+										)}-${getTextForEnum(
+											'Color',
+											req.DiamondRequirementSpec.ColorTo
+										)}`,
+								]
+									.filter(Boolean)
+									.join(' | ')}
+							</div>
+						)}
 					</div>
-				)) || 'No Requirements',
+				));
+			},
 		},
 		{
 			title: 'Quà',
 			key: 'gifts',
-			render: (_, record) =>
-				record.Gifts?.map((gift, index) => (
-					<div key={index}>
-						<span>{gift.Name}</span> - Carat Từ: {gift.CaratFrom}, Carat đến:{' '}
-						{gift.CaratTo}
+			render: (_, record) => {
+				const gifts = record.Gifts || [];
+
+				if (gifts.length === 0) return 'Không có quà';
+
+				return gifts.map((gift, index) => (
+					<div key={index} className="text-xs mb-1 bg-gray-50 p-1 rounded">
+						<div className="font-semibold">{gift.Name || 'N/A'}</div>
+
+						<div>Loại: {getTextForEnum('TargetType', gift.TargetType) || 'N/A'}</div>
+						<div>
+							Loại Giảm Giá: {getTextForEnum('UnitType', gift.UnitType) || 'N/A'}
+						</div>
+
+						{gift.UnitValue !== null && gift.UnitValue !== undefined && (
+							<div>Giá Trị Giảm Giá: {gift.UnitValue}</div>
+						)}
+						{gift.Amount !== null && gift.Amount !== undefined && (
+							<div>Số Lượng Được Giảm: {gift.Amount.toLocaleString()}</div>
+						)}
+						{gift.DiamondRequirementSpec && (
+							<div className="text-xs text-gray-600">
+								KĐ:{' '}
+								{[
+									gift.DiamondRequirementSpec.Origin &&
+										`Nguồn:${getTextForEnum(
+											'Origin',
+											gift.DiamondRequirementSpec.Origin
+										)}`,
+									gift.DiamondRequirementSpec.CaratFrom &&
+										gift.DiamondRequirementSpec.CaratTo &&
+										`Carat:${gift.DiamondRequirementSpec.CaratFrom}-${gift.DiamondRequirementSpec.CaratTo}`,
+									gift.DiamondRequirementSpec.ClarityFrom &&
+										gift.DiamondRequirementSpec.ClarityTo &&
+										`Độ Tinh:${getTextForEnum(
+											'Clarity',
+											gift.DiamondRequirementSpec.ClarityFrom
+										)}-${getTextForEnum(
+											'Clarity',
+											gift.DiamondRequirementSpec.ClarityTo
+										)}`,
+									gift.DiamondRequirementSpec.CutFrom &&
+										gift.DiamondRequirementSpec.CutTo &&
+										`Giác Cắt:${getTextForEnum(
+											'Cut',
+											gift.DiamondRequirementSpec.CutFrom
+										)}-${getTextForEnum(
+											'Cut',
+											gift.DiamondRequirementSpec.CutTo
+										)}`,
+									gift.DiamondRequirementSpec.ColorFrom &&
+										gift.DiamondRequirementSpec.ColorTo &&
+										`Màu:${getTextForEnum(
+											'Color',
+											gift.DiamondRequirementSpec.ColorFrom
+										)}-${getTextForEnum(
+											'Color',
+											gift.DiamondRequirementSpec.ColorTo
+										)}`,
+								]
+									.filter(Boolean)
+									.join(' | ')}
+							</div>
+						)}
 					</div>
-				)) || 'No Gifts',
+				));
+			},
 		},
 		{
 			title: '',

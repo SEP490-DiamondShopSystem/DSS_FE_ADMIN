@@ -10,7 +10,8 @@ import {
 	getAllJewelryModelCategoriesSelector,
 } from '../../../redux/selectors';
 import {FilterOutlined, CloseOutlined, InfoCircleOutlined, PlusOutlined} from '@ant-design/icons';
-import {Button, Tooltip, Skeleton, Empty, Tag} from 'antd';
+import {Button, Tooltip, Skeleton, Empty, Tag, Collapse, Divider} from 'antd';
+const {Panel} = Collapse;
 
 const DEFAULT_PLACEHOLDER_IMAGE = '/images/default-jewelry-placeholder.png';
 
@@ -73,45 +74,47 @@ const JewelryModelList = ({onSelectModel}) => {
 		setSelectedModel(model);
 	};
 
-	const handleImageError = (e) => {
-		e.target.src = DEFAULT_PLACEHOLDER_IMAGE;
-		e.target.onerror = null; // Prevent infinite loop if placeholder also fails
-	};
-
 	// Render Functions
 	const renderModelCard = (model) => (
 		<div
 			key={model.Id}
 			onClick={() => handleModelSelect(model)}
-			className="bg-white rounded-xl shadow-md hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2 cursor-pointer border flex flex-col min-h-[320px]"
+			className="bg-white rounded-xl shadow-md hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2 cursor-pointer border flex min-h-[400px] mt-6"
 		>
+			<div className="absolute top-2 right-2">
+				{model.IsEngravable && (
+					<Tag color="blue" className="mb-1">
+						Khắc được
+					</Tag>
+				)}
+			</div>
 			<div className="relative flex-grow">
 				{model.Thumbnail?.MediaPath ? (
 					<img
 						src={model.Thumbnail.MediaPath}
 						alt={model.Name}
-						className="w-full h-48 object-cover rounded-t-lg"
-						onError={handleImageError}
+						className="w-full h-20 object-cover rounded-t-xl"
 					/>
 				) : (
-					<div className="w-full h-48 flex items-center justify-center rounded-t-lg text-gray-500 bg-tintWhite">
+					<div className="w-full h-20 flex items-center justify-center rounded-t-xl text-gray-500 bg-tintWhite">
 						Chưa có hình ảnh
 					</div>
 				)}
-				<div className="absolute top-2 right-2">
-					{model.IsEngravable && (
-						<Tag color="blue" className="mb-1">
-							Khắc được
-						</Tag>
-					)}
-					{model.IsRhodiumFinish && <Tag color="purple">Xi Rhodium</Tag>}
-				</div>
 			</div>
 			<div className="p-4 flex flex-col justify-between flex-grow">
 				<h3 className="text-lg font-semibold text-gray-800 mb-2 truncate">{model.Name}</h3>
+				<p className="text-sm text-gray-600 mb-1">
+					Loại: {model.Category?.Name || 'Không rõ'}
+				</p>
+				<p className="text-sm text-gray-600 mb-1">
+					Kim loại hỗ trợ: {model.MetalSupported?.join(', ') || 'Không rõ'}
+				</p>
+				<p className="text-sm text-gray-600 mb-1">
+					Tùy chọn kim cương phụ: {model.SideDiamondOptionCount || 0}
+				</p>
 				<div className="flex justify-between text-sm text-gray-600">
-					<span>Kim Cương: {model.MainDiamondCount}</span>
-					<span>Phí: {model.CraftmanFee} VND</span>
+					<span>Kim cương chính: {model.MainDiamondCount || 0}</span>
+					<span>Phí gia công: {model.CraftmanFee?.toLocaleString('vi-VN') || '0'} VND</span>
 				</div>
 			</div>
 		</div>
@@ -192,11 +195,11 @@ const JewelryModelList = ({onSelectModel}) => {
 
 	const renderModelDetails = () =>
 		selectedModel && (
-			<div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-				<div className="bg-white rounded-2xl w-11/12 md:w-3/4 lg:w-2/3 max-h-[90vh] overflow-y-auto p-6 relative">
+			<div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 p-4">
+				<div className="bg-white rounded-2xl w-11/12 md:w-3/4 lg:w-2/3 max-h-3/4 p-6 ">
 					<button
 						onClick={() => setSelectedModel(null)}
-						className="absolute top-4 right-4 text-gray-600 hover:text-gray-900"
+						className="absolute top-4 left-4 text-gray hover:text-gray-900"
 					>
 						<CloseOutlined className="text-2xl" />
 					</button>
@@ -209,15 +212,16 @@ const JewelryModelList = ({onSelectModel}) => {
 										DEFAULT_PLACEHOLDER_IMAGE
 									}
 									alt={selectedModel.Name}
-									onError={handleImageError}
 									className="w-full rounded-lg shadow-md object-cover"
 								/>
 							</div>
 						</div>
 
-						<div className="md:w-2/3">
+						<div className="md:w-2/3 overflow-y-visible h-">
 							<h2 className="text-2xl font-bold mb-4">{selectedModel.Name}</h2>
-							<div className="grid grid-cols-2 gap-4">
+
+							{/* Basic Model Information */}
+							<div className="grid grid-cols-2 gap-4 mb-4">
 								<div>
 									<p className="font-semibold">Danh Mục</p>
 									<p>{selectedModel.Category?.Name}</p>
@@ -227,18 +231,205 @@ const JewelryModelList = ({onSelectModel}) => {
 									<p>{selectedModel.ModelCode}</p>
 								</div>
 								<div>
-									<p className="font-semibold">Kim Cương Chính</p>
-									<p>{selectedModel.MainDiamondCount} viên</p>
+									<p className="font-semibold">Phí Chế Tác</p>
+									<p>{selectedModel.CraftmanFee.toLocaleString()} VND</p>
 								</div>
 								<div>
-									<p className="font-semibold">Phí Chế Tác</p>
-									<p>{selectedModel.CraftmanFee} VND</p>
+									<div>
+										{selectedModel.IsEngravable && (
+											<Tag color="blue" className="mb-1">
+												Có Thể Khắc
+											</Tag>
+										)}
+									</div>
+								</div>
+								<div className="mb-2">
+									<p className="font-semibold">Số Lượng Kim Cương Chính</p>
+									<p>{selectedModel.MainDiamondCount} viên</p>
+								</div>
+								<div className="mb-2">
+									<p className="font-semibold">Số Lượng Kim Cương Phụ</p>
+									<p>{selectedModel.SideDiamondOptionCount} viên</p>
+								</div>
+								<div className="grid grid-cols-2 gap-2">
+									{selectedModel.Width !== null && (
+										<div>
+											<p className="font-semibold">Độ Rộng</p>
+											<p>{selectedModel.Width} mm</p>
+										</div>
+									)}
+									{selectedModel.Length !== null && (
+										<div>
+											<p className="font-semibold">Chiều Dài</p>
+											<p>{selectedModel.Length} mm</p>
+										</div>
+									)}
+									{selectedModel.ChainType && (
+										<div>
+											<p className="font-semibold">Loại Dây Chuyền</p>
+											<p>{selectedModel.ChainType}</p>
+										</div>
+									)}
+									{selectedModel.ClaspType && (
+										<div>
+											<p className="font-semibold">Loại Khóa</p>
+											<p>{selectedModel.ClaspType}</p>
+										</div>
+									)}
 								</div>
 							</div>
+
+							{/* Detailed Specifications Collapse */}
+							<Collapse defaultActiveKey={['1']} accordion>
+								{/* Main Diamond Specifications */}
+								<Panel header="Thông Số Kim Cương Chính" key="1">
+									<div>
+										{selectedModel.MainDiamonds &&
+										selectedModel.MainDiamonds.length > 0 ? (
+											selectedModel.MainDiamonds.map((mainDiamond, index) => (
+												<div
+													key={mainDiamond.Id}
+													className="border-b pb-4 mb-4"
+												>
+													<h3 className="text-lg font-semibold mb-2">
+														Kim Cương Chính {index + 1}
+													</h3>
+													<div className="grid grid-cols-3 gap-2">
+														{/* <div>
+															<p className="font-semibold">Carat</p>
+															<p>{mainDiamond.CaratWeight} ct</p>
+														</div> */}
+														{/* <div>
+															<p className="font-semibold">
+																Độ Tinh Khiết
+															</p>
+															<p>{`${mainDiamond.ClarityMin} - ${mainDiamond.ClarityMax}`}</p>
+														</div>
+														<div>
+															<p className="font-semibold">Màu Sắc</p>
+															<p>{`${mainDiamond.ColorMin} - ${mainDiamond.ColorMax}`}</p>
+														</div> */}
+														<div>
+															<p className="font-semibold">
+																Hình Dạng
+															</p>
+															<div>
+																{mainDiamond.Shapes.map((shape) => (
+																	<Tag
+																		key={shape.Shape.Id}
+																		color="green"
+																	>
+																		{shape.Shape.ShapeName}
+																	</Tag>
+																))}
+															</div>
+														</div>
+														<div>
+															<p className="font-semibold">
+																Khoảng Carat Cho Phép
+															</p>
+															<p>{`${mainDiamond.Shapes[0].CaratFrom} - ${mainDiamond.Shapes[0].CaratTo} ct`}</p>
+														</div>
+														<div>
+															<p className="font-semibold">
+																Số Lượng
+															</p>
+															<p>{mainDiamond.Quantity} viên</p>
+														</div>
+													</div>
+												</div>
+											))
+										) : (
+											<p>Không có thông tin kim cương chính</p>
+										)}
+									</div>
+								</Panel>
+
+								{/* Side Diamonds */}
+								{selectedModel.SideDiamonds &&
+									selectedModel.SideDiamonds.length > 0 && (
+										<Panel header="Kim Cương Phụ" key="2">
+											<div className="grid grid-cols-3 gap-2">
+												{selectedModel.SideDiamonds.map(
+													(sideDiamond, index) => (
+														<div key={sideDiamond.Id}>
+															<p className="font-semibold">
+																Kim Cương {index + 1}
+															</p>
+															<p>
+																Carat: {sideDiamond.CaratWeight} ct
+															</p>
+															<p>
+																Hình Dạng:{' '}
+																{sideDiamond.Shape.ShapeName}
+															</p>
+															<p>
+																Độ Tinh Khiết:{' '}
+																{`${sideDiamond.ClarityMin} - ${sideDiamond.ClarityMax}`}
+															</p>
+															<p>
+																Màu Sắc:{' '}
+																{`${sideDiamond.ColorMin} - ${sideDiamond.ColorMax}`}
+															</p>
+														</div>
+													)
+												)}
+											</div>
+										</Panel>
+									)}
+
+								{/* Metal Options */}
+								<Panel header="Lựa Chọn Kim Loại" key="3">
+									<div>
+										<p className="font-semibold mb-2">Kim Loại Hỗ Trợ</p>
+										<div className="flex flex-wrap gap-2">
+											{selectedModel.MetalSupported.map((metal) => (
+												<Tag key={metal} color="purple">
+													{metal}
+												</Tag>
+											))}
+										</div>
+									</div>
+									{selectedModel.SizeMetals && (
+										<div className="mt-4">
+											<p className="font-semibold mb-2">Kích Thước Sẵn Có</p>
+											<div className="grid grid-cols-4 gap-2 max-h-3 overflow-y-scroll">
+												{' '}
+												{selectedModel.SizeMetals.map((sizeMetalOption) => (
+													<div
+														key={`${sizeMetalOption.SizeId}-${sizeMetalOption.MetalId}`}
+														className="border rounded p-2 text-center"
+													>
+														<p>
+															{sizeMetalOption.Size.Value}{' '}
+															{sizeMetalOption.Size.Unit}
+														</p>
+														<p className="text-sm text-gray-600">
+															{sizeMetalOption.Metal.Name}
+															{sizeMetalOption.Metal.Price && (
+																<span className="ml-2 text-gray-500">
+																	(
+																	{sizeMetalOption.Metal.Price.toLocaleString()}{' '}
+																	VND)
+																</span>
+															)}
+														</p>
+														<p className="text-xs text-gray-500">
+															Trọng Lượng: {sizeMetalOption.Weight} g
+														</p>
+													</div>
+												))}
+											</div>
+										</div>
+									)}
+								</Panel>
+							</Collapse>
+
 							<div className="mt-4">
 								<p className="font-semibold">Mô Tả</p>
 								<p className="text-gray-600">{selectedModel.Description}</p>
 							</div>
+
 							<Button
 								type="primary"
 								icon={<PlusOutlined />}
@@ -255,7 +446,6 @@ const JewelryModelList = ({onSelectModel}) => {
 				</div>
 			</div>
 		);
-
 	// Main Render
 	return (
 		<div className="container mx-auto px-4 py-8">

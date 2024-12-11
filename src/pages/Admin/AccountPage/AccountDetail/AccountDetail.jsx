@@ -12,6 +12,7 @@ import {
 import {useNavigate, useParams} from 'react-router-dom';
 import {getDetailUserSelector, GetUserDetailSelector} from '../../../../redux/selectors';
 import {Button, Modal, Select, message, Spin} from 'antd';
+import Loading from '../../../../components/Loading';
 
 const {Option} = Select;
 
@@ -46,37 +47,37 @@ const AccountDetail = () => {
 
 	useEffect(() => {
 		if (id) {
-		  // Reset state on id change to avoid mixing data between profiles
-		  setUserInfo({
-			Email: '',
-			FirstName: '',
-			LastName: '',
-			PhoneNumber: '',
-			Id: '',
-			Addresses: [],
-		  });
-		  setUser({}); // Clear previous user data
-		  setLoading(true); // Show loading indicator when fetching new data
-	
-		  dispatch(getUserAccountDetail(id))  // Fetch new user's data based on id
-			.then(() => setLoading(false))  // Set loading to false after data is fetched
-			.catch(() => setLoading(false));  // Set loading to false in case of error
+			// Reset state on id change to avoid mixing data between profiles
+			setUserInfo({
+				Email: '',
+				FirstName: '',
+				LastName: '',
+				PhoneNumber: '',
+				Id: '',
+				Addresses: [],
+			});
+			setUser({}); // Clear previous user data
+			setLoading(true); // Show loading indicator when fetching new data
+
+			dispatch(getUserAccountDetail(id)) // Fetch new user's data based on id
+				.then(() => setLoading(false)) // Set loading to false after data is fetched
+				.catch(() => setLoading(false)); // Set loading to false in case of error
 		}
-	  }, [dispatch, id]);  // Only trigger when the id changes
-	
-	  useEffect(() => {
+	}, [dispatch, id]); // Only trigger when the id changes
+
+	useEffect(() => {
 		if (userDetail) {
-		  setUser(userDetail); // Set user data when it's fetched
-		  setUserInfo({
-			Email: userDetail?.Email || '',
-			FirstName: userDetail?.FirstName || '',
-			LastName: userDetail?.LastName || '',
-			PhoneNumber: userDetail?.PhoneNumber || '',
-			Id: userDetail?.Id || '',
-			Addresses: userDetail?.Addresses || [],
-		  });
+			setUser(userDetail); // Set user data when it's fetched
+			setUserInfo({
+				Email: userDetail?.Email || '',
+				FirstName: userDetail?.FirstName || '',
+				LastName: userDetail?.LastName || '',
+				PhoneNumber: userDetail?.PhoneNumber || '',
+				Id: userDetail?.Id || '',
+				Addresses: userDetail?.Addresses || [],
+			});
 		}
-	  }, [userDetail]);
+	}, [userDetail]);
 	useEffect(() => {
 		if (userDetailCurrent?.Roles) {
 			const roles = userDetailCurrent.Roles.map((role) => role?.RoleName);
@@ -239,7 +240,7 @@ const AccountDetail = () => {
 	};
 
 	if (loading) {
-		return <Spin size="large" className="loading-spinner" />; // Show spinner while loading
+		return <Loading />;
 	}
 	return (
 		<div>
@@ -280,11 +281,14 @@ const AccountDetail = () => {
 				onCancel={handleCancel}
 			>
 				<Select placeholder="Chọn" style={{width: '100%'}} onChange={handleChange}>
-					{roleLevel >= 3 && <Option value={44}>Deliverer</Option>}
-					{roleLevel >= 3 && <Option value={1}>Customer</Option>}
-					{roleLevel >= 3 && <Option value={11}>Staff</Option>}
-					{roleLevel >= 4 && <Option value={22}>Manager</Option>}
 					{roleLevel >= 5 && <Option value={33}>Admin</Option>}
+					{roleLevel >= 4 && <Option value={22}>Quản Lý</Option>}
+					{roleLevel >= 3 && <Option value={11}>Nhân Viên</Option>}
+					{roleLevel >= 3 && <Option value={44}>Nhân Viên Giao Hàng</Option>}
+					{roleLevel >= 3 && <Option value={1}>Khách Hàng</Option>}
+					{roleLevel >= 3 && <Option value={2}>Thành Viên Đồng</Option>}
+					{roleLevel >= 3 && <Option value={3}>Thành Viên Bạc</Option>}
+					{roleLevel >= 3 && <Option value={4}>Thành Viên Vàng</Option>}
 				</Select>
 			</Modal>
 
@@ -297,7 +301,7 @@ const AccountDetail = () => {
 				<Select placeholder="Chọn" style={{width: '100%'}} onChange={handleChange}>
 					{userDetail?.Roles.map((role) => (
 						<Option key={role.Id} value={role.Id}>
-							{role.RoleName}
+							{role.RoleName.replace('_', ' ')}
 						</Option>
 					))}
 				</Select>

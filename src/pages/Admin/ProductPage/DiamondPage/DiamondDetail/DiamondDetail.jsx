@@ -84,7 +84,7 @@ const statusMapping = {
 	6: {label: 'Đặt trước', color: 'geekblue'},
 };
 
-const DiamondDetail = ({diamond, handleView, id, handleLockDiamondView}) => {
+const DiamondDetail = ({diamond, handleView, id, handleLockDiamondView, handleOpenModal}) => {
 	if (!diamond) {
 		return <p className="text-center text-gray-500">Không có dữ liệu kim cương</p>;
 	}
@@ -240,10 +240,17 @@ const DiamondDetail = ({diamond, handleView, id, handleLockDiamondView}) => {
 
 			<div className="mt-10 text-center">
 				<Button
-					type="text"
-					className="bg-blue-500 py-3 px-8 rounded-lg shadow-lg hover:bg-blue transition-colors duration-300 transform hover:-translate-y-1"
-					onClick={() => handleLockDiamondView(diamond)}
+					className="ml-4 bg-gray-100 text-gray-700 py-3 px-8 rounded-lg shadow-lg hover:bg-gray-200 transition-colors duration-300 transform hover:-translate-y-1"
+					onClick={handleOpenModal}
 					disabled={Status === 2}
+				>
+					Thêm giá
+				</Button>
+				<Button
+					type="text"
+					className="mx-5 bg-blue-500 py-3 px-8 rounded-lg shadow-lg hover:bg-blue transition-colors duration-300 transform hover:-translate-y-1"
+					onClick={() => handleLockDiamondView(diamond)}
+					disabled={Status !== 1}
 				>
 					{diamond?.ProductLock === null ? (
 						<>
@@ -256,7 +263,7 @@ const DiamondDetail = ({diamond, handleView, id, handleLockDiamondView}) => {
 					)}
 				</Button>
 				<Button
-					className="ml-4 bg-gray-100 text-gray-700 py-3 px-8 rounded-lg shadow-lg hover:bg-gray-200 transition-colors duration-300 transform hover:-translate-y-1"
+					className="bg-gray-100 text-gray-700 py-3 px-8 rounded-lg shadow-lg hover:bg-gray-200 transition-colors duration-300 transform hover:-translate-y-1"
 					onClick={() => handleView(id)}
 				>
 					Tải lên hình ảnh
