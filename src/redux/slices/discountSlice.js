@@ -101,29 +101,47 @@ export const cancelDiscount = createAsyncThunk(
 export const updateDiscountThumbnail = createAsyncThunk(
 	'discounts/updateDiscountThumbnail',
 	async ({discountId, thumbnailData}, {rejectWithValue}) => {
-		const response = await api.put(`/Discount/${discountId}/Thumbnail`, thumbnailData);
-		return response;
+		try {
+			const response = await api.put(`/Discount/${discountId}/Thumbnail`, thumbnailData);
+			return response;
+		} catch (error) {
+			if (error.response) {
+				// Handle 400 and 500 status codes
+				if (error.response.status === 400) {
+					return rejectWithValue({status: 400, errors: error.errors});
+				} else if (error.response.status === 500) {
+					return rejectWithValue({status: 500, detail: error.detail});
+				}
+			}
+			return rejectWithValue({status: 'unknown', detail: 'An unexpected error occurred.'});
+		}
 	}
 );
 // Thunk to upload discount thumbnail
 export const uploadDiscountThumbnail = createAsyncThunk(
 	'discount/uploadThumbnail',
 	async ({discountId, imageFile}, {rejectWithValue}) => {
-		const formData = new FormData();
-		formData.append('imageFile', imageFile);
-
-		const response = await axios.put(`/api/Discount/${discountId}/Thumbnail`, formData, {
-			headers: {
-				'Content-Type': 'multipart/form-data',
-			},
-		});
-		return response;
+		try {
+			const formData = new FormData();
+			formData.append('imageFile', imageFile);
+			console.log('Uploading thumbnail with FormData:', formData);
+			const response = await api.put(`/Discount/${discountId}/Thumbnail`, formData, {
+				headers: {
+					'Content-Type': 'multipart/form-data',
+				},
+			});
+			return response.data;
+		} catch (error) {
+			return rejectWithValue(
+				error.response?.data || {status: 'unknown', detail: 'Failed to upload thumbnail'}
+			);
+		}
 	}
 );
 export const discountSlice = createSlice({
 	name: 'discountSlice',
 	initialState: {
-		discounts: null,
+		discounts: [],
 		discountDetail: null,
 		status: 'idle',
 		loading: false,

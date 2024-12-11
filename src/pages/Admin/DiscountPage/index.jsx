@@ -4,6 +4,8 @@ import {
 	EditFilled,
 	PlayCircleOutlined,
 	PauseOutlined,
+	PictureOutlined,
+	UploadOutlined,
 } from '@ant-design/icons';
 import {Button, Form, message, Popconfirm, Space, Table, Tooltip} from 'antd';
 import moment from 'moment';
@@ -18,6 +20,7 @@ import {
 	fetchDiscountDetail,
 	pauseDiscount,
 	updateDiscount,
+	uploadDiscountThumbnail,
 } from '../../../redux/slices/discountSlice';
 import {enumMappings} from '../../../utils/constant';
 import DiscountForm from './DiscountForm/DiscountForm';
@@ -319,6 +322,161 @@ const DiscountPage = ({discountData}) => {
 	// Table columns definition for displaying discounts
 	const columns = [
 		{
+			title: 'Thumbnail',
+			key: 'thumbnail',
+			render: (_, record) => {
+				return (
+					<div className="flex flex-col items-center space-y-2">
+						{record.Thumbnail ? (
+							<div className="relative group">
+								<img
+									src={record?.Thumbnail?.MediaPath}
+									alt={record?.Thumbnail?.MediaName}
+									className="w-16 h-16 object-cover rounded-md shadow-sm group-hover:opacity-70 transition-all duration-300"
+									onError={(e) => {
+										console.error('Image load error:', e);
+										e.target.style.display = 'none';
+									}}
+								/>
+								<div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-black bg-opacity-50 rounded-md">
+									<input
+										type="file"
+										accept="image/*"
+										className="hidden"
+										id={`thumbnail-upload-${record.Id}`}
+										onChange={(e) => {
+											const file = e.target.files[0];
+											if (file) {
+												dispatch(
+													uploadDiscountThumbnail({
+														discountId: record.Id,
+														imageFile: file,
+													})
+												)
+													.unwrap()
+													.then(() => {
+														message.success(
+															'Tải ảnh bìa lên thành công!'
+														);
+														dispatch(fetchDiscounts());
+													})
+													.catch((error) => {
+														message.error(
+															error?.data?.title ||
+																error?.detail ||
+																'Tải lên thất bại!'
+														);
+													});
+											}
+										}}
+									/>
+									<Button
+										type="text"
+										className="text-white hover:text-blue-200"
+										onClick={(e) => {
+											// Prevent event propagation
+											e.stopPropagation();
+
+											// Use optional chaining and provide a fallback
+											const fileInput = document.getElementById(
+												`thumbnail-upload-${record.Id}`
+											);
+											if (fileInput) {
+												fileInput.click();
+											} else {
+												message.error(
+													'Không thể tải ảnh. Vui lòng thử lại sau.'
+												);
+											}
+										}}
+									>
+										<EditFilled />
+									</Button>
+								</div>
+							</div>
+						) : (
+							<div className="w-16 h-16 flex items-center justify-center border-2 border-dashed border-gray-300 rounded-md">
+								<PictureOutlined className="text-gray-400" />
+							</div>
+						)}
+						<div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-black bg-opacity-50 rounded-md">
+							<input
+								type="file"
+								accept="image/*"
+								className="hidden"
+								id={`thumbnail-upload-${record.Id}`}
+								onChange={(e) => {
+									const file = e.target.files[0];
+									if (file) {
+										dispatch(
+											uploadDiscountThumbnail({
+												discountId: record.Id,
+												imageFile: file,
+											})
+										)
+											.unwrap()
+											.then(() => {
+												message.success('Tải ảnh bìa lên thành công!');
+												dispatch(fetchDiscounts());
+											})
+											.catch((error) => {
+												message.error(
+													error?.data?.title ||
+														error?.detail ||
+														'Tải lên thất bại!'
+												);
+											});
+									}
+								}}
+							/>
+							<Button
+								type="text"
+								className="text-white hover:text-blue-200"
+								onClick={(e) => {
+									// Prevent event propagation
+									e.stopPropagation();
+
+									// Use optional chaining and provide a fallback
+									const fileInput = document.getElementById(
+										`thumbnail-upload-${record.Id}`
+									);
+									if (fileInput) {
+										fileInput.click();
+									} else {
+										message.error('Không thể tải ảnh. Vui lòng thử lại sau.');
+									}
+								}}
+							>
+								<EditFilled />
+							</Button>
+						</div>
+						<Button
+							type="link"
+							size="small"
+							className="text-xs"
+							icon={<UploadOutlined />}
+							onClick={(e) => {
+								// Prevent event propagation
+								e.stopPropagation();
+
+								// Use optional chaining and provide a fallback
+								const fileInput = document.getElementById(
+									`thumbnail-upload-${record.Id}`
+								);
+								if (fileInput) {
+									fileInput.click();
+								} else {
+									message.error('Không thể tải ảnh. Vui lòng thử lại.');
+								}
+							}}
+						>
+							Tải ảnh bìa
+						</Button>
+					</div>
+				);
+			},
+		},
+		{
 			title: 'Tên',
 			dataIndex: 'Name',
 			key: 'name',
@@ -350,22 +508,133 @@ const DiscountPage = ({discountData}) => {
 			title: 'Giá Trị Giảm',
 			dataIndex: 'DiscountPercent',
 			key: 'discountPercent',
+			render: (text) => text + ' %',
 		},
 		{
-			title: 'Số Tiền',
-			dataIndex: 'moneyAmount',
-			key: 'moneyAmount',
-		},
-		{
-			title: 'Yêu Cầu',
-			key: 'discountReq',
-			render: (_, record) =>
-				record.DiscountReq?.map((req, index) => (
-					<div key={index}>
-						<span>{req.Name}</span> - Quantity: {req.Quantity}
+			title: 'Promotion Details',
+			key: 'promotionDetails',
+			render: (_, record) => {
+				const req = record.DiscountReq?.[0]; // Displaying only the first requirement
+				return (
+					<div>
+						{req && (
+							<div>
+								<ul>
+									{req.Name && <li>Tên Yêu Cầu: {req.Name}</li>}
+									{req.Amount && <li>Amount: {req.Amount}</li>}
+									{req.Operator && <li>Operator: {req.Operator}</li>}
+									{req.DiamondRequirementSpec?.CaratFrom !== undefined &&
+										req.DiamondRequirementSpec?.CaratTo !== undefined && (
+											<li>
+												Carat: {req.DiamondRequirementSpec.CaratFrom} -{' '}
+												{req.DiamondRequirementSpec.CaratTo}
+											</li>
+										)}
+									{req.DiamondRequirementSpec?.ClarityFrom &&
+										req.DiamondRequirementSpec?.ClarityTo && (
+											<li>
+												Độ Tinh Khiết:{' '}
+												{getTextForEnum(
+													'Clarity',
+													req.DiamondRequirementSpec.ClarityFrom
+												)}{' '}
+												-{' '}
+												{getTextForEnum(
+													'Clarity',
+													req.DiamondRequirementSpec.ClarityTo
+												)}
+											</li>
+										)}
+									{req.DiamondRequirementSpec?.ColorFrom &&
+										req.DiamondRequirementSpec?.ColorTo && (
+											<li>
+												Màu:{' '}
+												{getTextForEnum(
+													'Color',
+													req.DiamondRequirementSpec.ColorFrom
+												)}{' '}
+												-{' '}
+												{getTextForEnum(
+													'Color',
+													req.DiamondRequirementSpec.ColorTo
+												)}
+											</li>
+										)}
+									{req.DiamondRequirementSpec?.CutFrom &&
+										req.DiamondRequirementSpec?.CutTo && (
+											<li>
+												Giác Cắt:{' '}
+												{getTextForEnum(
+													'Cut',
+													req.DiamondRequirementSpec.CutFrom
+												)}{' '}
+												-{' '}
+												{getTextForEnum(
+													'Cut',
+													req.DiamondRequirementSpec.CutTo
+												)}
+											</li>
+										)}
+									{req.DiamondRequirementSpec?.Origin && (
+										<li>
+											Nguồn Gốc:{' '}
+											{getTextForEnum(
+												'Origin',
+												req.DiamondRequirementSpec.Origin
+											)}
+										</li>
+									)}
+									{req.DiamondRequirementSpec?.ShapesIDs?.length > 0 && (
+										<li>
+											Hình Dạng Kim Cương:{' '}
+											{req.DiamondRequirementSpec.ShapesIDs.join(', ')}
+										</li>
+									)}
+									{req.Model && (
+										<li>
+											Model:
+											<ul>
+												{req.Model.Id && <li>ID: {req.Model.Id}</li>}
+												{req.Model.Name && <li>Tên: {req.Model.Name}</li>}
+												{req.Model.ModelCode && (
+													<li>Mã Model: {req.Model.ModelCode}</li>
+												)}
+												{req.Model.CraftmanFee && (
+													<li>Phí Thợ: {req.Model.CraftmanFee}</li>
+												)}
+											</ul>
+										</li>
+									)}
+									{req.Model?.Category && (
+										<li>
+											Category:
+											<ul>
+												{req.Model.Category.Id && (
+													<li>ID: {req.Model.Category.Id}</li>
+												)}
+												{req.Model.Category.Name && (
+													<li>Tên: {req.Model.Category.Name}</li>
+												)}
+												{req.Model.Category.Description && (
+													<li>Mô Tả: {req.Model.Category.Description}</li>
+												)}
+												{req.Model.Category?.Thumbnail?.MediaPath && (
+													<img
+														src={req.Model.Category.Thumbnail.MediaPath}
+														alt="Category Thumbnail"
+													/>
+												)}
+											</ul>
+										</li>
+									)}
+								</ul>
+							</div>
+						)}
 					</div>
-				)) || 'No Requirements',
+				);
+			},
 		},
+
 		{
 			title: '',
 			key: 'action',
