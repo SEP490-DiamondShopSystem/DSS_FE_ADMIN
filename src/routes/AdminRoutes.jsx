@@ -27,6 +27,7 @@ import SideDiamondPricePage from '../pages/Admin/DiamondPricePage/SideDiamondPri
 import BlogPage from '../pages/Admin/BlogPage';
 import ConfigurationPage from '../pages/Admin/ConfigurationPage';
 import DiamondDetailPage from '../pages/Admin/ProductPage/DiamondPage/DiamondDetail';
+import JewelryDetail from '../pages/Admin/ProductPage/JewelryPage/JewelryDetail';
 export const AdminRouters = () => {
 	return (
 		<Routes>
@@ -105,6 +106,14 @@ export const AdminRouters = () => {
 					element={
 						<PrivateRoute roles={['staff', 'admin', 'manager']}>
 							<JewelryPage />
+						</PrivateRoute>
+					}
+				/>
+				<Route
+					path="/products/jewelry-list/:id"
+					element={
+						<PrivateRoute roles={['staff', 'admin', 'manager']}>
+							<JewelryDetail />
 						</PrivateRoute>
 					}
 				/>

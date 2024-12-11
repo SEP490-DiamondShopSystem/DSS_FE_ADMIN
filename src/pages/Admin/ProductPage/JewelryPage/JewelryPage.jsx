@@ -44,6 +44,7 @@ import JewelryCreateForm from './JewelryCreateForm';
 import {fetchAllMetals} from '../../../../redux/slices/jewelry/metalSlice';
 import {fetchAllSizes} from '../../../../redux/slices/jewelry/sizeSlice';
 import {formatPrice} from '../../../../utils';
+import Loading from '../../../../components/Loading';
 
 const JewelryPage = () => {
 	const dispatch = useDispatch();
@@ -56,12 +57,13 @@ const JewelryPage = () => {
 	const [pageSize, setPageSize] = useState(10);
 	const [jewelry, setJewelry] = useState(null);
 
-	const jewelryList = useSelector(selectJewelryList);
+	// const jewelryList = useSelector(selectJewelryList);
 	const [isPopupVisible, setIsPopupVisible] = useState(false);
 	const [selectedModel, setSelectedModel] = useState(null);
 	const [selectedJewelry, setSelectedJewelry] = useState(null);
 	const [isCreateFormOpen, setIsCreateFormOpen] = useState(false);
 	const [isFilterVisible, setIsFilterVisible] = useState(false);
+	const [jewelryList, setJewelryList] = useState(null);
 
 	const [filters, setFilters] = useState({
 		ModelName: '',
@@ -72,7 +74,7 @@ const JewelryPage = () => {
 		Status: 1,
 	});
 
-	console.log('filters', filters);
+	console.log('jewelryList', jewelryList);
 
 	const metals = useSelector(getAllMetalsSelector);
 	const sizes = useSelector(getAllSizesSelector);
@@ -93,6 +95,9 @@ const JewelryPage = () => {
 				})
 			)
 				.unwrap()
+				.then((res) => {
+					setJewelryList(res?.Values);
+				})
 				.catch((error) => {
 					notification.error({
 						message: 'Lỗi',
@@ -286,7 +291,9 @@ const JewelryPage = () => {
 													SizeId: filters.SizeId,
 													Status: filters.Status,
 												})
-											);
+											).then((res) => {
+												setJewelryList(res?.Values);
+											});
 										}}
 										className="w-full"
 									>
@@ -300,73 +307,78 @@ const JewelryPage = () => {
 					{/* Jewelry List */}
 					{loading ? (
 						<div className="flex justify-center items-center h-64">
-							<Spin size="large" />
+							<Loading />
 						</div>
-					) : jewelryList?.length === 0 ? (
+					) : !jewelryList ? (
 						<Empty
 							description="Không có trang sức nào. Vui lòng chọn mẫu trang sức và tiếp tục"
-							className="my-12"
+							className="my-10"
 						/>
 					) : (
 						<div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 my-10">
-							{jewelryList?.map((jewelry) => (
-								<Card
-									key={jewelry.Id}
-									hoverable
-									onClick={() => handleJewelryClick(jewelry)}
-									className="transform transition-all hover:scale-105 hover:shadow-2xl rounded-2xl overflow-hidden"
-								>
-									<div className="flex">
-										{/* Image Section - 40% width */}
-										<div className="w-40 mr-4">
-											<img
-												alt={jewelry.SerialCode}
-												src={
-													jewelry?.Model?.Thumbnail?.MediaPath ||
-													'/default-thumbnail.jpg'
-												}
-												className="w-full h-48 object-cover rounded-lg"
-											/>
-										</div>
+							{Array.isArray(jewelryList) &&
+								jewelryList?.map((jewelry) => (
+									<Card
+										key={jewelry.Id}
+										hoverable
+										onClick={() =>
+											navigate(`/products/jewelry-list/${jewelry?.Id}`)
+										}
+										className="transform transition-all hover:scale-105 hover:shadow-2xl hover:border rounded-2xl overflow-hidden"
+									>
+										<div className="flex">
+											{/* Image Section - 40% width */}
+											<div className="w-40 mr-5">
+												<img
+													alt={jewelry.SerialCode}
+													src={
+														jewelry?.Model?.Thumbnail?.MediaPath ||
+														'/default-thumbnail.jpg'
+													}
+													className="w-full h-48 object-cover rounded-lg"
+												/>
+											</div>
 
-										{/* Information Section - 60% width */}
-										<div className="w-3/5 flex flex-col justify-between">
-											<div>
-												<div className="flex justify-between items-center mb-2">
-													<span className="text-lg font-bold text-primary">
-														{jewelry.SerialCode}
-													</span>
-													{renderStatusTag(jewelry.Status)}
-												</div>
-
-												<div className="space-y-2 text-gray-700">
-													<div className="flex items-center">
-														<DollarOutlined className="mr-2 text-primary" />
-														<span className="font-semibold">
-															{jewelry.TotalPrice > 0
-																? formatPrice(jewelry.TotalPrice)
-																: 'Liên Hệ Báo Giá'}
+											{/* Information Section - 60% width */}
+											<div className="w-3/5 flex flex-col justify-between">
+												<div>
+													<div className="flex justify-between items-center mb-2">
+														<span className="text-lg font-bold text-primary">
+															{jewelry.SerialCode}
 														</span>
+														{renderStatusTag(jewelry.Status)}
 													</div>
-													<div className="flex justify-between text-sm">
-														<Tooltip title="Chất Liệu">
-															<span>
-																{jewelry?.Metal?.Name || 'N/A'}
+
+													<div className="space-y-2 text-gray-700">
+														<div className="flex items-center">
+															<DollarOutlined className="mr-2 text-primary" />
+															<span className="font-semibold">
+																{jewelry.TotalPrice > 0
+																	? formatPrice(
+																			jewelry.TotalPrice
+																	  )
+																	: 'Liên Hệ Báo Giá'}
 															</span>
-														</Tooltip>
-														<Tooltip title="Kích Thước">
-															<span>
-																{jewelry.Size?.Value}{' '}
-																{jewelry.Size?.Unit}
-															</span>
-														</Tooltip>
+														</div>
+														<div className="flex justify-between text-sm">
+															<Tooltip title="Chất Liệu">
+																<span>
+																	{jewelry?.Metal?.Name || 'N/A'}
+																</span>
+															</Tooltip>
+															<Tooltip title="Kích Thước">
+																<span>
+																	{jewelry.Size?.Value}{' '}
+																	{jewelry.Size?.Unit}
+																</span>
+															</Tooltip>
+														</div>
 													</div>
 												</div>
 											</div>
 										</div>
-									</div>
-								</Card>
-							))}
+									</Card>
+								))}
 						</div>
 					)}
 
