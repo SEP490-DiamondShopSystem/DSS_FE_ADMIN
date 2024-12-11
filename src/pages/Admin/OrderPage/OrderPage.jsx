@@ -229,7 +229,7 @@ const OrderPage = () => {
 				IsCollectAtShop ? 'Nhận Tại Cửa Hàng' : 'Giao Hàng Tận Nơi',
 		},
 		{
-			title: 'PT Thanh Toán',
+			title: 'Trạng Thái Thanh Toán',
 			key: 'paymentMethod',
 			dataIndex: 'paymentMethod',
 			align: 'center',
@@ -242,7 +242,7 @@ const OrderPage = () => {
 			},
 		},
 		{
-			title: 'Trạng Thái',
+			title: 'Trạng Thái Đơn Hàng',
 			key: 'Status',
 			dataIndex: 'Status',
 			align: 'center',

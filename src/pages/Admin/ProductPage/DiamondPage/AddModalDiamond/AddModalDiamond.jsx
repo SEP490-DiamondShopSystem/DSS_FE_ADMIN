@@ -226,15 +226,15 @@ export const AddModalDiamond = ({setShowModal, showModal}) => {
 				{/* Diamond 4C Row */}
 				<label className="font-semibold">Thêm 4C</label>
 				<div className="flex flex-wrap gap-4">
-					<Form.Item name="cut" label="Cut" className="w-1/5">
-						<Select placeholder="Chọn Cut">
+					<Form.Item name="cut" label="Chế Tác (Cut)" className="w-1/5">
+						<Select placeholder="Chế Tác (Cut)">
 							<Option value={1}>Good</Option>
 							<Option value={2}>Very Good</Option>
 							<Option value={3}>Excellent</Option>
 						</Select>
 					</Form.Item>
 
-					<Form.Item name="color" label="Color" className="w-1/5">
+					<Form.Item name="color" label="Màu Sắc (Color)" className="w-1/5">
 						<Select placeholder="Chọn Color">
 							<Option value={8}>D</Option>
 							<Option value={7}>E</Option>
@@ -247,8 +247,8 @@ export const AddModalDiamond = ({setShowModal, showModal}) => {
 						</Select>
 					</Form.Item>
 
-					<Form.Item name="clarity" label="Clarity" className="w-1/5">
-						<Select placeholder="Chọn Clarity">
+					<Form.Item name="clarity" label="Độ Trong (Clarity)" className="w-1/5">
+						<Select placeholder="Clarity">
 							<Option value={8}>FL</Option>
 							<Option value={7}>IF</Option>
 							<Option value={6}>VVS1</Option>
@@ -262,7 +262,7 @@ export const AddModalDiamond = ({setShowModal, showModal}) => {
 
 					<Form.Item
 						name="carat"
-						label="Carat"
+						label="Ly (Carat)"
 						className="w-1/5"
 						rules={[
 							{
@@ -289,7 +289,7 @@ export const AddModalDiamond = ({setShowModal, showModal}) => {
 					>
 						<InputNumber
 							step={0.01}
-							placeholder="Chọn Carat Weight"
+							placeholder="Chọn Ly (Carat)"
 							className="w-full"
 							min={rule?.MinCaratRange}
 							max={rule?.MaxCaratRange}
@@ -309,7 +309,7 @@ export const AddModalDiamond = ({setShowModal, showModal}) => {
 				<div className="flex flex-wrap gap-4">
 					<Form.Item
 						name="polish"
-						label="Polish"
+						label="Độ Bóng (Polish) "
 						className="w-1/4"
 						rules={[
 							{
@@ -319,17 +319,17 @@ export const AddModalDiamond = ({setShowModal, showModal}) => {
 						]}
 					>
 						<Select placeholder="Chọn Polish">
-							<Option value={1}>Poor</Option>
-							<Option value={2}>Fair</Option>
-							<Option value={3}>Good</Option>
-							<Option value={4}>Very Good</Option>
-							<Option value={5}>Excellent</Option>
+							<Option value={1}>Kém</Option>
+							<Option value={2}>Trung Bình</Option>
+							<Option value={3}>Tốt</Option>
+							<Option value={4}>Rất Tốt</Option>
+							<Option value={5}>Xuất Sắc</Option>
 						</Select>
 					</Form.Item>
 
 					<Form.Item
 						name="symmetry"
-						label="Symmetry"
+						label="Độ Bóng (Polish) "
 						className="w-1/4"
 						rules={[
 							{
@@ -339,17 +339,17 @@ export const AddModalDiamond = ({setShowModal, showModal}) => {
 						]}
 					>
 						<Select placeholder="Chọn Symmetry">
-							<Option value={1}>Poor</Option>
-							<Option value={2}>Fair</Option>
-							<Option value={3}>Good</Option>
-							<Option value={4}>Very Good</Option>
-							<Option value={5}>Excellent</Option>
+							<Option value={1}>Kém</Option>
+							<Option value={2}>Trung Bình</Option>
+							<Option value={3}>Tốt</Option>
+							<Option value={4}>Rất Tốt</Option>
+							<Option value={5}>Xuất Sắc</Option>
 						</Select>
 					</Form.Item>
 
 					<Form.Item
 						name="measurement"
-						label="Measurement"
+						label="Kích Thước"
 						className="w-1/4"
 						rules={[
 							{
@@ -369,7 +369,7 @@ export const AddModalDiamond = ({setShowModal, showModal}) => {
 				<div className="flex flex-wrap gap-4">
 					<Form.Item
 						name="girdle"
-						label="Girdle"
+						label="Viền Cạnh (Girdle)"
 						className="w-1/4"
 						rules={[
 							{
@@ -379,20 +379,20 @@ export const AddModalDiamond = ({setShowModal, showModal}) => {
 						]}
 					>
 						<Select placeholder="Chọn Girdle">
-							<Option value={1}>Extremely Thin</Option>
-							<Option value={2}>Very Thin</Option>
-							<Option value={3}>Thin</Option>
-							<Option value={4}>Medium</Option>
-							<Option value={5}>Slightly Thick</Option>
-							<Option value={6}>Thick</Option>
-							<Option value={7}>Very Thick</Option>
-							<Option value={8}>Extremely Thick</Option>
+							<Option value={1}>Cực Mỏng</Option>
+							<Option value={2}>Rất Mỏng</Option>
+							<Option value={3}>Mỏng</Option>
+							<Option value={4}>Trung Bình</Option>
+							<Option value={5}>Hơi Dày</Option>
+							<Option value={6}>Dày</Option>
+							<Option value={7}>Rất Dày</Option>
+							<Option value={8}>Cực Dày</Option>
 						</Select>
 					</Form.Item>
 
 					<Form.Item
 						name="fluorescence"
-						label="Fluorescence"
+						label="Huỳnh quang"
 						className="w-1/4"
 						rules={[
 							{
@@ -402,16 +402,16 @@ export const AddModalDiamond = ({setShowModal, showModal}) => {
 						]}
 					>
 						<Select placeholder="Chọn Fluorescence">
-							<Option value={1}>None</Option>
-							<Option value={2}>Faint</Option>
-							<Option value={3}>Medium</Option>
-							<Option value={4}>Strong</Option>
+							<Option value={1}>Không Có</Option>
+							<Option value={2}>Mờ</Option>
+							<Option value={3}>Trung Bình</Option>
+							<Option value={4}>Mạnh</Option>
 						</Select>
 					</Form.Item>
 
 					<Form.Item
 						name="culet"
-						label="Culet"
+						label="Chóp Đáy (Culet)"
 						className="w-1/4"
 						rules={[
 							{
@@ -421,14 +421,14 @@ export const AddModalDiamond = ({setShowModal, showModal}) => {
 						]}
 					>
 						<Select placeholder="Chọn Culet">
-							<Option value={1}>None</Option>
-							<Option value={2}>Very Small</Option>
-							<Option value={3}>Small</Option>
-							<Option value={4}>Medium</Option>
-							<Option value={5}>Slightly Large</Option>
-							<Option value={6}>Large</Option>
-							<Option value={7}>Very Large</Option>
-							<Option value={8}>Extremely Large</Option>
+							<Option value={1}>Không Có</Option>
+							<Option value={2}>Rất Nhỏ</Option>
+							<Option value={3}>Nhỏ</Option>
+							<Option value={4}>Trung Bình</Option>
+							<Option value={5}>Hơi lớn</Option>
+							<Option value={6}>Lớn</Option>
+							<Option value={7}>Rất Lớn</Option>
+							<Option value={8}>Cực Lớn</Option>
 						</Select>
 					</Form.Item>
 				</div>
@@ -437,7 +437,7 @@ export const AddModalDiamond = ({setShowModal, showModal}) => {
 				<div className="flex flex-wrap gap-4">
 					<Form.Item
 						name="withLenghtRatio"
-						label="Tỷ lệ chiều rộng-chiều dài"
+						label="Tỷ Lệ chiều rộng-chiều dài"
 						className="w-1/4"
 						rules={[
 							{
@@ -455,7 +455,7 @@ export const AddModalDiamond = ({setShowModal, showModal}) => {
 
 					<Form.Item
 						name="depth"
-						label="Depth"
+						label="Độ Sâu (Depth)"
 						className="w-1/4"
 						rules={[{required: true, message: 'Vui lòng nhập Depth'}]}
 					>
@@ -471,7 +471,7 @@ export const AddModalDiamond = ({setShowModal, showModal}) => {
 
 					<Form.Item
 						name="table"
-						label="Table"
+						label="Bề Mặt (Table)"
 						className="w-1/4"
 						rules={[{required: true, message: 'Vui lòng nhập Table'}]}
 					>
@@ -499,7 +499,7 @@ export const AddModalDiamond = ({setShowModal, showModal}) => {
 						</Select>
 					</Form.Item>
 
-					<Form.Item name="priceOffset" label="Giá Offset" className="w-1/3">
+					<Form.Item name="priceOffset" label="Bù Trừ Giá" className="w-1/3">
 						<InputNumber
 							min={0.0}
 							step={0.1}

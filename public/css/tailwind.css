@@ -2866,3 +2866,7 @@ video {
 .gap-6 {
 	gap: 1.5rem /* 24px */;
 }
+
+.font-extrabold {
+	font-weight: 800;
+}

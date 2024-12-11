@@ -312,7 +312,7 @@ const DashboardPage = () => {
 									{!change ? (
 										<Card
 											bordered={false}
-											style={{height: '100%', overflowY: 'auto'}}
+											style={{height: 420, overflowY: 'auto'}}
 										>
 											<div className="flex justify-between items-center">
 												<h3 className="font-bold text-lg">Bán Chạy</h3>

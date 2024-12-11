@@ -48,7 +48,6 @@ const JewelryPage = () => {
 	const dispatch = useDispatch();
 	const navigate = useNavigate();
 
-
 	const loading = useSelector(selectJewelryLoading);
 	const error = useSelector(selectJewelryError);
 	const totalPage = useSelector(selectJewelryTotalPage);
@@ -130,7 +129,7 @@ const JewelryPage = () => {
 			<div className="bg-white shadow-2xl rounded-2xl overflow-hidden">
 				{/* Header */}
 				<div className="bg-primary/10 px-6 py-6 border-b border-primary/20 flex justify-between items-center">
-					<h1 className="text-3xl font-extrabold text-primary flex items-center">
+					<h1 className="text-3xl font-semibold flex items-center">
 						<GoldOutlined className="mr-3 text-primary-600" />
 						Quản Lý Trang Sức
 					</h1>
@@ -301,7 +300,10 @@ const JewelryPage = () => {
 							<Spin size="large" />
 						</div>
 					) : jewelryList?.length === 0 ? (
-						<Empty description="Không có trang sức nào. Vui lòng chọn mẫu trang sức và tiếp tục" className="my-12" />
+						<Empty
+							description="Không có trang sức nào. Vui lòng chọn mẫu trang sức và tiếp tục"
+							className="my-12"
+						/>
 					) : (
 						<div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
 							{jewelryList?.map((jewelry) => (
@@ -373,24 +375,24 @@ const JewelryPage = () => {
 								disabled={currentPage === 1}
 								className="px-4 py-2 rounded-lg"
 							>
-								Previous
+								Trước
 							</Button>
 							<span className="text-lg font-semibold">
-								Page {currentPage} of {totalPage}
+								Trang {currentPage} / {totalPage}
 							</span>
 							<Button
 								onClick={() => setCurrentPage((p) => Math.min(totalPage, p + 1))}
 								disabled={currentPage === totalPage}
 								className="px-4 py-2 rounded-lg"
 							>
-								Next
+								Sau
 							</Button>
 						</div>
-						<Select value={pageSize} onChange={setPageSize} className="w-32">
+						{/* <Select value={pageSize} onChange={setPageSize} className="w-32">
 							<Select.Option value={5}>5 per page</Select.Option>
 							<Select.Option value={10}>10 per page</Select.Option>
 							<Select.Option value={20}>20 per page</Select.Option>
-						</Select>
+						</Select> */}
 					</div>
 				</div>
 			</div>
