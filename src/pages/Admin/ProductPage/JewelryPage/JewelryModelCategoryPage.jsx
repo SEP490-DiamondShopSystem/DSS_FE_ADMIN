@@ -47,6 +47,7 @@ const JewelryModelCategoryPage = () => {
       dispatch(createJewelryModelCategory(categoryData))
         .unwrap()
         .then(() => {
+          message.success('Tạo danh mục trang sức mới thành công!');
           setNewCategory({
             name: '',
             description: '',
