@@ -32,7 +32,7 @@ const MetalPage = () => {
 				setEditPrice((prevState) => ({...prevState, [metal.Id]: ''}));
 			})
 			.catch((error) => {
-				message.error(error?.data?.title || error?.detail);
+				message.error(error?.data?.detail );
 			});
 		await dispatch(fetchAllMetals());
 	};

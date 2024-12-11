@@ -43,7 +43,7 @@ const AddSizeMetalModal = ({
       })
       .catch((error) => {
         message.error(
-          error?.title || error?.detail || 'Thêm size kim loại thất bại!'
+          error?.data?.detail  || 'Thêm size kim loại thất bại!'
         );
       });
   };
