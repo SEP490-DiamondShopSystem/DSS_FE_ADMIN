@@ -141,7 +141,7 @@ const PromotionPage = ({promotionData}) => {
 				form.resetFields();
 			})
 			.catch((error) => {
-				message.error(error?.data?.title || error?.detail || 'Lỗi không xác định');
+				message.error(error?.data?.detail  || 'Lỗi không xác định');
 			});
 
 		// setIsEditing(false);
@@ -273,7 +273,7 @@ const PromotionPage = ({promotionData}) => {
 				});
 			})
 			.catch((error) => {
-				message.error(error?.data?.title || error?.detail || 'Lỗi không xác định');
+				message.error(error?.data?.detail  || 'Lỗi không xác định');
 			});
 	};
 
@@ -284,7 +284,7 @@ const PromotionPage = ({promotionData}) => {
 				message.success(`Khuyến mãi có id: ${id} đã bị hủy.`);
 			})
 			.catch((error) => {
-				message.error(error?.data?.title || error?.detail || 'Lỗi không xác định');
+				message.error(error?.data?.detail  || 'Lỗi không xác định');
 			});
 		await dispatch(fetchPromotions());
 	};
@@ -297,7 +297,7 @@ const PromotionPage = ({promotionData}) => {
 				);
 			})
 			.catch((error) => {
-				message.error(error?.data?.title || error?.detail || 'Lỗi không xác định');
+				message.error(error?.data?.detail  || 'Lỗi không xác định');
 			});
 		await dispatch(fetchPromotions());
 	};
@@ -496,7 +496,7 @@ const PromotionPage = ({promotionData}) => {
 				dispatch(fetchPromotions());
 			})
 			.catch((error) => {
-				message.error(error?.data?.title || error?.detail || 'Lỗi không xác định');
+				message.error(error?.data?.detail  || 'Lỗi không xác định');
 			});
 		await dispatch(fetchPromotions());
 	};
@@ -508,7 +508,7 @@ const PromotionPage = ({promotionData}) => {
 				message.success(`Đã xóa khuyến mãi có id: ${id}`);
 			})
 			.catch((error) => {
-				message.error(error?.data?.title || error?.detail);
+				message.error(error?.data?.detail );
 			});
 		await dispatch(fetchPromotions());
 	};

@@ -170,7 +170,7 @@ const BlogPage = () => {
 				);
 			})
 			.catch((error) => {
-				message.error(error?.data?.title || error?.detail);
+				message.error(error?.data?.detail );
 			});
 
 		// Reset state

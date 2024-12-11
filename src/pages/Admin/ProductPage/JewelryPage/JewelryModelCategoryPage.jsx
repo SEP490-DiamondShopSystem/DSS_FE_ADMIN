@@ -57,7 +57,7 @@ const JewelryModelCategoryPage = () => {
           setIsFormExpanded(false);
         })
         .catch((error) => {
-          message.error(error?.data?.title || error?.detail);
+          message.error(error?.data?.detail );
         });
     } else {
       message.error('Vui lòng điền đầy đủ các trường bắt buộc');

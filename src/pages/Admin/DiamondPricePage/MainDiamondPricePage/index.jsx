@@ -119,7 +119,7 @@ const MainDiamondPricePage = () => {
 				message.success('Thêm giá kim cương thành công!');
 			})
 			.catch((error) => {
-				message.error(error?.data?.title || error?.detail);
+				message.error(error?.data?.detail );
 			});
 
 		setEditedCells([]);
@@ -155,7 +155,7 @@ const MainDiamondPricePage = () => {
 				message.success('Cập nhật giá kim cương thành công!');
 			})
 			.catch((error) => {
-				message.error(error?.data?.title || error?.detail);
+				message.error(error?.data?.detail );
 			});
 
 		setEditedCells([]);

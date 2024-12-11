@@ -113,7 +113,7 @@ const AddSideDiamondOptionModal = ({isVisible, onClose, model, availableShapes})
 					})
 					.catch((error) => {
 						message.error(
-							error?.title || error?.detail || 'Failed to add side diamond option'
+							error?.data?.detail  || 'Failed to add side diamond option'
 						);
 					})
 					.finally(() => {

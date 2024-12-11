@@ -54,7 +54,7 @@ export const JewelryModelUploadForm = ({jewelryModelId, visible, onClose}) => {
 					}));
 				})
 				.catch((error) => {
-					message.error(error?.data?.title || error?.detail);
+					message.error(error?.data?.detail );
 				});
 
 			dispatch(fetchJewelryModelDetail(jewelryModelId))
@@ -67,7 +67,7 @@ export const JewelryModelUploadForm = ({jewelryModelId, visible, onClose}) => {
 					}));
 				})
 				.catch((error) => {
-					message.error(error?.data?.title || error?.detail);
+					message.error(error?.data?.detail );
 				});
 		}
 	}, [jewelryModelId, dispatch]);
@@ -114,7 +114,7 @@ export const JewelryModelUploadForm = ({jewelryModelId, visible, onClose}) => {
 
 			message.success('Data refreshed successfully');
 		} catch (error) {
-			message.error(error?.data?.title || error?.detail || 'Failed to reload data');
+			message.error(error?.data?.detail);
 		}
 	};
 	const handleCancel = () => {
@@ -160,7 +160,7 @@ export const JewelryModelUploadForm = ({jewelryModelId, visible, onClose}) => {
 					message.success('Hình ảnh kim loại đã được thêm thành công!');
 				})
 				.catch((error) => {
-					message.error(error?.data?.title || error?.detail);
+					message.error(error?.data?.detail );
 				});
 		}
 
@@ -186,7 +186,7 @@ export const JewelryModelUploadForm = ({jewelryModelId, visible, onClose}) => {
 				dispatch(fetchJewelryModelFiles(jewelryModelId));
 			})
 			.catch((error) => {
-				message.error(error?.data?.title || error?.detail);
+				message.error(error?.data?.detail );
 			});
 
 		setSideDiamondFile(null);
@@ -263,7 +263,7 @@ export const JewelryModelUploadForm = ({jewelryModelId, visible, onClose}) => {
 				setJewelryModelFiles(response);
 			})
 			.catch((error) => {
-				message.error(error?.data?.title || error?.detail);
+				message.error(error?.data?.detail );
 			});
 
 		resetFormState();
@@ -304,7 +304,7 @@ export const JewelryModelUploadForm = ({jewelryModelId, visible, onClose}) => {
 					message.success('Images deleted successfully');
 				})
 				.catch((error) => {
-					message.error(error?.data?.title || error?.detail);
+					message.error(error?.data?.detail );
 				});
 		}
 	};
@@ -322,7 +322,7 @@ export const JewelryModelUploadForm = ({jewelryModelId, visible, onClose}) => {
 				message.success('Thumbnail uploaded successfully');
 			})
 			.catch((error) => {
-				message.error(error?.data?.title || error?.detail);
+				message.error(error?.data?.detail );
 			});
 	};
 	const handleUploadCategorizedImage = async () => {
@@ -348,7 +348,7 @@ export const JewelryModelUploadForm = ({jewelryModelId, visible, onClose}) => {
 					message.success('Categorized image uploaded successfully');
 				})
 				.catch((error) => {
-					message.error(error?.data?.title || error?.detail);
+					message.error(error?.data?.detail );
 				});
 		}
 
@@ -368,7 +368,7 @@ export const JewelryModelUploadForm = ({jewelryModelId, visible, onClose}) => {
 				message.success('Diamond images uploaded successfully');
 			})
 			.catch((error) => {
-				message.error(error?.data?.title || error?.detail);
+				message.error(error?.data?.detail );
 			});
 	};
 	return (

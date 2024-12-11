@@ -35,10 +35,10 @@ const SignUpPage = () => {
 					setIsLoading(false);
 					console.log(error);
 
-					message.error(error?.data?.title || error?.detail);
+					message.error(error?.data?.detail );
 				});
 		} catch (error) {
-			message.error(error?.data?.title || error?.detail);
+			message.error(error?.data?.detail );
 		}
 	};
 
