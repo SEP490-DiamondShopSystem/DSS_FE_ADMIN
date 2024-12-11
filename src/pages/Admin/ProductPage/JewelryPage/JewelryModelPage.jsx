@@ -10,6 +10,7 @@ import {
 	createSizeMetalForJewelryModel,
 	updateSizeMetalForJewelryModel,
 	changeVisibilityJewelryModel,
+	updateCraftmanFee,
 } from '../../../../redux/slices/jewelry/jewelryModelSlice';
 import {
 	Button,

@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { Button, Modal, Select, InputNumber, message } from 'antd';
-import { updateSizeMetalForJewelryModel } from '../../../../redux/slices/jewelry/jewelryModelSlice';
+import { addSizeMetalForJewelryModel } from '../../../../redux/slices/jewelry/jewelryModelSlice';
 
-const UpdateSizeMetalModal = ({ 
+const AddSizeMetalModal = ({ 
   isVisible, 
   onClose, 
   model, 
@@ -11,30 +11,30 @@ const UpdateSizeMetalModal = ({
   availableSizes 
 }) => {
   const dispatch = useDispatch();
-  const [sizeMetal, setSizeMetal] = useState({
+  const [metalSizeSpec, setMetalSizeSpec] = useState({
     metalId: null,
     sizeId: null,
     weight: null
   });
 
-  const handleUpdateSizeMetal = () => {
+  const handleAddmetalSizeSpec = () => {
     // Validate input
-    if (!sizeMetal.metalId || !sizeMetal.sizeId || !sizeMetal.weight) {
+    if (!metalSizeSpec.metalId || !metalSizeSpec.sizeId || !metalSizeSpec.weight) {
       message.error('Please fill in all fields');
       return;
     }
 
     dispatch(
-      updateSizeMetalForJewelryModel({
+        addSizeMetalForJewelryModel({
         modelId: model.Id,
-        sizeMetals: [sizeMetal]
+        metalSizeSpec: metalSizeSpec
       })
     )
       .unwrap()
       .then(() => {
-        message.success('Size Metal updated successfully');
+        message.success('Thêm size kim loại thành công!');
         // Reset form and close modal
-        setSizeMetal({
+        setMetalSizeSpec({
           metalId: null,
           sizeId: null,
           weight: null
@@ -43,38 +43,38 @@ const UpdateSizeMetalModal = ({
       })
       .catch((error) => {
         message.error(
-          error?.title || error?.detail || 'Failed to update size metal'
+          error?.title || error?.detail || 'Thêm size kim loại thất bại!'
         );
       });
   };
 
   return (
     <Modal
-      title="Update Size Metal"
+      title="Thêm Size Kim Loại"
       visible={isVisible}
       onCancel={onClose}
       footer={[
         <Button key="cancel" onClick={onClose}>
-          Cancel
+          Hủy
         </Button>,
         <Button 
           key="update" 
           type="primary" 
-          onClick={handleUpdateSizeMetal}
-          disabled={!sizeMetal.metalId || !sizeMetal.sizeId || !sizeMetal.weight}
+          onClick={handleAddmetalSizeSpec}
+          disabled={!metalSizeSpec.metalId || !metalSizeSpec.sizeId || !metalSizeSpec.weight}
         >
-          Update Size Metal
+          Thêm size kim loại
         </Button>
       ]}
     >
       <div className="space-y-4">
         <div>
-          <label>Metal</label>
+          <label>Kim Loại</label>
           <Select
             style={{ width: '100%' }}
             placeholder="Select Metal"
-            value={sizeMetal.metalId}
-            onChange={(value) => setSizeMetal(prev => ({ ...prev, metalId: value }))}
+            value={metalSizeSpec.metalId}
+            onChange={(value) => setMetalSizeSpec(prev => ({ ...prev, metalId: value }))}
           >
             {availableMetals.map(metal => (
               <Select.Option key={metal.Id} value={metal.Id}>
@@ -89,8 +89,8 @@ const UpdateSizeMetalModal = ({
           <Select
             style={{ width: '100%' }}
             placeholder="Select Size"
-            value={sizeMetal.sizeId}
-            onChange={(value) => setSizeMetal(prev => ({ ...prev, sizeId: value }))}
+            value={metalSizeSpec.sizeId}
+            onChange={(value) => setMetalSizeSpec(prev => ({ ...prev, sizeId: value }))}
           >
             {availableSizes.map(size => (
               <Select.Option key={size.Id} value={size.Id}>
@@ -101,14 +101,14 @@ const UpdateSizeMetalModal = ({
         </div>
 
         <div>
-          <label>Weight (g)</label>
+          <label>Trọng lượng (g)</label>
           <InputNumber
             style={{ width: '100%' }}
             placeholder="Enter Weight"
             min={0}
             step={0.1}
-            value={sizeMetal.weight}
-            onChange={(value) => setSizeMetal(prev => ({ ...prev, weight: value }))}
+            value={metalSizeSpec.weight}
+            onChange={(value) => setMetalSizeSpec(prev => ({ ...prev, weight: value }))}
           />
         </div>
       </div>
@@ -116,4 +116,4 @@ const UpdateSizeMetalModal = ({
   );
 };
 
-export default UpdateSizeMetalModal;
+export default AddSizeMetalModal;
