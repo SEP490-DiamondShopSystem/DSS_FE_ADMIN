@@ -70,9 +70,9 @@ export const Information = ({
 				/>
 			</div>
 			<p className="font-semibold text-lg my-2">{user?.Email}</p>
-			{/* <p className="font-semibold my-2" style={{color: '#939698'}}>
-				Đăng nhập lần cuối: 1 phút trước
-			</p> */}
+			{user?.UserIdentity?.IsBan === true && (
+				<div className="text-red font-semibold">Người dùng hiện đang bị cấm</div>
+			)}
 			<div className="my-4 mr-20">
 				<div
 					className="border border-lightGray1 rounded-full w-full px-2 flex items-center justify-around"
@@ -170,7 +170,9 @@ export const Information = ({
 						<p>
 							<StopOutlined />
 						</p>
-						<p className="ml-3">Cấm Người Dùng</p>
+						<p className="ml-3">
+							{user?.UserIdentity?.IsBan ? 'Hủy Cấm Người Dùng' : 'Cấm Người Dùng'}
+						</p>
 					</Button>
 				</div>
 			</div>

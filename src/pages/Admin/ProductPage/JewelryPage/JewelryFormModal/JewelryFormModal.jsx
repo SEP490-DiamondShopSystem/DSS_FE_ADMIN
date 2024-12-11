@@ -21,15 +21,19 @@ const JewelryFormModal = ({
 	isCreateFormOpen,
 	setIsCreateFormOpen,
 }) => {
-	const handleCloseModal = () => {
-		setIsCreateFormOpen(false);
-		onClose();
-	};
 	const [isMainDiamondsOpen, setIsMainDiamondsOpen] = useState(false);
 	const [isSizeMetalsOpen, setIsSizeMetalsOpen] = useState(false);
 	const [isSideDiamondsOpen, setIsSideDiamondsOpen] = useState(false);
 	const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
 	const [modelToConfirm, setModelToConfirm] = useState(null);
+
+	const handleCloseModal = () => {
+		setIsCreateFormOpen(false);
+		onClose();
+	};
+	const handleCloseConfirmModal = () => {
+		setIsConfirmModalOpen(false);
+	};
 
 	const handleModelSelection = (modelId) => {
 		const model = models.find((m) => m.Id === modelId);
@@ -47,7 +51,7 @@ const JewelryFormModal = ({
 	return (
 		<>
 			<Modal
-				title="Jewelry Request Form"
+				title="Mẫu yêu cầu trang sức"
 				visible={isCreateFormOpen}
 				onOk={() => form.submit()}
 				onCancel={handleCloseModal}
@@ -57,7 +61,7 @@ const JewelryFormModal = ({
 			>
 				<Form form={form} layout="vertical" width={1600} onFinish={handleSubmit}>
 					<Form.Item label="Mẫu Trang Sức" name={['JewelryRequest', 'ModelId']}>
-						<Select onChange={handleModelSelection} placeholder="Select a model">
+						<Select onChange={handleModelSelection} placeholder="Chọn một mẫu">
 							{Array.isArray(models) &&
 								models.map((model) => (
 									<Option key={model.Id} value={model.Id}>
@@ -160,17 +164,17 @@ const JewelryFormModal = ({
 					)}
 					{/* Confirmation Modal */}
 					<Modal
-						title="Confirm Model Selection"
+						title="Xác nhận lựa chọn mẫu"
 						visible={isConfirmModalOpen}
-						onCancel={handleCloseModal}
+						onCancel={handleCloseConfirmModal}
 						footer={null}
 						centered
-						className="rounded-lg shadow-lg"
+						className="rounded-lg shadow-lg min-w-[1000px] md:w-full"
 					>
 						{modelToConfirm && (
-							<div className="fixed inset-0 bg-gray bg-opacity-50 flex justify-center items-center p-3 z-50">
-								<div className="bg-white p-4 rounded-lg shadow-lg w-11/12 md:w-1/2 lg:w-2/3">
-									<h2 className="text-3xl font-bold text-primary text-center">
+							<div className="inset-0  flex justify-center items-center p-3 ">
+								<div className="bg-white p-4 rounded-lg shadow-lg w-full ">
+									<h2 className="text-3xl font-bold text-primary text-center my-2">
 										Chi Tiết Mẫu Trang Sức
 									</h2>
 									<div className="flex gap-8">

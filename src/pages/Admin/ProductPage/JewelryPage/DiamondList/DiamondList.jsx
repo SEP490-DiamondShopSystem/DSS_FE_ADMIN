@@ -7,7 +7,13 @@ import Loading from '../../../../../components/Loading';
 import {LoadingDiamondSelector} from '../../../../../redux/selectors';
 import {formatPrice} from '../../../../../utils';
 
-export const DiamondList = ({diamond, handleDiamondSelectChange, currentDiamondId, shape}) => {
+export const DiamondList = ({
+	diamond,
+	handleDiamondSelectChange,
+	currentDiamondId,
+	shape,
+	handleDiamondOptionDisable,
+}) => {
 	const loading = useSelector(LoadingDiamondSelector);
 
 	return (
@@ -33,7 +39,7 @@ export const DiamondList = ({diamond, handleDiamondSelectChange, currentDiamondI
 										key={i}
 										className={`shadow-lg bg-white border-2 rounded-lg hover:border-2 hover:border-black cursor-pointer ${
 											diamondItem?.Id === currentDiamondId?.Id
-												? 'border-black'
+												? 'border-black pointer-events-none' // Disable if selected
 												: 'border-white'
 										}`}
 										onClick={() => handleDiamondSelectChange(diamondItem)}
