@@ -1,8 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import {
-  fetchAllJewelryModelCategories,
-  createJewelryModelCategory,
+import { 
+  PlusIcon, 
+  FolderIcon, 
+} from 'lucide-react';
+import { 
+  fetchAllJewelryModelCategories, 
+  createJewelryModelCategory 
 } from '../../../../redux/slices/jewelry/jewelryModelCategorySlice';
 import {
   getAllJewelryModelCategoriesSelector,
@@ -23,8 +27,9 @@ const JewelryModelCategoryPage = () => {
     parentCategoryId: '',
   });
 
+  const [isFormExpanded, setIsFormExpanded] = useState(false);
+
   useEffect(() => {
-    // Lấy tất cả danh mục khi component được tải
     dispatch(fetchAllJewelryModelCategories());
   }, [dispatch]);
 
@@ -41,19 +46,20 @@ const JewelryModelCategoryPage = () => {
 
       dispatch(createJewelryModelCategory(categoryData))
         .unwrap()
-        .then((res) => {
+        .then(() => {
           setNewCategory({
             name: '',
             description: '',
             isGeneral: false,
             parentCategoryId: '',
           });
+          setIsFormExpanded(false);
         })
         .catch((error) => {
           message.error(error?.data?.title || error?.detail);
         });
     } else {
-      message.error(error?.data?.title || error?.detail);
+      message.error('Vui lòng điền đầy đủ các trường bắt buộc');
     }
   };
 
@@ -66,96 +72,139 @@ const JewelryModelCategoryPage = () => {
   };
 
   return (
-    <div className="p-6 bg-offWhite min-h-screen">
-      <h1 className="text-3xl font-semibold text-primary mb-6">
-        Danh Mục Mẫu Trang Sức
-      </h1>
+    <div className="container mx-auto px-4 py-8 max-w-4xl">
+      <div className="flex items-center justify-between mb-8">
+        <h1 className="text-4xl font-bold text-gray-800 flex items-center">
+          <FolderIcon className="mr-4 text-primary" size={40} />
+          Loại Trang Sức
+        </h1>
+        <button 
+          onClick={() => setIsFormExpanded(!isFormExpanded)}
+          className="bg-primary text-white px-4 py-2 rounded-lg flex items-center hover:bg-primaryDark transition-colors"
+        >
+          <PlusIcon className="mr-2" size={20} />
+          Thêm danh mục
+        </button>
+      </div>
 
-      {/* Xử lý trạng thái đang tải và lỗi */}
-      {loading ? (
-        <div className="text-xl text-blue-500">Đang tải danh mục...</div>
-      ) : error ? (
-        <div className="text-xl text-red-500">Lỗi: {error}</div>
-      ) : (
-        <div className="mt-6">
-          {/* Danh sách danh mục */}
-          <div className="my-6">
-            {/* <h2 className="text-2xl font-semibold text-primary">Danh Mục</h2> */}
-            <ul>
-              {categories.map((category) => (
-                <li
-                  key={category.Id}
-                  className="py-3 px-4 bg-white rounded-lg shadow-md mb-4 border border-lightGray"
-                >
-                  <strong className="text-xl text-black">{category.Name}</strong>{' '}
-                  - <span className="text-gray-600">{category.Description}</span>
-                </li>
-              ))}
-            </ul>
-          </div>
+      {loading && (
+        <div className="text-center py-8 text-primary">
+          <span className="loading-spinner">Đang tải...</span>
+        </div>
+      )}
 
-          {/* Form tạo danh mục mới */}
-          <div className="border-t pt-6 mt-8">
-            <h2 className="text-2xl font-semibold text-primary">Tạo Danh Mục Mới</h2>
-            <div className="space-y-6 bg-white p-6 rounded-lg shadow-md mt-4 border border-lightGray">
-              <div>
-                <label className="block text-sm font-medium text-gray-700">
-                  Tên Danh Mục
-                </label>
-                <input
-                  type="text"
-                  name="name"
-                  value={newCategory.name}
-                  onChange={handleInputChange}
-                  className="mt-2 block w-full border border-gray-300 rounded-md p-3 focus:outline-none focus:ring-2 focus:ring-primary"
-                  placeholder="Tên danh mục"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700">
-                  Mô Tả
-                </label>
-                <textarea
-                  name="description"
-                  value={newCategory.description}
-                  onChange={handleInputChange}
-                  className="mt-2 block w-full border border-gray-300 rounded-md p-3 focus:outline-none focus:ring-2 focus:ring-primary"
-                  placeholder="Mô tả danh mục"
-                />
-              </div>
-              <div className="flex items-center">
-                <input
-                  type="checkbox"
-                  name="isGeneral"
-                  checked={newCategory.isGeneral}
-                  onChange={handleInputChange}
-                  className="mr-3"
-                />
-                <label className="text-gray-700">Danh Mục Chung</label>
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700">
-                  ID Danh Mục Cha
-                </label>
-                <input
-                  type="text"
-                  name="parentCategoryId"
-                  value={newCategory.parentCategoryId}
-                  onChange={handleInputChange}
-                  className="mt-2 block w-full border border-gray-300 rounded-md p-3 focus:outline-none focus:ring-2 focus:ring-primary"
-                  placeholder="ID danh mục cha"
-                />
-              </div>
-              <div className="w-full mt-5">
-                <button
-                  onClick={handleCreateCategory}
-                  className="w-full px-6 py-3 bg-primary text-white rounded-md hover:bg-primaryDark focus:outline-none focus:ring-2 focus:ring-primary"
-                >
-                  Tạo Danh Mục
-                </button>
-              </div>
+      {error && (
+        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
+          <strong className="font-bold">Lỗi: </strong>
+          <span className="block sm:inline">{error}</span>
+        </div>
+      )}
+
+      {isFormExpanded && !loading && (
+        <div className="bg-white shadow-md rounded-lg p-6 mb-8 border border-gray-200 transition-all duration-300">
+          <h2 className="text-2xl font-semibold text-gray-800 mb-6 flex items-center">
+            <PlusIcon className="mr-3 text-primary" size={24} />
+            Tạo danh mục mới
+          </h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Tên danh mục
+              </label>
+              <input
+                type="text"
+                name="name"
+                value={newCategory.name}
+                onChange={handleInputChange}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
+                placeholder="Nhập tên danh mục"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                ID danh mục cha (Tuỳ chọn)
+              </label>
+              <input
+                type="text"
+                name="parentCategoryId"
+                value={newCategory.parentCategoryId}
+                onChange={handleInputChange}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
+                placeholder="ID danh mục cha"
+              />
+            </div>
+            <div className="md:col-span-2">
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Mô tả
+              </label>
+              <textarea
+                name="description"
+                value={newCategory.description}
+                onChange={handleInputChange}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
+                rows="3"
+                placeholder="Nhập mô tả danh mục"
+              />
+            </div>
+            <div className="flex items-center">
+              <input
+                type="checkbox"
+                name="isGeneral"
+                checked={newCategory.isGeneral}
+                onChange={handleInputChange}
+                className="mr-3 text-primary focus:ring-primary"
+              />
+              <label className="text-gray-700">Danh mục chung</label>
+            </div>
+            <div>
+              <button
+                onClick={handleCreateCategory}
+                className="w-full bg-primary text-white py-2 rounded-md hover:bg-primaryDark transition-colors"
+              >
+                Tạo danh mục
+              </button>
             </div>
           </div>
+        </div>
+      )}
+
+      {!loading && categories.length > 0 && (
+        <div className="bg-white shadow-md rounded-lg overflow-hidden">
+          <div className="px-6 py-4 bg-gray-50 border-b border-gray-200 flex items-center">
+            <h2 className="text-xl font-semibold text-gray-800">
+              Các danh mục hiện có
+            </h2>
+          </div>
+          <ul>
+            {categories.map((category) => (
+              <li 
+                key={category.Id} 
+                className="px-6 py-4 border-b border-gray-200 hover:bg-gray-50 transition-colors last:border-b-0"
+              >
+                <div className="flex justify-between items-center">
+                  <div>
+                    <h3 className="text-lg font-semibold text-gray-800">
+                      {category.Name}
+                    </h3>
+                    <p className="text-gray-600">{category.Description}</p>
+                  </div>
+                  {category.isGeneral && (
+                    <span className="px-3 py-1 bg-green-100 text-green-800 rounded-full text-xs">
+                      Chung
+                    </span>
+                  )}
+                </div>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+
+      {!loading && categories.length === 0 && (
+        <div className="text-center py-8 bg-white shadow-md rounded-lg">
+          <p className="text-gray-500">
+            Chưa có danh mục nào. Tạo danh mục đầu tiên của bạn!
+          </p>
         </div>
       )}
     </div>
