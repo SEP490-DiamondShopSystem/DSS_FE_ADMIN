@@ -69,7 +69,7 @@ const MainDiamondPricePage = () => {
 	const handleCheckboxChange = (diamondPriceId) => {
 		setSelectedPrices(
 			(prev) =>
-				prev.includes()
+				prev.includes(diamondPriceId)
 					? prev.filter((id) => id !== diamondPriceId) // Uncheck
 					: [...prev, diamondPriceId] // Check
 		);
@@ -90,13 +90,24 @@ const MainDiamondPricePage = () => {
 	};
 
 	const savePrices = async () => {
-		const listPrices = editedCells.map((cell) => ({
-			DiamondCriteriaId: priceBoard.PriceTables[0].CriteriaId,
-			price: Number(cell.price),
-			cut: priceBoard.MainCut,
-			color: Object.keys(priceBoard.PriceTables[0].ColorRange)[cell.rowIndex],
-			clarity: Object.keys(priceBoard.PriceTables[0].ClarityRange)[cell.cellIndex],
-		}));
+		const listPrices = editedCells
+			.map((cell) => {
+				// Find the correct price table for this cell
+				const matchingPriceTable = priceBoard.PriceTables.find(
+					(table) =>
+						table.CellMatrix[cell.rowIndex][cell.cellIndex].DiamondPriceId ===
+						cell.diamondPriceId
+				);
+
+				return {
+					DiamondCriteriaId: matchingPriceTable ? matchingPriceTable.CriteriaId : null,
+					price: Number(cell.price),
+					cut: priceBoard.MainCut,
+					color: Object.keys(priceBoard.PriceTables[0].ColorRange)[cell.rowIndex],
+					clarity: Object.keys(priceBoard.PriceTables[0].ClarityRange)[cell.cellIndex],
+				};
+			})
+			.filter((price) => price.DiamondCriteriaId !== null); // Filter out any prices without a matching criteria ID
 
 		if (listPrices.length === 0) return;
 
