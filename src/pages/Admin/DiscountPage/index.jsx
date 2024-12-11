@@ -715,7 +715,7 @@ const DiscountPage = ({discountData}) => {
 	return (
 		<div className="p-8 bg-white shadow-md rounded-lg">
 			<h2 className="text-2xl font-bold mb-6">
-				{isEditing ? 'Edit Discount' : 'Create New Discount'}
+				{isEditing ? 'Cập Nhật Giảm Giá' : 'Tạo Giảm Giá Mới'}
 			</h2>
 			<DiscountForm
 				isEditing={isEditing}
