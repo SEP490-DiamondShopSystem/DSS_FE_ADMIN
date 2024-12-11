@@ -73,6 +73,20 @@ export const createJewelry = createAsyncThunk(
 		}
 	}
 );
+export const deleteJewelry = createAsyncThunk(
+	'jewelry/deleteJewelry',
+	async (JewelryId, {rejectWithValue}) => {
+		try {
+			const response = await api.delete(`/Jewelry/Delete?JewelryId=${JewelryId}`);
+			console.log('createJewelry response:', response);
+			return response;
+		} catch (error) {
+			console.error('createJewelry error:', error);
+			return rejectWithValue(error);
+		}
+	}
+);
+
 export const changeJewelryReviewVisibility = createAsyncThunk(
 	'jewelry/changeReviewVisibility',
 	async (jewelryId, thunkAPI) => {
@@ -162,16 +176,24 @@ export const jewelrySlice = createSlice({
 			.addCase(changeJewelryReviewVisibility.pending, (state) => {
 				state.loading = true;
 				state.error = null;
-				console.log('changeJewelryReviewVisibility pending');
 			})
 			.addCase(changeJewelryReviewVisibility.fulfilled, (state, action) => {
 				state.loading = false;
-				console.log('changeJewelryReviewVisibility fulfilled:', action.payload);
 			})
 			.addCase(changeJewelryReviewVisibility.rejected, (state, action) => {
 				state.loading = false;
 				state.error = action.payload;
-				console.error('changeJewelryReviewVisibility rejected:', action.payload);
+			})
+			.addCase(deleteJewelry.pending, (state) => {
+				state.loading = true;
+				state.error = null;
+			})
+			.addCase(deleteJewelry.fulfilled, (state, action) => {
+				state.loading = false;
+			})
+			.addCase(deleteJewelry.rejected, (state, action) => {
+				state.loading = false;
+				state.error = action.payload;
 			});
 	},
 });

@@ -3,12 +3,13 @@ import {useDispatch} from 'react-redux';
 import {
 	fetchJewelryDetail,
 	changeJewelryReviewVisibility,
+	deleteJewelry,
 } from '../../../../redux/slices/jewelry/jewelrySlice';
 import {Camera, Ruler, Star, Info, Diamond, Tag, Eye, EyeOff, X} from 'lucide-react';
 import {useNavigate, useParams} from 'react-router-dom';
 import Loading from '../../../../components/Loading';
-import {LeftCircleFilled, LeftOutlined} from '@ant-design/icons';
-import {Button} from 'antd';
+import {DeleteFilled, LeftCircleFilled, LeftOutlined} from '@ant-design/icons';
+import {Button, message, Modal, Tooltip} from 'antd';
 const ClarityEnum = {
 	1: 'SI2',
 	2: 'SI1',
@@ -156,11 +157,36 @@ const JewelryDetail = ({jewelry, onClose}) => {
 					setLoading(false);
 				});
 		}
-	}, [jewelry?.Id, dispatch]);
+	}, [id, dispatch, fetch]);
 
 	if (loading) {
 		return <Loading />;
 	}
+
+	const handleDeleteClick = () => {
+		Modal.confirm({
+			title: 'Bạn có chắc chắn muốn xóa trang sức này?',
+			content: 'Hành động này không thể hoàn tác.',
+			okText: 'Đồng ý',
+			okType: 'danger',
+			cancelText: 'Hủy',
+			onOk() {
+				dispatch(deleteJewelry(id))
+					.unwrap()
+					.then((res) => {
+						message.success('Xóa trang sức thành công!');
+						navigate('/products/jewelry-list');
+						setFetch(res);
+					})
+					.catch((error) => {
+						message.error(error.data.detail || error.detail);
+					});
+			},
+			onCancel() {
+				console.log('Đã hủy việc xóa');
+			},
+		});
+	};
 
 	const mapEnum = (value, enumObj) => enumObj[value] || 'Chưa Có';
 
@@ -611,6 +637,11 @@ const JewelryDetail = ({jewelry, onClose}) => {
 							className="text-2xl font-bold text-primary text-center mb-6 pb-2 border-b"
 						>
 							{fetchedJewelry?.SerialCode}
+							<Tooltip title="Xóa trang sức">
+								<Button danger className="mb-2 ml-5" onClick={handleDeleteClick}>
+									<DeleteFilled />
+								</Button>
+							</Tooltip>
 						</h2>
 
 						{/* Tab Navigation */}
