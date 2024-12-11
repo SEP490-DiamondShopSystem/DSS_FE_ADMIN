@@ -96,7 +96,18 @@ const AccountPage = () => {
 				</>
 			),
 		},
-
+		{
+			title: 'Trạng Thái',
+			dataIndex: 'UserIdentity',
+			key: 'UserIdentity',
+			align: 'center',
+			render: (userIdentity) => {
+				if (userIdentity?.IsBan) {
+					return <Tag color="red">Bị Cấm</Tag>;
+				}
+				return <Tag color="green">Đang Hoạt Động</Tag>;
+			},
+		},
 		{
 			title: '',
 			key: 'action',

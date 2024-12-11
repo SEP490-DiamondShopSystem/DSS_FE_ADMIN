@@ -39,17 +39,33 @@ const JewelryCreateForm = ({onClose, isCreateFormOpen, setIsCreateFormOpen}) => 
 	const [diamondList, setDiamondList] = useState();
 	const [currentDiamondId, setCurrentDiamondId] = useState(null);
 	const [selectedDiamondList, setSelectedDiamondList] = useState([]);
+	const [mainDiamonds, setMainDiamonds] = useState(0);
 
-	const mainDiamonds = selectedModel?.MainDiamonds;
+	useEffect(() => {
+		// Hàm tạo ra các đối tượng theo quantity
+		const expandDiamondsByQuantity = () => {
+			const expandedDiamonds = selectedModel?.MainDiamonds?.flatMap((diamond) => {
+				// Tạo ra một mảng mới với quantity lần lặp
+				return Array.from({length: diamond.Quantity}, () => ({...diamond}));
+			});
+			setMainDiamonds(expandedDiamonds); // Cập nhật state với các đối tượng đã nhân bản
+		};
+
+		expandDiamondsByQuantity(); // Gọi hàm khi selectedModel thay đổi
+	}, [selectedModel]);
+
+	console.log('mainDiamonds', mainDiamonds);
 
 	const getDiamondForFilter = (index) => {
-		if (index >= 0 && index < selectedModel?.MainDiamonds?.length) {
-			return selectedModel?.MainDiamonds[index];
+		if (index >= 0 && index < mainDiamonds?.length) {
+			return mainDiamonds[index];
 		}
 		return null; // Nếu chỉ số không hợp lệ, trả về null
 	};
 
 	const diamondForFilter = getDiamondForFilter(selectedIndex);
+
+	console.log('diamondForFilter', diamondForFilter);
 
 	const filterShape = diamondForFilter?.Shapes?.find((id) => id?.ShapeId === shape);
 
@@ -82,10 +98,12 @@ const JewelryCreateForm = ({onClose, isCreateFormOpen, setIsCreateFormOpen}) => 
 
 	const models = useSelector(getAllJewelryModelsSelector);
 	useEffect(() => {
-		dispatch(fetchAllJewelryModels({
-			CurrentPage: 1,
-			PageSize: 100,
-		}));
+		dispatch(
+			fetchAllJewelryModels({
+				CurrentPage: 1,
+				PageSize: 100,
+			})
+		);
 	}, [dispatch]);
 
 	const diamonds = useSelector(getAllDiamondSelector);
@@ -104,7 +122,8 @@ const JewelryCreateForm = ({onClose, isCreateFormOpen, setIsCreateFormOpen}) => 
 				caratFrom: filters?.carat?.minCarat,
 				caratTo: filters?.carat?.maxCarat,
 				isLab: checked,
-				includeJewelryDiamond: checkedDiamondJewelry,
+				includeJewelryDiamond: false,
+				diamondStatuses: 1,
 			})
 		);
 	}, 500);
@@ -142,7 +161,7 @@ const JewelryCreateForm = ({onClose, isCreateFormOpen, setIsCreateFormOpen}) => 
 		diamondForFilterId,
 		diamondListId,
 		diamondListTitle,
-		index 
+		index
 	) => {
 		// Tìm index của diamondForFilter trong array
 		const existingIndex = selectedDiamonds.findIndex(
@@ -172,6 +191,17 @@ const JewelryCreateForm = ({onClose, isCreateFormOpen, setIsCreateFormOpen}) => 
 		// Ensure we have a valid Chấu index
 		if (selectedIndex === null) return;
 
+		// Check if the diamond.Id already exists in the selectedDiamondList
+		const isDiamondExist = selectedDiamondList.some(
+			(item) => item.diamondListId === diamond.Id
+		);
+
+		if (isDiamondExist) {
+			// If the diamond is already in the list, show a message and return
+			message.warning('Kim cương này đã được chọn!', 3); // Thông báo cảnh báo
+			return;
+		}
+
 		// Update currentDiamondId
 		setCurrentDiamondId(diamond);
 
@@ -185,6 +215,14 @@ const JewelryCreateForm = ({onClose, isCreateFormOpen, setIsCreateFormOpen}) => 
 				selectedIndex // Pass Chấu index
 			)
 		);
+
+		// Show a success message when the diamond is selected
+		message.success('Kim cương đã được chọn!', 3); // Thông báo thành công
+	};
+
+	const handleDiamondOptionDisable = (diamondId) => {
+		// Check if the diamond is already selected, if so, disable it in the UI
+		return selectedDiamondList.some((item) => item.diamondId === diamondId);
 	};
 
 	// Filter metals based on selected model's supported metals
@@ -299,10 +337,6 @@ const JewelryCreateForm = ({onClose, isCreateFormOpen, setIsCreateFormOpen}) => 
 			...(sideDiamondOptId && {sideDiamondOptId}),
 		};
 
-		// Log the final data you're about to send
-		console.log('attachedDiamonds:', attachedDiamonds);
-		console.log('Final data to be dispatched:', finalData);
-
 		dispatch(createJewelry(finalData))
 			.unwrap()
 			.then((res) => {
@@ -332,6 +366,7 @@ const JewelryCreateForm = ({onClose, isCreateFormOpen, setIsCreateFormOpen}) => 
 
 	const handleCancel = () => {
 		setIsModalVisible(false);
+		setSelectedIndex(0);
 	};
 
 	console.log('selectedDiamondList', selectedDiamondList);
@@ -369,20 +404,18 @@ const JewelryCreateForm = ({onClose, isCreateFormOpen, setIsCreateFormOpen}) => 
 				<p></p>
 				<div className="my-10">
 					<label className="mr-5">Chấu vỏ trang sức</label>
-					<Select onChange={handleDiamondChange} placeholder="Chọn chấu" className="w-64">
+					<Select
+						onChange={handleDiamondChange}
+						placeholder="Chọn chấu"
+						className="w-64"
+						value={selectedIndex}
+					>
 						{Array.isArray(mainDiamonds) &&
-							mainDiamonds.flatMap((diamond, i) =>
-								Array.from({length: diamond.Quantity || 1}, (_, index) => (
-									<Select.Option
-										key={`${diamond.Id}-${index}`}
-										value={`${i}-${index}`} // Ensure unique key and value
-									>
-										{`Chấu ${i + 1}${
-											diamond.Quantity > 1 ? ` - ${index + 1}` : ''
-										}`}
-									</Select.Option>
-								))
-							)}
+							mainDiamonds.flatMap((diamond, i) => (
+								<Select.Option key={i} value={i}>
+									{`Chấu ${i + 1}`}
+								</Select.Option>
+							))}
 					</Select>
 				</div>
 
@@ -391,8 +424,8 @@ const JewelryCreateForm = ({onClose, isCreateFormOpen, setIsCreateFormOpen}) => 
 					<div className="mb-5">
 						<Table
 							dataSource={selectedDiamondList.map((diamond, i) => ({
-								key: i,
-								index: diamond.index + 1, // Display Chấu index (1-based)
+								key: i, // Chỉ mục làm khóa duy nhất cho mỗi dòng
+								index: i + 1, // Hiển thị index bắt đầu từ 1
 								diamondForFilterId: diamond.diamondForFilterId,
 								diamondListTitle: diamond.diamondListTitle || 'N/A',
 							}))}
@@ -451,19 +484,20 @@ const JewelryCreateForm = ({onClose, isCreateFormOpen, setIsCreateFormOpen}) => 
 							Kim Cương Nhân Tạo
 						</Checkbox>
 					</div>
-					<div className="ml-10">
+					{/* <div className="ml-10">
 						<Checkbox
 							checked={checkedDiamondJewelry}
 							onChange={handleChangeCheckboxDiamondJewelry}
 						>
 							Kim Cương Đã Đính
 						</Checkbox>
-					</div>
+					</div> */}
 				</Space>
 				<div>
 					<DiamondList
 						diamond={diamondList}
 						handleDiamondSelectChange={handleDiamondSelectChange}
+						handleDiamondOptionDisable={handleDiamondOptionDisable}
 						currentDiamondId={currentDiamondId}
 						shape={shape}
 					/>
