@@ -3,8 +3,13 @@ import {useDispatch} from 'react-redux';
 import {
 	fetchJewelryDetail,
 	changeJewelryReviewVisibility,
+	deleteJewelry,
 } from '../../../../redux/slices/jewelry/jewelrySlice';
 import {Camera, Ruler, Star, Info, Diamond, Tag, Eye, EyeOff, X} from 'lucide-react';
+import {useNavigate, useParams} from 'react-router-dom';
+import Loading from '../../../../components/Loading';
+import {DeleteFilled, LeftCircleFilled, LeftOutlined} from '@ant-design/icons';
+import {Button, message, Modal, Tooltip} from 'antd';
 const ClarityEnum = {
 	1: 'SI2',
 	2: 'SI1',
@@ -79,6 +84,8 @@ const PolishEnum = {
 
 const JewelryDetail = ({jewelry, onClose}) => {
 	const dispatch = useDispatch();
+	const navigate = useNavigate();
+	const {id} = useParams();
 	const [loading, setLoading] = useState(false);
 	const [activeTab, setActiveTab] = useState('main');
 	const [fetchedJewelry, setJewelry] = useState(jewelry);
@@ -87,7 +94,7 @@ const JewelryDetail = ({jewelry, onClose}) => {
 
 	const handleToggleReviewVisibility = async () => {
 		if (fetchedJewelry?.Id) {
-			await dispatch(changeJewelryReviewVisibility(fetchedJewelry.Id))
+			await dispatch(changeJewelryReviewVisibility(fetchedJewelry?.Id))
 				.unwrap()
 				.then((updatedJewelry) => {
 					setJewelry((prevJewelry) => ({
@@ -98,7 +105,7 @@ const JewelryDetail = ({jewelry, onClose}) => {
 				.catch((error) => {
 					console.error('Error toggling review visibility:', error);
 				});
-			await dispatch(fetchJewelryDetail(fetchedJewelry.Id))
+			await dispatch(fetchJewelryDetail(fetchedJewelry?.Id))
 				.unwrap()
 				.then((data) => {
 					setJewelry(data);
@@ -111,9 +118,9 @@ const JewelryDetail = ({jewelry, onClose}) => {
 		}
 	};
 	useEffect(() => {
-		if (jewelry?.Id) {
+		if (id) {
 			setLoading(true);
-			dispatch(fetchJewelryDetail(jewelry.Id))
+			dispatch(fetchJewelryDetail(id))
 				.unwrap()
 				.then((data) => {
 					setJewelry(data);
@@ -150,23 +157,36 @@ const JewelryDetail = ({jewelry, onClose}) => {
 					setLoading(false);
 				});
 		}
-	}, [jewelry?.Id, dispatch]);
+	}, [id, dispatch, fetch]);
 
 	if (loading) {
-		return (
-			<div
-				className="fixed inset-0 z-50 bg-black bg-opacity-50 flex items-center justify-center p-4 z-auto animate-fadeIn"
-				aria-labelledby="jewelry-detail-title"
-				aria-modal="true"
-				role="dialog"
-			>
-				<div className="animate-pulse">
-					<Diamond className="w-16 h-16 text-primary animate-bounce" />
-					<p className="text-white mt-4 text-center">Đang tải...</p>
-				</div>
-			</div>
-		);
+		return <Loading />;
 	}
+
+	const handleDeleteClick = () => {
+		Modal.confirm({
+			title: 'Bạn có chắc chắn muốn xóa trang sức này?',
+			content: 'Hành động này không thể hoàn tác.',
+			okText: 'Đồng ý',
+			okType: 'danger',
+			cancelText: 'Hủy',
+			onOk() {
+				dispatch(deleteJewelry(id))
+					.unwrap()
+					.then((res) => {
+						message.success('Xóa trang sức thành công!');
+						navigate('/products/jewelry-list');
+						setFetch(res);
+					})
+					.catch((error) => {
+						message.error(error.data.detail || error.detail);
+					});
+			},
+			onCancel() {
+				console.log('Đã hủy việc xóa');
+			},
+		});
+	};
 
 	const mapEnum = (value, enumObj) => enumObj[value] || 'Chưa Có';
 
@@ -174,7 +194,7 @@ const JewelryDetail = ({jewelry, onClose}) => {
 		switch (activeTab) {
 			case 'main':
 				return (
-					<div className="flex flex-wrap gap-6 p-4 bg-white rounded-lg">
+					<div className="flex flex-wrap gap-6 p-4 bg-white rounded-lg font-semibold">
 						<div className="flex justify-center items-center w-60 h-60">
 							<img
 								src={
@@ -185,7 +205,7 @@ const JewelryDetail = ({jewelry, onClose}) => {
 								className="w-[150px] h-[150px] object-cover rounded-xl shadow-lg transition-transform hover:scale-105"
 							/>
 						</div>
-						<div className="space-y-3">
+						<div className="">
 							<div className="bg-white p-4 rounded-lg shadow-sm">
 								<div className="flex items-center mb-2">
 									<Camera className="mr-2 text-primary" size={20} />
@@ -599,56 +619,62 @@ const JewelryDetail = ({jewelry, onClose}) => {
 	};
 
 	return (
-		<div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 p-4">
-			<div className="bg-white rounded-2xl w-11/12 md:w-3/4 lg:w-2/3 max-h-3/4 p-6 ">
-				{/* Close Button */}
-				<button
-					onClick={onClose}
-					className="absolute top-4 left-4 text-gray hover:text-gray-900"
-					aria-label="Close"
-				>
-					<X className="w-6 h-6 text-gray-700" />
-				</button>
-				{/* Modal Content */}
-				<div className="p-6">
-					{/* Title */}
-					<h2
-						id="jewelry-detail-title"
-						className="text-2xl font-bold text-primary text-center mb-6 pb-2 border-b"
-					>
-						{fetchedJewelry?.SerialCode}
-					</h2>
+		<>
+			<Button
+				type="text"
+				className="bg-primary ml-10"
+				onClick={() => navigate('/products/jewelry-list')}
+			>
+				<LeftOutlined /> Quay lại
+			</Button>
+			<div className=" inset-0 z-50 flex items-center justify-center p-4 shadow-lg">
+				<div className=" rounded-2xl w-11/12 p-6 ">
+					{/* Modal Content */}
+					<div className="p-6">
+						{/* Title */}
+						<h2
+							id="jewelry-detail-title"
+							className="text-2xl font-bold text-primary text-center mb-6 pb-2 border-b"
+						>
+							{fetchedJewelry?.SerialCode}
+							<Tooltip title="Xóa trang sức">
+								<Button danger className="mb-2 ml-5" onClick={handleDeleteClick}>
+									<DeleteFilled />
+								</Button>
+							</Tooltip>
+						</h2>
 
-					{/* Tab Navigation */}
-					<div className="flex mb-6 bg-gray-100 rounded-full p-1">
-						{[
-							{key: 'main', label: 'Thông Tin Chính', icon: Info},
-							{key: 'additional', label: 'Thông Tin Khác', icon: Ruler},
-							{key: 'diamonds', label: 'Kim Cương Chính', icon: Diamond},
-							{key: 'review', label: 'Review', icon: Star},
-						]
-							.filter((tab) => availableTabs.includes(tab.key))
-							.map((tab) => (
-								<button
-									key={tab.key}
-									className={`flex-1 p-3 rounded-full flex items-center justify-center transition-colors ${
-										activeTab === tab.key
-											? 'bg-primary text-white'
-											: 'text-gray-600 hover:bg-gray-200'
-									}`}
-									onClick={() => setActiveTab(tab.key)}
-								>
-									<tab.icon className="mr-2" size={20} />
-									<span className="hidden md:inline">{tab.label}</span>
-								</button>
-							))}
+						{/* Tab Navigation */}
+						<div className="flex mb-6 bg-gray-100 rounded-full p-1">
+							{[
+								{key: 'main', label: 'Thông Tin Chính', icon: Info},
+								{key: 'additional', label: 'Thông Tin Khác', icon: Ruler},
+								{key: 'diamonds', label: 'Kim Cương Chính', icon: Diamond},
+								{key: 'review', label: 'Review', icon: Star},
+							]
+								.filter((tab) => availableTabs.includes(tab.key))
+								.map((tab) => (
+									<button
+										key={tab.key}
+										className={`flex-1 p-3 rounded-full flex items-center justify-center transition-colors ${
+											activeTab === tab.key
+												? 'bg-primary text-white'
+												: 'text-gray-600 hover:bg-gray-200'
+										}`}
+										onClick={() => setActiveTab(tab.key)}
+									>
+										<tab.icon className="mr-2" size={20} />
+										<span className="hidden md:inline">{tab.label}</span>
+									</button>
+								))}
+						</div>
+
+						{/* Render Tab Content */}
+						{renderTabContent()}
 					</div>
-
-					{/* Render Tab Content */}
-					{renderTabContent()}
 				</div>
 			</div>
-		</div>
+		</>
 	);
 };
 

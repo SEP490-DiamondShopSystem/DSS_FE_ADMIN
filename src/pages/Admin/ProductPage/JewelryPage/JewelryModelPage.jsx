@@ -44,6 +44,7 @@ import {
 	getAllDiamondShapesSelector,
 } from '../../../../redux/selectors';
 import {JewelryModelUploadForm} from './JewelryModelUploadForm';
+import Loading from '../../../../components/Loading';
 
 const JewelryModelPage = () => {
 	const dispatch = useDispatch();
@@ -423,7 +424,7 @@ const JewelryModelPage = () => {
 
 			{/* Loading and Error Handling */}
 			{loading ? (
-				<div className="text-xl text-blue">Đang tải các mẫu trang sức...</div>
+				<Loading />
 			) : (
 				<div>
 					{/* Models List */}
