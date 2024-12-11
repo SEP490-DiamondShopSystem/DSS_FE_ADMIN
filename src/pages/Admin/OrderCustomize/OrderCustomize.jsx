@@ -125,7 +125,7 @@ const OrderCustomizePage = () => {
 			align: 'center',
 		},
 		{
-			title: 'Thời Gian Đặt Hàng',
+			title: 'Thời Gian Gửi Yêu Cầu',
 			dataIndex: 'orderTime',
 			key: 'orderTime',
 			align: 'center',

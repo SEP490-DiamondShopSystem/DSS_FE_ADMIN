@@ -204,14 +204,14 @@ export const DiamondUploadForm = ({diamondId, visible, onClose}) => {
 
 	return (
 		<Modal
-			title="Diamond's Files"
+			title="Ảnh Kim Cương"
 			visible={visible}
 			onCancel={handleCancel}
 			footer={
 				isEditMode
 					? [
 							<Button key="cancel" onClick={handleCancel}>
-								Cancel
+								Hủy
 							</Button>,
 							<Button
 								key="save"
@@ -219,7 +219,7 @@ export const DiamondUploadForm = ({diamondId, visible, onClose}) => {
 								loading={loading}
 								onClick={handleSaveChanges}
 							>
-								Save Changes
+								Lưu
 							</Button>,
 					  ]
 					: [
@@ -229,7 +229,7 @@ export const DiamondUploadForm = ({diamondId, visible, onClose}) => {
 								icon={<EditOutlined />}
 								onClick={handleSwitchToEdit}
 							>
-								Switch to Edit Mode
+								Chỉnh sửa
 							</Button>,
 					  ]
 			}
@@ -237,7 +237,7 @@ export const DiamondUploadForm = ({diamondId, visible, onClose}) => {
 			{isEditMode ? (
 				<Form layout="vertical">
 					{/* Thumbnail Upload */}
-					<Form.Item label="Thumbnail">
+					<Form.Item label="Ảnh">
 						<Upload
 							accept="image/*"
 							beforeUpload={(file) => {
@@ -263,7 +263,7 @@ export const DiamondUploadForm = ({diamondId, visible, onClose}) => {
 					</Form.Item>
 
 					{/* Certificates Upload */}
-					<Form.Item label="Certificates">
+					<Form.Item label="Chứng nhận">
 						<Upload
 							multiple
 							accept="application/pdf"
@@ -289,7 +289,7 @@ export const DiamondUploadForm = ({diamondId, visible, onClose}) => {
 					</Form.Item>
 
 					{/* Diamond Images Upload */}
-					<Form.Item label="Diamond Images">
+					<Form.Item label="Ảnh chi tiết">
 						<Upload
 							multiple
 							accept="image/*"
@@ -319,7 +319,7 @@ export const DiamondUploadForm = ({diamondId, visible, onClose}) => {
 				<div>
 					{/* View Mode */}
 					<List
-						header={<b>Thumbnail</b>}
+						header={<b>Ảnh</b>}
 						dataSource={thumbnailFile ? [thumbnailFile] : []}
 						renderItem={(item) => (
 							<List.Item>
@@ -329,7 +329,7 @@ export const DiamondUploadForm = ({diamondId, visible, onClose}) => {
 					/>
 
 					<List
-						header={<b>Certificates</b>}
+						header={<b>Chứng nhận</b>}
 						dataSource={certificateFiles}
 						renderItem={(item, index) => (
 							<List.Item>
@@ -341,7 +341,7 @@ export const DiamondUploadForm = ({diamondId, visible, onClose}) => {
 					/>
 
 					<List
-						header={<b>Diamond Images</b>}
+						header={<b>Ảnh chi tiết</b>}
 						grid={{gutter: 16, column: 4}}
 						dataSource={imageFiles}
 						renderItem={(item) => (

@@ -434,13 +434,13 @@ const JewelryModelPage = () => {
 								type="text"
 								value={name}
 								onChange={(e) => setName(e.target.value)}
-								placeholder="Filter by Name"
+								placeholder="Nhập tên mẫu"
 								className="form-input p-2 border border-gray-300 rounded-md"
 							/>
 							<select
 								value={category}
 								onChange={(e) => setCategory(e.target.value)}
-								placeholder="Filter by Category"
+								placeholder="Nhập theo loại mẫu"
 								className="form-input p-2 border border-gray-300 rounded-md"
 							>
 								{categories.map((category) => (
@@ -463,9 +463,9 @@ const JewelryModelPage = () => {
 								onChange={(e) => setIsEngravable(e.target.value === 'true')}
 								className="form-select p-2 border border-gray-300 rounded-md"
 							>
-								<option value="">Engravable?</option>
-								<option value="true">Yes</option>
-								<option value="false">No</option>
+								<option value="">Có thể khác chữ?</option>
+								<option value="true">Có</option>
+								<option value="false">Không</option>
 							</select>
 						</div>
 						{loading ? (
@@ -556,7 +556,7 @@ const JewelryModelPage = () => {
 							>
 								Trước
 							</button>
-							<span className="text-lg">{`Page ${currentPage} of ${totalPage}`}</span>
+							<span className="text-lg">{`Trang ${currentPage} / ${totalPage}`}</span>
 							<button
 								onClick={handleNextPage}
 								disabled={currentPage === totalPage}
@@ -1168,14 +1168,14 @@ const JewelryModelPage = () => {
 							onClick={handleClear}
 							className="py-2 px-6 text-white bg-gray rounded-md hover:bg-gray hover:text-white focus:outline-none"
 						>
-							Clear
+							Cài Lại
 						</button>
 						<button
 							type="submit"
 							onClick={handleSubmit}
-							className="py-2 px-6 text-white bg-blue-600 rounded-md hover:bg-blue focus:outline-none"
+							className="py-2 px-6 text-white bg-primary rounded-md hover:bg-secondary focus:outline-none"
 						>
-							Submit
+							Tạo
 						</button>
 					</div>
 				</div>
