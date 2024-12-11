@@ -250,26 +250,27 @@ const JewelryCreateForm = ({onClose, isCreateFormOpen, setIsCreateFormOpen}) => 
 			sideDiamondOptId: '', // move outside of JewelryRequest
 		});
 	}, [form]);
+	const checkAndShowDiamondModal = () => {
+		if (selectedModel && selectedModel.MainDiamondCount > 0) {
+			showModal();
+		}
+	};
 
 	// Handle model change to filter metals and populate side diamond details
-	const handleModelChange = (value) => {
-		const model = models.find((model) => model.Id === value);
+	const handleModelChange = (model) => {
 		if (model) {
 			setSelectedModel(model);
 			form.setFieldsValue({
 				JewelryRequest: {
 					...form.getFieldsValue().JewelryRequest,
-					ModelId: value,
-					MentalId: '',
-					SizeId: '',
+					ModelId: model.Id,
+					MentalId: '', // Reset metal
+					SizeId: '', // Reset size
 				},
 				sideDiamondOptId: '',
 			});
 			setSelectedDiamondList([]);
 		}
-
-		// Log model change
-		console.log('Selected Model:', model);
 	};
 
 	// Handle side diamond option change
@@ -306,6 +307,7 @@ const JewelryCreateForm = ({onClose, isCreateFormOpen, setIsCreateFormOpen}) => 
 	// Handle form submission
 	const handleSubmit = () => {
 		const formValues = form.getFieldsValue();
+
 		console.log('Form Values Before Submission:', formValues); // Log all form values before submission
 
 		// Extract JewelryRequest and sideDiamondOptId separately
@@ -343,9 +345,10 @@ const JewelryCreateForm = ({onClose, isCreateFormOpen, setIsCreateFormOpen}) => 
 				message.success('Tạo trang sức thành công!');
 				form.resetFields();
 				onClose();
+				setIsModalVisible(false); // Add this line to close the diamond selection modal
 			})
 			.catch((error) => {
-				message.error(error?.data?.title || error?.detail);
+				message.error(error?.data?.detail);
 			});
 	};
 
@@ -391,7 +394,6 @@ const JewelryCreateForm = ({onClose, isCreateFormOpen, setIsCreateFormOpen}) => 
 				isCreateFormOpen={isCreateFormOpen}
 				setIsCreateFormOpen={setIsCreateFormOpen}
 			/>
-
 			<Modal
 				title="Yêu Cầu Kim Cương"
 				visible={isModalVisible}

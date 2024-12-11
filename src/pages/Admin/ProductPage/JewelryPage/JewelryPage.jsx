@@ -151,9 +151,7 @@ const JewelryPage = () => {
 					</Button>
 				</div>
 
-				{/* Model Selection & Filters Container */}
 				<div className="p-6 space-y-6">
-					{/* Model Selection */}
 					<Card
 						className="border-primary/50 hover:border-primary transition-all"
 						title={
