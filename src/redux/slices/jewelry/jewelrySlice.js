@@ -6,12 +6,36 @@ export const fetchAllJewelry = createAsyncThunk(
 	'jewelry/fetchAll',
 	async (params, {rejectWithValue}) => {
 		try {
-			const response = await api.get('/Jewelry/Staff/All', {params});
-			console.log('fetchAllJewelry response:', response);
+			const {
+				CurrentPage,
+				PageSize,
+				ModelName,
+				SerialCode,
+				SizeId,
+				MetalId,
+				Status,
+				JewelryModelId,
+			} = params;
+			let url = '/Jewelry/Staff/All';
+			const queryParams = new URLSearchParams();
+
+			if (CurrentPage) queryParams.append('CurrentPage', CurrentPage);
+			if (PageSize) queryParams.append('PageSize', PageSize);
+			if (JewelryModelId) queryParams.append('JewelryModelId', JewelryModelId);
+			if (ModelName) queryParams.append('ModelName', ModelName);
+			if (SerialCode) queryParams.append('SerialCode', SerialCode);
+			if (SizeId) queryParams.append('SizeId', SizeId);
+			if (MetalId) queryParams.append('MetalId', MetalId);
+			if (Status) queryParams.append('Status', Status);
+
+			if (queryParams.toString()) {
+				url += `?${queryParams.toString()}`;
+			}
+
+			const response = await api.get(url);
 			return response;
 		} catch (error) {
-			console.error('fetchAllJewelry error:', error.response);
-			return thunkAPI.rejectWithValue(error.response);
+			return rejectWithValue(error);
 		}
 	}
 );
@@ -25,8 +49,8 @@ export const fetchJewelryDetail = createAsyncThunk(
 			console.log('fetchJewelryDetail response:', response);
 			return response;
 		} catch (error) {
-			console.error('fetchJewelryDetail error:', error.response);
-			return thunkAPI.rejectWithValue(error.response);
+			console.error('fetchJewelryDetail error:', error);
+			return thunkAPI.rejectWithValue(error);
 		}
 	}
 );
@@ -44,8 +68,8 @@ export const createJewelry = createAsyncThunk(
 			console.log('createJewelry response:', response);
 			return response;
 		} catch (error) {
-			console.error('createJewelry error:', error.response);
-			return thunkAPI.rejectWithValue(error.response);
+			console.error('createJewelry error:', error);
+			return thunkAPI.rejectWithValue(error);
 		}
 	}
 );
@@ -59,8 +83,8 @@ export const changeJewelryReviewVisibility = createAsyncThunk(
 			console.log('changeJewelryReviewVisibility response:', response);
 			return response;
 		} catch (error) {
-			console.error('changeJewelryReviewVisibility error:', error.response);
-			return thunkAPI.rejectWithValue(error.response);
+			console.error('changeJewelryReviewVisibility error:', error);
+			return thunkAPI.rejectWithValue(error);
 		}
 	}
 );

@@ -17,6 +17,7 @@ import {
 	Tag,
 	Tooltip,
 	Empty,
+	message,
 } from 'antd';
 import {
 	SearchOutlined,
@@ -71,6 +72,8 @@ const JewelryPage = () => {
 		Status: 1,
 	});
 
+	console.log('filters', filters);
+
 	const metals = useSelector(getAllMetalsSelector);
 	const sizes = useSelector(getAllSizesSelector);
 
@@ -100,7 +103,7 @@ const JewelryPage = () => {
 					});
 				});
 		}
-	}, [dispatch, selectedModel?.Id, currentPage, pageSize, filters]);
+	}, [dispatch, selectedModel?.Id, currentPage, pageSize]);
 
 	const handleSelectModel = (model) => {
 		setSelectedModel(model);
@@ -193,98 +196,98 @@ const JewelryPage = () => {
 						{isFilterVisible && (
 							<Row gutter={[16, 16]}>
 								<Col xs={24} md={12} lg={6}>
-									<Form.Item label="Chất Liệu">
-										<Select
-											value={filters.MetalId}
-											onChange={(value) => {
-												const updatedFilters = {...filters, MetalId: value};
-												setFilters(updatedFilters);
-											}}
-											placeholder="Chọn chất liệu"
-											allowClear
-											className="w-full"
-										>
-											{metals.map((metal) => (
-												<Select.Option key={metal.Id} value={metal.Id}>
-													{metal.Name}
-												</Select.Option>
-											))}
-										</Select>
-									</Form.Item>
+									<div>Chất Liệu</div>
+									<Select
+										value={filters.MetalId}
+										onChange={(value) => {
+											const updatedFilters = {...filters, MetalId: value};
+											setFilters(updatedFilters);
+										}}
+										placeholder="Chọn chất liệu"
+										allowClear
+										className="w-full"
+									>
+										{metals.map((metal) => (
+											<Select.Option key={metal.Id} value={metal.Id}>
+												{metal.Name}
+											</Select.Option>
+										))}
+									</Select>
 								</Col>
 								<Col xs={24} md={12} lg={6}>
-									<Form.Item label="Kích Thước">
-										<Select
-											value={filters.SizeId}
-											onChange={(value) => {
-												const updatedFilters = {...filters, SizeId: value};
-												setFilters(updatedFilters); // Update the state
-											}}
-											placeholder="Chọn kích thước"
-											allowClear
-											className="w-full"
-										>
-											{sizes.map((size) => (
-												<Select.Option key={size.Id} value={size.Id}>
-													{size.Value} {size.Unit}
-												</Select.Option>
-											))}
-										</Select>
-									</Form.Item>
+									<div>Kích Thước</div>
+									<Select
+										value={filters.SizeId}
+										onChange={(value) => {
+											const updatedFilters = {...filters, SizeId: value};
+											setFilters(updatedFilters); // Update the state
+										}}
+										placeholder="Chọn kích thước"
+										allowClear
+										className="w-full"
+									>
+										{sizes.map((size) => (
+											<Select.Option key={size.Id} value={size.Id}>
+												{size.Value} {size.Unit}
+											</Select.Option>
+										))}
+									</Select>
+								</Col>
+
+								<Col xs={24} md={12} lg={6}>
+									<div>Trạng Thái</div>
+									<Select
+										allowClear
+										value={filters.Status}
+										onChange={(value) => {
+											const updatedFilters = {...filters, Status: value};
+											setFilters(updatedFilters); // Update the state
+										}}
+										className="w-full"
+									>
+										<Select.Option value={1}>Hoạt động</Select.Option>
+										<Select.Option value={4}>Không hoạt động</Select.Option>
+										<Select.Option value={3}>Đã lưu trữ</Select.Option>
+										<Select.Option value={2}>Đã bán</Select.Option>
+										<Select.Option value={5}>Bị khóa</Select.Option>
+										<Select.Option value={6}>Đặt trước</Select.Option>
+									</Select>
 								</Col>
 								<Col xs={24} md={12} lg={6}>
-									<Form.Item label="Kim Cương">
-										<Checkbox
-											checked={filters.HasSideDiamond}
-											onChange={(e) => {
-												const updatedFilters = {
-													...filters,
-													HasSideDiamond: e.target.checked,
-												};
-												setFilters(updatedFilters); // Update the state
-											}}
-										>
-											Có Kim Cương
-										</Checkbox>
-									</Form.Item>
-								</Col>
-								<Col xs={24} md={12} lg={6}>
-									<Form.Item label="Trạng Thái">
-										<Select
-											value={filters.Status}
-											onChange={(value) => {
-												const updatedFilters = {...filters, Status: value};
-												setFilters(updatedFilters); // Update the state
-											}}
-											className="w-full"
-										>
-											<Select.Option value={1}>Hoạt động</Select.Option>
-											<Select.Option value={2}>Không hoạt động</Select.Option>
-											<Select.Option value={3}>Đã lưu trữ</Select.Option>
-											<Select.Option value={4}>Đã bán</Select.Option>
-											<Select.Option value={5}>Bị khóa</Select.Option>
-											<Select.Option value={6}>Đặt trước</Select.Option>
-										</Select>
-									</Form.Item>
+									<div>Mã số sê-ri</div>
+									<Input
+										onChange={(e) => {
+											const updatedFilters = {
+												...filters,
+												SerialCode: e.target.value,
+											};
+											setFilters(updatedFilters); // Update the state
+										}}
+									/>
 								</Col>
 								<Col span={24}>
 									<Button
 										type="primary"
 										icon={<SearchOutlined />}
-										onClick={() =>
+										onClick={() => {
+											if (!selectedModel) {
+												message.warning(
+													'Vui lòng chọn mẫu trang sức trước khi lọc'
+												);
+												return;
+											}
 											dispatch(
 												fetchAllJewelry({
 													JewelryModelId: selectedModel?.Id,
 													CurrentPage: currentPage,
 													PageSize: pageSize,
-													ModelName: filters.ModelName,
+													MetalId: filters.MetalId,
 													SerialCode: filters.SerialCode,
 													SizeId: filters.SizeId,
-													HasSideDiamond: filters.HasSideDiamond,
 													Status: filters.Status,
 												})
-											)
-										}
+											);
+										}}
 										className="w-full"
 									>
 										Áp Dụng Bộ Lọc
@@ -305,7 +308,7 @@ const JewelryPage = () => {
 							className="my-12"
 						/>
 					) : (
-						<div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+						<div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 my-10">
 							{jewelryList?.map((jewelry) => (
 								<Card
 									key={jewelry.Id}

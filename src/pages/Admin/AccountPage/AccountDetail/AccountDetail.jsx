@@ -220,14 +220,14 @@ const AccountDetail = () => {
 	};
 
 	const handleBan = async () => {
-		await dispatch(handleBanAccount(userDetail?.IdentityId))
+		await dispatch(handleBanAccount(user?.IdentityId))
 			.unwrap()
 			.then(() => {
-				message.message(`Cấm tài khoản ${userDetail.Id} thành công`);
-				form.resetFields();
+				message.success(`Cấm tài khoản ${user.Id} thành công`);
+				// form.resetFields();
 			})
 			.catch((error) => {
-				message.error(error?.data?.title || error?.detail);
+				message.error(error?.data?.detail || error?.detail);
 			});
 		await dispatch(getUserAccountDetail(id));
 	};
