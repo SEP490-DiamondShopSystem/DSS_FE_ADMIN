@@ -311,104 +311,107 @@ const JewelryPage = () => {
 						</div>
 					) : !jewelryList ? (
 						<Empty
-							description="Không có trang sức nào. Vui lòng chọn mẫu trang sức và tiếp tục"
+							description="Chưa có trang sức nào, Vui lòng chọn mẫu trang sức và tiếp tục!"
 							className="my-10"
 						/>
 					) : (
-						<div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 my-10">
-							{Array.isArray(jewelryList) &&
-								jewelryList?.map((jewelry) => (
-									<Card
-										key={jewelry.Id}
-										hoverable
-										onClick={() =>
-											navigate(`/products/jewelry-list/${jewelry?.Id}`)
-										}
-										className="transform transition-all hover:scale-105 hover:shadow-2xl hover:border rounded-2xl overflow-hidden"
-									>
-										<div className="flex">
-											{/* Image Section - 40% width */}
-											<div className="w-40 mr-5">
-												<img
-													alt={jewelry.SerialCode}
-													src={
-														jewelry?.Model?.Thumbnail?.MediaPath ||
-														'/default-thumbnail.jpg'
-													}
-													className="w-full h-48 object-cover rounded-lg"
-												/>
-											</div>
+						<>
+							<div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 my-10">
+								{Array.isArray(jewelryList) &&
+									jewelryList?.map((jewelry) => (
+										<Card
+											key={jewelry.Id}
+											hoverable
+											onClick={() =>
+												navigate(`/products/jewelry-list/${jewelry?.Id}`)
+											}
+											className="transform transition-all hover:scale-105 hover:shadow-2xl hover:border rounded-2xl overflow-hidden"
+										>
+											<div className="flex">
+												{/* Image Section - 40% width */}
+												<div className="w-40 mr-5">
+													<img
+														alt={jewelry.SerialCode}
+														src={
+															jewelry?.Model?.Thumbnail?.MediaPath ||
+															'/default-thumbnail.jpg'
+														}
+														className="w-full h-48 object-cover rounded-lg"
+													/>
+												</div>
 
-											{/* Information Section - 60% width */}
-											<div className="w-3/5 flex flex-col justify-between">
-												<div>
-													<div className="flex justify-between items-center mb-2">
-														<span className="text-lg font-bold text-primary">
-															{jewelry.SerialCode}
-														</span>
-														{renderStatusTag(jewelry.Status)}
-													</div>
-
-													<div className="space-y-2 text-gray-700">
-														<div className="flex items-center">
-															<DollarOutlined className="mr-2 text-primary" />
-															<span className="font-semibold">
-																{jewelry.TotalPrice > 0
-																	? formatPrice(
-																			jewelry.TotalPrice
-																	  )
-																	: 'Liên Hệ Báo Giá'}
+												{/* Information Section - 60% width */}
+												<div className="w-3/5 flex flex-col justify-between">
+													<div>
+														<div className="flex justify-between items-center mb-2">
+															<span className="text-lg font-bold text-primary">
+																{jewelry.SerialCode}
 															</span>
+															{renderStatusTag(jewelry.Status)}
 														</div>
-														<div className="flex justify-between text-sm">
-															<Tooltip title="Chất Liệu">
-																<span>
-																	{jewelry?.Metal?.Name || 'N/A'}
+
+														<div className="space-y-2 text-gray-700">
+															<div className="flex items-center">
+																<DollarOutlined className="mr-2 text-primary" />
+																<span className="font-semibold">
+																	{jewelry.TotalPrice > 0
+																		? formatPrice(
+																				jewelry.TotalPrice
+																		  )
+																		: 'Liên Hệ Báo Giá'}
 																</span>
-															</Tooltip>
-															<Tooltip title="Kích Thước">
-																<span>
-																	{jewelry.Size?.Value}{' '}
-																	{jewelry.Size?.Unit}
-																</span>
-															</Tooltip>
+															</div>
+															<div className="flex justify-between text-sm">
+																<Tooltip title="Chất Liệu">
+																	<span>
+																		{jewelry?.Metal?.Name ||
+																			'N/A'}
+																	</span>
+																</Tooltip>
+																<Tooltip title="Kích Thước">
+																	<span>
+																		{jewelry.Size?.Value}{' '}
+																		{jewelry.Size?.Unit}
+																	</span>
+																</Tooltip>
+															</div>
 														</div>
 													</div>
 												</div>
 											</div>
-										</div>
-									</Card>
-								))}
-						</div>
-					)}
-
-					{/* Pagination */}
-					<div className="flex flex-col sm:flex-row justify-center items-center mt-12 space-y-4 sm:space-y-0 sm:space-x-6">
-						<div className="flex items-center space-x-4">
-							<Button
-								onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
-								disabled={currentPage === 1}
-								className="px-4 py-2 rounded-lg"
-							>
-								Trước
-							</Button>
-							<span className="text-lg font-semibold">
-								Trang {currentPage} / {totalPage}
-							</span>
-							<Button
-								onClick={() => setCurrentPage((p) => Math.min(totalPage, p + 1))}
-								disabled={currentPage === totalPage}
-								className="px-4 py-2 rounded-lg"
-							>
-								Sau
-							</Button>
-						</div>
-						{/* <Select value={pageSize} onChange={setPageSize} className="w-32">
+										</Card>
+									))}
+							</div>
+							<div className="flex flex-col sm:flex-row justify-center items-center mt-12 space-y-4 sm:space-y-0 sm:space-x-6">
+								<div className="flex items-center space-x-4">
+									<Button
+										onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+										disabled={currentPage === 1}
+										className="px-4 py-2 rounded-lg"
+									>
+										Trước
+									</Button>
+									<span className="text-lg font-semibold">
+										Trang {currentPage} / {totalPage}
+									</span>
+									<Button
+										onClick={() =>
+											setCurrentPage((p) => Math.min(totalPage, p + 1))
+										}
+										disabled={currentPage === totalPage}
+										className="px-4 py-2 rounded-lg"
+									>
+										Sau
+									</Button>
+								</div>
+								{/* <Select value={pageSize} onChange={setPageSize} className="w-32">
 							<Select.Option value={5}>5 per page</Select.Option>
 							<Select.Option value={10}>10 per page</Select.Option>
 							<Select.Option value={20}>20 per page</Select.Option>
 						</Select> */}
-					</div>
+							</div>
+						</>
+					)}
 				</div>
 			</div>
 

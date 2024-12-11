@@ -47,6 +47,7 @@ const JewelryModelCategoryPage = () => {
       dispatch(createJewelryModelCategory(categoryData))
         .unwrap()
         .then(() => {
+          message.success('Tạo danh mục trang sức mới thành công!');
           setNewCategory({
             name: '',
             description: '',
@@ -122,16 +123,21 @@ const JewelryModelCategoryPage = () => {
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                ID danh mục cha (Tuỳ chọn)
+                Danh mục cha (Tuỳ chọn)
               </label>
-              <input
-                type="text"
+              <select
                 name="parentCategoryId"
                 value={newCategory.parentCategoryId}
                 onChange={handleInputChange}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
-                placeholder="ID danh mục cha"
-              />
+              >
+                <option value="">Không chọn danh mục cha</option>
+                {categories.map((category) => (
+                  <option key={category.Id} value={category.Id}>
+                    {category.Name}
+                  </option>
+                ))}
+              </select>
             </div>
             <div className="md:col-span-2">
               <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -187,6 +193,11 @@ const JewelryModelCategoryPage = () => {
                       {category.Name}
                     </h3>
                     <p className="text-gray-600">{category.Description}</p>
+                    {category.ParentCategory && (
+                      <p className="text-sm text-gray-500">
+                        Danh mục cha: {category.ParentCategory.Name}
+                      </p>
+                    )}
                   </div>
                   {category.isGeneral && (
                     <span className="px-3 py-1 bg-green-100 text-green-800 rounded-full text-xs">
