@@ -89,13 +89,16 @@ const DefaultLayout = () => {
 				navigate('/orders');
 				setHasRedirected(true);
 			}
+			if (isAdmin && !isAllowedPath && !hasRedirected) {
+				navigate('/accounts');
+				setHasRedirected(true);
+			}
 		}
 	}, [userDetail, navigate, location.pathname, hasRedirected]);
 
 	// Menu items (same as previous implementation)
 	const items = [
-		(adminRole || managerRole || staffRole) &&
-			getItem('Dashboard', '/dashboard', <DashboardOutlined />),
+		(managerRole || staffRole) && getItem('Dashboard', '/dashboard', <DashboardOutlined />),
 		adminRole && getItem('Quản Lí Tài Khoản', '/accounts', <UserOutlined />),
 
 		(managerRole || staffRole) &&
@@ -197,7 +200,7 @@ const DefaultLayout = () => {
 						onClick={toggleMobileMenu}
 						className="mr-2"
 					/>
-					<Link to="/dashboard" className="flex-grow text-center">
+					<Link to="" className="flex-grow text-center">
 						<img src={imageExporter.logo} alt="logo" className="h-10 mx-auto" />
 					</Link>
 				</div>
@@ -295,7 +298,7 @@ const DefaultLayout = () => {
 					theme="light"
 					onCollapse={toggleCollapsed}
 				>
-					<Link to="/dashboard" className="block h-24 mb-10">
+					<Link to="" className="block h-24 mb-10">
 						<img
 							src={collapsed ? imageExporter.tinylogo : imageExporter.logo}
 							alt="logo"

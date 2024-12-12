@@ -442,6 +442,7 @@ const TimeLineOrder = ({
 				console.log('res', res);
 				message.success('Chấp nhận đơn thiết kế thành công!');
 				setIsModalVisible(false);
+				setCompleted(res);
 			})
 			.catch((error) => {
 				message.error(error?.data?.detail);
@@ -588,7 +589,7 @@ const TimeLineOrder = ({
 								</p>
 							</div>
 							<div className="flex justify-around font-semibold text-darkBlue text-lg">
-								Chờ Khách Hàng Xác Nhận
+								Vui Lòng Chờ Khách Hàng Xác Nhận
 							</div>
 						</div>
 					)}

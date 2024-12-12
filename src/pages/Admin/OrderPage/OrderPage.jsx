@@ -33,12 +33,12 @@ const statusList = [
 	{name: 'Tất Cả', icon: <UnorderedListOutlined />, value: ''},
 	{name: 'Chờ Xử Lý', icon: <DollarOutlined />, value: '1'},
 	{name: 'Đang Xử Lý', icon: <LoadingOutlined />, value: '2'},
-	{name: 'Từ Chối', icon: <CloseOutlined />, value: '3'},
-	{name: 'Hủy Đơn', icon: <CloseOutlined />, value: '4'},
 	{name: 'Đã Chuẩn Bị', icon: <DownloadOutlined />, value: '5'},
 	{name: 'Đang Vận Chuyển', icon: <TruckOutlined />, value: '6'},
-	{name: 'Vận Chuyển Thất Bại', icon: <CloseOutlined />, value: '7'},
 	{name: 'Thành Công', icon: <CheckOutlined />, value: '8'},
+	{name: 'Từ Chối', icon: <CloseOutlined />, value: '3'},
+	{name: 'Hủy Đơn', icon: <CloseOutlined />, value: '4'},
+	{name: 'Vận Chuyển Thất Bại', icon: <CloseOutlined />, value: '7'},
 ];
 
 const statusMapping = {
@@ -65,8 +65,8 @@ const delivererStatusList = [
 	{name: 'Tất Cả', icon: <UnorderedListOutlined />, value: ''},
 	{name: 'Đã Chuẩn Bị', icon: <DownloadOutlined />, value: '5'},
 	{name: 'Đang Vận Chuyển', icon: <TruckOutlined />, value: '6'},
-	{name: 'Vận Chuyển Thất Bại', icon: <CloseOutlined />, value: '7'},
 	{name: 'Thành Công', icon: <CheckOutlined />, value: '8'},
+	{name: 'Vận Chuyển Thất Bại', icon: <CloseOutlined />, value: '7'},
 ];
 
 const OrderPage = () => {

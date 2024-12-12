@@ -95,10 +95,12 @@ const TimeLineOrder = ({
 	const [transactionOrderDelivering, setTransactionOrderDelivering] = useState();
 	const [transactionOrderPending, setTransactionOrderPending] = useState();
 	const [transactionOrderPendingPayAll, setTransactionOrderPendingPayAll] = useState();
+	const [transactionOrderOthers, setTransactionOrderOthers] = useState();
 
 	console.log('transactionOrderDelivering', transactionOrderDelivering);
 	console.log('transactionOrderPending', transactionOrderPending);
 	console.log('transactionOrderPendingPayAll', transactionOrderPendingPayAll);
+	console.log('transactionOrderOthers', transactionOrderOthers);
 
 	useEffect(() => {
 		if (orders?.Transactions?.length > 0) {
@@ -113,10 +115,17 @@ const TimeLineOrder = ({
 			const transactionOrderPendingPayAll = orders?.Transactions?.filter((obj) =>
 				obj?.Description?.includes('Trả hết')
 			);
+			const transactionOrderOthers = orders?.Transactions?.filter(
+				(obj) =>
+					!transactionOrderDelivering.includes(obj) &&
+					!transactionOrderPending.includes(obj) &&
+					!transactionOrderPendingPayAll.includes(obj)
+			);
 
 			setTransactionOrderDelivering(transactionOrderDelivering);
 			setTransactionOrderPending(transactionOrderPending);
 			setTransactionOrderPendingPayAll(transactionOrderPendingPayAll);
+			setTransactionOrderOthers(transactionOrderOthers);
 		}
 	}, [orders?.Transactions]);
 
@@ -719,7 +728,7 @@ const TimeLineOrder = ({
 									<ClockCircleOutlined /> {ORDER_STATUS_TEXTS.Pending}
 								</p>
 							</div>
-							{orders?.Transactions?.length > 0 ? (
+							{orders?.Transactions?.length > 0 && orders?.PaymentStatus === 1 ? (
 								<>
 									<div className="my-5">
 										<Title level={5}>
@@ -834,6 +843,12 @@ const TimeLineOrder = ({
 											? formatPrice(
 													transactionOrderPending[0]?.TransactionAmount
 											  )
+											: transactionOrderOthers[0]?.Status === 2 &&
+											  orders?.Transactions?.length === 1
+											? formatPriceCeilFloor(
+													transactionOrderOthers[0]?.TransactionAmount *
+														0.9
+											  )
 											: 'Không'}
 									</label>
 									<InputNumber
@@ -938,6 +953,12 @@ const TimeLineOrder = ({
 													transactionOrderPendingPayAll[0]
 														?.TransactionAmount * 0.9
 											  )
+											: transactionOrderOthers[0]?.Status === 2 &&
+											  orders?.Transactions?.length === 1
+											? formatPriceCeilFloor(
+													transactionOrderOthers[0]?.TransactionAmount *
+														0.9
+											  )
 											: 'Không'}
 									</label>
 									<InputNumber
@@ -986,7 +1007,7 @@ const TimeLineOrder = ({
 							<div className="flex justify-around">
 								<Button
 									type="text"
-									className="bg-primary font-semibold w-32 rounded-full"
+									className="bg-primary font-semibold rounded-full"
 									onClick={handleRefund}
 									disabled={loading}
 								>
