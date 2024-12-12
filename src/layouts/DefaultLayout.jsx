@@ -1,20 +1,20 @@
 import React, {useEffect, useState} from 'react';
 import {
 	DashboardOutlined,
-	DeliveredProcedureOutlined,
-	GiftOutlined,
-	OrderedListOutlined,
-	ProductOutlined,
-	RightOutlined,
 	UserOutlined,
+	ProductOutlined,
+	OrderedListOutlined,
+	GiftOutlined,
 	TagOutlined,
-	MenuFoldOutlined,
-	MenuUnfoldOutlined,
-	LogoutOutlined,
+	DeliveredProcedureOutlined,
 	SettingOutlined,
-	SlidersOutlined,
+	EditOutlined, // New import for blogs
+	SlidersFilled, // More descriptive icon for customization requests
 } from '@ant-design/icons';
-import {DiamondOutlined} from '@mui/icons-material';
+import {
+	DiamondOutlined, // Kept for diamond-related items
+	CategoryOutlined, // New import for jewelry model categories
+} from '@mui/icons-material';
 import {Breadcrumb, message, Layout, Menu, Drawer, Button, Tooltip} from 'antd';
 import {Link, Outlet, useLocation, useNavigate} from 'react-router-dom';
 import {imageExporter} from '../assets/images';
@@ -94,52 +94,51 @@ const DefaultLayout = () => {
 
 	// Menu items (same as previous implementation)
 	const items = [
-		(managerRole || staffRole) && getItem('Dashboard', '/dashboard', <DashboardOutlined />),
-		adminRole && getItem('Quản Lí Tài Khoản', '/accounts', <UserOutlined />),
+        (managerRole || staffRole) && getItem('Dashboard', '/dashboard', <DashboardOutlined />),
+        adminRole && getItem('Quản Lí Tài Khoản', '/accounts', <UserOutlined />),
 
-		(managerRole || staffRole) &&
-			getItem('Quản Lý Sản Phẩm', '/products', <ProductOutlined />, [
-				getItem('Danh Sách Kim Cương', '/products/diamond-list', <DiamondOutlined />),
-				getItem('Danh Sách Trang Sức', '/products/jewelry-list', <RightOutlined />),
+        (managerRole || staffRole) &&
+            getItem('Quản Lý Sản Phẩm', '/products', <ProductOutlined />, [
+                getItem('Danh Sách Kim Cương', '/products/diamond-list', <DiamondOutlined />),
+                getItem('Danh Sách Trang Sức', '/products/jewelry-list', <ProductOutlined />),
+                getItem(
+                    'Danh Sách Mẫu Trang Sức',
+                    '/products/jewelry-model-list',
+                    <EditOutlined />
+                ),
+            ]),
+        managerRole && getItem('Danh Sách Kim Loại', '/products/metal-list', <DiamondOutlined />),
+        (managerRole || staffRole || delivererRole) &&
+            getItem('Quản Lí Đặt Hàng', '/orders', <OrderedListOutlined />),
 
-				getItem(
-					'Danh Sách Mẫu Trang Sức',
-					'/products/jewelry-model-list',
-					<RightOutlined />
-				),
-			]),
-		managerRole && getItem('Danh Sách Kim Loại', '/products/metal-list', <DiamondOutlined />),
-		(managerRole || staffRole || delivererRole) &&
-			getItem('Quản Lí Đặt Hàng', '/orders', <OrderedListOutlined />),
+        (managerRole || staffRole) &&
+            getItem('Các Yêu Cầu Thiết Kế', '/request-customize', <SlidersFilled />),
 
-		(managerRole || staffRole) &&
-			getItem('Các Yêu Cầu Thiết Kế', '/request-customize', <SlidersOutlined />),
+        (managerRole || staffRole) && getItem('Quản Lí Khuyến Mãi', '/promotion', <GiftOutlined />),
+        (managerRole || staffRole) && getItem('Quản Lí Giảm Giá', '/discount', <TagOutlined />),
 
-		(managerRole || staffRole) && getItem('Quản Lí Khuyến Mãi', '/promotion', <GiftOutlined />),
-		(managerRole || staffRole) && getItem('Quản Lí Giảm Giá', '/discount', <TagOutlined />),
+        managerRole &&
+            getItem('Quản Lí Phí Vận Chuyển', '/delivery-fee', <DeliveredProcedureOutlined />),
+        managerRole &&
+            getItem('Quản Lí Giá Kim Cương', '/dimond-price', <TagOutlined />, [
+                getItem(
+                    'Quản Lí Giá Kim Cương Chính',
+                    '/diamond-price/main-diamond-price',
+                    <DiamondOutlined />
+                ),
+                getItem(
+                    'Quản Lí Giá Kim Cương Tấm',
+                    '/diamond-price/side-diamond-price',
+                    <DiamondOutlined />
+                ),
+            ]),
 
-		managerRole &&
-			getItem('Quản Lí Phí Vận Chuyển', '/delivery-fee', <DeliveredProcedureOutlined />),
-		managerRole &&
-			getItem('Quản Lí Giá Kim Cương', '/dimond-price', <TagOutlined />, [
-				getItem(
-					'Quản Lí Giá Kim Cương Chính',
-					'/diamond-price/main-diamond-price',
-					<TagOutlined />
-				),
-				getItem(
-					'Quản Lí Giá Kim Cương Tấm',
-					'/diamond-price/side-diamond-price',
-					<TagOutlined />
-				),
-			]),
-
-		(managerRole || staffRole) &&
-			getItem('Quản Lí Bài Viết', '/blogs', <DeliveredProcedureOutlined />),
-		adminRole &&
-			getItem('Danh Sách Loại Trang Sức', '/jewelry-model-category-list', <RightOutlined />),
-		adminRole && getItem('Cài Đặt Hệ Thống', '/config', <SettingOutlined />),
-	];
+        (managerRole || staffRole) &&
+            getItem('Quản Lí Bài Viết', '/blogs', <EditOutlined />),
+        adminRole &&
+            getItem('Danh Sách Loại Trang Sức', '/jewelry-model-category-list', <CategoryOutlined />),
+        adminRole && getItem('Cài Đặt Hệ Thống', '/config', <SettingOutlined />),
+    ];
 
 	const handleClickMenuItem = (e) => {
 		setSelectMenu(e.key);
