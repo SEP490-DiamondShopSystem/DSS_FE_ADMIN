@@ -277,7 +277,7 @@ const InformationOrder = ({orders, statusOrder, paymentStatusOrder, userDetail})
 			})
 			.catch((error) => {
 				message.error(
-					error?.data?.title || error?.title || 'Đã xảy ra lỗi, vui lòng thử lại.'
+					error?.data?.detail || error?.detail || 'Đã xảy ra lỗi, vui lòng thử lại.'
 				);
 			});
 	};

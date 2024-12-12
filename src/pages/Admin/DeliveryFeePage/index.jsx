@@ -62,7 +62,7 @@ const DeliveryFeePage = () => {
 				dispatch(updateDeliveryFee(updatePayload));
 			})
 			.catch((error) => {
-				message.error(error?.data?.detail );
+				message.error(error?.data?.detail || error?.detail);
 			});
 		await dispatch(fetchDeliveryFees({isLocation: true}));
 	};
@@ -74,7 +74,7 @@ const DeliveryFeePage = () => {
 				dispatch(updateDeliveryFee(updatePayload)); // Assuming this action updates the Redux store
 			})
 			.catch((error) => {
-				message.error(error?.data?.detail  || 'Đã xảy ra lỗi!');
+				message.error(error?.data?.detail || error?.detail || 'Đã xảy ra lỗi!');
 			});
 		await dispatch(fetchDeliveryFees({isLocation: true}));
 	};
@@ -104,7 +104,7 @@ const DeliveryFeePage = () => {
 					message.success('Cập nhật giá vận chuyển thành công!');
 				})
 				.catch((error) => {
-					message.error(error?.data?.detail );
+					message.error(error?.data?.detail || error?.detail);
 				});
 			await dispatch(fetchDeliveryFees({isLocation: true}));
 		} else {
@@ -114,7 +114,7 @@ const DeliveryFeePage = () => {
 					message.success('Thêm giá vận chuyển thành công!');
 				})
 				.catch((error) => {
-					message.error(error?.data?.detail );
+					message.error(error?.data?.detail || error?.detail);
 				});
 			await dispatch(fetchDeliveryFees({isLocation: true}));
 		}
@@ -158,11 +158,10 @@ const DeliveryFeePage = () => {
 					</Button>
 					<Button
 						onClick={() => HandleActiveDeliveryFee(record.Id)}
-						danger
 						className={
 							record.IsEnabled
 								? 'text-red hover:text-redLight'
-								: 'text-green hover:text-greenDark'
+								: 'text-green hover:text-green'
 						}
 						icon={
 							record.IsEnabled ? (

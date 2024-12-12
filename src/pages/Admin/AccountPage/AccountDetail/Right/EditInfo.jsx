@@ -175,7 +175,7 @@ export const EditInfo = ({
 						</label>
 						<Input
 							className="font-semibold text-lg"
-							disabled={!editing}
+							disabled
 							name="FirstName"
 							value={userInfo?.FirstName}
 							onChange={onChange}
@@ -187,7 +187,7 @@ export const EditInfo = ({
 						</label>
 						<Input
 							className="font-semibold text-lg"
-							disabled={!editing}
+							disabled
 							name="LastName"
 							value={userInfo?.LastName}
 							onChange={onChange}

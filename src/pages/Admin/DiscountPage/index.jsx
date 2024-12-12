@@ -95,7 +95,7 @@ const DiscountPage = ({discountData}) => {
 				form.resetFields();
 			})
 			.catch((error) => {
-				message.error(error?.data?.detail  || 'Lỗi không xác định');
+				message.error(error?.data?.detail || error?.detail || 'Lỗi không xác định');
 			});
 	};
 
@@ -178,7 +178,7 @@ const DiscountPage = ({discountData}) => {
 			})
 
 			.catch((error) => {
-				message.error(error?.data?.detail );
+				message.error(error?.data?.detail || error?.detail);
 			});
 	};
 	const handlePause = async (id, currentStatus) => {
@@ -190,7 +190,7 @@ const DiscountPage = ({discountData}) => {
 				dispatch(fetchDiscounts());
 			})
 			.catch((error) => {
-				message.error(error?.data?.detail );
+				message.error(error?.data?.detail || error?.detail);
 			});
 	};
 
@@ -201,7 +201,7 @@ const DiscountPage = ({discountData}) => {
 				message.success(`Mã giảm giá với id: ${id} đã được bị hủy.`);
 			})
 			.catch((error) => {
-				message.error(error?.data?.detail );
+				message.error(error?.data?.detail || error?.detail);
 			});
 		await dispatch(fetchDiscounts());
 	};
@@ -277,11 +277,11 @@ const DiscountPage = ({discountData}) => {
 		await dispatch(updateDiscount({discountId: editingDiscountId, discountData}))
 			.unwrap()
 			.then(() => {
-				message.success('Cập giảm giá thành công!');
+				message.success('Cập nhật giảm giá thành công!');
 				form.resetFields(); // Clear all fields in the form
 			})
 			.catch((error) => {
-				message.error(error?.data?.detail );
+				message.error(error?.data?.detail || error?.detail);
 			});
 
 		// Refresh the discount list and reset states
@@ -298,7 +298,7 @@ const DiscountPage = ({discountData}) => {
 				message.success(`Đã xóa giảm giá có id: ${id}`);
 			})
 			.catch((error) => {
-				message.error(error?.data?.detail );
+				message.error(error?.data?.detail || error?.detail);
 			});
 		await dispatch(fetchDiscounts());
 	};
@@ -362,7 +362,7 @@ const DiscountPage = ({discountData}) => {
 													})
 													.catch((error) => {
 														message.error(
-															error?.data?.title ||
+															error?.data?.detail ||
 																error?.detail ||
 																'Tải lên thất bại!'
 														);
@@ -421,7 +421,7 @@ const DiscountPage = ({discountData}) => {
 											})
 											.catch((error) => {
 												message.error(
-													error?.data?.title ||
+													error?.data?.detail ||
 														error?.detail ||
 														'Tải lên thất bại!'
 												);
@@ -521,8 +521,10 @@ const DiscountPage = ({discountData}) => {
 							<div>
 								<ul>
 									{req.Name && <li>Tên Yêu Cầu: {req.Name}</li>}
-									{req.Amount && <li>Amount: {req.Amount}</li>}
-									{req.Operator && <li>Operator: {req.Operator}</li>}
+									{req.Amount !== 0 && <li>Giá trị: {req.Amount}</li>}
+									{req.Operator && (
+										<li>Toán tử: {getTextForEnum('Operator', req.Operator)}</li>
+									)}
 									{req.DiamondRequirementSpec?.CaratFrom !== undefined &&
 										req.DiamondRequirementSpec?.CaratTo !== undefined && (
 											<li>
@@ -587,9 +589,12 @@ const DiscountPage = ({discountData}) => {
 									{req.DiamondRequirementSpec?.ShapesIDs?.length > 0 && (
 										<li>
 											Hình Dạng Kim Cương:{' '}
-											{req.DiamondRequirementSpec.ShapesIDs.join(', ')}
+											{req.DiamondRequirementSpec.ShapesIDs.map((shapeID) =>
+												getTextForEnum('Shape', shapeID)
+											).join(', ')}
 										</li>
 									)}
+
 									{req.Model && (
 										<li>
 											Model:

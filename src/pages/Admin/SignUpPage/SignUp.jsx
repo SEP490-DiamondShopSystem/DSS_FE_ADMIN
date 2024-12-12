@@ -26,19 +26,18 @@ const SignUpPage = () => {
 			dispatch(handleStaffRegister({...values, fullName, isManager: role}))
 				.unwrap()
 				.then(() => {
-						message.success('Đăng ký thành công!');
-						form.resetFields();
-						navigate('/login');
-
+					message.success('Đăng ký thành công!');
+					form.resetFields();
+					navigate('/login');
 				})
 				.catch((error) => {
 					setIsLoading(false);
 					console.log(error);
 
-					message.error(error?.data?.detail );
+					message.error(error?.data?.detail || error?.detail);
 				});
 		} catch (error) {
-			message.error(error?.data?.detail );
+			message.error(error?.data?.detail || error?.detail);
 		}
 	};
 

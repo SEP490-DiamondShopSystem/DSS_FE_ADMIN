@@ -56,7 +56,8 @@ const JewelryModelEditModal = ({isVisible, onClose, model}) => {
 				message.success('Cập nhật phí gai công thành công!');
 			})
 			.catch((error) => {
-				message.error(error?.data?.detail  || 'Failed to update craftman fee');
+				message.error(error?.detail || error?.detail || 'Failed to update craftman fee');
+				message.error(error?.data?.detail || 'Failed to update craftman fee');
 			});
 	};
 
@@ -79,7 +80,7 @@ const JewelryModelEditModal = ({isVisible, onClose, model}) => {
 				);
 			})
 			.catch((error) => {
-				message.error(error?.data?.detail  || 'Không thể xóa kim loại size này!');
+				message.error(error?.data?.detail || 'Không thể xóa kim loại size này!');
 			});
 	};
 
@@ -94,9 +95,7 @@ const JewelryModelEditModal = ({isVisible, onClose, model}) => {
 				);
 			})
 			.catch((error) => {
-				message.error(
-					error?.data?.detail  || 'Failed to delete side diamond option'
-				);
+				message.error(error?.data?.detail || 'Failed to delete side diamond option');
 			});
 	};
 	const handleUpdateWeight = (metalId, sizeId, newWeight) => {
@@ -126,7 +125,7 @@ const JewelryModelEditModal = ({isVisible, onClose, model}) => {
 			})
 			.catch((error) => {
 				message.error(
-					error?.data?.detail  || 'Cập nhật trọng lượng size kim loại thất bại!'
+					error?.data?.detail || 'Cập nhật trọng lượng size kim loại thất bại!'
 				);
 			});
 	};

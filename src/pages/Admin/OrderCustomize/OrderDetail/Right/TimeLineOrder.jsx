@@ -364,7 +364,7 @@ const TimeLineOrder = ({
 					setCompleted(res);
 				})
 				.catch((error) => {
-					message.error(error?.detail);
+					message.error(error?.data?.detail);
 				});
 		} else {
 			const diamondData = changeDiamond
@@ -415,7 +415,7 @@ const TimeLineOrder = ({
 					setChangeDiamond(null);
 				})
 				.catch((error) => {
-					message.error(error?.detail);
+					message.error(error?.data?.detail);
 				});
 		}
 	};
@@ -440,11 +440,11 @@ const TimeLineOrder = ({
 			.unwrap()
 			.then((res) => {
 				console.log('res', res);
-				message.success('Chấp Nhận Đơn Thiết Kế Thành Công!');
+				message.success('Chấp nhận đơn thiết kế thành công!');
 				setIsModalVisible(false);
 			})
 			.catch((error) => {
-				message.error(error?.detail);
+				message.error(error?.data?.detail);
 			});
 	};
 
@@ -468,7 +468,7 @@ const TimeLineOrder = ({
 				setIsModalVisible(false);
 			})
 			.catch((error) => {
-				message.error(error?.detail);
+				message.error(error?.data?.detail);
 			});
 	};
 
@@ -479,7 +479,7 @@ const TimeLineOrder = ({
 				message.success('Từ chối thành công!');
 			})
 			.catch((error) => {
-				message.error(error?.detail);
+				message.error(error?.data?.detail);
 			});
 		setIsCancelModalVisible(false);
 	};

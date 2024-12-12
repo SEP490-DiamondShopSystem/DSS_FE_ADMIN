@@ -263,8 +263,8 @@ export const enumMappings = {
 		3: 'Cả Hai',
 	},
 	Operator: {
-		1: 'Equal or Larger',
-		2: 'Larger',
+		1: 'Lớn hơn hoặc bằng',
+		2: 'Lớn hơn',
 	},
 	PriorityLevel: {
 		0: 'Low',
@@ -369,6 +369,18 @@ export const enumMappings = {
 		3: 'Tốt',
 		4: 'Rất Tốt',
 		5: 'Xuất Sắc',
+	},
+	Shape: {
+		1: 'Round',
+		2: 'Princess',
+		4: 'Emerald',
+		7: 'Asscher',
+		8: 'Marquise',
+		5: 'Oval',
+		6: 'Radiant',
+		10: 'Pear',
+		9: 'Heart',
+		3: 'Cushion',
 	},
 };
 

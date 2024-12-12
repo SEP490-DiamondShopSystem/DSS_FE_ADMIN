@@ -1,5 +1,15 @@
 import React, {useEffect, useState} from 'react';
-import {CalendarOutlined, EditFilled} from '@ant-design/icons';
+import {
+	CalendarOutlined,
+	CheckOutlined,
+	CloseOutlined,
+	DollarOutlined,
+	DownloadOutlined,
+	EditFilled,
+	LoadingOutlined,
+	TruckOutlined,
+	UnorderedListOutlined,
+} from '@ant-design/icons';
 import {Button, DatePicker, Input, Select, Space, Table, Tag, Typography} from 'antd';
 import {useDispatch, useSelector} from 'react-redux';
 import {Link, useNavigate} from 'react-router-dom';
@@ -20,15 +30,15 @@ const {Title} = Typography;
 const {Option} = Select;
 
 const statusList = [
-	{name: 'Tất Cả', value: ''},
-	{name: 'Chờ Xử Lý', value: '1'},
-	{name: 'Đang Xử Lý', value: '2'},
-	{name: 'Từ Chối', value: '3'},
-	{name: 'Hủy Đơn', value: '4'},
-	{name: 'Đã Chuẩn Bị', value: '5'},
-	{name: 'Đang Vận Chuyển', value: '6'},
-	{name: 'Vận Chuyển Thất Bại', value: '7'},
-	{name: 'Thành Công', value: '8'},
+	{name: 'Tất Cả', icon: <UnorderedListOutlined />, value: ''},
+	{name: 'Chờ Xử Lý', icon: <DollarOutlined />, value: '1'},
+	{name: 'Đang Xử Lý', icon: <LoadingOutlined />, value: '2'},
+	{name: 'Từ Chối', icon: <CloseOutlined />, value: '3'},
+	{name: 'Hủy Đơn', icon: <CloseOutlined />, value: '4'},
+	{name: 'Đã Chuẩn Bị', icon: <DownloadOutlined />, value: '5'},
+	{name: 'Đang Vận Chuyển', icon: <TruckOutlined />, value: '6'},
+	{name: 'Vận Chuyển Thất Bại', icon: <CloseOutlined />, value: '7'},
+	{name: 'Thành Công', icon: <CheckOutlined />, value: '8'},
 ];
 
 const statusMapping = {
@@ -52,11 +62,11 @@ const statusPaymentMapping = {
 };
 
 const delivererStatusList = [
-	{name: 'Tất Cả', value: ''},
-	{name: 'Đã Chuẩn Bị', value: '5'},
-	{name: 'Đang Vận Chuyển', value: '6'},
-	{name: 'Vận Chuyển Thất Bại', value: '7'},
-	{name: 'Thành Công', value: '8'},
+	{name: 'Tất Cả', icon: <UnorderedListOutlined />, value: ''},
+	{name: 'Đã Chuẩn Bị', icon: <DownloadOutlined />, value: '5'},
+	{name: 'Đang Vận Chuyển', icon: <TruckOutlined />, value: '6'},
+	{name: 'Vận Chuyển Thất Bại', icon: <CloseOutlined />, value: '7'},
+	{name: 'Thành Công', icon: <CheckOutlined />, value: '8'},
 ];
 
 const OrderPage = () => {
