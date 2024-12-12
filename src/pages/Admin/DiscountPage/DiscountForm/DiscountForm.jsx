@@ -118,7 +118,7 @@ const DiscountForm = ({
 							htmlType="submit"
 							className="bg-blue-500 text-white hover:bg-blue-600"
 						>
-							{isEditing ? 'Save' : 'Create'}
+							{isEditing ? 'Lưu' : 'Tạo'}
 						</Button>
 					</div>
 				</Form.Item>

@@ -939,7 +939,7 @@ const PromotionPage = ({promotionData}) => {
 	return (
 		<div className="p-8 bg-white shadow-md rounded-lg">
 			<h2 className="text-2xl font-bold mb-6">
-				{isEditing ? 'Edit Promotion' : 'Create New Promotion'}
+				{isEditing ? 'Cập Nhật Khuyến Mãi' : 'Tạo Khuyến Mãi Mới'}
 			</h2>{' '}
 			{/* <PromoForm /> */}
 			<PromotionForm

@@ -88,20 +88,44 @@ export const createSideDiamondOptionForJewelryModel = createAsyncThunk(
 
 export const updateCraftmanFee = createAsyncThunk(
 	'jewelryModel/updateCraftmanFee',
-	async ({modelId, craftmanFee}, thunkAPI) => {
+	async ({modelId, newFee}, thunkAPI) => {
 		try {
-			const formData = new FormData();
-			formData.append('ModelId', modelId);
-			formData.append('CraftmanFee', craftmanFee);
+			// Construct the payload as JSON
+			const payload = {
+				modelId,
+				newFee,
+			};
 
-			const response = await api.put('/JewelryModel/Update/CraftmanFee', formData, {
-				headers: {'Content-Type': 'multipart/form-data'},
+			// Send a JSON request
+			const response = await api.put('/JewelryModel/Update/CraftmanFee', payload, {
+				headers: {
+					'Content-Type': 'application/json-patch+json', // Match the expected content type
+				},
 			});
+
 			console.log('updateCraftmanFee response:', response); // Log API response
-			return response;
+			return response.data; // Assuming the response contains JSON
 		} catch (error) {
 			console.error('updateCraftmanFee error:', error.response || error); // Log error
-			return thunkAPI.rejectWithValue(error.response || 'Failed to update craftsman fee');
+			return thunkAPI.rejectWithValue(
+				error.response?.data || 'Failed to update craftsman fee'
+			);
+		}
+	}
+);
+export const addSizeMetalForJewelryModel = createAsyncThunk(
+	'jewelryModel/addSizeMetalForJewelryModel',
+	async ({modelId, metalSizeSpec}, thunkAPI) => {
+		try {
+			const response = await api.post('/JewelryModel/Create/SizeMetal', {
+				modelId: modelId,
+				metalSizeSpec: metalSizeSpec,
+			});
+			console.log('addSizeMetalForJewelryModel response:', response);
+			return response;
+		} catch (error) {
+			console.error('addSizeMetalForJewelryModel error:', error.response || error);
+			return thunkAPI.rejectWithValue(error.response);
 		}
 	}
 );
@@ -165,7 +189,9 @@ export const changeVisibilityJewelryModel = createAsyncThunk(
 			return response;
 		} catch (error) {
 			console.error('changeVisibilityJewelryModel error:', error.response || error); // Log error
-			return rejectWithValue(error.response || 'Failed to toggle review jewelry model víibility');
+			return rejectWithValue(
+				error.response || 'Failed to toggle review jewelry model víibility'
+			);
 		}
 	}
 );

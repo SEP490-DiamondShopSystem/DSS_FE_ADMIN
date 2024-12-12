@@ -215,7 +215,7 @@ export const GiftForm = ({form, shapes, Option, removeGift}) => {
 													<div className="flex gap-5 w-full">
 														<Form.Item
 															className="w-full"
-															label="Origin"
+															label="Nguồn Gốc"
 															{...restField}
 															name={[
 																name,
@@ -254,7 +254,7 @@ export const GiftForm = ({form, shapes, Option, removeGift}) => {
 														</Form.Item>
 														<Form.Item
 															className="w-full"
-															label="Shape"
+															label="Hình Dáng"
 															{...restField}
 															name={[
 																name,

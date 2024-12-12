@@ -182,7 +182,7 @@ const PromotionForm = ({
 								onClick={handleCancelEdit}
 								className="bg-gray-100 text-gray-700 hover:bg-gray-200"
 							>
-								Cancel
+								Hủy
 							</Button>
 						)}
 						<Button
@@ -190,7 +190,7 @@ const PromotionForm = ({
 							htmlType="submit"
 							className="bg-blue-500 text-white hover:bg-blue-600"
 						>
-							{isEditing ? 'Save' : 'Create'}
+							{isEditing ? 'Lưu' : 'Tạo'}
 						</Button>
 					</div>
 				</Form.Item>

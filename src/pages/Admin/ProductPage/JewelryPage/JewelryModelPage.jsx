@@ -10,6 +10,7 @@ import {
 	createSizeMetalForJewelryModel,
 	updateSizeMetalForJewelryModel,
 	changeVisibilityJewelryModel,
+	updateCraftmanFee,
 } from '../../../../redux/slices/jewelry/jewelryModelSlice';
 import {
 	Button,
@@ -44,13 +45,11 @@ import {
 } from '../../../../redux/selectors';
 import {JewelryModelUploadForm} from './JewelryModelUploadForm';
 import Loading from '../../../../components/Loading';
+import ModelDetailsView from './ModelDetailView';
 
 const JewelryModelPage = () => {
 	const dispatch = useDispatch();
 	const models = useSelector(getAllJewelryModelsSelector);
-	const [isMainDiamondsOpen, setIsMainDiamondsOpen] = useState(false);
-	const [isSizeMetalsOpen, setIsSizeMetalsOpen] = useState(false);
-	const [isSideDiamondsOpen, setIsSideDiamondsOpen] = useState(false);
 	const loading = useSelector(LoadingJewelryModelSelector);
 	const error = useSelector(JewelryModelErrorSelector);
 	const [selectedJewelryModelId, setSelectedJewelryModelId] = useState();
@@ -64,6 +63,7 @@ const JewelryModelPage = () => {
 	const [pageSize, setPageSize] = React.useState(5);
 	const [totalPage, setTotalPage] = useState(0);
 	const [errorCarat, setErrorCarat] = useState('');
+	const [showDeleteConfirm, setShowDeleteConfirm] = useState(false); // For the delete confirmation popup
 
 	const [newModel, setNewModel] = useState({
 		name: '',
@@ -80,7 +80,6 @@ const JewelryModelPage = () => {
 		width: '',
 		length: '',
 		isEngravable: false,
-		isRhodiumFinish: false,
 		backType: '',
 		claspType: '',
 		chainType: '',
@@ -420,21 +419,17 @@ const JewelryModelPage = () => {
 	return (
 		<div className="p-6 bg-white min-h-screen">
 			<h1 className="text-3xl font-semibold text-primary mb-6">Mẫu Trang Sức</h1>
-
-			{/* Loading and Error Handling */}
 			{loading ? (
 				<Loading />
 			) : (
 				<div>
-					{/* Models List */}
 					<div className=" p-4 mb-6 bg-offWhite">
-						{/* Filters */}
 						<div className="mb-4 flex flex-wrap gap-4">
 							<input
 								type="text"
 								value={name}
 								onChange={(e) => setName(e.target.value)}
-								placeholder="Nhập tên mẫu"
+								placeholder="Nhập mã mẫu"
 								className="form-input p-2 border border-gray-300 rounded-md"
 							/>
 							<select
@@ -449,15 +444,6 @@ const JewelryModelPage = () => {
 									</option>
 								))}
 							</select>
-							{/* <select
-								value={isRhodiumFinished}
-								onChange={(e) => setIsRhodiumFinished(e.target.value === 'true')}
-								className="form-select p-2 border border-gray-300 rounded-md"
-							>
-								<option value="">Rhodium Finished?</option>
-								<option value="true">Yes</option>
-								<option value="false">No</option>
-							</select> */}
 							<select
 								value={isEngravable}
 								onChange={(e) => setIsEngravable(e.target.value === 'true')}
@@ -510,11 +496,6 @@ const JewelryModelPage = () => {
 											{model.IsEngravable && (
 												<div className="text-sm text-gray-500">
 													Có khắc chữ
-												</div>
-											)}
-											{model.IsRhodiumFinish && (
-												<div className="text-sm text-gray-500">
-													Mạ Rhodium
 												</div>
 											)}
 											{model.MainDiamondCount > 0 && (
@@ -1183,284 +1164,34 @@ const JewelryModelPage = () => {
 
 			{/* Modal for Jewelry Model Detail */}
 			{showModal && selectedModel && (
-				<div className="fixed inset-0 bg-gray bg-opacity-50 flex justify-center items-center p-3 z-50">
-					<div className="bg-white p-4 rounded-lg shadow-lg w-11/12 md:w-1/2 lg:w-2/3">
-						<h2 className="text-3xl font-semibold text-primary mb-6 text-center">
-							Chi Tiết Mẫu
-						</h2>
+				<ModelDetailsView
+					selectedModel={selectedModel}
+					onEdit={() => {
+						console.log('Edit button clicked', selectedModel);
+						setIsEditModalVisible(true);
+					}}
+					onView={() => handleView(selectedModel.Id)}
+					onDelete={() => {
+						const isConfirmed = window.confirm(
+							'Bạn có chắc chắn muốn xóa món trang sức này không?'
+						);
+						if (isConfirmed) {
+							handleDeleteModel();
+						}
+					}}
+					onClose={handleCloseModal}
+				/>
+			)}
 
-						<div className="flex gap-8">
-							{/* Cột Bên Trái */}
-							<div className="flex-1">
-								<p className="text-lg font-medium text-gray">
-									<strong>Tên:</strong> {selectedModel.Name}
-								</p>
-								<p className="text-lg font-medium text-gray">
-									<strong>Danh Mục:</strong> {selectedModel.Category.Name}
-								</p>
-								<p className="text-lg font-medium text-gray">
-									<strong>Mã Mẫu:</strong> {selectedModel.ModelCode}
-								</p>
-								<p className="text-lg font-medium text-gray">
-									<strong>Phí Chế Tác:</strong> {selectedModel.CraftmanFee} VND
-								</p>
-								<p className="text-lg font-medium text-gray">
-									<strong>Mô Tả:</strong> {selectedModel.Description}
-								</p>
-								<p className="text-lg font-medium text-gray">
-									<strong>Chiều Rộng:</strong> {selectedModel.Width} mm
-								</p>
-								<p className="text-lg font-medium text-gray">
-									<strong>Có Khắc Được:</strong>{' '}
-									{selectedModel.IsEngravable ? 'Có' : 'Không'}
-								</p>
-							</div>
-
-							{/* Cột Bên Phải */}
-							<div className="flex-1">
-								<p className="text-lg font-medium text-gray">
-									<strong>Số Lượng Kim Cương Chính:</strong>{' '}
-									{selectedModel.MainDiamondCount}
-								</p>
-								<p className="text-lg font-medium text-gray">
-									<strong>Số Lượng Tùy Chọn Kim Cương Phụ:</strong>{' '}
-									{selectedModel.SideDiamondOptionCount}
-								</p>
-								{/* <p className="text-lg font-medium text-gray">
-									<strong>Xi Rhodium:</strong>{' '}
-									{selectedModel.IsRhodiumFinish ? 'Có' : 'Không'}
-								</p> */}
-								<p className="text-lg font-medium text-gray">
-									<strong>Kim Loại Hỗ Trợ:</strong>{' '}
-									{selectedModel.MetalSupported.join(', ')}
-								</p>
-							</div>
-						</div>
-
-						<div className="flex space-x-4 mt-4">
-							<Button
-								type="primary"
-								size="large"
-								onClick={() => {
-									setSelectedJewelryModelId(selectedModel.Id);
-									setIsEditModalVisible(true);
-								}}
-								className="flex-1"
-							>
-								Sửa Mẫu
-							</Button>
-							<Button
-								type="primary"
-								size="large"
-								onClick={() => handleView(selectedModel.Id)}
-								className="flex-1"
-							>
-								Xem Mẫu
-							</Button>
-						</div>
-
-						{/* Phần Kim Cương Chính */}
-						{selectedModel.MainDiamonds && selectedModel.MainDiamonds.length > 0 && (
-							<div className="mt-6">
-								<h3
-									className="text-xl font-semibold cursor-pointer"
-									onClick={() => setIsMainDiamondsOpen(!isMainDiamondsOpen)}
-								>
-									Kim Cương Chính {isMainDiamondsOpen ? '▲' : '▼'}
-								</h3>
-								{isMainDiamondsOpen && (
-									<ul className="space-y-4 mt-3 pl-4 max-h-24 overflow-y-auto border rounded-md">
-										{selectedModel.MainDiamonds.map((diamond, index) => (
-											<li key={index} className="border-b pb-4">
-												<div className="flex justify-between px-5 py-2">
-													<div>
-														<p className="text-gray">
-															<strong>Loại:</strong>{' '}
-															{diamond.SettingType}
-														</p>
-													</div>
-													<div>
-														<p className="text-gray">
-															<strong>Số Lượng:</strong>{' '}
-															{diamond.Quantity}
-														</p>
-													</div>
-													<div>
-														<p className="text-gray">
-															<strong>
-																ID Yêu Cầu Kim Cương Chính:
-															</strong>{' '}
-															{diamond.MainDiamondReqId || 'Không Có'}
-														</p>
-													</div>
-													<div>
-														{diamond.Shapes &&
-														diamond.Shapes.length > 0 ? (
-															diamond.Shapes.map(
-																(shape, shapeIndex) => (
-																	<div
-																		key={shapeIndex}
-																		className="pl-4 gap-3 flex justify-between"
-																	>
-																		<p className="text-gray">
-																			<strong>
-																				Hình Dáng:
-																			</strong>{' '}
-																			{shape.Shape
-																				?.ShapeName ||
-																				'Không Có'}
-																		</p>
-
-																		<p className="text-gray">
-																			<strong>
-																				Khoảng Carat:
-																			</strong>{' '}
-																			{shape.CaratFrom} -{' '}
-																			{shape.CaratTo} carats
-																		</p>
-																	</div>
-																)
-															)
-														) : (
-															<p className="text-gray">
-																Hình Dáng Không Có
-															</p>
-														)}
-													</div>
-												</div>
-											</li>
-										))}
-									</ul>
-								)}
-							</div>
-						)}
-
-						{/* Phần Kích Thước Kim Loại */}
-						{selectedModel.SizeMetals && selectedModel.SizeMetals.length > 0 && (
-							<div className="mt-6">
-								<h3
-									className="text-xl font-semibold cursor-pointer"
-									onClick={() => setIsSizeMetalsOpen(!isSizeMetalsOpen)}
-								>
-									Kích Thước Kim Loại {isSizeMetalsOpen ? '▲' : '▼'}
-								</h3>
-								{isSizeMetalsOpen && (
-									<ul className="space-y-4 mt-3 pl-4 max-h-24 overflow-y-auto border rounded-md">
-										{selectedModel.SizeMetals.map((sizeMetal, index) => (
-											<li key={index} className="border-b pb-4">
-												<div className="flex justify-between px-5 py-2">
-													<div>
-														<p className="text-gray">
-															<strong>Kích Thước:</strong>{' '}
-															{sizeMetal.Size.Value}{' '}
-															{sizeMetal.Size.Unit}
-														</p>
-													</div>
-													<div>
-														<p className="text-gray">
-															<strong>Kim Loại:</strong>{' '}
-															{sizeMetal.Metal.Name}
-														</p>
-													</div>
-													<div>
-														<p className="text-gray">
-															<strong>Trọng Lượng:</strong>{' '}
-															{sizeMetal.Weight} g
-														</p>
-													</div>
-													<div>
-														<p className="text-gray">
-															<strong>Giá:</strong>{' '}
-															{sizeMetal.Metal.Price} VND
-														</p>
-													</div>
-												</div>
-											</li>
-										))}
-									</ul>
-								)}
-							</div>
-						)}
-
-						{/* Phần Kim Cương Phụ */}
-						{selectedModel.SideDiamonds && selectedModel.SideDiamonds.length > 0 && (
-							<div className="mt-6">
-								<h3
-									className="text-xl font-semibold cursor-pointer"
-									onClick={() => setIsSideDiamondsOpen(!isSideDiamondsOpen)}
-								>
-									Kim Cương Phụ {isSideDiamondsOpen ? '▲' : '▼'}
-								</h3>
-								{isSideDiamondsOpen && (
-									<ul className="space-y-4 mt-3 pl-4 max-h-24 overflow-y-auto border rounded-md">
-										{selectedModel.SideDiamonds.map((sideDiamond, index) => (
-											<li key={index} className="border-b pb-4">
-												<div className="flex justify-between px-5 py-2">
-													<div>
-														<p className="text-gray">
-															<strong>Trọng Lượng Carat:</strong>{' '}
-															{sideDiamond.CaratWeight}
-														</p>
-													</div>
-													<div>
-														<p className="text-gray">
-															<strong>Loại Gắn:</strong>{' '}
-															{sideDiamond.SettingType}
-														</p>
-													</div>
-													<div>
-														<p className="text-gray">
-															<strong>Số Lượng:</strong>{' '}
-															{sideDiamond.Quantity}
-														</p>
-													</div>
-													<div>
-														<p className="text-gray">
-															<strong>Khoảng Màu:</strong>{' '}
-															{sideDiamond.ColorMin} -{' '}
-															{sideDiamond.ColorMax}
-														</p>
-													</div>
-													<div>
-														<p className="text-gray">
-															<strong>Khoảng Độ Tinh Khiết:</strong>{' '}
-															{sideDiamond.ClarityMin} -{' '}
-															{sideDiamond.ClarityMax}
-														</p>
-													</div>
-												</div>
-											</li>
-										))}
-									</ul>
-								)}
-							</div>
-						)}
-
-						{isEditModalVisible && (
-							<JewelryModelEditModal
-								isVisible={isEditModalVisible}
-								onClose={() => setIsEditModalVisible(false)}
-								model={selectedModel}
-							/>
-						)}
-						{/* Nút Xóa và Đóng */}
-						<div className="flex gap-4 mt-6">
-							<Button
-								type="danger"
-								onClick={handleDeleteModel}
-								className="flex-1 bg-red text-white rounded-md hover:bg-red-600"
-							>
-								Xóa Mẫu
-							</Button>
-							<Button
-								onClick={handleCloseModal}
-								className="flex-1 bg-gray text-white rounded-md hover:bg-gray-800"
-							>
-								Đóng
-							</Button>
-						</div>
-					</div>
-				</div>
+			{selectedModel && (
+				<JewelryModelEditModal
+					isVisible={isEditModalVisible}
+					onClose={() => {
+						console.log('Closing edit modal');
+						setIsEditModalVisible(false);
+					}}
+					model={selectedModel}
+				/>
 			)}
 		</div>
 	);

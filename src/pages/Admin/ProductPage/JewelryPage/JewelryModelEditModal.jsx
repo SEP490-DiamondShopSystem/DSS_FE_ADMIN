@@ -7,25 +7,43 @@ import {
 	updateCraftmanFee,
 } from '../../../../redux/slices/jewelry/jewelryModelSlice';
 import {Button, Modal, Input, Table, message, Popconfirm} from 'antd';
-import {getAllMetalsSelector, getAllSizesSelector} from '../../../../redux/selectors';
+import {
+	getAllMetalsSelector,
+	getAllSizesSelector,
+	getAllShapesSelector,
+} from '../../../../redux/selectors';
 import {fetchAllSizes} from '../../../../redux/slices/jewelry/sizeSlice';
 import {fetchAllMetals} from '../../../../redux/slices/jewelry/metalSlice';
-import UpdateSizeMetalModal from './UpdateSizeMetalModal';
+import {fetchAllShapes} from '../../../../redux/slices/shapeSlice.js';
+import AddSizeMetalModal from './AddSizeMetalModal';
+import AddSideDiamondOptionModal from './AddSideDiamondOptionModal';
+
 const JewelryModelEditModal = ({isVisible, onClose, model}) => {
 	const dispatch = useDispatch();
 	const [craftmanFee, setCraftmanFee] = useState(model.CraftmanFee || '');
 	const [editingMetals, setEditingMetals] = useState(model.SizeMetals || []);
 	const [editingSideDiamonds, setEditingSideDiamonds] = useState(model.SideDiamonds || []);
-	const [isUpdateSizeMetalModalVisible, setIsUpdateSizeMetalModalVisible] = useState(false);
+	const [isAddSizeMetalModalVisible, setIsAddSizeMetalModalVisible] = useState(false);
+	const [isAddSideDiamondModalVisible, setIsAddSideDiamondModalVisible] = useState(false);
+
+	const [isEditWeightModalVisible, setIsEditWeightModalVisible] = useState(false);
+	const [currentEditingSizeMetal, setCurrentEditingSizeMetal] = useState(null);
 
 	const availableMetals = useSelector(getAllMetalsSelector); // Selector for getting metals from the store
 	useEffect(() => {
 		dispatch(fetchAllMetals());
 	}, [dispatch]);
-	const availableSizes = useSelector(getAllSizesSelector); // Selector for getting metals from the store
+
+	const availableSizes = useSelector(getAllSizesSelector); // Selector for getting sizes from the store
 	useEffect(() => {
 		dispatch(fetchAllSizes());
 	}, [dispatch]);
+
+	const availableShapes = useSelector(getAllShapesSelector); // Selector for getting shapes from the store
+	useEffect(() => {
+		dispatch(fetchAllShapes());
+	}, [dispatch]);
+
 	const handleUpdateCraftmanFee = () => {
 		dispatch(
 			updateCraftmanFee({
@@ -35,10 +53,11 @@ const JewelryModelEditModal = ({isVisible, onClose, model}) => {
 		)
 			.unwrap()
 			.then(() => {
-				message.success('Craftman Fee updated successfully');
+				message.success('Cập nhật phí gai công thành công!');
 			})
 			.catch((error) => {
 				message.error(error?.detail || error?.detail || 'Failed to update craftman fee');
+				message.error(error?.data?.detail || 'Failed to update craftman fee');
 			});
 	};
 
@@ -61,7 +80,7 @@ const JewelryModelEditModal = ({isVisible, onClose, model}) => {
 				);
 			})
 			.catch((error) => {
-				message.error(error?.detail || error?.detail || 'Không thể xóa kim loại size này!');
+				message.error(error?.data?.detail || 'Không thể xóa kim loại size này!');
 			});
 	};
 
@@ -76,15 +95,77 @@ const JewelryModelEditModal = ({isVisible, onClose, model}) => {
 				);
 			})
 			.catch((error) => {
+				message.error(error?.data?.detail || 'Failed to delete side diamond option');
+			});
+	};
+	const handleUpdateWeight = (metalId, sizeId, newWeight) => {
+		const payload = {
+			sizeMetals: [
+				{
+					MetalId: metalId,
+					SizeId: sizeId,
+					Weight: parseFloat(newWeight),
+				},
+			],
+		};
+		console.log('Dispatching updateSizeMetalForJewelryModel with payload:', payload);
+		dispatch(
+			updateSizeMetalForJewelryModel({modelId: model.Id, sizeMetals: payload.sizeMetals})
+		)
+			.unwrap()
+			.then(() => {
+				message.success('Cập nhật trọng lượng size kim loại thành công!');
+				setEditingMetals((prev) =>
+					prev.map((item) =>
+						item.Metal.Id === metalId && item.Size.Id === sizeId
+							? {...item, Weight: newWeight}
+							: item
+					)
+				);
+			})
+			.catch((error) => {
 				message.error(
-					error?.detail || error?.detail || 'Failed to delete side diamond option'
+					error?.data?.detail || 'Cập nhật trọng lượng size kim loại thất bại!'
 				);
 			});
 	};
 
+	const EditWeightModal = ({isVisible, onClose, sizeMetal, onUpdate}) => {
+		const [weight, setWeight] = useState(sizeMetal?.Weight || '');
+
+		useEffect(() => {
+			if (sizeMetal) {
+				setWeight(sizeMetal.Weight);
+			}
+		}, [sizeMetal]);
+
+		const handleUpdate = () => {
+			onUpdate(sizeMetal.Metal.Id, sizeMetal.Size.Id, weight);
+			onClose();
+		};
+
+		return (
+			<Modal
+				title="Cập nhật trọng lượng size kim loại"
+				visible={isVisible}
+				onCancel={onClose}
+				onOk={handleUpdate}
+				okText="Cập nhật"
+				cancelText="Hủy"
+			>
+				<Input
+					type="number"
+					value={weight}
+					onChange={(e) => setWeight(e.target.value)}
+					placeholder="Enter new weight"
+				/>
+			</Modal>
+		);
+	};
+
 	const sizeMetalColumns = [
 		{
-			title: 'Metal',
+			title: 'Kim Loại',
 			dataIndex: ['Metal', 'Name'],
 			key: 'metalName',
 		},
@@ -95,45 +176,56 @@ const JewelryModelEditModal = ({isVisible, onClose, model}) => {
 			render: (text, record) => `${text} ${record.Size.Unit}`,
 		},
 		{
-			title: 'Weight',
+			title: 'Trọng Lượng',
 			dataIndex: 'Weight',
 			key: 'weight',
 			render: (text) => `${text} g`,
 		},
 		{
-			title: 'Actions',
+			title: 'Thao Tác',
 			key: 'actions',
 			render: (_, record) => (
-				<Popconfirm
-					title="Are you sure to delete this size metal?"
-					onConfirm={() => handleDeleteSizeMetal(record.Metal.Id, record.Size.Id)}
-				>
-					<Button type="link" danger>
-						Delete
+				<>
+					<Button
+						type="link"
+						onClick={() => {
+							setCurrentEditingSizeMetal(record);
+							setIsEditWeightModalVisible(true);
+						}}
+					>
+						Cập Nhật
 					</Button>
-				</Popconfirm>
+					<Popconfirm
+						title="Are you sure to delete this size metal?"
+						onConfirm={() => handleDeleteSizeMetal(record.Metal.Id, record.Size.Id)}
+					>
+						<Button type="link" danger>
+							Xóa
+						</Button>
+					</Popconfirm>
+				</>
 			),
 		},
 	];
 
 	const sideDiamondColumns = [
 		{
-			title: 'Carat Weight',
+			title: 'Carat',
 			dataIndex: 'CaratWeight',
 			key: 'caratWeight',
 		},
 		{
-			title: 'Setting Type',
+			title: 'Loại Setting',
 			dataIndex: 'SettingType',
 			key: 'settingType',
 		},
 		{
-			title: 'Quantity',
+			title: 'Số Lượng',
 			dataIndex: 'Quantity',
 			key: 'quantity',
 		},
 		{
-			title: 'Actions',
+			title: 'Thao Tác',
 			key: 'actions',
 			render: (_, record) => (
 				<Popconfirm
@@ -141,7 +233,7 @@ const JewelryModelEditModal = ({isVisible, onClose, model}) => {
 					onConfirm={() => handleDeleteSideDiamondOption(record.Id)}
 				>
 					<Button type="link" danger>
-						Delete
+						Xóa
 					</Button>
 				</Popconfirm>
 			),
@@ -150,25 +242,25 @@ const JewelryModelEditModal = ({isVisible, onClose, model}) => {
 
 	return (
 		<Modal
-			title="Edit Jewelry Model"
+			title="Chỉnh sửa mẫu trang sức"
 			visible={isVisible}
 			onCancel={onClose}
 			footer={[
 				<Button key="back" onClick={onClose}>
-					Cancel
+					Hủy
 				</Button>,
 			]}
 			width={800}
 		>
 			{/* Craftman Fee Update Section */}
 			<div className="mb-6">
-				<h3 className="text-lg font-semibold mb-4">Update Craftman Fee</h3>
+				<h3 className="text-lg font-semibold mb-4">Cập nhật giá gia công</h3>
 				<div className="flex items-center space-x-4">
 					<Input
 						type="number"
 						value={craftmanFee}
 						onChange={(e) => setCraftmanFee(e.target.value)}
-						placeholder="Enter new craftman fee"
+						placeholder="Giá gia công"
 						className="w-64"
 					/>
 					<Button
@@ -176,7 +268,7 @@ const JewelryModelEditModal = ({isVisible, onClose, model}) => {
 						onClick={handleUpdateCraftmanFee}
 						disabled={!craftmanFee}
 					>
-						Update Fee
+						Cập nhật giá gia công
 					</Button>
 				</div>
 			</div>
@@ -184,9 +276,9 @@ const JewelryModelEditModal = ({isVisible, onClose, model}) => {
 			{/* Size Metals Section */}
 			<div className="mb-6">
 				<div className="flex justify-between items-center mb-4">
-					<h3 className="text-lg font-semibold">Size Metals</h3>
-					<Button type="primary" onClick={() => setIsUpdateSizeMetalModalVisible(true)}>
-						Add Size Metal
+					<h3 className="text-lg font-semibold">Size Kim Loại</h3>
+					<Button type="primary" onClick={() => setIsAddSizeMetalModalVisible(true)}>
+						Thêm Size Kim Loại
 					</Button>
 				</div>
 				<Table
@@ -200,7 +292,12 @@ const JewelryModelEditModal = ({isVisible, onClose, model}) => {
 
 			{/* Side Diamond Options Section */}
 			<div>
-				<h3 className="text-lg font-semibold mb-4">Side Diamond Options</h3>
+				<div className="flex justify-between items-center mb-4">
+					<h3 className="text-lg font-semibold mb-4">Các Lựa Chọn Kim Cương Tấm</h3>
+					<Button type="primary" onClick={() => setIsAddSideDiamondModalVisible(true)}>
+						Thêm Lựa Chọn Kim Cương Tấm
+					</Button>
+				</div>
 				<Table
 					columns={sideDiamondColumns}
 					dataSource={editingSideDiamonds}
@@ -209,12 +306,24 @@ const JewelryModelEditModal = ({isVisible, onClose, model}) => {
 					locale={{emptyText: 'No side diamond options'}}
 				/>
 			</div>
-			<UpdateSizeMetalModal
-				isVisible={isUpdateSizeMetalModalVisible}
-				onClose={() => setIsUpdateSizeMetalModalVisible(false)}
+			<AddSizeMetalModal
+				isVisible={isAddSizeMetalModalVisible}
+				onClose={() => setIsAddSizeMetalModalVisible(false)}
 				model={model}
 				availableMetals={availableMetals}
 				availableSizes={availableSizes}
+			/>
+			<EditWeightModal
+				isVisible={isEditWeightModalVisible}
+				onClose={() => setIsEditWeightModalVisible(false)}
+				sizeMetal={currentEditingSizeMetal}
+				onUpdate={handleUpdateWeight}
+			/>
+			<AddSideDiamondOptionModal
+				isVisible={isAddSideDiamondModalVisible}
+				onClose={() => setIsAddSideDiamondModalVisible(false)}
+				availableShapes={availableShapes}
+				model={model}
 			/>
 		</Modal>
 	);

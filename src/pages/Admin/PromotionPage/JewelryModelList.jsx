@@ -88,15 +88,15 @@ const JewelryModelList = ({onSelectModel}) => {
 					</Tag>
 				)}
 			</div>
-			<div className="relative flex-grow">
+			<div className="relative flex-grow items-center justify-center ">
 				{model.Thumbnail?.MediaPath ? (
 					<img
 						src={model.Thumbnail.MediaPath}
 						alt={model.Name}
-						className="w-full h-20 object-cover rounded-t-xl"
+						className="w-40 h-40 object-cover rounded-xl"
 					/>
 				) : (
-					<div className="w-full h-20 flex items-center justify-center rounded-t-xl text-gray-500 bg-tintWhite">
+					<div className="w-40 h-40 flex items-center justify-center rounded-xl text-gray-500 bg-tintWhite">
 						Chưa có hình ảnh
 					</div>
 				)}

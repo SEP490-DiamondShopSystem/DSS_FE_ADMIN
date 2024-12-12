@@ -158,11 +158,10 @@ const DeliveryFeePage = () => {
 					</Button>
 					<Button
 						onClick={() => HandleActiveDeliveryFee(record.Id)}
-						danger
 						className={
 							record.IsEnabled
 								? 'text-red hover:text-redLight'
-								: 'text-green hover:text-greenDark'
+								: 'text-green hover:text-green'
 						}
 						icon={
 							record.IsEnabled ? (

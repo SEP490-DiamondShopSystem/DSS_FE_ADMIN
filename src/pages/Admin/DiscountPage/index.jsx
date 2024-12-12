@@ -521,8 +521,10 @@ const DiscountPage = ({discountData}) => {
 							<div>
 								<ul>
 									{req.Name && <li>Tên Yêu Cầu: {req.Name}</li>}
-									{req.Amount && <li>Amount: {req.Amount}</li>}
-									{req.Operator && <li>Operator: {req.Operator}</li>}
+									{req.Amount !== 0 && <li>Giá trị: {req.Amount}</li>}
+									{req.Operator && (
+										<li>Toán tử: {getTextForEnum('Operator', req.Operator)}</li>
+									)}
 									{req.DiamondRequirementSpec?.CaratFrom !== undefined &&
 										req.DiamondRequirementSpec?.CaratTo !== undefined && (
 											<li>
@@ -587,9 +589,12 @@ const DiscountPage = ({discountData}) => {
 									{req.DiamondRequirementSpec?.ShapesIDs?.length > 0 && (
 										<li>
 											Hình Dạng Kim Cương:{' '}
-											{req.DiamondRequirementSpec.ShapesIDs.join(', ')}
+											{req.DiamondRequirementSpec.ShapesIDs.map((shapeID) =>
+												getTextForEnum('Shape', shapeID)
+											).join(', ')}
 										</li>
 									)}
+
 									{req.Model && (
 										<li>
 											Model:
@@ -715,7 +720,7 @@ const DiscountPage = ({discountData}) => {
 	return (
 		<div className="p-8 bg-white shadow-md rounded-lg">
 			<h2 className="text-2xl font-bold mb-6">
-				{isEditing ? 'Edit Discount' : 'Create New Discount'}
+				{isEditing ? 'Cập Nhật Giảm Giá' : 'Tạo Giảm Giá Mới'}
 			</h2>
 			<DiscountForm
 				isEditing={isEditing}
