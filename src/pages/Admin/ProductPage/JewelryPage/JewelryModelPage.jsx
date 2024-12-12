@@ -80,7 +80,6 @@ const JewelryModelPage = () => {
 		width: '',
 		length: '',
 		isEngravable: false,
-		isRhodiumFinish: false,
 		backType: '',
 		claspType: '',
 		chainType: '',
@@ -430,7 +429,7 @@ const JewelryModelPage = () => {
 								type="text"
 								value={name}
 								onChange={(e) => setName(e.target.value)}
-								placeholder="Nhập tên mẫu"
+								placeholder="Nhập mã mẫu"
 								className="form-input p-2 border border-gray-300 rounded-md"
 							/>
 							<select

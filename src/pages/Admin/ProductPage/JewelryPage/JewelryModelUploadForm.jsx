@@ -373,7 +373,7 @@ export const JewelryModelUploadForm = ({jewelryModelId, visible, onClose}) => {
 	};
 	return (
 		<Modal
-			title="Jewelry Model's Files"
+			title="Hình Ảnh Mẫu Trang Sức"
 			visible={visible}
 			onCancel={handleCancel}
 			footer={

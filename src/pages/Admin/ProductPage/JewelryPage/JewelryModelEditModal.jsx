@@ -151,7 +151,7 @@ const JewelryModelEditModal = ({isVisible, onClose, model}) => {
 				visible={isVisible}
 				onCancel={onClose}
 				onOk={handleUpdate}
-				okText="Update"
+				okText="Cập nhật"
 				cancelText="Hủy"
 			>
 				<Input
@@ -234,7 +234,7 @@ const JewelryModelEditModal = ({isVisible, onClose, model}) => {
 					onConfirm={() => handleDeleteSideDiamondOption(record.Id)}
 				>
 					<Button type="link" danger>
-						Delete
+						Xóa
 					</Button>
 				</Popconfirm>
 			),
