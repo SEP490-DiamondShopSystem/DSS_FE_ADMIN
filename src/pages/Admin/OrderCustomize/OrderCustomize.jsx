@@ -1,4 +1,13 @@
-import {CalendarOutlined, EditFilled} from '@ant-design/icons';
+import {
+	CalendarOutlined,
+	CheckOutlined,
+	CloseOutlined,
+	DollarOutlined,
+	EditFilled,
+	LoadingOutlined,
+	SyncOutlined,
+	UnorderedListOutlined,
+} from '@ant-design/icons';
 import {Button, DatePicker, Input, Space, Table, Tag, Typography} from 'antd';
 import React, {useEffect, useState} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
@@ -19,14 +28,14 @@ const {RangePicker} = DatePicker;
 const {Title} = Typography;
 
 const statusList = [
-	{name: 'Tất Cả', value: ''},
-	{name: 'Chờ Xử Lý', value: '1'},
-	{name: 'Đã Có Giá', value: '2'},
-	{name: 'Đang Yêu Cầu', value: '3'},
-	{name: 'Đã Chấp Nhận', value: '4'},
-	{name: 'Shop Từ Chối', value: '5'},
-	{name: 'Khách Hàng Từ Chối', value: '6'},
-	{name: 'Khách Hàng Hủy Đơn', value: '7'},
+	{name: 'Tất Cả', icon: <UnorderedListOutlined />, value: ''},
+	{name: 'Chờ Xử Lý', icon: <SyncOutlined />, value: '1'},
+	{name: 'Đã Có Giá', icon: <DollarOutlined />, value: '2'},
+	{name: 'Đang Yêu Cầu', icon: <LoadingOutlined />, value: '3'},
+	{name: 'Đã Chấp Nhận', icon: <CheckOutlined />, value: '4'},
+	{name: 'Shop Từ Chối', icon: <CloseOutlined />, value: '5'},
+	{name: 'Khách Hàng Từ Chối', icon: <CloseOutlined />, value: '6'},
+	{name: 'Khách Hàng Hủy Đơn', icon: <CloseOutlined />, value: '7'},
 ];
 
 const statusMapping = {

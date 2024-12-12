@@ -72,7 +72,7 @@ export const AddModalDiamond = ({setShowModal, showModal}) => {
 				setEstimatePrice(res);
 			})
 			.catch((error) => {
-				message.error(error?.data?.title || error?.title);
+				message.error(error?.data?.detail || error?.detail);
 			});
 	}, [diamondParams, dispatch]);
 
@@ -210,7 +210,7 @@ export const AddModalDiamond = ({setShowModal, showModal}) => {
 				form.resetFields();
 			})
 			.catch((error) => {
-				message.error(error?.data?.title || error?.title);
+				message.error(error?.data?.detail || error?.detail);
 			});
 	};
 

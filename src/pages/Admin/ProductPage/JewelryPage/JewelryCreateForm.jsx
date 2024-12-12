@@ -348,7 +348,7 @@ const JewelryCreateForm = ({onClose, isCreateFormOpen, setIsCreateFormOpen}) => 
 				setIsModalVisible(false); // Add this line to close the diamond selection modal
 			})
 			.catch((error) => {
-				message.error(error?.data?.detail);
+				message.error(error?.data?.detail || error?.detail);
 			});
 	};
 

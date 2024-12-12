@@ -43,7 +43,7 @@ export const DiamondUploadForm = ({diamondId, visible, onClose}) => {
 					setDiamondFiles(response);
 				})
 				.catch((error) => {
-					message.error(error?.data?.detail );
+					message.error(error?.data?.detail || error?.detail);
 				});
 		}
 	}, [diamondId, dispatch]);
@@ -94,7 +94,7 @@ export const DiamondUploadForm = ({diamondId, visible, onClose}) => {
 			}
 			handleDeleteImages();
 		} else {
-			message.error(error?.data?.detail );
+			message.error(error?.data?.detail || error?.detail);
 		}
 		await dispatch(fetchDiamondFiles(diamondId))
 			.unwrap()
@@ -104,7 +104,7 @@ export const DiamondUploadForm = ({diamondId, visible, onClose}) => {
 				}
 			})
 			.catch((error) => {
-				message.error(error?.data?.detail );
+				message.error(error?.data?.detail || error?.detail);
 			});
 		setIsEditMode(false);
 	};
@@ -139,7 +139,7 @@ export const DiamondUploadForm = ({diamondId, visible, onClose}) => {
 					message.success('Images deleted successfully');
 				})
 				.catch((error) => {
-					message.error(error?.data?.detail );
+					message.error(error?.data?.detail || error?.detail);
 				});
 		}
 	};
@@ -156,7 +156,7 @@ export const DiamondUploadForm = ({diamondId, visible, onClose}) => {
 				message.success('Thumbnail uploaded successfully');
 			})
 			.catch((error) => {
-				message.error(error?.data?.detail );
+				message.error(error?.data?.detail || error?.detail);
 			});
 	};
 
@@ -176,7 +176,7 @@ export const DiamondUploadForm = ({diamondId, visible, onClose}) => {
 					message.success('Certificates uploaded successfully');
 				})
 				.catch((error) => {
-					message.error(error?.data?.detail );
+					message.error(error?.data?.detail || error?.detail);
 				});
 		}
 	};
@@ -194,7 +194,7 @@ export const DiamondUploadForm = ({diamondId, visible, onClose}) => {
 				message.success('Diamond images uploaded successfully');
 			})
 			.catch((error) => {
-				message.error(error?.data?.detail );
+				message.error(error?.data?.detail || error?.detail);
 			});
 	};
 

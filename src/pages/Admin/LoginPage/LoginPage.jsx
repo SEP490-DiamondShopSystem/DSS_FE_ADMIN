@@ -37,7 +37,7 @@ const LoginPage = () => {
 				navigate('/');
 			})
 			.catch((error) => {
-				message.error(error?.data?.detail );
+				message.error(error?.data?.detail || error?.detail);
 			});
 	};
 

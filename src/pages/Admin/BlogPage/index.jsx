@@ -170,7 +170,7 @@ const BlogPage = () => {
 				);
 			})
 			.catch((error) => {
-				message.error(error?.data?.detail );
+				message.error(error?.data?.detail || error?.detail);
 			});
 
 		// Reset state
@@ -230,7 +230,7 @@ const BlogPage = () => {
 
 	const handleDelete = (id) => {
 		dispatch(removeBlog(id));
-		message.success('Blog deleted successfully!');
+		message.success('Xóa bài viết thành công!');
 	};
 
 	const onCancel = async () => {
@@ -417,7 +417,7 @@ const BlogPage = () => {
 						</div>
 					</Form.Item>
 
-					<Form.Item className="mb-6" label="Thumbnail" style={{marginBottom: '16px'}}>
+					<Form.Item className="mb-6" label="Ảnh" style={{marginBottom: '16px'}}>
 						<div className="upload-section">
 							<Upload.Dragger
 								name="thumbnail"
@@ -507,7 +507,6 @@ const BlogPage = () => {
 											['link', 'image', 'video', 'table'],
 											['clean'],
 										],
-										
 									}}
 								/>
 								<Button
