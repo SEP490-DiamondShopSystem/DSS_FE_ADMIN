@@ -94,8 +94,7 @@ const DefaultLayout = () => {
 
 	// Menu items (same as previous implementation)
 	const items = [
-		(adminRole || managerRole || staffRole) &&
-			getItem('Dashboard', '/dashboard', <DashboardOutlined />),
+		(managerRole || staffRole) && getItem('Dashboard', '/dashboard', <DashboardOutlined />),
 		adminRole && getItem('Quản Lí Tài Khoản', '/accounts', <UserOutlined />),
 
 		(managerRole || staffRole) &&
@@ -108,9 +107,8 @@ const DefaultLayout = () => {
 					'/products/jewelry-model-list',
 					<RightOutlined />
 				),
-				getItem('Danh Sách Kim Loại', '/products/metal-list', <DiamondOutlined />),
 			]),
-
+		managerRole && getItem('Danh Sách Kim Loại', '/products/metal-list', <DiamondOutlined />),
 		(managerRole || staffRole || delivererRole) &&
 			getItem('Quản Lí Đặt Hàng', '/orders', <OrderedListOutlined />),
 
@@ -120,9 +118,9 @@ const DefaultLayout = () => {
 		(managerRole || staffRole) && getItem('Quản Lí Khuyến Mãi', '/promotion', <GiftOutlined />),
 		(managerRole || staffRole) && getItem('Quản Lí Giảm Giá', '/discount', <TagOutlined />),
 
-		(managerRole || staffRole) &&
+		managerRole &&
 			getItem('Quản Lí Phí Vận Chuyển', '/delivery-fee', <DeliveredProcedureOutlined />),
-		(managerRole || staffRole) &&
+		managerRole &&
 			getItem('Quản Lí Giá Kim Cương', '/dimond-price', <TagOutlined />, [
 				getItem(
 					'Quản Lí Giá Kim Cương Chính',
