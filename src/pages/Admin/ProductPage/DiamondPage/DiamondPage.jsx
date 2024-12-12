@@ -361,7 +361,7 @@ const DiamondPage = () => {
 				message.success('Xóa Kim Cương Thành Công!');
 			})
 			.catch((error) => {
-				message.error(error?.data?.title || error?.detail);
+				message.error(error?.data?.detail || error?.detail);
 			});
 		setIsModalVisible(false);
 	};
@@ -395,7 +395,7 @@ const DiamondPage = () => {
 				form.resetFields();
 			})
 			.catch((error) => {
-				message.error(error?.data?.title || error?.title);
+				message.error(error?.data?.detail || error?.detail);
 			});
 	};
 

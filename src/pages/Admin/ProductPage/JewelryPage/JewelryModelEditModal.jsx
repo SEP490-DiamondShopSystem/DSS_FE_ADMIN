@@ -38,7 +38,7 @@ const JewelryModelEditModal = ({isVisible, onClose, model}) => {
 				message.success('Craftman Fee updated successfully');
 			})
 			.catch((error) => {
-				message.error(error?.title || error?.detail || 'Failed to update craftman fee');
+				message.error(error?.detail || error?.detail || 'Failed to update craftman fee');
 			});
 	};
 
@@ -61,7 +61,7 @@ const JewelryModelEditModal = ({isVisible, onClose, model}) => {
 				);
 			})
 			.catch((error) => {
-				message.error(error?.title || error?.detail || 'Không thể xóa kim loại size này!');
+				message.error(error?.detail || error?.detail || 'Không thể xóa kim loại size này!');
 			});
 	};
 
@@ -77,7 +77,7 @@ const JewelryModelEditModal = ({isVisible, onClose, model}) => {
 			})
 			.catch((error) => {
 				message.error(
-					error?.title || error?.detail || 'Failed to delete side diamond option'
+					error?.detail || error?.detail || 'Failed to delete side diamond option'
 				);
 			});
 	};

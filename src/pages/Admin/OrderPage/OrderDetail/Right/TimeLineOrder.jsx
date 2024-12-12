@@ -423,8 +423,8 @@ const TimeLineOrder = ({
 	};
 
 	const handleDeliveredStatus = () => {
-		if (!images.length && !video) {
-			message.error('Vui lòng tải lên ít nhất một hình ảnh hoặc video!');
+		if (!images.length) {
+			message.error('Vui lòng tải lên ít nhất một hình ảnh!');
 			return;
 		}
 

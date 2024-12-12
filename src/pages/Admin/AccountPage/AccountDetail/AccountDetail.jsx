@@ -149,7 +149,7 @@ const AccountDetail = () => {
 				setEditing(false); // Disable editing mode
 			})
 			.catch((error) => {
-				message.error(error?.data?.title || error?.detail || 'Đã xảy ra lỗi!');
+				message.error(error?.data?.detail || error?.detail || 'Đã xảy ra lỗi!');
 			});
 		await dispatch(getUserAccountDetail(id));
 	};
@@ -192,7 +192,7 @@ const AccountDetail = () => {
 				setIsModalVisible(false);
 			})
 			.catch((error) => {
-				message.error(error?.data?.title || error?.detail);
+				message.error(error?.data?.detail || error?.detail);
 			});
 		await dispatch(getUserAccountDetail(id));
 	};
@@ -212,7 +212,7 @@ const AccountDetail = () => {
 				setIsModalRemoveRoleVisible(false);
 			})
 			.catch((error) => {
-				message.error(error?.data?.title || error?.detail);
+				message.error(error?.data?.detail || error?.detail);
 			});
 
 		await dispatch(getUserAccountDetail(id));

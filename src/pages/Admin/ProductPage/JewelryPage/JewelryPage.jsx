@@ -102,7 +102,7 @@ const JewelryPage = () => {
 					notification.error({
 						message: 'Lỗi',
 						description:
-							error?.data?.title ||
+							error?.data?.detail ||
 							error?.detail ||
 							'Không thể tải danh sách trang sức',
 					});

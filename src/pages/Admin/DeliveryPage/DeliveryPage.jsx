@@ -179,7 +179,7 @@ const DeliveryPage = () => {
 				setIsModalVisible(false);
 			})
 			.catch((error) => {
-				message.error(error?.data?.title || error?.detail);
+				message.error(error?.data?.detail || error?.detail);
 			});
 	};
 	const handleBeginDeliveryBtn = () => {
@@ -189,7 +189,7 @@ const DeliveryPage = () => {
 				message.success('Giao hàng sớm!');
 			})
 			.catch((error) => {
-				message.error(error?.data?.title || error?.detail);
+				message.error(error?.data?.detail || error?.detail);
 			});
 	};
 	const onSearch = (value) => {

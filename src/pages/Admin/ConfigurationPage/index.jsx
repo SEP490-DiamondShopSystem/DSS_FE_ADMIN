@@ -142,7 +142,7 @@ const ConfigurationPage = () => {
 				handleSuccess('Cập Nhật Quy Định Tài Khoản Thành Công!');
 			})
 			.catch((error) => {
-				message.error(error?.data?.title || error?.title);
+				message.error(error?.data?.detail || error?.detail);
 			});
 	};
 	const handleDiamondSubmit = (values) => {
@@ -152,7 +152,7 @@ const ConfigurationPage = () => {
 				handleSuccess('Cập Nhật Quy Định Kim Cương Thành Công!');
 			})
 			.catch((error) => {
-				message.error(error?.data?.title || error?.title);
+				message.error(error?.data?.detail || error?.detail);
 			});
 	};
 
@@ -163,17 +163,17 @@ const ConfigurationPage = () => {
 				handleSuccess('Cập Nhật Quy Định Hiển Thị Thành Công!');
 			})
 			.catch((error) => {
-				message.error(error?.data?.title || error?.title);
+				message.error(error?.data?.detail || error?.detail);
 			});
 	};
 	const handleLocationSubmit = (values) => {
 		dispatch(updateLocationRules(values))
 			.unwrap()
 			.then(() => {
-				handleSuccess('Cập Nhật Địa Chỉ Shop Thành Công!');
+				handleSuccess('Cập Nhật Địa Chỉ Cửa Hàng Thành Công!');
 			})
 			.catch((error) => {
-				message.error(error?.data?.title || error?.title);
+				message.error(error?.data?.detail || error?.detail);
 			});
 	};
 	const handleOrderSubmit = (values) => {
@@ -183,7 +183,7 @@ const ConfigurationPage = () => {
 				handleSuccess('Cập Nhật Quy Định Đặt Hàng Thành Công!');
 			})
 			.catch((error) => {
-				message.error(error?.data?.title || error?.title);
+				message.error(error?.data?.detail || error?.detail);
 			});
 	};
 	const handleOrderPaymentSubmit = (values) => {
@@ -203,7 +203,7 @@ const ConfigurationPage = () => {
 				handleSuccess('Cập Nhật Quy Định Thanh Toán Thành Công!');
 			})
 			.catch((error) => {
-				message.error(error?.data?.title || error?.title);
+				message.error(error?.data?.detail || error?.detail);
 			});
 	};
 
@@ -219,7 +219,7 @@ const ConfigurationPage = () => {
 					handleSuccess('Tải lên thành công!');
 				})
 				.catch((error) => {
-					message.error(error?.data?.title || error?.title);
+					message.error(error?.data?.detail || error?.detail);
 				});
 		}
 
@@ -235,7 +235,7 @@ const ConfigurationPage = () => {
 				handleSuccess('Cập nhật tài khoản ngân hàng thành công!');
 			})
 			.catch((error) => {
-				message.error(error?.data?.title || error?.title);
+				message.error(error?.data?.detail || error?.detail);
 			});
 	};
 
@@ -246,7 +246,7 @@ const ConfigurationPage = () => {
 				handleSuccess('Cập Nhật Quy Định Khuyến Mãi Thành Công!');
 			})
 			.catch((error) => {
-				message.error(error?.data?.title || error?.title);
+				message.error(error?.data?.detail || error?.detail);
 			});
 	};
 	if (isLoading) {
