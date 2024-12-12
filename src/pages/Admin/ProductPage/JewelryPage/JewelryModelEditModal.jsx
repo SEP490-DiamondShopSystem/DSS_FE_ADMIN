@@ -151,8 +151,8 @@ const JewelryModelEditModal = ({isVisible, onClose, model}) => {
 				visible={isVisible}
 				onCancel={onClose}
 				onOk={handleUpdate}
-				okText="Update"
-				cancelText="Cancel"
+				okText="Cập nhật"
+				cancelText="Hủy"
 			>
 				<Input
 					type="number"
@@ -183,7 +183,7 @@ const JewelryModelEditModal = ({isVisible, onClose, model}) => {
 			render: (text) => `${text} g`,
 		},
 		{
-			title: 'Tương Tác',
+			title: 'Thao Tác',
 			key: 'actions',
 			render: (_, record) => (
 				<>
@@ -211,22 +211,22 @@ const JewelryModelEditModal = ({isVisible, onClose, model}) => {
 
 	const sideDiamondColumns = [
 		{
-			title: 'Carat Weight',
+			title: 'Carat',
 			dataIndex: 'CaratWeight',
 			key: 'caratWeight',
 		},
 		{
-			title: 'Setting Type',
+			title: 'Loại Setting',
 			dataIndex: 'SettingType',
 			key: 'settingType',
 		},
 		{
-			title: 'Quantity',
+			title: 'Số Lượng',
 			dataIndex: 'Quantity',
 			key: 'quantity',
 		},
 		{
-			title: 'Actions',
+			title: 'Thao Tác',
 			key: 'actions',
 			render: (_, record) => (
 				<Popconfirm
@@ -234,7 +234,7 @@ const JewelryModelEditModal = ({isVisible, onClose, model}) => {
 					onConfirm={() => handleDeleteSideDiamondOption(record.Id)}
 				>
 					<Button type="link" danger>
-						Delete
+						Xóa
 					</Button>
 				</Popconfirm>
 			),
@@ -243,25 +243,25 @@ const JewelryModelEditModal = ({isVisible, onClose, model}) => {
 
 	return (
 		<Modal
-			title="Edit Jewelry Model"
+			title="Chỉnh sửa mẫu trang sức"
 			visible={isVisible}
 			onCancel={onClose}
 			footer={[
 				<Button key="back" onClick={onClose}>
-					Cancel
+					Hủy
 				</Button>,
 			]}
 			width={800}
 		>
 			{/* Craftman Fee Update Section */}
 			<div className="mb-6">
-				<h3 className="text-lg font-semibold mb-4">Update Craftman Fee</h3>
+				<h3 className="text-lg font-semibold mb-4">Cập nhật giá gia công</h3>
 				<div className="flex items-center space-x-4">
 					<Input
 						type="number"
 						value={craftmanFee}
 						onChange={(e) => setCraftmanFee(e.target.value)}
-						placeholder="Enter new craftman fee"
+						placeholder="Giá gia công"
 						className="w-64"
 					/>
 					<Button
