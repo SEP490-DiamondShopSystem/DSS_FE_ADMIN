@@ -329,7 +329,7 @@ export const AddModalDiamond = ({setShowModal, showModal}) => {
 
 					<Form.Item
 						name="symmetry"
-						label="Độ Bóng (Polish) "
+						label="Độ Tương Xứng (Symmetry) "
 						className="w-1/4"
 						rules={[
 							{

@@ -51,7 +51,7 @@ export const GiftForm = ({form, shapes, Option, removeGift}) => {
 												{targetType !== 3 && (
 													<Form.Item
 														className="w-full"
-														label="Giá Trị"
+														label="Số Lượng"
 														{...restField}
 														name={[name, 'amount']}
 														fieldKey={[fieldKey, 'amount']}
@@ -61,13 +61,15 @@ export const GiftForm = ({form, shapes, Option, removeGift}) => {
 																message: 'Amount is required',
 															},
 														]}
+														initialValue={1} // Always set to 1
 														labelCol={{span: 24}}
 														wrapperCol={{span: 24}}
 													>
 														<InputNumber
 															className="w-full"
 															placeholder="Enter amount"
-														/>
+															disabled
+															/>
 													</Form.Item>
 												)}
 												<Form.Item
