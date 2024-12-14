@@ -406,16 +406,18 @@ const JewelryDetail = ({jewelry, onClose}) => {
 														VND
 													</span>
 												</div>
-												<div className="flex justify-between items-center">
-													<span className="font-bold text-black text-xl">
-														Giá Sau Giảm:
-													</span>
-													<span className="text-darkGreen font-bold text-xl">
-														{diamond.TruePrice.toLocaleString() ||
-															'Chưa Có'}{' '}
-														VND
-													</span>
-												</div>
+												{diamond.SoldPrice && (
+													<div className="flex justify-between items-center">
+														<span className="font-bold text-black text-xl">
+															Giá Đã Bán:
+														</span>
+														<span className="text-darkGreen font-bold text-xl">
+															{diamond.SoldPrice.toLocaleString() ||
+																'Chưa Có'}{' '}
+															VND
+														</span>
+													</div>
+												)}
 											</div>
 										</div>
 									</div>
@@ -543,15 +545,25 @@ const JewelryDetail = ({jewelry, onClose}) => {
 										</span>
 									</div>
 									<div className="flex justify-between items-center">
-										<span className="font-medium text-gray-700">
-											Giá Bán Sau Giảm:
-										</span>
+										<span className="font-medium text-gray-700">Giá Bán:</span>
 										<span className="text-green-600 font-bold">
 											{fetchedJewelry.SalePrice?.toLocaleString() ||
 												'Chưa Có'}{' '}
 											VND
 										</span>
 									</div>
+									{fetchedJewelry?.SoldPrice && (
+										<div className="flex justify-between items-center">
+											<span className="font-medium text-gray-700">
+												Giá Đã Bán:
+											</span>
+											<span className="text-darkGreen font-bold">
+												{fetchedJewelry.SoldPrice?.toLocaleString() ||
+													'Chưa Có'}{' '}
+												VND
+											</span>
+										</div>
+									)}
 								</div>
 							</div>
 
