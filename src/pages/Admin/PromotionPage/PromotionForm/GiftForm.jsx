@@ -164,6 +164,40 @@ export const GiftForm = ({form, shapes, Option, removeGift}) => {
 														])}
 													/>
 												</Form.Item>
+												{unitType === 1 && (
+													<Form.Item
+														className="w-full"
+														label="Giá Trị Khuyến Mãi Tối Đa"
+														{...restField}
+														name={[name, 'maxAmount']}
+														fieldKey={[fieldKey, 'maxAmount']}
+														rules={[
+															{
+																required: true,
+																type: 'number',
+																min: 1000,
+																message:'Giá trị tối thiểu 1000 VND',
+															},
+															{
+																validator: (_, value) =>
+																	value % 1000 !== 0
+																		? Promise.reject(
+																				new Error(
+																					'Giá trị phải là bội của 1000'
+																				)
+																		  )
+																		: Promise.resolve(),
+															},
+														]}
+														labelCol={{span: 24}}
+														wrapperCol={{span: 24}}
+													>
+														<InputNumber
+															className="w-full"
+															addonAfter="VND"
+														/>
+													</Form.Item>
+												)}
 											</Col>
 											<Col span={12}>
 												{targetType === 1 && (
