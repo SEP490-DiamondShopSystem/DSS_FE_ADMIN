@@ -83,8 +83,12 @@ export const deleteDiscount = createAsyncThunk(
 export const pauseDiscount = createAsyncThunk(
 	'discounts/pauseDiscount',
 	async (discountId, {rejectWithValue}) => {
-		const response = await api.patch(`/Discount/${discountId}/Pause`);
-		return response;
+		try {
+			const response = await api.patch(`/Discount/${discountId}/Pause`);
+			return response;
+		} catch (error) {
+			return rejectWithValue(error);
+		}
 	}
 );
 
@@ -92,8 +96,12 @@ export const pauseDiscount = createAsyncThunk(
 export const cancelDiscount = createAsyncThunk(
 	'discounts/cancelDiscount',
 	async (discountId, {rejectWithValue}) => {
-		const response = await api.patch(`/Discount/${discountId}/Cancel`);
-		return response;
+		try {
+			const response = await api.patch(`/Discount/${discountId}/Cancel`);
+			return response;
+		} catch (error) {
+			return rejectWithValue(error);
+		}
 	}
 );
 
@@ -105,15 +113,7 @@ export const updateDiscountThumbnail = createAsyncThunk(
 			const response = await api.put(`/Discount/${discountId}/Thumbnail`, thumbnailData);
 			return response;
 		} catch (error) {
-			if (error.response) {
-				// Handle 400 and 500 status codes
-				if (error.response.status === 400) {
-					return rejectWithValue({status: 400, errors: error.errors});
-				} else if (error.response.status === 500) {
-					return rejectWithValue({status: 500, detail: error.detail});
-				}
-			}
-			return rejectWithValue({status: 'unknown', detail: 'An unexpected error occurred.'});
+			return rejectWithValue(error);
 		}
 	}
 );
@@ -132,9 +132,7 @@ export const uploadDiscountThumbnail = createAsyncThunk(
 			});
 			return response.data;
 		} catch (error) {
-			return rejectWithValue(
-				error.response?.data || {status: 'unknown', detail: 'Failed to upload thumbnail'}
-			);
+			return rejectWithValue(error);
 		}
 	}
 );

@@ -185,14 +185,31 @@ const DiscountPage = ({discountData}) => {
 		await dispatch(pauseDiscount(id))
 			.unwrap()
 			.then(() => {
-				message.success(`Mã giảm giá với id: ${id} đã được ${currentStatus === 3 ? 'tiếp tục' : 'dừng'}.`);
+				message.success(`Mã giảm giá có id: ${id} đã được tạm dừng.`);
 				dispatch(fetchDiscounts());
 			})
 			.catch((error) => {
 				message.error(error?.data?.detail || error?.detail);
 			});
 	};
-
+	const handleContinue = async (id) => {
+		try {
+			await dispatch(pauseDiscount(id)).unwrap();
+			message.success(`Mã giảm giá có id: ${id} đã được tiếp tục.`);
+			await dispatch(fetchDiscounts());
+		} catch (error) {
+			message.error(error?.data?.detail || error?.detail || 'Lỗi không xác định');
+		}
+	};
+	const handleStart = async (id) => {
+		try {
+			await dispatch(pauseDiscount(id)).unwrap();
+			message.success(`Mã giảm giá có id: ${id} đã được bắt đầu.`);
+			await dispatch(fetchDiscounts());
+		} catch (error) {
+			message.error(error?.data?.detail || error?.detail || 'Lỗi không xác định');
+		}
+	};
 	const handleCancel = async (id) => {
 		await dispatch(cancelDiscount(id))
 			.unwrap()
@@ -666,7 +683,7 @@ const DiscountPage = ({discountData}) => {
 							{canStart && (
 								<Popconfirm
 									title="Bạn có chắc bắt đầu giảm giá này không?"
-									onConfirm={() => handlePause(record.Id)}
+									onConfirm={() => handleStart(record.Id)}
 								>
 									<Tooltip title="Bắt Đầu Giảm Giá">
 										<Button type="link">
@@ -694,7 +711,7 @@ const DiscountPage = ({discountData}) => {
 							{canContinue && (
 								<Popconfirm
 									title="Bạn có chắc tiếp tục giảm giá này không?"
-									onConfirm={() => handlePause(record.Id)}
+									onConfirm={() => handleContinue(record.Id)}
 								>
 									<Tooltip title="Tiếp Tục Giảm Giá">
 										<Button type="link">
