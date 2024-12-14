@@ -289,17 +289,31 @@ const PromotionPage = ({promotionData}) => {
 		await dispatch(fetchPromotions());
 	};
 	const handlePause = async (id) => {
-		await dispatch(pausePromotion(id))
-			.unwrap()
-			.then(() => {
-				message.success(
-					`Khuyến mãi có id: ${id} đã được ${status === 3 ? 'tiếp tục' : 'dừng'}.`
-				);
-			})
-			.catch((error) => {
-				message.error(error?.data?.detail || error?.detail || 'Lỗi không xác định');
-			});
-		await dispatch(fetchPromotions());
+		try {
+			await dispatch(pausePromotion(id)).unwrap();
+			message.success(`Khuyến mãi có id: ${id} đã được tạm dừng.`);
+			await dispatch(fetchPromotions());
+		} catch (error) {
+			message.error(error?.data?.detail || error?.detail || 'Lỗi không xác định');
+		}
+	};
+	const handleContinue = async (id) => {
+		try {
+			await dispatch(pausePromotion(id)).unwrap();
+			message.success(`Khuyến mãi có id: ${id} đã được tiếp tục.`);
+			await dispatch(fetchPromotions());
+		} catch (error) {
+			message.error(error?.data?.detail || error?.detail || 'Lỗi không xác định');
+		}
+	};
+	const handleStart = async (id) => {
+		try {
+			await dispatch(pausePromotion(id)).unwrap();
+			message.success(`Khuyến mãi có id: ${id} đã được bắt đầu.`);
+			await dispatch(fetchPromotions());
+		} catch (error) {
+			message.error(error?.data?.detail || error?.detail || 'Lỗi không xác định');
+		}
 	};
 	const handleUpdate = async () => {
 		// Validate the form fields
@@ -889,7 +903,7 @@ const PromotionPage = ({promotionData}) => {
 						{canStart && (
 							<Popconfirm
 								title="Bạn có chắc bắt đầu khuyến mãi này không?"
-								onConfirm={() => handlePause(record.Id)}
+								onConfirm={() => handleStart(record.Id)}
 							>
 								<Tooltip title="Bắt Đầu Khuyến Mãi">
 									<Button type="link">
@@ -917,7 +931,7 @@ const PromotionPage = ({promotionData}) => {
 						{canContinue && (
 							<Popconfirm
 								title="Bạn có chắc tiếp tục khuyến mãi này không?"
-								onConfirm={() => handlePause(record.Id)}
+								onConfirm={() => handleContinue(record.Id)}
 							>
 								<Tooltip title="Tiếp Tục Khuyến Mãi">
 									<Button type="link">
