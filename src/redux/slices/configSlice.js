@@ -48,6 +48,17 @@ export const fetchPromotionRule = createAsyncThunk(
 		}
 	}
 );
+export const fetchJewelryModelRule = createAsyncThunk(
+	'config/fetchJewelryModelRule',
+	async (_, {rejectWithValue}) => {
+		try {
+			const response = await api.get('/Configuration/JewelryModelRules');
+			return response;
+		} catch (error) {
+			return rejectWithValue(error);
+		}
+	}
+);
 export const fetchLocationRule = createAsyncThunk(
 	'config/fetchLocationRule',
 	async (_, {rejectWithValue}) => {
@@ -55,7 +66,7 @@ export const fetchLocationRule = createAsyncThunk(
 			const response = await api.get('/Configuration/LocationRules');
 			return response;
 		} catch (error) {
-			return rejectWithValue(error.response || error.message);
+			return rejectWithValue(error);
 		}
 	}
 );
@@ -66,7 +77,7 @@ export const fetchOrderRule = createAsyncThunk(
 			const response = await api.get('/Configuration/OrderRule');
 			return response;
 		} catch (error) {
-			return rejectWithValue(error.response || error.message);
+			return rejectWithValue(error);
 		}
 	}
 );
@@ -77,7 +88,7 @@ export const fetchOrderRulePayment = createAsyncThunk(
 			const response = await api.get('/Configuration/OrderRule/Payment');
 			return response;
 		} catch (error) {
-			return rejectWithValue(error.response || error.message);
+			return rejectWithValue(error);
 		}
 	}
 );
@@ -88,11 +99,10 @@ export const fetchShopBankAccountRule = createAsyncThunk(
 			const response = await api.get('/Configuration/ShopBankAccountRule');
 			return response;
 		} catch (error) {
-			return rejectWithValue(error.response || error.message);
+			return rejectWithValue(error);
 		}
 	}
 );
-// Async thunks for updating configuration data
 export const updateAccountRule = createAsyncThunk(
 	'config/updateAccountRule',
 	async (data, {rejectWithValue}) => {
@@ -105,7 +115,6 @@ export const updateAccountRule = createAsyncThunk(
 	}
 );
 
-// Async thunks for updating configuration data
 export const updateDiamondRule = createAsyncThunk(
 	'config/updateDiamondRule',
 	async (data, {rejectWithValue}) => {
@@ -129,6 +138,19 @@ export const updateFrontendDisplayRule = createAsyncThunk(
 		}
 	}
 );
+
+export const updateJewelryModelRule = createAsyncThunk(
+	'config/updateJewelryModelRule',
+	async (data, {rejectWithValue}) => {
+		try {
+			const response = await api.post('/Configuration/JewelryModelRules', data);
+			return response;
+		} catch (error) {
+			return rejectWithValue(error);
+		}
+	}
+);
+
 export const updateLocationRules = createAsyncThunk(
 	'config/updateLocationRules',
 	async (data, {rejectWithValue}) => {
@@ -136,7 +158,7 @@ export const updateLocationRules = createAsyncThunk(
 			const response = await api.post('/Configuration/LocationRules', data);
 			return response;
 		} catch (error) {
-			return rejectWithValue(error.response || error.message);
+			return rejectWithValue(error);
 		}
 	}
 );
@@ -147,7 +169,7 @@ export const updateOrderRule = createAsyncThunk(
 			const response = await api.post('/Configuration/OrderRule', data);
 			return response;
 		} catch (error) {
-			return rejectWithValue(error.response || error.message);
+			return rejectWithValue(error);
 		}
 	}
 );
@@ -158,7 +180,7 @@ export const updateOrderRulePayment = createAsyncThunk(
 			const response = await api.post('/Configuration/OrderRule/Payment', data);
 			return response;
 		} catch (error) {
-			return rejectWithValue(error.response || error.message);
+			return rejectWithValue(error);
 		}
 	}
 );
@@ -182,7 +204,7 @@ export const updateShopBankAccountRule = createAsyncThunk(
 			const response = await api.post('/Configuration/ShopBankAccountRule', data);
 			return response;
 		} catch (error) {
-			return rejectWithValue(error.response || error.message);
+			return rejectWithValue(error);
 		}
 	}
 );
@@ -199,7 +221,7 @@ export const updateShopBankQRRule = createAsyncThunk(
 			});
 			return response;
 		} catch (error) {
-			return rejectWithValue(error.response || error.message);
+			return rejectWithValue(error);
 		}
 	}
 );
@@ -213,6 +235,7 @@ export const configSlice = createSlice({
 		frontendDisplayRule: {},
 		promotionRule: {},
 		locationRule: {},
+		modelRule: {},
 		orderRule: {},
 		orderPaymentRule: {},
 		orderPaymentRule: {},
@@ -259,6 +282,18 @@ export const configSlice = createSlice({
 				state.frontendDisplayRule = action.payload;
 			})
 			.addCase(fetchFrontendDisplayRule.rejected, (state, action) => {
+				state.isLoading = false;
+				state.error = action.payload;
+			})
+			.addCase(fetchJewelryModelRule.pending, (state) => {
+				state.isLoading = true;
+				state.error = null;
+			})
+			.addCase(fetchJewelryModelRule.fulfilled, (state, action) => {
+				state.modelRule = action.payload;
+				state.isLoading = false;
+			})
+			.addCase(fetchJewelryModelRule.rejected, (state, action) => {
 				state.isLoading = false;
 				state.error = action.payload;
 			})
@@ -352,6 +387,17 @@ export const configSlice = createSlice({
 				state.isLoading = false;
 			})
 			.addCase(updateFrontendDisplayRule.rejected, (state, action) => {
+				state.isLoading = false;
+				state.error = action.payload;
+			})
+			.addCase(updateJewelryModelRule.pending, (state) => {
+				state.isLoading = true;
+				state.error = null;
+			})
+			.addCase(updateJewelryModelRule.fulfilled, (state) => {
+				state.isLoading = false;
+			})
+			.addCase(updateJewelryModelRule.rejected, (state, action) => {
 				state.isLoading = false;
 				state.error = action.payload;
 			})

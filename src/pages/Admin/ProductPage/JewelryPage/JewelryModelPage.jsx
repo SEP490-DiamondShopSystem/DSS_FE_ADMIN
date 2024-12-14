@@ -11,6 +11,7 @@ import {fetchAllSizes} from '../../../../redux/slices/jewelry/sizeSlice';
 import {fetchAllShapes} from '../../../../redux/slices/shapeSlice';
 import {fetchAllEnums} from '../../../../redux/slices/jewelry/enumSlice';
 import {fetchAllJewelryModelCategories} from '../../../../redux/slices/jewelry/jewelryModelCategorySlice';
+import {fetchJewelryModelRule} from '../../../../redux/slices/configSlice';
 import JewelryModelEditModal from './JewelryModelEditModal';
 import {
 	getAllJewelryModelsSelector,
@@ -22,6 +23,7 @@ import {
 	getAllJewelryModelCategoriesSelector,
 	getAllEnumsSelector,
 	getAllDiamondShapesSelector,
+	selectModelRule,
 } from '../../../../redux/selectors';
 import {JewelryModelUploadForm} from './JewelryModelUploadForm';
 import Loading from '../../../../components/Loading';
@@ -44,7 +46,23 @@ const JewelryModelPage = () => {
 	const [totalPage, setTotalPage] = useState(0);
 	const [errorCarat, setErrorCarat] = useState('');
 	const [showDeleteConfirm, setShowDeleteConfirm] = useState(false); // For the delete confirmation popup
+	const [jewelryModelRule, setJewelryModelRule] = useState({
+		MaximumMainDiamond: 3,
+		MaximumSideDiamondOption: 5,
+	});
 
+	useEffect(() => {
+		// Fetch jewelry model rules
+		dispatch(fetchJewelryModelRule())
+			.unwrap()
+			.then((rules) => {
+				setJewelryModelRule(rules);
+			})
+			.catch((error) => {
+				message.error('Failed to fetch jewelry model rules');
+				console.error(error);
+			});
+	}, [dispatch]);
 	const [newModel, setNewModel] = useState({
 		name: '',
 		description: '',
@@ -172,13 +190,15 @@ const JewelryModelPage = () => {
 		}
 	};
 	const handleMainDiamondChange = (index, field, value) => {
+		const maxDiamonds = jewelryModelRule.MaximumMainDiamond || 3;
+
 		if (field === 'quantity') {
 			const otherSpecsQuantity = mainDiamondSpecs.reduce(
 				(sum, spec, i) => (i === index ? sum : sum + (Number(spec.quantity) || 0)),
 				0
 			);
 
-			if (Number(value) + otherSpecsQuantity <= 3) {
+			if (Number(value) + otherSpecsQuantity <= maxDiamonds) {
 				const updatedSpecs = [...mainDiamondSpecs];
 				updatedSpecs[index] = {
 					...updatedSpecs[index],
@@ -186,7 +206,7 @@ const JewelryModelPage = () => {
 				};
 				setMainDiamondSpecs(updatedSpecs);
 			} else {
-				message.warning('Tổng số lượng kim cương chính không được vượt quá 3');
+				message.warning(`Tổng số lượng kim cương chính không được vượt quá ${maxDiamonds}`);
 			}
 		} else {
 			const updatedSpecs = [...mainDiamondSpecs];
@@ -237,12 +257,14 @@ const JewelryModelPage = () => {
 		});
 	};
 	const handleAddMainDiamondSpec = () => {
+		const maxDiamonds = jewelryModelRule.MaximumMainDiamond || 3;
+
 		const totalQuantity = mainDiamondSpecs.reduce(
 			(sum, spec) => sum + (Number(spec.quantity) || 0),
 			0
 		);
 
-		if (mainDiamondSpecs.length < 3 && totalQuantity < 3) {
+		if (mainDiamondSpecs.length < maxDiamonds  && totalQuantity < maxDiamonds ) {
 			setMainDiamondSpecs([
 				...mainDiamondSpecs,
 				{
@@ -252,7 +274,7 @@ const JewelryModelPage = () => {
 				},
 			]);
 		} else {
-			message.warning('Chỉ được phép tối đa 3 kim cương chính');
+			message.warning(`Chỉ được phép tối đa ${maxDiamonds} kim cương chính`);
 		}
 	};
 	const handleAddShapeSpec = (index) => {

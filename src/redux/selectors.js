@@ -146,6 +146,7 @@ export const GetAllSellingJewelrySelector = (state) => state.dashboardSlice.topS
 export const selectDiamondRule = (state) => state?.config?.diamondRule;
 export const selectFrontendDisplayRule = (state) => state?.config?.frontendDisplayRule;
 export const selectPromotionRule = (state) => state?.config?.promotionRule;
+export const selectModelRule = (state) => state?.config?.modelRule;
 export const selectLocationRule = (state) => state?.config?.locationRule;
 export const selectOrderRule = (state) => state?.config?.orderRule;
 export const selectOrderPaymentRule = (state) => state?.config?.orderPaymentRule;
