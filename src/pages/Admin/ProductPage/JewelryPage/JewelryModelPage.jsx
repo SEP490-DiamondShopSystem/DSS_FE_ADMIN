@@ -4,28 +4,8 @@ import {
 	fetchAllJewelryModels,
 	createJewelryModel,
 	deleteJewelryModel,
-	deleteSideDiamondOption,
-	deleteSizeMetalFromJewelryModel,
-	createSideDiamondOptionForJewelryModel,
-	createSizeMetalForJewelryModel,
-	updateSizeMetalForJewelryModel,
-	changeVisibilityJewelryModel,
-	updateCraftmanFee,
 } from '../../../../redux/slices/jewelry/jewelryModelSlice';
-import {
-	Button,
-	Checkbox,
-	Image,
-	Input,
-	message,
-	Modal,
-	Popover,
-	Select,
-	Slider,
-	Space,
-	Table,
-	Tag,
-} from 'antd';
+import {message, Collapse} from 'antd';
 import {fetchAllMetals} from '../../../../redux/slices/jewelry/metalSlice';
 import {fetchAllSizes} from '../../../../redux/slices/jewelry/sizeSlice';
 import {fetchAllShapes} from '../../../../redux/slices/shapeSlice';
@@ -77,9 +57,9 @@ const JewelryModelPage = () => {
 		code: '',
 		categoryId: '',
 		craftManFee: '',
+		isEngravable: false,
 		width: '',
 		length: '',
-		isEngravable: false,
 		backType: '',
 		claspType: '',
 		chainType: '',
@@ -192,10 +172,30 @@ const JewelryModelPage = () => {
 		}
 	};
 	const handleMainDiamondChange = (index, field, value) => {
-		const updatedMainDiamondSpecs = [...mainDiamondSpecs];
-		updatedMainDiamondSpecs[index][field] = value;
-		setMainDiamondSpecs(updatedMainDiamondSpecs);
-		console.log(`Updated Main Diamond Spec [${index}] field ${field}:`, value);
+		if (field === 'quantity') {
+			const otherSpecsQuantity = mainDiamondSpecs.reduce(
+				(sum, spec, i) => (i === index ? sum : sum + (Number(spec.quantity) || 0)),
+				0
+			);
+
+			if (Number(value) + otherSpecsQuantity <= 3) {
+				const updatedSpecs = [...mainDiamondSpecs];
+				updatedSpecs[index] = {
+					...updatedSpecs[index],
+					[field]: value,
+				};
+				setMainDiamondSpecs(updatedSpecs);
+			} else {
+				message.warning('Tổng số lượng kim cương chính không được vượt quá 3');
+			}
+		} else {
+			const updatedSpecs = [...mainDiamondSpecs];
+			updatedSpecs[index] = {
+				...updatedSpecs[index],
+				[field]: value,
+			};
+			setMainDiamondSpecs(updatedSpecs);
+		}
 	};
 	const handleShapeChange = (mainIndex, shapeIndex, field, value) => {
 		setMainDiamondSpecs((prevState) => {
@@ -237,16 +237,24 @@ const JewelryModelPage = () => {
 		});
 	};
 	const handleAddMainDiamondSpec = () => {
-		setMainDiamondSpecs([
-			...mainDiamondSpecs,
-			{
-				settingType: '',
-				quantity: '',
-				shapeSpecs: [{shapeId: '', caratFrom: '', caratTo: ''}],
-			},
-		]);
-	};
+		const totalQuantity = mainDiamondSpecs.reduce(
+			(sum, spec) => sum + (Number(spec.quantity) || 0),
+			0
+		);
 
+		if (mainDiamondSpecs.length < 3 && totalQuantity < 3) {
+			setMainDiamondSpecs([
+				...mainDiamondSpecs,
+				{
+					settingType: '',
+					quantity: '',
+					shapeSpecs: [{shapeId: '', caratFrom: '', caratTo: ''}],
+				},
+			]);
+		} else {
+			message.warning('Chỉ được phép tối đa 3 kim cương chính');
+		}
+	};
 	const handleAddShapeSpec = (index) => {
 		const newShapeSpec = {shapeId: '', caratFrom: '', caratTo: ''};
 		setMainDiamondSpecs((prevState) => {
@@ -571,575 +579,764 @@ const JewelryModelPage = () => {
 						</h2>
 						<div className="flex gap-5">
 							<div className="flex flex-col gap-5">
-								{/* Model Spec Fields */}
 								<div className="p-6 border border-black rounded-lg shadow-md bg-white">
 									<h2 className="text-xl font-semibold text-black mb-4">
 										Thông Số Mẫu Trang Sức
 									</h2>
 									<div className="grid grid-cols-4 sm:grid-cols-2 lg:grid-cols-5 gap-5 p-6 border border-black rounded-lg shadow-md bg-tintWhite">
-										{Object.keys(modelSpec).map((field) => (
-											<div key={field} className="mb-4">
-												{field === 'categoryId' ? (
-													// Render a dropdown for categoryId
-													<select
-														name="categoryId"
-														value={modelSpec.categoryId}
-														onChange={handleInputChange}
-														required
-														className="form-input w-full p-2 border border-gray text-black rounded-md"
-													>
-														<option value="">
-															Chọn loại trang sức
-														</option>
-														{categories.map((category) => (
-															<option
-																key={category.id}
-																value={category.Id}
-															>
-																{category.Name}
-															</option>
-														))}
-													</select>
-												) : typeof modelSpec[field] === 'boolean' ? (
-													// Render a checkbox for boolean fields
-													<div className="flex items-center">
-														<input
-															type="checkbox"
-															name={field}
-															checked={modelSpec[field]}
+										{Object.keys(modelSpec).map((field) => {
+											// Define category-specific visible fields
+											const categorySpecificFields = {
+												1: ['isEngravable', 'width'], // Ring
+												2: [
+													'length',
+													'chainType',
+													'claspType',
+													'isEngravable',
+												], // Necklace
+												3: ['length', 'claspType', 'isEngravable'], // Bracelace
+												4: ['backType', 'isEngravable'], // Earring
+											};
+
+											// Only show fields relevant to the selected category or always visible fields
+											if (
+												modelSpec.categoryId !== '' &&
+												field !== 'categoryId' &&
+												field !== 'name' &&
+												field !== 'code' &&
+												field !== 'craftManFee' &&
+												!categorySpecificFields[
+													modelSpec.categoryId
+												]?.includes(field)
+											) {
+												return null;
+											}
+
+											return (
+												<div key={field} className="mb-4">
+													{field === 'categoryId' ? (
+														// Render a dropdown for categoryId
+														<select
+															name="categoryId"
+															value={modelSpec.categoryId}
 															onChange={handleInputChange}
-															className="form-checkbox h-5 w-5 text-blue transition duration-200 ease-in-out focus:ring-blue rounded focus:outline-none"
-														/>
-														<label
-															htmlFor={field}
-															className="ml-2 text-gray"
+															required
+															className="form-input w-full p-2 border border-gray text-black rounded-md"
 														>
-															{field.replace(/([A-Z])/g, ' $1')}
-														</label>
-													</div>
-												) : (
-													// Render a text input for other fields
-													<input
-														placeholder={field.replace(
-															/([A-Z])/g,
-															' $1'
-														)}
-														type="text"
-														name={field}
-														value={modelSpec[field]}
-														required
-														onChange={handleInputChange}
-														className="form-input w-full p-3 border border-gray rounded-md shadow-sm transition duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue focus:border-primary placeholder-gray"
-													/>
-												)}
-											</div>
-										))}
+															<option value="">
+																Chọn loại trang sức
+															</option>
+															{categories.map((category) => (
+																<option
+																	key={category.id}
+																	value={category.Id}
+																>
+																	{category.Name}
+																</option>
+															))}
+														</select>
+													) : field === 'chainType' ? (
+														// Custom dropdown for chain type (only for Necklace)
+														<select
+															name="chainType"
+															value={modelSpec.chainType}
+															onChange={handleInputChange}
+															className="form-input w-full p-2 border border-gray text-black rounded-md"
+														>
+															<option value="">
+																Chọn loại dây chuyền
+															</option>
+															<option value="2">Hạt</option>
+															<option value="3">Byzantine</option>
+															<option value="0">Dây Cáp"</option>
+															<option value="5">
+																Dây Xích Phẳng
+															</option>
+															<option value="4">Dây Figaro</option>
+															<option value="1">Dây Thừng</option>
+														</select>
+													) : field === 'claspType' ? (
+														// Custom dropdown for clasp type (for Necklace and Bracelace)
+														<select
+															name="claspType"
+															value={modelSpec.claspType}
+															onChange={handleInputChange}
+															className="form-input w-full p-2 border border-gray text-black rounded-md"
+														>
+															<option value="">Chọn loại khóa</option>
+															<option value="3">Khóa Thùng</option>
+															<option value="2">Khóa Gài</option>
+															<option value="9">Khóa Vòng Tay</option>
+															<option value="1">Khóa Móc</option>
+															<option value="7">Khóa Từ Tính</option>
+															<option value="4">Khóa Hộp Mở</option>
+															<option value="8">
+																Khóa Ngọc Trai
+															</option>
+															<option value="6">Khóa Chữ S</option>
+															<option value="0">Khóa Lò Xo</option>
+															<option value="5">Khóa Gài Chéo</option>
+														</select>
+													) : field === 'backType' ? (
+														// Custom dropdown for back type (only for Earring)
+														<select
+															name="backType"
+															value={modelSpec.backType}
+															onChange={handleInputChange}
+															className="form-input w-full p-2 border border-gray text-black rounded-md"
+														>
+															<option value="">Chọn loại gài</option>
+															<option value="0">Gài Ấn</option>
+															<option value="1">Gài Vặn</option>
+															<option value="2">
+																Gài Khóa An Toàn
+															</option>
+														</select>
+													) : typeof modelSpec[field] === 'boolean' ? (
+														// Render a checkbox for boolean fields
+														<div className="flex items-center">
+															<input
+																type="checkbox"
+																name={field}
+																checked={modelSpec[field]}
+																onChange={handleInputChange}
+																className="form-checkbox h-5 w-5 text-blue transition duration-200 ease-in-out focus:ring-blue rounded focus:outline-none"
+															/>{' '}
+															<label
+																htmlFor={field}
+																className="m-3 text-gray"
+															>
+																{field.replace(/([A-Z])/g, ' $1')}
+															</label>
+														</div>
+													) : (
+														// Render a text input for other fields
+														<input
+															placeholder={field.replace(
+																/([A-Z])/g,
+																' $1'
+															)}
+															type="text"
+															name={field}
+															value={modelSpec[field]}
+															required={
+																field !== 'width' &&
+																field !== 'length'
+															}
+															onChange={handleInputChange}
+															className="form-input w-full p-3 border border-gray rounded-md shadow-sm transition duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue focus:border-primary placeholder-gray"
+														/>
+													)}
+												</div>
+											);
+										})}
 									</div>
 								</div>
 
 								<div className="p-6 border rounded-lg shadow-md bg-white">
-									<h2 className="text-xl font-semibold mb-4">
-										Thông số kim cương chính
-									</h2>
-									{mainDiamondSpecs.map((spec, index) => (
-										<div
-											key={index}
-											className="mb-4 border p-4 rounded-md bg-tintWhite"
+									<Collapse
+										defaultActiveKey={[]}
+										ghost
+										className="bg-white border rounded-lg shadow-md"
+									>
+										<Collapse.Panel
+											header={
+												<h2 className="text-xl font-semibold">
+													Thông số kim cương chính
+												</h2>
+											}
+											key="mainDiamond"
 										>
-											<div className="flex justify-between">
-												<h3 className="font-semibold text-lg mb-2">
-													Kim cương chính {index + 1}
-												</h3>
-												{mainDiamondSpecs.length > 1 && (
-													<button
-														onClick={() =>
-															handleRemoveMainDiamondSpec(index)
-														}
-														className="text-red"
-													>
-														- Xóa
-													</button>
-												)}
-											</div>
-											<div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-4">
-												<div>
-													<select
-														label="Mẫu Thiết Kế"
-														type="number"
-														value={spec.settingType}
-														onChange={(e) =>
-															handleMainDiamondChange(
-																index,
-																'settingType',
-																e.target.value
-															)
-														}
-														placeholder="Mẫu Thiết Kế"
-														className="form-input w-full p-2 border border-gray-300 rounded-md"
-													>
-														{' '}
-														<option value="">Mẫu Thiết Kế</option>
-														{enums?.SettingType &&
-															Object.keys(enums.SettingType).map(
-																(key) => (
-																	<option
-																		key={key}
-																		value={
-																			enums.SettingType[key]
-																		}
-																	>
-																		{key.replace(
-																			/([A-Z])/g,
-																			' $1'
-																		)}
-																	</option>
-																)
-															)}
-													</select>
-												</div>
-
-												<input
-													label=""
-													type="number"
-													value={spec.quantity}
-													onChange={(e) =>
-														handleMainDiamondChange(
-															index,
-															'quantity',
-															e.target.value
-														)
-													}
-													placeholder="Số Lượng"
-													className="form-input w-full p-2 border border-gray-300 rounded-md"
-												/>
-											</div>
-
-											{/* Shape Specs */}
-											<div className="ml-4">
-												<h4 className="font-semibold mb-2">
-													Thông Số Hình Dáng
-												</h4>
-												{spec.shapeSpecs.map((shape, shapeIndex) => (
-													<div key={shapeIndex} className=" mb-2">
-														<div className="flex justify-between">
-															<h3 className="font-semibold text-lg mb-2">
-																Hình dáng {shapeIndex + 1}
-															</h3>
-															{spec.shapeSpecs.length > 1 && (
-																<button
-																	onClick={() =>
-																		handleRemoveShapeSpec(
-																			index,
-																			shapeIndex
-																		)
-																	}
-																	className="text-red"
-																>
-																	- Xóa
-																</button>
-															)}
-														</div>
-														<div className="grid grid-cols-3 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-4">
+											{mainDiamondSpecs.map((spec, index) => (
+												<div
+													key={index}
+													className="mb-4 border p-4 rounded-md bg-tintWhite"
+												>
+													<div className="flex justify-between">
+														<h3 className="font-semibold text-lg mb-2">
+															Kim cương chính {index + 1}
+														</h3>
+														{mainDiamondSpecs.length > 1 && (
+															<button
+																onClick={() =>
+																	handleRemoveMainDiamondSpec(
+																		index
+																	)
+																}
+																className="text-red"
+															>
+																- Xóa
+															</button>
+														)}
+													</div>
+													<div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-4">
+														<div>
 															<select
-																value={shape.shapeId}
+																label="Mẫu Thiết Kế"
+																type="number"
+																value={spec.settingType}
 																onChange={(e) =>
-																	handleShapeChange(
+																	handleMainDiamondChange(
 																		index,
-																		shapeIndex,
-																		'shapeId',
+																		'settingType',
 																		e.target.value
 																	)
 																}
-																placeholder=" ID"
+																placeholder="Mẫu Thiết Kế"
 																className="form-input w-full p-2 border border-gray-300 rounded-md"
 															>
+																{' '}
 																<option value="">
-																	Chọn Hình Dáng
+																	Mẫu Thiết Kế
 																</option>
-																{Array.isArray(shapes) &&
-																	shapes.map((shape) => (
+																{enums?.SettingType &&
+																	Object.keys(
+																		enums.SettingType
+																	).map((key) => (
 																		<option
-																			key={shape.id}
-																			value={shape.Id}
+																			key={key}
+																			value={
+																				enums.SettingType[
+																					key
+																				]
+																			}
 																		>
-																			{shape.ShapeName}
+																			{key.replace(
+																				/([A-Z])/g,
+																				' $1'
+																			)}
 																		</option>
 																	))}
 															</select>
-															<input
-																type="number"
-																value={shape.caratFrom}
-																onChange={(e) =>
-																	handleShapeChange(
-																		index,
-																		shapeIndex,
-																		'caratFrom',
-																		e.target.value
-																	)
-																}
-																placeholder="Carat thấp nhất"
-																className="form-input w-full p-2 border border-gray-300 rounded-md"
-															/>
-															<input
-																type="number"
-																value={shape.caratTo}
-																onChange={(e) =>
-																	handleShapeChange(
-																		index,
-																		shapeIndex,
-																		'caratTo',
-																		e.target.value
-																	)
-																}
-																placeholder="Carat cao nhất"
-																className="form-input w-full p-2 border border-gray rounded-md"
-															/>
 														</div>
+
+														<input
+															label=""
+															type="number"
+															min="1"
+															value={spec.quantity}
+															onChange={(e) =>
+																handleMainDiamondChange(
+																	index,
+																	'quantity',
+																	e.target.value
+																)
+															}
+															placeholder="Số Lượng"
+															className="form-input w-full p-2 border border-gray-300 rounded-md"
+														/>
 													</div>
-												))}
-												<button
-													onClick={() => handleAddShapeSpec(index)}
-													className="text-blue"
-												>
-													+ Thêm hình dáng khác
-												</button>
-											</div>
-										</div>
-									))}
-									<button
-										onClick={handleAddMainDiamondSpec}
-										className="text-blue"
-									>
-										+ Thêm bộ thông số khác
-									</button>
+
+													{/* Shape Specs */}
+													<div className="ml-4">
+														<h4 className="font-semibold mb-2">
+															Thông Số Hình Dáng
+														</h4>
+														{spec.shapeSpecs.map(
+															(shape, shapeIndex) => (
+																<div
+																	key={shapeIndex}
+																	className=" mb-2"
+																>
+																	<div className="flex justify-between">
+																		<h3 className="font-semibold text-lg mb-2">
+																			Hình dáng{' '}
+																			{shapeIndex + 1}
+																		</h3>
+																		{spec.shapeSpecs.length >
+																			1 && (
+																			<button
+																				onClick={() =>
+																					handleRemoveShapeSpec(
+																						index,
+																						shapeIndex
+																					)
+																				}
+																				className="text-red"
+																			>
+																				- Xóa
+																			</button>
+																		)}
+																	</div>
+																	<div className="grid grid-cols-3 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-4">
+																		<select
+																			value={shape.shapeId}
+																			onChange={(e) =>
+																				handleShapeChange(
+																					index,
+																					shapeIndex,
+																					'shapeId',
+																					e.target.value
+																				)
+																			}
+																			placeholder=" ID"
+																			className="form-input w-full p-2 border border-gray-300 rounded-md"
+																		>
+																			<option value="">
+																				Chọn Hình Dáng
+																			</option>
+																			{Array.isArray(
+																				shapes
+																			) &&
+																				shapes.map(
+																					(shape) => (
+																						<option
+																							key={
+																								shape.id
+																							}
+																							value={
+																								shape.Id
+																							}
+																						>
+																							{
+																								shape.ShapeName
+																							}
+																						</option>
+																					)
+																				)}
+																		</select>
+																		<input
+																			type="number"
+																			value={shape.caratFrom}
+																			onChange={(e) =>
+																				handleShapeChange(
+																					index,
+																					shapeIndex,
+																					'caratFrom',
+																					e.target.value
+																				)
+																			}
+																			placeholder="Carat thấp nhất"
+																			className="form-input w-full p-2 border border-gray-300 rounded-md"
+																		/>
+																		<input
+																			type="number"
+																			value={shape.caratTo}
+																			onChange={(e) =>
+																				handleShapeChange(
+																					index,
+																					shapeIndex,
+																					'caratTo',
+																					e.target.value
+																				)
+																			}
+																			placeholder="Carat cao nhất"
+																			className="form-input w-full p-2 border border-gray rounded-md"
+																		/>
+																	</div>
+																</div>
+															)
+														)}
+														<button
+															onClick={() =>
+																handleAddShapeSpec(index)
+															}
+															className="text-blue"
+														>
+															+ Thêm hình dáng khác
+														</button>
+													</div>
+												</div>
+											))}
+											<button
+												onClick={handleAddMainDiamondSpec}
+												className="text-blue"
+											>
+												+ Thêm bộ thông số khác
+											</button>
+										</Collapse.Panel>
+									</Collapse>
 								</div>
 							</div>
 							<div className="flex flex-col gap-5">
-								{/* Side Diamond Specs Section */}
 								<div className="p-6 border rounded-lg shadow-md bg-white">
-									<h2 className="text-xl font-semibold mb-4">
-										Thông số kim cương tấm
-									</h2>
-
-									{sideDiamondSpecs.map((spec, index) => (
-										<div
-											key={index}
-											className="mb-4 border p-4 rounded-md bg-tintWhite"
-										>
-											<div className="flex justify-between">
-												<h3 className="font-semibold text-lg mb-2">
-													Kim cương tấm {index + 1}
-												</h3>{' '}
-												{sideDiamondSpecs.length > 1 && (
-													<button
-														onClick={() =>
-															handleRemoveSideDiamondSpec(index)
-														}
-														className="text-red"
-													>
-														- Xóa
-													</button>
-												)}
-											</div>
-											<div className="grid grid-cols-4 gap-4 ">
-												<select
-													value={spec.shapeId}
-													onChange={(e) =>
-														handleSideDiamondChange(
-															index,
-															'shapeId',
-															e.target.value
-														)
-													}
-													placeholder="ID"
-													className="form-input w-full p-2 border border-gray-300 rounded-md"
-												>
-													<option value="">
-														Chọn Hình Dáng Kim Cương
-													</option>
-													{Array.isArray(shapes) &&
-														shapes.map((shape) => (
-															<option key={shape.id} value={shape.Id}>
-																{shape.ShapeName}
-															</option>
-														))}
-												</select>
-
-												<select
-													value={spec.colorMin}
-													onChange={(e) =>
-														handleSideDiamondChange(
-															index,
-															'colorMin',
-															e.target.value
-														)
-													}
-													placeholder="Color thấp nhất"
-													className="form-input w-full p-2 border border-gray-300 rounded-md"
-												>
-													{' '}
-													<option value="">Color thấp nhất</option>
-													{enums?.Color &&
-														Object.keys(enums.Color).map((key) => (
-															<option
-																key={key}
-																value={enums.Color[key]}
-															>
-																{key.replace(/([A-Z])/g, ' $1')}
-															</option>
-														))}
-												</select>
-												<select
-													value={spec.colorMax}
-													onChange={(e) =>
-														handleSideDiamondChange(
-															index,
-															'colorMax',
-															e.target.value
-														)
-													}
-													placeholder="Color cao nhất"
-													className="form-input w-full p-2 border border-gray-300 rounded-md"
-												>
-													{' '}
-													<option value="">Color cao nhất</option>
-													{enums?.Color &&
-														Object.keys(enums.Color).map((key) => (
-															<option
-																key={key}
-																value={enums.Color[key]}
-															>
-																{key.replace(/([A-Z])/g, ' $1')}
-															</option>
-														))}
-												</select>
-												<select
-													value={spec.clarityMin}
-													placeholder="Clarity thấp nhất"
-													onChange={(e) =>
-														handleSideDiamondChange(
-															index,
-															'clarityMin',
-															e.target.value
-														)
-													}
-													className="form-input w-full p-2 border border-gray-300 rounded-md"
-												>
-													{' '}
-													<option value="">Clarity thấp nhất</option>
-													{enums?.Clarity &&
-														Object.keys(enums.Clarity).map((key) => (
-															<option
-																key={key}
-																value={enums.Clarity[key]}
-															>
-																{key.replace(/([A-Z])/g, ' $1')}
-															</option>
-														))}
-												</select>
-												<select
-													value={spec.clarityMax}
-													onChange={(e) =>
-														handleSideDiamondChange(
-															index,
-															'clarityMax',
-															e.target.value
-														)
-													}
-													placeholder="Clarity cao nhất"
-													className="form-input w-full p-2 border border-gray-300 rounded-md"
-												>
-													{' '}
-													<option value="">Clarity cao nhất</option>
-													{enums?.Clarity &&
-														Object.keys(enums.Clarity).map((key) => (
-															<option
-																key={key}
-																value={enums.Clarity[key]}
-															>
-																{key.replace(/([A-Z])/g, ' $1')}
-															</option>
-														))}
-												</select>
-												<select
-													value={spec.settingType}
-													onChange={(e) =>
-														handleSideDiamondChange(
-															index,
-															'settingType',
-															e.target.value
-														)
-													}
-													placeholder="Mẫu Thiết Kế"
-													className="form-input w-full p-2 border border-gray-300 rounded-md"
-												>
-													{' '}
-													<option value="">Mẫu thiết kế</option>
-													{enums?.SettingType &&
-														Object.keys(enums.SettingType).map(
-															(key) => (
-																<option
-																	key={key}
-																	value={enums.SettingType[key]}
-																>
-																	{key.replace(/([A-Z])/g, ' $1')}
-																</option>
-															)
-														)}
-												</select>
-
-												<input
-													type="number"
-													value={spec.caratWeight}
-													onChange={(e) =>
-														handleSideDiamondChange(
-															index,
-															'caratWeight',
-															e.target.value
-														)
-													}
-													placeholder="Trọng lượng Carat"
-													className="form-input w-full p-2 border border-gray-300 rounded-md"
-												/>
-												<input
-													type="number"
-													value={spec.quantity}
-													onChange={(e) =>
-														handleSideDiamondChange(
-															index,
-															'quantity',
-															e.target.value
-														)
-													}
-													placeholder="Số Lượng"
-													className="form-input w-full p-2 border border-gray-300 rounded-md"
-												/>
-											</div>
-											{errorCarat && (
-												<p className="text-red text-sm mt-1">
-													{errorCarat}
-												</p>
-											)}
-											{!errorCarat && (
-												<p className="text-gray text-sm mt-2">
-													Hãy chắc chắn rằng trung bình mỗi viên kim cương
-													tấm không vượt quá 0.18 ct
-												</p>
-											)}
-											{/* Repeat other fields for each side diamond spec */}
-										</div>
-									))}
-									<button
-										onClick={handleAddSideDiamondSpec}
-										className="text-blue-600"
+									<Collapse
+										defaultActiveKey={[]}
+										ghost
+										className="bg-white border rounded-lg shadow-md"
 									>
-										+ Thêm bộ thông số khác
-									</button>
+										<Collapse.Panel
+											header={
+												<h2 className="text-xl font-semibold">
+													Thông số kim cương tấm
+												</h2>
+											}
+											key="sideDiamond"
+										>
+											{sideDiamondSpecs.map((spec, index) => (
+												<div
+													key={index}
+													className="mb-4 border p-4 rounded-md bg-tintWhite"
+												>
+													<div className="flex justify-between">
+														<h3 className="font-semibold text-lg mb-2">
+															Kim cương tấm {index + 1}
+														</h3>{' '}
+														{sideDiamondSpecs.length > 1 && (
+															<button
+																onClick={() =>
+																	handleRemoveSideDiamondSpec(
+																		index
+																	)
+																}
+																className="text-red"
+															>
+																- Xóa
+															</button>
+														)}
+													</div>
+													<div className="grid grid-cols-4 gap-4 ">
+														<select
+															value={spec.shapeId}
+															onChange={(e) =>
+																handleSideDiamondChange(
+																	index,
+																	'shapeId',
+																	e.target.value
+																)
+															}
+															placeholder="ID"
+															className="form-input w-full p-2 border border-gray-300 rounded-md"
+														>
+															<option value="">
+																Chọn Hình Dáng Kim Cương
+															</option>
+															{Array.isArray(shapes) &&
+																shapes.map((shape) => (
+																	<option
+																		key={shape.id}
+																		value={shape.Id}
+																	>
+																		{shape.ShapeName}
+																	</option>
+																))}
+														</select>
+
+														<select
+															value={spec.colorMin}
+															onChange={(e) =>
+																handleSideDiamondChange(
+																	index,
+																	'colorMin',
+																	e.target.value
+																)
+															}
+															placeholder="Color thấp nhất"
+															className="form-input w-full p-2 border border-gray-300 rounded-md"
+														>
+															{' '}
+															<option value="">
+																Color thấp nhất
+															</option>
+															{enums?.Color &&
+																Object.keys(enums.Color).map(
+																	(key) => (
+																		<option
+																			key={key}
+																			value={enums.Color[key]}
+																		>
+																			{key.replace(
+																				/([A-Z])/g,
+																				' $1'
+																			)}
+																		</option>
+																	)
+																)}
+														</select>
+														<select
+															value={spec.colorMax}
+															onChange={(e) =>
+																handleSideDiamondChange(
+																	index,
+																	'colorMax',
+																	e.target.value
+																)
+															}
+															placeholder="Color cao nhất"
+															className="form-input w-full p-2 border border-gray-300 rounded-md"
+														>
+															{' '}
+															<option value="">Color cao nhất</option>
+															{enums?.Color &&
+																Object.keys(enums.Color).map(
+																	(key) => (
+																		<option
+																			key={key}
+																			value={enums.Color[key]}
+																		>
+																			{key.replace(
+																				/([A-Z])/g,
+																				' $1'
+																			)}
+																		</option>
+																	)
+																)}
+														</select>
+														<select
+															value={spec.clarityMin}
+															placeholder="Clarity thấp nhất"
+															onChange={(e) =>
+																handleSideDiamondChange(
+																	index,
+																	'clarityMin',
+																	e.target.value
+																)
+															}
+															className="form-input w-full p-2 border border-gray-300 rounded-md"
+														>
+															{' '}
+															<option value="">
+																Clarity thấp nhất
+															</option>
+															{enums?.Clarity &&
+																Object.keys(enums.Clarity).map(
+																	(key) => (
+																		<option
+																			key={key}
+																			value={
+																				enums.Clarity[key]
+																			}
+																		>
+																			{key.replace(
+																				/([A-Z])/g,
+																				' $1'
+																			)}
+																		</option>
+																	)
+																)}
+														</select>
+														<select
+															value={spec.clarityMax}
+															onChange={(e) =>
+																handleSideDiamondChange(
+																	index,
+																	'clarityMax',
+																	e.target.value
+																)
+															}
+															placeholder="Clarity cao nhất"
+															className="form-input w-full p-2 border border-gray-300 rounded-md"
+														>
+															{' '}
+															<option value="">
+																Clarity cao nhất
+															</option>
+															{enums?.Clarity &&
+																Object.keys(enums.Clarity).map(
+																	(key) => (
+																		<option
+																			key={key}
+																			value={
+																				enums.Clarity[key]
+																			}
+																		>
+																			{key.replace(
+																				/([A-Z])/g,
+																				' $1'
+																			)}
+																		</option>
+																	)
+																)}
+														</select>
+														<select
+															value={spec.settingType}
+															onChange={(e) =>
+																handleSideDiamondChange(
+																	index,
+																	'settingType',
+																	e.target.value
+																)
+															}
+															placeholder="Mẫu Thiết Kế"
+															className="form-input w-full p-2 border border-gray-300 rounded-md"
+														>
+															{' '}
+															<option value="">Mẫu thiết kế</option>
+															{enums?.SettingType &&
+																Object.keys(enums.SettingType).map(
+																	(key) => (
+																		<option
+																			key={key}
+																			value={
+																				enums.SettingType[
+																					key
+																				]
+																			}
+																		>
+																			{key.replace(
+																				/([A-Z])/g,
+																				' $1'
+																			)}
+																		</option>
+																	)
+																)}
+														</select>
+
+														<input
+															type="number"
+															value={spec.caratWeight}
+															onChange={(e) =>
+																handleSideDiamondChange(
+																	index,
+																	'caratWeight',
+																	e.target.value
+																)
+															}
+															placeholder="Trọng lượng Carat"
+															className="form-input w-full p-2 border border-gray-300 rounded-md"
+														/>
+														<input
+															type="number"
+															value={spec.quantity}
+															onChange={(e) =>
+																handleSideDiamondChange(
+																	index,
+																	'quantity',
+																	e.target.value
+																)
+															}
+															placeholder="Số Lượng"
+															className="form-input w-full p-2 border border-gray-300 rounded-md"
+														/>
+													</div>
+													{errorCarat && (
+														<p className="text-red text-sm mt-1">
+															{errorCarat}
+														</p>
+													)}
+													{!errorCarat && (
+														<p className="text-gray text-sm mt-2">
+															Hãy chắc chắn rằng trung bình mỗi viên
+															kim cương tấm không vượt quá 0.18 ct
+														</p>
+													)}
+													{/* Repeat other fields for each side diamond spec */}
+												</div>
+											))}
+											<button
+												onClick={handleAddSideDiamondSpec}
+												className="text-blue-600"
+											>
+												+ Thêm bộ thông số khác
+											</button>{' '}
+										</Collapse.Panel>
+									</Collapse>
 								</div>
 
-								{/* Metal Size Specs Section */}
 								<div className="p-6 border rounded-lg shadow-md bg-white">
-									<h2 className="text-xl font-semibold mb-4">
-										Thông số kim loại
-									</h2>
-									{metalSizeSpecs.map((spec, index) => (
-										<div
-											key={index}
-											className="mb-4 border p-4 rounded-md bg-gray-50  bg-tintWhite"
-										>
-											<div className="flex justify-between">
-												<h3 className="font-semibold text-lg mb-2">
-													Kim loại {index + 1}
-												</h3>{' '}
-												{metalSizeSpecs.length > 1 && (
-													<button
-														onClick={() =>
-															handleRemoveMetalSizeSpec(index)
-														}
-														className="text-red"
-													>
-														- Xóa
-													</button>
-												)}
-											</div>
-											<div className="grid grid-cols-3 sm:grid-cols-2 lg:grid-cols-3 gap-6 ">
-												<select
-													value={spec.metalId}
-													onChange={(e) =>
-														handleMetalSizeChange(
-															index,
-															'metalId',
-															e.target.value
-														)
-													}
-													required
-													className="form-input w-full p-2 border border-gray text-black rounded-md"
-												>
-													<option value="">Chọn kim loại</option>
-													{Array.isArray(metals) &&
-														metals.map((metal) => (
-															<option
-																className="text-black"
-																key={metal.id}
-																value={metal.Id}
-															>
-																{metal.Name}{' '}
-																{/* Display the metal name */}
-															</option>
-														))}
-												</select>
-
-												<select
-													value={spec.sizeId}
-													onChange={(e) =>
-														handleMetalSizeChange(
-															index,
-															'sizeId',
-															e.target.value
-														)
-													}
-													required
-													placeholder="Size ID"
-													className="form-input w-full p-2 border border-gray text-black rounded-md"
-												>
-													{' '}
-													<option value="">Chọn size</option>
-													{Array.isArray(sizes) &&
-														sizes.map((size) => (
-															<option
-																className="text-black"
-																key={size.id}
-																value={size.id}
-															>
-																{size.Value}{' '}
-																{/* Display the metal name */}
-															</option>
-														))}
-												</select>
-
-												<input
-													type="number"
-													value={spec.weight}
-													onChange={(e) =>
-														handleMetalSizeChange(
-															index,
-															'weight',
-															e.target.value
-														)
-													}
-													required
-													placeholder="Khối Lượng"
-													className="form-input w-full p-2 border border-gray-300 rounded-md"
-												/>
-											</div>
-										</div>
-									))}
-									<button
-										onClick={handleAddMetalSizeSpec}
-										className="text-blue-600"
+									<Collapse
+										defaultActiveKey={[]}
+										ghost
+										className="bg-white border rounded-lg shadow-md"
 									>
-										+ Thêm bộ thông số khác
-									</button>
+										<Collapse.Panel
+											header={
+												<h2 className="text-xl font-semibold">
+													Thông số kim loại
+												</h2>
+											}
+											key="metalSize"
+										>
+											{metalSizeSpecs.map((spec, index) => (
+												<div
+													key={index}
+													className="mb-4 border p-4 rounded-md bg-gray-50  bg-tintWhite"
+												>
+													<div className="flex justify-between">
+														<h3 className="font-semibold text-lg mb-2">
+															Kim loại {index + 1}
+														</h3>{' '}
+														{metalSizeSpecs.length > 1 && (
+															<button
+																onClick={() =>
+																	handleRemoveMetalSizeSpec(index)
+																}
+																className="text-red"
+															>
+																- Xóa
+															</button>
+														)}
+													</div>
+													<div className="grid grid-cols-3 sm:grid-cols-2 lg:grid-cols-3 gap-6 ">
+														<select
+															value={spec.metalId}
+															onChange={(e) =>
+																handleMetalSizeChange(
+																	index,
+																	'metalId',
+																	e.target.value
+																)
+															}
+															required
+															className="form-input w-full p-2 border border-gray text-black rounded-md"
+														>
+															<option value="">Chọn kim loại</option>
+															{Array.isArray(metals) &&
+																metals.map((metal) => (
+																	<option
+																		className="text-black"
+																		key={metal.id}
+																		value={metal.Id}
+																	>
+																		{metal.Name}{' '}
+																		{/* Display the metal name */}
+																	</option>
+																))}
+														</select>
+
+														<select
+															value={spec.sizeId}
+															onChange={(e) =>
+																handleMetalSizeChange(
+																	index,
+																	'sizeId',
+																	e.target.value
+																)
+															}
+															required
+															placeholder="Size ID"
+															className="form-input w-full p-2 border border-gray text-black rounded-md"
+														>
+															{' '}
+															<option value="">Chọn size</option>
+															{Array.isArray(sizes) &&
+																sizes.map((size) => (
+																	<option
+																		className="text-black"
+																		key={size.id}
+																		value={size.id}
+																	>
+																		{size.Value}{' '}
+																		{/* Display the metal name */}
+																	</option>
+																))}
+														</select>
+
+														<input
+															type="number"
+															value={spec.weight}
+															onChange={(e) =>
+																handleMetalSizeChange(
+																	index,
+																	'weight',
+																	e.target.value
+																)
+															}
+															required
+															placeholder="Khối Lượng"
+															className="form-input w-full p-2 border border-gray-300 rounded-md"
+														/>
+													</div>
+												</div>
+											))}
+											<button
+												onClick={handleAddMetalSizeSpec}
+												className="text-blue-600"
+											>
+												+ Thêm bộ thông số khác
+											</button>{' '}
+										</Collapse.Panel>
+									</Collapse>
 								</div>
 							</div>
 						</div>

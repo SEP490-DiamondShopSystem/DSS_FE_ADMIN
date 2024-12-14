@@ -177,6 +177,7 @@ const ModelDetailsView = ({
                     {diamond.Shapes &&
                       diamond.Shapes.map((shape, shapeIndex) => (
                         <React.Fragment key={shapeIndex}>
+                        <div className="border rounded-xl p-1">
                           {renderDetailRow(
                             'Hình Dáng',
                             shape.Shape?.ShapeName
@@ -186,7 +187,7 @@ const ModelDetailsView = ({
                             renderDetailRow(
                               'Khoảng Carat',
                               `${shape?.CaratFrom} - ${shape?.CaratTo} carats`
-                            )}
+                            )}</div>
                         </React.Fragment>
                       ))}
                   </div>

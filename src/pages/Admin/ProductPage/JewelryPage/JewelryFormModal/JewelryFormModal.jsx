@@ -1,5 +1,5 @@
 import React, {useState} from 'react';
-import {Modal, Form, Select, Button, Table} from 'antd';
+import {Modal, Form, Select, Button, Table, Input} from 'antd';
 import JewelryModelList from '../../../PromotionPage/JewelryModelList';
 const {Option} = Select;
 
@@ -116,6 +116,30 @@ const JewelryFormModal = ({
 								</Option>
 							))}
 						</Select>
+					</Form.Item>
+					<Form.Item
+						label="Mã Mẫu"
+						name={['JewelryRequest', 'ModelCode']}
+						rules={[
+							{
+								pattern: /^[A-Z0-9_-]+$/,
+								message: 'Chỉ cho phép chữ in hoa, số, gạch dưới và gạch ngang',
+							},
+						]}
+					>
+						<Input
+							onChange={(e) => {
+								const uppercaseValue = e.target.value.toUpperCase();
+								const sanitizedValue = uppercaseValue.replace(/[^A-Z0-9_-]/g, '');
+								form.setFieldsValue({
+									JewelryRequest: {
+										ModelCode: sanitizedValue,
+									},
+								});
+								handleChange('ModelCode', sanitizedValue); // Use sanitizedValue here
+							}}
+							placeholder="Nhập mã mẫu (CHỈ IN HOA)"
+						/>
 					</Form.Item>
 					<Form.Item label="Trạng Thái" name={['JewelryRequest', 'status']}>
 						<Select onChange={(value) => handleChange('status', value)}>
