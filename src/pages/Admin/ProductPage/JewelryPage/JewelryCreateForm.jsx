@@ -244,6 +244,7 @@ const JewelryCreateForm = ({onClose, isCreateFormOpen, setIsCreateFormOpen}) => 
 				ModelId: '',
 				MentalId: '',
 				SizeId: '',
+				ModelCode: '',
 				status: 1, // default status
 			},
 			attachedDiamondIds: [],
@@ -264,6 +265,7 @@ const JewelryCreateForm = ({onClose, isCreateFormOpen, setIsCreateFormOpen}) => 
 				JewelryRequest: {
 					...form.getFieldsValue().JewelryRequest,
 					ModelId: model.Id,
+					ModelCode:'',
 					MentalId: '', // Reset metal
 					SizeId: '', // Reset size
 				},
@@ -299,11 +301,11 @@ const JewelryCreateForm = ({onClose, isCreateFormOpen, setIsCreateFormOpen}) => 
 				[name]: value,
 			},
 		});
-
-		// Log individual field change
+	
+		// Add explicit logging
 		console.log(`Changed ${name}:`, value);
+		console.log('Current Form Values:', form.getFieldsValue());
 	};
-
 	// Handle form submission
 	const handleSubmit = () => {
 		const formValues = form.getFieldsValue();
@@ -314,8 +316,9 @@ const JewelryCreateForm = ({onClose, isCreateFormOpen, setIsCreateFormOpen}) => 
 		const {JewelryRequest, attachedDiamondIds, sideDiamondOptId} = formValues;
 
 		// Validation checks
-		const {ModelId, SizeId, MentalId, status} = JewelryRequest;
+		const {ModelId, SizeId, ModelCode, MentalId, status} = JewelryRequest;
 
+		console.log('ModelCode:', ModelCode);
 		if (!ModelId || !SizeId || !MentalId) {
 			alert('Please fill out all required fields (Model, Size, and Metal).');
 			return;
@@ -331,6 +334,7 @@ const JewelryCreateForm = ({onClose, isCreateFormOpen, setIsCreateFormOpen}) => 
 		const finalData = {
 			...(ModelId && {modelId: ModelId}),
 			...(SizeId && {sizeId: SizeId}),
+			...(ModelCode && {modelCode: ModelCode}),
 			...(MentalId && {metalId: MentalId}),
 			...(status && {status}),
 			...(selectedDiamondList.length > 0 && {
@@ -338,6 +342,7 @@ const JewelryCreateForm = ({onClose, isCreateFormOpen, setIsCreateFormOpen}) => 
 			}),
 			...(sideDiamondOptId && {sideDiamondOptId}),
 		};
+		console.log('Final Data for Submission:', finalData);
 
 		dispatch(createJewelry(finalData))
 			.unwrap()

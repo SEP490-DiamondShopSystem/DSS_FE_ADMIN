@@ -182,18 +182,34 @@ const DiscountPage = ({discountData}) => {
 			});
 	};
 	const handlePause = async (id, currentStatus) => {
-		const action = currentStatus === 2 ? 'tạm dừng' : 'tiếp tục';
 		await dispatch(pauseDiscount(id))
 			.unwrap()
 			.then(() => {
-				message.success(`Mã giảm giá với id: ${id} đã được ${action} thành công.`);
+				message.success(`Mã giảm giá có id: ${id} đã được tạm dừng.`);
 				dispatch(fetchDiscounts());
 			})
 			.catch((error) => {
 				message.error(error?.data?.detail || error?.detail);
 			});
 	};
-
+	const handleContinue = async (id) => {
+		try {
+			await dispatch(pauseDiscount(id)).unwrap();
+			message.success(`Mã giảm giá có id: ${id} đã được tiếp tục.`);
+			await dispatch(fetchDiscounts());
+		} catch (error) {
+			message.error(error?.data?.detail || error?.detail || 'Lỗi không xác định');
+		}
+	};
+	const handleStart = async (id) => {
+		try {
+			await dispatch(pauseDiscount(id)).unwrap();
+			message.success(`Mã giảm giá có id: ${id} đã được bắt đầu.`);
+			await dispatch(fetchDiscounts());
+		} catch (error) {
+			message.error(error?.data?.detail || error?.detail || 'Lỗi không xác định');
+		}
+	};
 	const handleCancel = async (id) => {
 		await dispatch(cancelDiscount(id))
 			.unwrap()
@@ -641,80 +657,101 @@ const DiscountPage = ({discountData}) => {
 		},
 
 		{
-			title: '',
-			key: 'action',
-			render: (_, record) => {
-				const status = record.Status;
-				const isActive = status === 1 || status === 3; // Active status
-				const canPause = status === 2; // Pause status
-				const canContinue = status === 3; // Allow continuing for status 3
-
-				const canCancel = status === 1 || status === 3; // Cancel status
-				const canDelete = status === 5 || status === 4; // Delete status
-
-				return (
-					<Space size="middle">
-						{/* Edit Button */}
-						<Tooltip title="Sửa">
-							<Button type="link" onClick={() => handleEdit(record)}>
-								<EditFilled />
-							</Button>
-						</Tooltip>
-
-						{/* Pause Button (only if Status is 2) */}
-						{/* Pause Button (only if Status is 2) */}
-						{(canPause || canContinue) && (
-							<Popconfirm
-								title={
-									canPause
-										? 'Bạn có chắc tạm ngưng khuyến mãi này không?'
-										: 'Bạn có chắc tiếp tục khuyến mãi này không?'
-								}
-								onConfirm={() => handlePause(record.Id)}
-							>
-								<Tooltip
-									title={
-										canPause ? 'Tạm Ngưng Khuyến Mãi' : 'Tiếp Tục Khuyến Mãi'
-									}
+				title: '',
+				key: 'action',
+				render: (_, record) => {
+					const status = record.Status;
+					const canEdit = status === 1 || status === 2; // Scheduled or Active
+					const canPause = status === 2; // Only Active can be paused
+					const canStart = status === 1; // Only Scheduled can be started
+					const canContinue = status === 3; // Only Paused can be continued
+					const canCancel = status === 1 || status === 3; // Scheduled and Paused can be cancelled
+					const canDelete = status === 4 || status === 5; // Expired or Cancelled can be deleted
+	
+					return (
+						<Space size="middle">
+							{/* Edit Button (only for Scheduled or Active) */}
+							{canEdit && (
+								<Tooltip title="Sửa">
+									<Button type="link" onClick={() => handleEdit(record)}>
+										<EditFilled />
+									</Button>
+								</Tooltip>
+							)}
+	
+							{/* Start Button (for Scheduled promotions) */}
+							{canStart && (
+								<Popconfirm
+									title="Bạn có chắc bắt đầu giảm giá này không?"
+									onConfirm={() => handleStart(record.Id)}
 								>
-									<Button type="link" danger={canPause}>
-										{canPause ? <PauseOutlined /> : <PlayCircleOutlined />}
-									</Button>
-								</Tooltip>
-							</Popconfirm>
-						)}
-
-						{/* Cancel Button (only if Status is 1 or 3) */}
-						{canCancel && (
-							<Popconfirm
-								title="Bạn có chắc hủy khuyến mãi này không?"
-								onConfirm={() => handleCancel(record.Id)}
-							>
-								<Tooltip title="Hủy Khuyến Mãi">
-									<Button type="link" danger>
-										<CloseOutlined />
-									</Button>
-								</Tooltip>
-							</Popconfirm>
-						)}
-
-						{/* Delete Button (only if Status is 5 or 4) */}
-						{canDelete && (
-							<Popconfirm
-								title="Xác Nhận Xóa?"
-								onConfirm={() => handleDelete(record.Id)}
-							>
-								<Tooltip title="Xóa">
-									<Button type="link" danger>
-										<DeleteFilled />
-									</Button>
-								</Tooltip>
-							</Popconfirm>
-						)}
-					</Space>
-				);
+									<Tooltip title="Bắt Đầu Giảm Giá">
+										<Button type="link">
+											<PlayCircleOutlined />
+										</Button>
+									</Tooltip>
+								</Popconfirm>
+							)}
+	
+							{/* Pause Button (for Active promotions) */}
+							{canPause && (
+								<Popconfirm
+									title="Bạn có chắc tạm ngưng giảm giá này không?"
+									onConfirm={() => handlePause(record.Id)}
+								>
+									<Tooltip title="Tạm Ngưng Giảm Giá">
+										<Button type="link" danger>
+											<PauseOutlined />
+										</Button>
+									</Tooltip>
+								</Popconfirm>
+							)}
+	
+							{/* Continue Button (for Paused promotions) */}
+							{canContinue && (
+								<Popconfirm
+									title="Bạn có chắc tiếp tục giảm giá này không?"
+									onConfirm={() => handleContinue(record.Id)}
+								>
+									<Tooltip title="Tiếp Tục Giảm Giá">
+										<Button type="link">
+											<PlayCircleOutlined />
+										</Button>
+									</Tooltip>
+								</Popconfirm>
+							)}
+	
+							{/* Cancel Button (for Scheduled or Active promotions) */}
+							{canCancel && (
+								<Popconfirm
+									title="Bạn có chắc hủy giảm giá này không?"
+									onConfirm={() => handleCancel(record.Id)}
+								>
+									<Tooltip title="Hủy Giảm Giá">
+										<Button type="link" danger>
+											<CloseOutlined />
+										</Button>
+									</Tooltip>
+								</Popconfirm>
+							)}
+	
+							{/* Delete Button (for Expired or Cancelled promotions) */}
+							{canDelete && (
+								<Popconfirm
+									title="Xác Nhận Xóa?"
+									onConfirm={() => handleDelete(record.Id)}
+								>
+									<Tooltip title="Xóa">
+										<Button type="link" danger>
+											<DeleteFilled />
+										</Button>
+									</Tooltip>
+								</Popconfirm>
+							)}
+						</Space>
+					);
+				},
 			},
-		},
 	];
 
 	return (

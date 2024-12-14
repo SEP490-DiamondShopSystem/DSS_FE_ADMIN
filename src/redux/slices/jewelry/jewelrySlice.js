@@ -58,10 +58,13 @@ export const fetchJewelryDetail = createAsyncThunk(
 // Thunk to create a new jewelry item
 export const createJewelry = createAsyncThunk(
 	'jewelry/create',
-	async ({modelId, sizeId, metalId, status, sideDiamondOptId, attachedDiamondIds}, thunkAPI) => {
+	async (
+		{modelId, sizeId, metalId, modelCode, status, sideDiamondOptId, attachedDiamondIds},
+		thunkAPI
+	) => {
 		try {
 			const response = await api.post('/Jewelry/Create', {
-				jewelryRequest: {modelId, sizeId, metalId, status},
+				jewelryRequest: {modelId, sizeId, metalId, modelCode, status},
 				sideDiamondOptId,
 				attachedDiamondIds,
 			});
