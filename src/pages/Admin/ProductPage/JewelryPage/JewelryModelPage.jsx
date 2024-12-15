@@ -225,28 +225,31 @@ const JewelryModelPage = () => {
 		});
 	};
 	const handleSideDiamondChange = (index, field, value) => {
-		// Update the side diamond specs first
-		setSideDiamondSpecs((prevState) => {
-			const updatedSpecs = [...prevState];
-			updatedSpecs[index][field] = value;
+		const maxSideDiamonds = jewelryModelRule.MaximumSideDiamondOption || 5;
 
-			// Calculate CaratWeight / Quantity after updating
-			const {caratWeight, quantity} = updatedSpecs[index];
-			const caratPerDiamond = caratWeight && quantity ? caratWeight / quantity : 0;
+		if (index >= 0 && index < maxSideDiamonds) {
+			setSideDiamondSpecs((prevState) => {
+				const updatedSpecs = [...prevState];
+				updatedSpecs[index][field] = value;
 
-			// Validation check
-			if (caratPerDiamond >= 0.18) {
-				setErrorCarat(
-					`Carat Weight per diamond must be less than 0.18. Currently: ${caratPerDiamond.toFixed(
-						2
-					)}`
-				);
-			} else {
-				setErrorCarat(''); // Clear error if the condition is met
-			}
+				const {caratWeight, quantity} = updatedSpecs[index];
+				const caratPerDiamond = caratWeight && quantity ? caratWeight / quantity : 0;
 
-			return updatedSpecs;
-		});
+				if (caratPerDiamond >= 0.18) {
+					setErrorCarat(
+						`Carat trung bình cho một viên kim cương tấm phải dưới 0.18ct. Hiện tại trung bình một viên là: ${caratPerDiamond.toFixed(
+							2
+						)} ct`
+					);
+				} else {
+					setErrorCarat('');
+				}
+
+				return updatedSpecs;
+			});
+		} else {
+			message.warning(`Chỉ được phép tối đa ${maxSideDiamonds} lựa chọn kim cương tấm`);
+		}
 	};
 
 	const handleMetalSizeChange = (index, field, value) => {
@@ -264,7 +267,7 @@ const JewelryModelPage = () => {
 			0
 		);
 
-		if (mainDiamondSpecs.length < maxDiamonds  && totalQuantity < maxDiamonds ) {
+		if (mainDiamondSpecs.length < maxDiamonds && totalQuantity < maxDiamonds) {
 			setMainDiamondSpecs([
 				...mainDiamondSpecs,
 				{
@@ -289,19 +292,26 @@ const JewelryModelPage = () => {
 		setMetalSizeSpecs([...metalSizeSpecs, {metalId: '', sizeId: '', weight: ''}]);
 	};
 	const handleAddSideDiamondSpec = () => {
-		setSideDiamondSpecs([
-			...sideDiamondSpecs,
-			{
-				shapeId: '',
-				colorMin: '',
-				colorMax: '',
-				clarityMin: '',
-				clarityMax: '',
-				settingType: '',
-				caratWeight: '',
-				quantity: '',
-			},
-		]);
+		const maxSideDiamonds = jewelryModelRule.MaximumSideDiamondOption || 5;
+
+		// Check if current number of side diamond specs is less than max allowed
+		if (sideDiamondSpecs.length < maxSideDiamonds) {
+			setSideDiamondSpecs([
+				...sideDiamondSpecs,
+				{
+					shapeId: '',
+					colorMin: '',
+					colorMax: '',
+					clarityMin: '',
+					clarityMax: '',
+					settingType: '',
+					caratWeight: '',
+					quantity: '',
+				},
+			]);
+		} else {
+			message.warning(`Chỉ được phép tối đa ${maxSideDiamonds} lựa chọn kim cương tấm`);
+		}
 	};
 
 	const handleRemoveMainDiamondSpec = (index) => {
@@ -605,7 +615,7 @@ const JewelryModelPage = () => {
 									<h2 className="text-xl font-semibold text-black mb-4">
 										Thông Số Mẫu Trang Sức
 									</h2>
-									<div className="grid grid-cols-4 sm:grid-cols-2 lg:grid-cols-5 gap-5 p-6 border border-black rounded-lg shadow-md bg-tintWhite">
+									<div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-5 gap-5 p-6 border border-black rounded-lg shadow-md bg-tintWhite">
 										{Object.keys(modelSpec).map((field) => {
 											// Define category-specific visible fields
 											const categorySpecificFields = {
@@ -772,11 +782,11 @@ const JewelryModelPage = () => {
 											{mainDiamondSpecs.map((spec, index) => (
 												<div
 													key={index}
-													className="mb-4 border p-4 rounded-md bg-tintWhite"
+													className="mb-4 border p-4 rounded-lg bg-tintWhite"
 												>
 													<div className="flex justify-between">
 														<h3 className="font-semibold text-lg mb-2">
-															Kim cương chính {index + 1}
+															Kim cương chính thứ {index + 1}
 														</h3>
 														{mainDiamondSpecs.length > 1 && (
 															<button
@@ -988,11 +998,11 @@ const JewelryModelPage = () => {
 											{sideDiamondSpecs.map((spec, index) => (
 												<div
 													key={index}
-													className="mb-4 border p-4 rounded-md bg-tintWhite"
+													className="mb-4 border p-4 rounded-lg bg-tintWhite"
 												>
 													<div className="flex justify-between">
 														<h3 className="font-semibold text-lg mb-2">
-															Kim cương tấm {index + 1}
+															 Lựa chọn kim cương tấm thứ {index + 1}
 														</h3>{' '}
 														{sideDiamondSpecs.length > 1 && (
 															<button
@@ -1262,11 +1272,11 @@ const JewelryModelPage = () => {
 											{metalSizeSpecs.map((spec, index) => (
 												<div
 													key={index}
-													className="mb-4 border p-4 rounded-md bg-gray-50  bg-tintWhite"
+													className="mb-4 border p-4 rounded-lg  bg-tintWhite"
 												>
 													<div className="flex justify-between">
 														<h3 className="font-semibold text-lg mb-2">
-															Kim loại {index + 1}
+															Lựa chọn kim loại thứ {index + 1}
 														</h3>{' '}
 														{metalSizeSpecs.length > 1 && (
 															<button
