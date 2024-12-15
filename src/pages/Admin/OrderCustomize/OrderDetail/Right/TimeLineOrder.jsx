@@ -214,10 +214,21 @@ const TimeLineOrder = ({
 	const handleSaveDiamond = () => {
 		if (orders?.Status === 1) {
 			if (selectedRequest && currentDiamondId) {
+				// Kiểm tra xem currentDiamondId đã tồn tại trong filteredDiamondRequests chưa
+				const isDuplicate = filteredDiamondRequests.some(
+					(request) => request.Id === currentDiamondId.Id
+				);
+
+				if (isDuplicate) {
+					message.warning('Kim cương này đã được chọn.');
+					return;
+				}
+
 				// Create the updated selection
 				const updatedSelection = {
 					...currentDiamondId,
 					diamondRequestId: selectedRequest.DiamondRequestId,
+					Position: selectedRequest.Position,
 				};
 
 				// Check if the DiamondRequestId already exists in filteredDiamondRequests
@@ -252,6 +263,16 @@ const TimeLineOrder = ({
 			}
 		} else {
 			if (selectedRequest && currentDiamondId) {
+				// Kiểm tra xem currentDiamondId đã tồn tại trong changeDiamond chưa
+				const isDuplicate =
+					changeDiamond &&
+					Object.values(changeDiamond).some((entry) => entry.Id === currentDiamondId.Id);
+
+				if (isDuplicate) {
+					message.warning('Kim cương này đã được chọn.');
+					return;
+				}
+
 				const updatedSelection = {
 					DiamondRequestId: selectedRequest.DiamondRequestId,
 					...currentDiamondId,
@@ -311,37 +332,11 @@ const TimeLineOrder = ({
 					(item) => item?.DiamondRequestId === req?.DiamondRequestId
 				);
 
-				// If a matching item is found, extract its Id; otherwise, set diamondId as null
-				const diamondId = matchingDiamond ? matchingDiamond?.Id : null;
+				// Extract the Id of the matching diamond; if no match, set to null
+				const diamondId = matchingDiamond?.Id || matchingDiamond?.DiamondId;
 
-				const createDiamondCommand = req?.DiamondId
-					? {
-							diamond4c: {
-								cut: req?.Diamond?.Cut,
-								color: req?.Diamond?.Color,
-								clarity: req?.Diamond?.Clarity,
-								carat: req?.Diamond?.Carat,
-								isLabDiamond: req?.Diamond?.IsLabDiamond,
-							},
-							details: {
-								polish: req?.Diamond?.Polish,
-								symmetry: req?.Diamond?.Symmetry,
-								girdle: req?.Diamond?.Girdle,
-								fluorescence: req?.Diamond?.Fluorescence,
-								culet: req?.Diamond?.Culet,
-							},
-							measurement: {
-								withLenghtRatio: req?.Diamond?.WidthLengthRatio,
-								depth: req?.Diamond?.Depth,
-								table: req?.Diamond?.Table,
-								measurement: req?.Diamond?.Measurement,
-							},
-							shapeId: req?.Diamond?.DiamondShapeId,
-							sku: generateRandomSKU(16),
-							certificate: 1,
-							priceOffset: req?.Diamond?.PriceOffset,
-					  }
-					: null;
+				// If needed, prepare createDiamondCommand here (set to null for now)
+				const createDiamondCommand = null;
 
 				return {
 					diamondRequestId: req?.DiamondRequestId,
@@ -398,7 +393,6 @@ const TimeLineOrder = ({
 						certificate: 1,
 						priceOffset: diamondData?.PriceOffset,
 				  };
-			console.log('createDiamondCommand', createDiamondCommand);
 			dispatch(
 				handleChangeDiamondCustomize({
 					customizeRequestId: selectedRequest?.CustomizeRequestId,
@@ -439,7 +433,6 @@ const TimeLineOrder = ({
 		dispatch(handleCustomizeOrder({requestId: orders?.Id}))
 			.unwrap()
 			.then((res) => {
-				console.log('res', res);
 				message.success('Chấp nhận đơn thiết kế thành công!');
 				setIsModalVisible(false);
 				setCompleted(res);
@@ -460,8 +453,6 @@ const TimeLineOrder = ({
 	};
 
 	const handleRejectStatus = async () => {
-		// console.log('diamondAssigning', diamondAssigning);
-
 		dispatch(handleRejectCustomize(id))
 			.unwrap()
 			.then(() => {

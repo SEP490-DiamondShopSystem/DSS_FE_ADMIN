@@ -74,7 +74,6 @@ export const AddModalDiamond = ({
 			lockPrice,
 			culet,
 		} = values;
-		console.log('isLabDiamond', isLabDiamond);
 
 		const diamond4c = {
 			cut,

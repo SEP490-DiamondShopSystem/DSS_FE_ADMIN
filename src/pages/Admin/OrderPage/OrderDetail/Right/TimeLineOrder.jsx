@@ -1476,7 +1476,7 @@ const TimeLineOrder = ({
 							<div className="flex justify-around">
 								{!userRoleDeliverer && (
 									<div className="font-semibold text-base text-center text-darkBlue">
-										Chờ Nhân Viên Giao Hàng Xác Nhận
+										Vui Lòng Chờ Nhân Viên Giao Hàng Xác Nhận
 									</div>
 								)}
 								{userRoleDeliverer && (

@@ -40,7 +40,7 @@ const OrderDetail = () => {
 	const [completed, setCompleted] = useState(null);
 
 	console.log('completed', completed);
-	console.log('orders', orders);
+	console.log('completedOrder', completedOrder);
 
 	// Handle responsive layout
 	useEffect(() => {

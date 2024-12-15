@@ -153,6 +153,54 @@ const InformationOrder = ({
 				return <Tag color={color}>{statusLabel.toUpperCase()}</Tag>;
 			},
 		},
+		...(orders?.JewelryModel
+			? [
+					{
+						title: 'Giá Kim Cương Tấm',
+						key: 'SD_Price',
+						dataIndex: 'JewelryModel',
+						align: 'center',
+						render: (jewelry) =>
+							jewelry?.SD_Price && `${formatPrice(jewelry?.SD_Price)}`,
+					},
+			  ]
+			: []),
+		...(orders?.JewelryModel
+			? [
+					{
+						title: 'Giá Gia Công',
+						key: 'CraftmanFee',
+						dataIndex: 'JewelryModel',
+						align: 'center',
+						render: (jewelry) =>
+							jewelry?.CraftmanFee && `${formatPrice(jewelry?.CraftmanFee)}`,
+					},
+			  ]
+			: []),
+		...(orders?.Status !== 4
+			? [
+					{
+						title: 'Tổng Giá Mẫu',
+						key: 'SettingPrice',
+						dataIndex: 'JewelryModel',
+						align: 'center',
+						render: (jewelry) =>
+							jewelry?.SettingPrice && `${formatPrice(jewelry?.SettingPrice)}`,
+					},
+			  ]
+			: []),
+		...(orders?.Status === 4
+			? [
+					{
+						title: 'Giá Trang Sức',
+						key: 'Jewelry',
+						dataIndex: 'Jewelry',
+						align: 'center',
+						render: (jewelry) =>
+							jewelry?.TotalPrice && `${formatPrice(jewelry.TotalPrice)}`,
+					},
+			  ]
+			: []),
 	];
 
 	const subColumns = [
