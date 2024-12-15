@@ -144,6 +144,7 @@ const DiscountPage = ({discountData}) => {
 							operator: req.Operator,
 							quantity: req.Quantity || 0,
 							jewelryModelId: req.jewelryModelId,
+							jewelryModelName: req?.Model?.Name,
 							promotionId: req.PromotionId,
 							discountId: req.DiscountId,
 							diamondRequirementSpec: {

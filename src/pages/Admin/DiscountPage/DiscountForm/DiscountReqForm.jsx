@@ -5,6 +5,7 @@ import JewelryModelList from '../../PromotionPage/JewelryModelList';
 export const DiscountReqForm = ({form, shapes, Option, removeRequirement}) => {
 	const [isPopupVisible, setIsPopupVisible] = useState(false);
 	const [selectedModel, setSelectedModel] = useState(null);
+	const [selectedModelName, setSelectedModelName] = useState(null);
 
 	const handleTargetTypeChange = (targetType, name, setFieldsValue) => {
 		const isOrder = targetType === 3;
@@ -25,7 +26,9 @@ export const DiscountReqForm = ({form, shapes, Option, removeRequirement}) => {
 			requirements: form
 				.getFieldValue('requirements')
 				.map((req, index) =>
-					index === fieldKey ? {...req, jewelryModelId: model?.Id} : req
+					index === fieldKey
+						? {...req, jewelryModelId: model?.Id, jewelryModelName: model?.Name}
+						: req
 				),
 		});
 		setIsPopupVisible(false);
@@ -543,6 +546,17 @@ export const DiscountReqForm = ({form, shapes, Option, removeRequirement}) => {
 																	'jewelryModelId',
 																])}
 															/>
+														</Form.Item>
+														<Form.Item
+															{...restField}
+															label="Tên Mẫu Trang Sức"
+															name={[name, 'jewelryModelName']}
+															fieldKey={[
+																fieldKey,
+																'jewelryModelName',
+															]}
+														>
+															<Input readOnly />
 														</Form.Item>
 														<Button
 															onClick={() => setIsPopupVisible(true)}
