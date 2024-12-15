@@ -63,6 +63,7 @@ const mapAttributes = (data, attributes) => {
 		EngravedText: data?.EngravedText,
 		AccountId: data.AccountId,
 		SizeId: data?.SizeId,
+		SettingPrice: data?.JewelryModel?.SettingPrice,
 		orderTime: data?.CreatedDate,
 		expiredTime: data?.ExpiredDate,
 		status: data?.Status,
@@ -103,6 +104,10 @@ const OrderCustomizePage = () => {
 			})
 		);
 	}, [pageSize, current, activeStatus, startDate, endDate, searchText]);
+
+	useEffect(() => {
+		setCurrent(1);
+	}, [activeStatus, startDate, endDate, searchText]);
 
 	useEffect(() => {
 		if (userDetail?.Roles) {

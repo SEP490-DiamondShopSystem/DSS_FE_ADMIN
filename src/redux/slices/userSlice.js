@@ -8,7 +8,7 @@ export const getAllUser = createAsyncThunk('userSlice/getAllUser', async (params
 
 		const queryParams = new URLSearchParams();
 
-		if (current) queryParams.append('current', current);
+		if (current !== null && current !== undefined) queryParams.append('current', current);
 		if (size) queryParams.append('size', size);
 		if (roleId) queryParams.append('roleIds', roleId);
 		if (emailStr) queryParams.append('emailStr', emailStr);

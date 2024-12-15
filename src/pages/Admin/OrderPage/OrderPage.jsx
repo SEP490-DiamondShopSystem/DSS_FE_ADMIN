@@ -70,7 +70,6 @@ const delivererStatusList = [
 ];
 
 const OrderPage = () => {
-	const navigate = useNavigate();
 	const dispatch = useDispatch();
 
 	const loading = useSelector(LoadingOrderSelector);
@@ -119,6 +118,10 @@ const OrderPage = () => {
 	}, [dispatch, pageSize, current, activeStatus, startDate, endDate, searchText, selectOrder]);
 
 	useEffect(() => {
+		setCurrent(1);
+	}, [activeStatus, startDate, endDate, searchText, selectOrder]);
+
+	useEffect(() => {
 		if (userDetail?.Roles) {
 			const isDeliverer = userDetail.Roles.some((role) => role?.RoleName === 'deliverer');
 			setDelivererRole(isDeliverer);
@@ -144,8 +147,6 @@ const OrderPage = () => {
 			setOrders(mappedData);
 		}
 	}, [orderList, enums]);
-
-	console.log('orderList', orderList);
 
 	// Helper function to render status
 	const renderStatus = (status) => {

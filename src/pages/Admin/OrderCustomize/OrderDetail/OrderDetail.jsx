@@ -39,8 +39,6 @@ const OrderCustomizeDetail = () => {
 
 	const allDiamondRequests = orders?.DiamondRequests;
 
-	console.log('allDiamondRequests', allDiamondRequests);
-
 	const allDiamondsHaveId =
 		orders?.DiamondRequests?.every((request) => request.DiamondId !== null) || false;
 
