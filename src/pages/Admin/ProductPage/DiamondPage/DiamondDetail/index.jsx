@@ -1,7 +1,7 @@
 import React, {useState, useEffect} from 'react';
 import DiamondDetail from './DiamondDetail';
 import {useParams} from 'react-router-dom';
-import {useDispatch} from 'react-redux';
+import {useDispatch, useSelector} from 'react-redux';
 import {
 	getDiamondDetail,
 	handleAddPrice,
@@ -11,11 +11,14 @@ import {DiamondUploadForm} from '../DiamondUploadForm';
 import {LockDiamondModal} from '../LockDiamondModal/LockDiamondModal';
 import {Form, message} from 'antd';
 import {PriceExtraFeeModal} from '../PriceExtraFeeModal/PriceExtraFeeModal';
+import {selectDiamondFiles} from '../../../../../redux/selectors';
 
 const DiamondDetailPage = () => {
 	const [form] = Form.useForm();
 	const {id} = useParams();
 	const dispatch = useDispatch();
+	const diamondFiles = useSelector(selectDiamondFiles);
+
 	const [diamond, setDiamond] = useState(null);
 	const [selectedDiamondId, setSelectedDiamondId] = useState(null);
 	const [isFormVisible, setIsFormVisible] = useState(false);
@@ -32,7 +35,7 @@ const DiamondDetailPage = () => {
 			.then((res) => {
 				setDiamond(res);
 			});
-	}, [id, fetch]);
+	}, [id, fetch, diamondFiles]);
 
 	const handleView = (diamondId) => {
 		setSelectedDiamondId(diamondId);
@@ -101,6 +104,7 @@ const DiamondDetailPage = () => {
 				diamondId={id}
 				visible={isFormVisible}
 				onClose={() => setIsFormVisible(false)}
+				diamondFilesFetch={diamondFiles}
 			/>
 			<LockDiamondModal
 				isOpen={isLockDiamondModalVisible}

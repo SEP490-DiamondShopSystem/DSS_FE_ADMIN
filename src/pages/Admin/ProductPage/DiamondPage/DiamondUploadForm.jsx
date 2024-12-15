@@ -16,7 +16,7 @@ import {
 } from '../../../../redux/slices/filesSlice';
 import {selectFileLoading, selectFileError} from '../../../../redux/selectors';
 
-export const DiamondUploadForm = ({diamondId, visible, onClose}) => {
+export const DiamondUploadForm = ({diamondId, visible, onClose, diamondFilesFetch}) => {
 	const dispatch = useDispatch();
 	const loading = useSelector(selectFileLoading);
 	const error = useSelector(selectFileError);
@@ -101,6 +101,7 @@ export const DiamondUploadForm = ({diamondId, visible, onClose}) => {
 			.then((response) => {
 				if (response) {
 					setDiamondFiles(response);
+					onClose();
 				}
 			})
 			.catch((error) => {
@@ -131,12 +132,10 @@ export const DiamondUploadForm = ({diamondId, visible, onClose}) => {
 	// Handle the deletion of images by calling the API
 	const handleDeleteImages = () => {
 		if (removedImagePaths.length > 0) {
-			console.log('Deleting images:', removedImagePaths);
-
 			dispatch(deleteDiamondImages({diamondId, imagePaths: removedImagePaths}))
 				.unwrap()
 				.then(() => {
-					message.success('Images deleted successfully');
+					message.success('Hình ảnh đã được xóa thành công');
 				})
 				.catch((error) => {
 					message.error(error?.data?.detail || error?.detail);
@@ -149,11 +148,10 @@ export const DiamondUploadForm = ({diamondId, visible, onClose}) => {
 			return;
 		}
 
-		console.log('Uploading Thumbnail for Diamond ID:', diamondId);
 		await dispatch(uploadDiamondThumbnail({diamondId, formFile: thumbnailFile}))
 			.unwrap()
 			.then(() => {
-				message.success('Thumbnail uploaded successfully');
+				message.success('Hình đã được tải lên thành công');
 			})
 			.catch((error) => {
 				message.error(error?.data?.detail || error?.detail);
@@ -165,15 +163,13 @@ export const DiamondUploadForm = ({diamondId, visible, onClose}) => {
 			return;
 		}
 
-		console.log('Uploading Certificates for Diamond ID:', diamondId);
-
 		for (const file of certificateFiles) {
 			await dispatch(
 				uploadCertificates({diamondId, certificateCode: file.name, formFile: file})
 			)
 				.unwrap()
 				.then(() => {
-					message.success('Certificates uploaded successfully');
+					message.success('Chứng nhận đã được tải lên thành công');
 				})
 				.catch((error) => {
 					message.error(error?.data?.detail || error?.detail);
@@ -186,12 +182,10 @@ export const DiamondUploadForm = ({diamondId, visible, onClose}) => {
 			return;
 		}
 
-		console.log('Uploading Diamond Images for Diamond ID:', diamondId);
-
 		await dispatch(uploadDiamondImages({diamondId, formFiles: imageFiles}))
 			.unwrap()
 			.then(() => {
-				message.success('Diamond images uploaded successfully');
+				message.success('Hình ảnh kim cương đã được tải lên thành công');
 			})
 			.catch((error) => {
 				message.error(error?.data?.detail || error?.detail);
@@ -246,7 +240,7 @@ export const DiamondUploadForm = ({diamondId, visible, onClose}) => {
 							}}
 							showUploadList={false}
 						>
-							<Button icon={<UploadOutlined />}>Select Thumbnail</Button>
+							<Button icon={<UploadOutlined />}>Chọn hình</Button>
 						</Upload>
 						{thumbnailFile && (
 							<img
@@ -284,7 +278,7 @@ export const DiamondUploadForm = ({diamondId, visible, onClose}) => {
 								status: 'done',
 							}))}
 						>
-							<Button icon={<FileProtectOutlined />}>Select Certificates</Button>
+							<Button icon={<FileProtectOutlined />}>Chọn chứng nhận</Button>
 						</Upload>
 					</Form.Item>
 
@@ -311,7 +305,7 @@ export const DiamondUploadForm = ({diamondId, visible, onClose}) => {
 								status: 'done',
 							}))}
 						>
-							<Button icon={<FileImageOutlined />}>Select Diamond Images</Button>
+							<Button icon={<FileImageOutlined />}>Chọn hình ảnh kim cương</Button>
 						</Upload>
 					</Form.Item>
 				</Form>

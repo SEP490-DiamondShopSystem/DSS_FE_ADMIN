@@ -33,7 +33,12 @@ export const PriceExtraFeeModal = ({form, isVisible, onClose, onSubmit}) => {
 					label="Bù trừ giá"
 					rules={[{required: true, message: 'Vui lòng nhập giá bù trừ!'}]}
 				>
-					<InputNumber min={0} style={{width: '100%'}} placeholder="Nhập giá bù trừ" />
+					<InputNumber
+						min={-0.5}
+						step={0.1}
+						style={{width: '100%'}}
+						placeholder="Nhập giá bù trừ"
+					/>
 				</Form.Item>
 
 				<Form.Item
