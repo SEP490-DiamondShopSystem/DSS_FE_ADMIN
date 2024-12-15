@@ -112,7 +112,7 @@ const SideDiamondPricePage = () => {
 		if (listPrices.length === 0) return;
 
 		await dispatch(
-			createDiamondPrice({listPrices, shapeId, isLabDiamond, isSideDiamond: false})
+			createDiamondPrice({listPrices, shapeId, isLabDiamond, isSideDiamond: true})
 		)
 			.unwrap()
 			.then(() => {
@@ -125,7 +125,7 @@ const SideDiamondPricePage = () => {
 		setEditedCells([]);
 		setIsCreating(false);
 
-		await dispatch(fetchPriceBoard({shapeId, isLabDiamond, isSideDiamond: false}));
+		await dispatch(fetchPriceBoard({shapeId, isLabDiamond, isSideDiamond: true}));
 	};
 
 	const handleSave = async () => {
