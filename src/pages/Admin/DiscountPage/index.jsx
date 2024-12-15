@@ -143,7 +143,7 @@ const DiscountPage = ({discountData}) => {
 							targetType: req.TargetType,
 							operator: req.Operator,
 							quantity: req.Quantity || 0,
-							jewelryModelId: req.jewelryModelId,
+							jewelryModelId: req.JewelryModelId,
 							jewelryModelName: req?.Model?.Name,
 							promotionId: req.PromotionId,
 							discountId: req.DiscountId,
