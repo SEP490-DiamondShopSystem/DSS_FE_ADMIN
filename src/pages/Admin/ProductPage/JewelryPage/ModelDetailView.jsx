@@ -39,7 +39,7 @@ const ModelDetailsView = ({
 
     return (
       <div className="flex items-center mb-2 p-2 bg-gradient-to-r from-blue-50 to-blue-100 rounded-md shadow-sm hover:shadow-md transition-all duration-300">
-        <span className="font-semibold text-blue-800 mr-2 w-1/3">{label}:</span>
+        <span className="font-semibold text-blue-800 mr-2 w-1/2">{label}:</span>
         <span className="text-gray-900 flex-1 font-medium">{displayValue}</span>
       </div>
     );
@@ -177,7 +177,7 @@ const ModelDetailsView = ({
                     {diamond.Shapes &&
                       diamond.Shapes.map((shape, shapeIndex) => (
                         <React.Fragment key={shapeIndex}>
-                        <div className="border rounded-xl p-1">
+                        <div className="border rounded-xl ">
                           {renderDetailRow(
                             'Hình Dáng',
                             shape.Shape?.ShapeName

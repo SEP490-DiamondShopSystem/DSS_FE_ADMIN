@@ -5,7 +5,7 @@ import {
 	changeJewelryReviewVisibility,
 	deleteJewelry,
 } from '../../../../redux/slices/jewelry/jewelrySlice';
-import {Camera, Ruler, Star, Info, Diamond, Tag, Eye, EyeOff, X} from 'lucide-react';
+import {Camera, Ruler, Star, Info, Diamond, Tag, Eye, EyeOff, X, Cannabis} from 'lucide-react';
 import {useNavigate, useParams} from 'react-router-dom';
 import Loading from '../../../../components/Loading';
 import {DeleteFilled, LeftCircleFilled, LeftOutlined} from '@ant-design/icons';
@@ -209,8 +209,19 @@ const JewelryDetail = ({jewelry, onClose}) => {
 							<div className="bg-white p-4 rounded-lg shadow-sm">
 								<div className="flex items-center mb-2">
 									<Camera className="mr-2 text-primary" size={20} />
+									<span className="font-semibold text-gray-700">
+										Mã Trang Sức:
+									</span>
+									<span className="ml-2">
+										{' '}
+										{fetchedJewelry?.SerialCode || 'Chưa Có'}
+									</span>{' '}
+								</div>
+								<div className="flex items-center mb-2">
+									<Cannabis className="mr-2 text-primary" size={20} />
 									<span className="font-semibold text-gray-700">Mã Mẫu:</span>
 									<span className="ml-2">
+										{' '}
 										{fetchedJewelry?.ModelCode || 'Chưa Có'}
 									</span>
 								</div>
@@ -678,7 +689,7 @@ const JewelryDetail = ({jewelry, onClose}) => {
 							id="jewelry-detail-title"
 							className="text-2xl font-bold text-primary text-center mb-6 pb-2 border-b"
 						>
-							{fetchedJewelry?.SerialCode}
+							{fetchedJewelry?.Title}
 							<Tooltip title="Xóa trang sức">
 								<Button danger className="mb-2 ml-5" onClick={handleDeleteClick}>
 									<DeleteFilled />
