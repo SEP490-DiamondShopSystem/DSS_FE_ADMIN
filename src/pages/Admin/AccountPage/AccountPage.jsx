@@ -15,6 +15,7 @@ import {
 	handleStaffRegister,
 } from '../../../redux/slices/userLoginSlice';
 import {getAllUser} from '../../../redux/slices/userSlice';
+import {Helmet} from 'react-helmet';
 
 const {Search} = Input;
 
@@ -27,7 +28,7 @@ const AccountPage = () => {
 	const loading = useSelector(getLoadingUserSelector);
 	const userDetail = useSelector(GetUserDetailSelector);
 
-	const [pageSize, setPageSize] = useState(100);
+	const [pageSize, setPageSize] = useState(5);
 	const [current, setCurrent] = useState(0);
 	const [users, setUsers] = useState();
 	const [isModalAddVisible, setIsModalAddVisible] = useState(false);
@@ -133,6 +134,10 @@ const AccountPage = () => {
 	}, [current, pageSize, role, searchText, completed]);
 
 	useEffect(() => {
+		setCurrent(0);
+	}, [role, searchText]);
+
+	useEffect(() => {
 		if (userDetail) {
 			const isManager = userDetail?.Roles?.some((role) => role?.RoleName === 'manager');
 
@@ -226,6 +231,9 @@ const AccountPage = () => {
 
 	return (
 		<div className="mx-20 my-10">
+			<Helmet>
+				<title>Quản Lí Tài Khoản</title>
+			</Helmet>
 			{/* <Filter filter={filter} handleStatusBtn={handleStatusBtn} active={active} /> */}
 			<div>
 				<div className="flex items-center justify-between">
@@ -271,7 +279,7 @@ const AccountPage = () => {
 							icon={<PlusOutlined />}
 							onClick={openForm}
 						>
-							Thêm
+							Thêm tài khoản
 						</Button>
 					</div>
 				</div>
@@ -279,8 +287,13 @@ const AccountPage = () => {
 					<Table
 						dataSource={users}
 						columns={columns}
-						pagination={{pageSize: 5, total: 100}}
-						className="custom-table-header"
+						pagination={{
+							current: current + 1,
+							total: userList?.TotalPage * pageSize,
+							pageSize: pageSize,
+							onChange: (page) => setCurrent(page - 1),
+							showSizeChanger: false,
+						}}
 						loading={loading}
 					/>
 				</div>

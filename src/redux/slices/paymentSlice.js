@@ -107,7 +107,7 @@ export const handleOrder = createAsyncThunk(
 			const response = await api.put(`/Order/Proceed?orderId=${id}`, formData, {
 				headers: {'Content-Type': 'multipart/form-data'},
 			});
-			return response.data;
+			return response;
 		} catch (error) {
 			console.error(error);
 			return rejectWithValue(error);
@@ -137,7 +137,7 @@ export const handleCompletedOrderAtShop = createAsyncThunk(
 			const response = await api.post(`/Order/Staff/CompleteAtShopOrder`, formData, {
 				headers: {'Content-Type': 'multipart/form-data'},
 			});
-			return response.data;
+			return response;
 		} catch (error) {
 			console.error(error);
 			return rejectWithValue(error);
