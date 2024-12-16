@@ -5,7 +5,7 @@ import {
 	createJewelryModel,
 	deleteJewelryModel,
 } from '../../../../redux/slices/jewelry/jewelryModelSlice';
-import {message, Collapse} from 'antd';
+import {message, Collapse, Input, Select} from 'antd';
 import {fetchAllMetals} from '../../../../redux/slices/jewelry/metalSlice';
 import {fetchAllSizes} from '../../../../redux/slices/jewelry/sizeSlice';
 import {fetchAllShapes} from '../../../../redux/slices/shapeSlice';
@@ -37,10 +37,15 @@ const JewelryModelPage = () => {
 	const [selectedJewelryModelId, setSelectedJewelryModelId] = useState();
 	const [isFormVisible, setIsFormVisible] = useState(false); // for controlling the form visibility
 	const [isEditModalVisible, setIsEditModalVisible] = useState(false);
-	const [name, setName] = React.useState('');
-	const [category, setCategory] = React.useState('');
-	const [isRhodiumFinished, setIsRhodiumFinished] = React.useState('');
-	const [isEngravable, setIsEngravable] = React.useState('');
+	// State for search parameters
+	const [searchName, setSearchName] = useState('');
+	const [searchCategory, setSearchCategory] = useState('');
+	const [searchIsEngravable, setSearchIsEngravable] = useState('');
+
+	// Actual state used for fetching
+	const [name, setName] = useState('');
+	const [category, setCategory] = useState('');
+	const [isEngravable, setIsEngravable] = useState('');
 	const [currentPage, setCurrentPage] = React.useState(1);
 	const [pageSize, setPageSize] = React.useState(5);
 	const [totalPage, setTotalPage] = useState(0);
@@ -120,7 +125,35 @@ const JewelryModelPage = () => {
 			weight: '',
 		},
 	]);
+	const handleSearch = () => {
+		// Update the actual search parameters
+		setName(searchName);
+		setCategory(searchCategory);
+		setIsEngravable(searchIsEngravable);
 
+		// Reset to first page when performing a new search
+		setCurrentPage(1);
+
+		// Dispatch fetch action with search parameters
+		dispatch(
+			fetchAllJewelryModels({
+				Currentpage: 1,
+				PageSize: pageSize,
+				Name: searchName,
+				Category: searchCategory,
+				IsEngravable: searchIsEngravable,
+			})
+		)
+			.then((response) => {
+				console.log('API response:', response);
+				if (response && response.payload.TotalPage) {
+					setTotalPage(response.payload.TotalPage);
+				}
+			})
+			.catch((error) => {
+				message.error(error?.data?.detail || error?.detail);
+			});
+	};
 	const handleNextPage = () => {
 		if (currentPage < totalPage) {
 			setCurrentPage((prev) => prev + 1);
@@ -139,7 +172,6 @@ const JewelryModelPage = () => {
 				PageSize: pageSize,
 				Name: name,
 				Category: category,
-				// IsRhodiumFinished: isRhodiumFinished,
 				IsEngravable: isEngravable,
 			})
 		)
@@ -153,7 +185,7 @@ const JewelryModelPage = () => {
 			.catch((error) => {
 				message.error(error?.data?.detail || error?.detail);
 			});
-	}, [dispatch, name, category, isRhodiumFinished, isEngravable, currentPage, pageSize]);
+	}, [dispatch, name, category, isEngravable, currentPage, pageSize]);
 	const metals = useSelector(getAllMetalsSelector); // Selector for getting metals from the store
 	useEffect(() => {
 		dispatch(fetchAllMetals());
@@ -413,7 +445,6 @@ const JewelryModelPage = () => {
 				PageSize: pageSize,
 				Name: name,
 				Category: category,
-				// IsRhodiumFinished: isRhodiumFinished,
 				IsEngravable: isEngravable,
 			})
 		);
@@ -432,7 +463,6 @@ const JewelryModelPage = () => {
 							PageSize: pageSize,
 							Name: name,
 							Category: category,
-							// IsRhodiumFinished: isRhodiumFinished,
 							IsEngravable: isEngravable,
 						})
 					);
@@ -465,34 +495,38 @@ const JewelryModelPage = () => {
 				<div>
 					<div className=" p-4 mb-6 bg-offWhite">
 						<div className="mb-4 flex flex-wrap gap-4">
-							<input
+							<Input
 								type="text"
-								value={name}
-								onChange={(e) => setName(e.target.value)}
+								value={searchName}
+								onChange={(e) => setSearchName(e.target.value)}
 								placeholder="Nhập mã mẫu"
-								className="form-input p-2 border border-gray-300 rounded-md"
 							/>
-							<select
-								value={category}
-								onChange={(e) => setCategory(e.target.value)}
+							<Select
+								value={searchCategory}
+								onChange={(e) => setSearchCategory(e.target.value)}
 								placeholder="Nhập theo loại mẫu"
-								className="form-input p-2 border border-gray-300 rounded-md"
 							>
+								<option value="">Loại Trang Sức</option>
 								{categories.map((category) => (
 									<option key={category.id} value={category.Name}>
 										{category.Name}
 									</option>
 								))}
-							</select>
-							<select
-								value={isEngravable}
-								onChange={(e) => setIsEngravable(e.target.value === 'true')}
-								className="form-select p-2 border border-gray-300 rounded-md"
+							</Select>
+							<Select
+								value={searchIsEngravable}
+								onChange={(e) => setSearchIsEngravable(e.target.value)}
 							>
 								<option value="">Có thể khác chữ?</option>
 								<option value="true">Có</option>
 								<option value="false">Không</option>
-							</select>
+							</Select>
+							<button
+								onClick={handleSearch}
+								className="bg-primary text-white px-4 py-2 rounded-md hover:bg-primary-dark transition-colors"
+							>
+								Tìm kiếm
+							</button>
 						</div>
 						{loading ? (
 							<p>Đang tải...</p>
@@ -525,22 +559,23 @@ const JewelryModelPage = () => {
 											<strong className="text-xl text-black">
 												{model.Name}
 											</strong>{' '}
-											-{' '}
-											<span className="text-gray-600">
-												{model.Description}
-											</span>
+											<div className="text-xl text-black">
+												Mã Mẫu: {model.ModelCode}
+											</div>
+											{model.MainDiamondCount > 0 && (
+												<div className="text-sm text-gray-500">
+													Số lượng kim cương chính:{' '}
+													{model.MainDiamondCount} viên
+												</div>
+											)}
 											<div className="text-sm text-gray-500">
-												Option kim cương tấm: {model.SideDiamondOptionCount}
+												Số lượng lựa chọn kim cương tấm:{' '}
+												{model.SideDiamondOptionCount}
 											</div>
 											{/* Displaying more model details conditionally */}
 											{model.IsEngravable && (
 												<div className="text-sm text-gray-500">
 													Có khắc chữ
-												</div>
-											)}
-											{model.MainDiamondCount > 0 && (
-												<div className="text-sm text-gray-500">
-													Kim cương chính: {model.MainDiamondCount} viên
 												</div>
 											)}
 											{model.MetalSupported &&
@@ -1002,7 +1037,7 @@ const JewelryModelPage = () => {
 												>
 													<div className="flex justify-between">
 														<h3 className="font-semibold text-lg mb-2">
-															 Lựa chọn kim cương tấm thứ {index + 1}
+															Lựa chọn kim cương tấm thứ {index + 1}
 														</h3>{' '}
 														{sideDiamondSpecs.length > 1 && (
 															<button
@@ -1330,7 +1365,7 @@ const JewelryModelPage = () => {
 															className="form-input w-full p-2 border border-gray text-black rounded-md"
 														>
 															{' '}
-															<option value="">Chọn size</option>
+															<option value="">Chọn size( mm)</option>
 															{Array.isArray(sizes) &&
 																sizes.map((size) => (
 																	<option
@@ -1355,7 +1390,7 @@ const JewelryModelPage = () => {
 																)
 															}
 															required
-															placeholder="Khối Lượng"
+															placeholder="Khối Lượng( grams)"
 															className="form-input w-full p-2 border border-gray-300 rounded-md"
 														/>
 													</div>
