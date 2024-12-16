@@ -55,7 +55,7 @@ export const fetchLocationRule = createAsyncThunk(
 			const response = await api.get('/Configuration/LocationRules');
 			return response;
 		} catch (error) {
-			return rejectWithValue(error.response || error.message);
+			return rejectWithValue(error);
 		}
 	}
 );
@@ -66,7 +66,7 @@ export const fetchOrderRule = createAsyncThunk(
 			const response = await api.get('/Configuration/OrderRule');
 			return response;
 		} catch (error) {
-			return rejectWithValue(error.response || error.message);
+			return rejectWithValue(error);
 		}
 	}
 );
@@ -77,7 +77,7 @@ export const fetchOrderRulePayment = createAsyncThunk(
 			const response = await api.get('/Configuration/OrderRule/Payment');
 			return response;
 		} catch (error) {
-			return rejectWithValue(error.response || error.message);
+			return rejectWithValue(error);
 		}
 	}
 );
@@ -88,7 +88,7 @@ export const fetchShopBankAccountRule = createAsyncThunk(
 			const response = await api.get('/Configuration/ShopBankAccountRule');
 			return response;
 		} catch (error) {
-			return rejectWithValue(error.response || error.message);
+			return rejectWithValue(error);
 		}
 	}
 );
@@ -136,7 +136,7 @@ export const updateLocationRules = createAsyncThunk(
 			const response = await api.post('/Configuration/LocationRules', data);
 			return response;
 		} catch (error) {
-			return rejectWithValue(error.response || error.message);
+			return rejectWithValue(error);
 		}
 	}
 );
@@ -147,7 +147,7 @@ export const updateOrderRule = createAsyncThunk(
 			const response = await api.post('/Configuration/OrderRule', data);
 			return response;
 		} catch (error) {
-			return rejectWithValue(error.response || error.message);
+			return rejectWithValue(error);
 		}
 	}
 );
@@ -158,7 +158,7 @@ export const updateOrderRulePayment = createAsyncThunk(
 			const response = await api.post('/Configuration/OrderRule/Payment', data);
 			return response;
 		} catch (error) {
-			return rejectWithValue(error.response || error.message);
+			return rejectWithValue(error);
 		}
 	}
 );
@@ -182,7 +182,7 @@ export const updateShopBankAccountRule = createAsyncThunk(
 			const response = await api.post('/Configuration/ShopBankAccountRule', data);
 			return response;
 		} catch (error) {
-			return rejectWithValue(error.response || error.message);
+			return rejectWithValue(error);
 		}
 	}
 );
@@ -199,7 +199,7 @@ export const updateShopBankQRRule = createAsyncThunk(
 			});
 			return response;
 		} catch (error) {
-			return rejectWithValue(error.response || error.message);
+			return rejectWithValue(error);
 		}
 	}
 );

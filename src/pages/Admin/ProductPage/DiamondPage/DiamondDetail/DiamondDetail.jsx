@@ -2,6 +2,7 @@ import {Button, Tag} from 'antd';
 import React from 'react';
 import {formatPrice} from '../../../../../utils';
 import {LockOutlined, UnlockOutlined} from '@ant-design/icons';
+import Loading from '../../../../../components/Loading';
 
 const ClarityEnum = {
 	1: 'SI2',
@@ -86,7 +87,7 @@ const statusMapping = {
 
 const DiamondDetail = ({diamond, handleView, id, handleLockDiamondView, handleOpenModal}) => {
 	if (!diamond) {
-		return <p className="text-center text-gray-500">Không có dữ liệu kim cương</p>;
+		return <Loading />;
 	}
 
 	const {

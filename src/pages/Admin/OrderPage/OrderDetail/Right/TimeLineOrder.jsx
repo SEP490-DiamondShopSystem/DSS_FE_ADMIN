@@ -44,6 +44,7 @@ import {
 import {getDelivererAccount} from '../../../../../redux/slices/userSlice';
 import {formatPrice, formatPriceCeilFloor, getOrderStatus} from '../../../../../utils';
 import {TimeLine} from './TimeLine';
+import {fetchOrderRulePayment} from '../../../../../redux/slices/configSlice';
 
 const {Title, Text} = Typography;
 const {Option} = Select;
@@ -96,11 +97,13 @@ const TimeLineOrder = ({
 	const [transactionOrderPending, setTransactionOrderPending] = useState();
 	const [transactionOrderPendingPayAll, setTransactionOrderPendingPayAll] = useState();
 	const [transactionOrderOthers, setTransactionOrderOthers] = useState();
+	const [payAllFine, setPayAllFine] = useState();
 
 	console.log('transactionOrderDelivering', transactionOrderDelivering);
 	console.log('transactionOrderPending', transactionOrderPending);
 	console.log('transactionOrderPendingPayAll', transactionOrderPendingPayAll);
 	console.log('transactionOrderOthers', transactionOrderOthers);
+	console.log('payAllFine', payAllFine);
 
 	useEffect(() => {
 		if (orders?.Transactions?.length > 0) {
@@ -142,6 +145,14 @@ const TimeLineOrder = ({
 	useEffect(() => {
 		dispatch(getDelivererAccount());
 	}, [dispatch]);
+
+	useEffect(() => {
+		dispatch(fetchOrderRulePayment())
+			.unwrap()
+			.then((res) => {
+				setPayAllFine(res?.PayAllFine);
+			});
+	}, []);
 
 	useEffect(() => {
 		if (userDetail?.Roles) {
@@ -847,7 +858,7 @@ const TimeLineOrder = ({
 											  orders?.Transactions?.length === 1
 											? formatPriceCeilFloor(
 													transactionOrderOthers[0]?.TransactionAmount *
-														0.9
+														((100 - payAllFine) / 100)
 											  )
 											: 'Không'}
 									</label>
@@ -951,13 +962,14 @@ const TimeLineOrder = ({
 											  orders?.Transactions?.length === 1
 											? formatPriceCeilFloor(
 													transactionOrderPendingPayAll[0]
-														?.TransactionAmount * 0.9
+														?.TransactionAmount *
+														((100 - payAllFine) / 100)
 											  )
 											: transactionOrderOthers[0]?.Status === 2 &&
 											  orders?.Transactions?.length === 1
 											? formatPriceCeilFloor(
 													transactionOrderOthers[0]?.TransactionAmount *
-														0.9
+														((100 - payAllFine) / 100)
 											  )
 											: 'Không'}
 									</label>

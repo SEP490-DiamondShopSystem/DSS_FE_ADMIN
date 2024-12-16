@@ -193,7 +193,7 @@ export const AddModalDiamond = ({setShowModal, showModal}) => {
 			visible={showModal}
 			onOk={() => form.submit()}
 			onCancel={handleCancel}
-			width={800}
+			width={1200}
 			centered
 		>
 			<Form
@@ -225,9 +225,9 @@ export const AddModalDiamond = ({setShowModal, showModal}) => {
 				<div className="flex flex-wrap gap-4">
 					<Form.Item name="cut" label="Chế Tác (Cut)" className="w-1/5">
 						<Select placeholder="Chế Tác (Cut)">
-							<Option value={1}>Good</Option>
-							<Option value={2}>Very Good</Option>
-							<Option value={3}>Excellent</Option>
+							<Option value={1}>Tốt</Option>
+							<Option value={2}>Rất Tốt</Option>
+							<Option value={3}>Xuất Sắc</Option>
 						</Select>
 					</Form.Item>
 
@@ -244,7 +244,7 @@ export const AddModalDiamond = ({setShowModal, showModal}) => {
 						</Select>
 					</Form.Item>
 
-					<Form.Item name="clarity" label="Độ Trong (Clarity)" className="w-1/5">
+					<Form.Item name="clarity" label="Độ Tinh Khuyết (Clarity)" className="w-1/5">
 						<Select placeholder="Clarity">
 							<Option value={8}>FL</Option>
 							<Option value={7}>IF</Option>
@@ -306,7 +306,7 @@ export const AddModalDiamond = ({setShowModal, showModal}) => {
 				<div className="flex flex-wrap gap-4">
 					<Form.Item
 						name="polish"
-						label="Độ Bóng (Polish) "
+						label="Độ Bóng (Polish)"
 						className="w-1/4"
 						rules={[
 							{
@@ -326,7 +326,7 @@ export const AddModalDiamond = ({setShowModal, showModal}) => {
 
 					<Form.Item
 						name="symmetry"
-						label="Độ Bóng (Polish) "
+						label="Chọn Đối Xứng (Symmetry)"
 						className="w-1/4"
 						rules={[
 							{
@@ -549,24 +549,12 @@ export const AddModalDiamond = ({setShowModal, showModal}) => {
 						<strong>Giá tìm thấy:</strong>{' '}
 						{estimatePrice?.PriceFound?.Price?.toLocaleString('vi-VN')} VND
 					</p>
-					{/* <p>
-					<strong>Tiêu chí:</strong>{' '}
-					{estimatePrice?.CriteraFound
-						? JSON.stringify(estimatePrice?.CriteraFound)
-						: 'Không có'}
-				</p>
-				<p>
-					<strong>Khoảng bù hiện tại:</strong> {estimatePrice?.CurrentGivenOffset}
-				</p>
-				<p>
-					<strong>Giá đã biết:</strong> {estimatePrice?.IsPriceKnown ? 'Có' : 'Không'}
-				</p>
-				<p>
-					<strong>Hợp lệ:</strong> {estimatePrice?.IsValid ? 'Có' : 'Không'}
-				</p>
-				<p>
-					<strong>Gợi ý khoảng bù:</strong> {estimatePrice?.SuggestedOffsetTobeAdded}
-				</p> */}
+					<p>
+						<strong>Gợi ý khoảng bù kim cương hình:</strong>{' '}
+						{estimatePrice?.IsFancyShape
+							? estimatePrice?.FancyShapeOffsetSuggested
+							: estimatePrice?.CutOffsetSuggested}
+					</p>
 				</div>
 			</Form>
 		</Modal>
