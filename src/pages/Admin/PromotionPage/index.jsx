@@ -6,6 +6,10 @@ import {
 	PauseOutlined,
 	UploadOutlined,
 	PictureOutlined,
+	TagOutlined,
+	DollarOutlined,
+	NumberOutlined,
+	SketchOutlined,
 } from '@ant-design/icons';
 import {Button, Form, message, Popconfirm, Space, Table, Tooltip} from 'antd';
 import moment from 'moment';
@@ -198,6 +202,8 @@ const PromotionPage = ({promotionData}) => {
 							quantity: req.Quantity || 0,
 							moneyAmount: req.Amount || 0,
 							jewelryModelId: req.JewelryModelId,
+							jewelryModelName: req?.Model?.Name,
+
 							promotionId: req.PromotionId,
 							diamondRequirementSpec: {
 								origin: diamondSpec.Origin
@@ -744,66 +750,149 @@ const PromotionPage = ({promotionData}) => {
 			render: (_, record) => {
 				const requirements = record.PromoReqs || [];
 
-				if (requirements.length === 0) return 'Không có yêu cầu';
+				if (requirements.length === 0)
+					return <div className="text-sm text-gray-500 italic">Không có yêu cầu</div>;
 
-				return requirements.map((req, index) => (
-					<div key={index} className="text-xs mb-1 bg-gray-50 p-1 rounded">
-						{/* <div className="font-semibold">{req.Name || 'N/A'}</div> */}
-						<div className="flex justify-between">
-							<span>Loại: {getTextForEnum('TargetType', req.TargetType)}</span>
-							{req.Quantity !== null && req.Quantity !== undefined && (
-								<span>SL: {req.Quantity}</span>
-							)}
-						</div>
-						{req.Amount !== null && req.Amount !== undefined && (
-							<div>Số Tiền: {req.Amount.toLocaleString()} VNĐ</div>
-						)}
-						{req.DiamondRequirementSpec && (
-							<div className="text-xs text-gray-600">
-								KĐ:{' '}
-								{[
-									req.DiamondRequirementSpec.Origin &&
-										`Nguồn gốc: ${getTextForEnum(
-											'Origin',
-											req.DiamondRequirementSpec.Origin
-										)}`,
-									req.DiamondRequirementSpec.CaratFrom ||
-										(req.DiamondRequirementSpec.CaratTo &&
-											`Carat: ${req.DiamondRequirementSpec.CaratFrom}-${req.DiamondRequirementSpec.CaratTo}`),
-									req.DiamondRequirementSpec.ClarityFrom &&
-										req.DiamondRequirementSpec.ClarityTo &&
-										`Độ Tinh Khiết: ${getTextForEnum(
-											'Clarity',
-											req.DiamondRequirementSpec.ClarityFrom
-										)}-${getTextForEnum(
-											'Clarity',
-											req.DiamondRequirementSpec.ClarityTo
-										)}`,
-									req.DiamondRequirementSpec.CutFrom &&
-										req.DiamondRequirementSpec.CutTo &&
-										`Giác Cắt: ${getTextForEnum(
-											'Cut',
-											req.DiamondRequirementSpec.CutFrom
-										)}-${getTextForEnum(
-											'Cut',
-											req.DiamondRequirementSpec.CutTo
-										)}`,
-									req.DiamondRequirementSpec.ColorFrom &&
-										req.DiamondRequirementSpec.ColorTo &&
-										`Màu:${getTextForEnum(
-											'Color',
-											req.DiamondRequirementSpec.ColorFrom
-										)}-${getTextForEnum(
-											'Color',
-											req.DiamondRequirementSpec.ColorTo
-										)}`,
-								]
-									.filter(Boolean)
-									.join(' | ')}
+				return (
+					<div className="space-y-2">
+						{requirements.map((req, index) => (
+							<div
+								key={index}
+								className="bg-gray-50 rounded-lg p-3 shadow-sm transition-all hover:shadow-md"
+							>
+								<div className="flex flex-col items-center mb-2">
+									<h4 className="font-bold text-sm text-gray-800">
+										{req.Name || 'Yêu Cầu Không Xác Định'}
+									</h4>
+									<span className="text-xs text-blue-600 bg-blue-50 px-2 py-1 rounded-full">
+										{getTextForEnum('TargetType', req.TargetType)}
+									</span>
+								</div>
+
+								<div className="grid grid-cols-1 gap-2 text-xs text-gray-700">
+									{req.Quantity !== null && req.Quantity !== undefined && (
+										<div className="flex items-center">
+											<span className="mr-2 font-semibold">Số Lượng:</span>
+											{req.Quantity}
+										</div>
+									)}
+
+									{req.Amount !== null && req.Amount !== undefined && (
+										<div className="flex items-center">
+											<span className="mr-2 font-semibold">Số Tiền:</span>
+											{req.Amount.toLocaleString()} VNĐ
+										</div>
+									)}
+
+									{req.JewelryModelId && (
+										<div className="flex items-center">
+											<span className="mr-2 font-semibold">
+												ID Trang Sức:
+											</span>
+											{req.JewelryModelId}
+										</div>
+									)}
+								</div>
+
+								{req.Model && (
+									<div className="mt-2 text-xs text-gray-600 bg-white border border-gray-100 rounded p-2">
+										<div className="font-semibold mb-1">
+											Chi Tiết Trang Sức:
+										</div>
+										<div className="space-y-1">
+											{req.Model.Name && (
+												<div>
+													<span className="font-medium">Tên:</span>{' '}
+													{req.Model.Name}
+												</div>
+											)}
+											{req.Model.ModelCode && (
+												<div>
+													<span className="font-medium">Mã:</span>{' '}
+													{req.Model.ModelCode}
+												</div>
+											)}
+										</div>
+									</div>
+								)}
+
+								{req.DiamondRequirementSpec && (
+									<div className="mt-2 text-xs text-gray-600 bg-white border border-gray-100 rounded p-2">
+										<div className="font-semibold mb-1">Yêu Cầu Kim Cương:</div>
+										<div className="grid grid-cols-1 gap-1">
+											{req.DiamondRequirementSpec.Origin && (
+												<div>
+													<span className="font-medium">Nguồn Gốc:</span>{' '}
+													{getTextForEnum(
+														'Origin',
+														req.DiamondRequirementSpec.Origin
+													)}
+												</div>
+											)}
+											{(req.DiamondRequirementSpec.CaratFrom ||
+												req.DiamondRequirementSpec.CaratTo) && (
+												<div>
+													<span className="font-medium">Carat:</span>{' '}
+													{req.DiamondRequirementSpec.CaratFrom}-
+													{req.DiamondRequirementSpec.CaratTo}
+												</div>
+											)}
+											{req.DiamondRequirementSpec.ClarityFrom &&
+												req.DiamondRequirementSpec.ClarityTo && (
+													<div>
+														<span className="font-medium">
+															Độ Tinh Khiết:
+														</span>{' '}
+														{getTextForEnum(
+															'Clarity',
+															req.DiamondRequirementSpec.ClarityFrom
+														)}
+														-
+														{getTextForEnum(
+															'Clarity',
+															req.DiamondRequirementSpec.ClarityTo
+														)}
+													</div>
+												)}
+											{req.DiamondRequirementSpec.CutFrom &&
+												req.DiamondRequirementSpec.CutTo && (
+													<div>
+														<span className="font-medium">
+															Giác Cắt:
+														</span>{' '}
+														{getTextForEnum(
+															'Cut',
+															req.DiamondRequirementSpec.CutFrom
+														)}
+														-
+														{getTextForEnum(
+															'Cut',
+															req.DiamondRequirementSpec.CutTo
+														)}
+													</div>
+												)}
+											{req.DiamondRequirementSpec.ColorFrom &&
+												req.DiamondRequirementSpec.ColorTo && (
+													<div>
+														<span className="font-medium">Màu:</span>{' '}
+														{getTextForEnum(
+															'Color',
+															req.DiamondRequirementSpec.ColorFrom
+														)}
+														-
+														{getTextForEnum(
+															'Color',
+															req.DiamondRequirementSpec.ColorTo
+														)}
+													</div>
+												)}
+										</div>
+									</div>
+								)}
 							</div>
-						)}
+						))}
 					</div>
-				));
+				);
 			},
 		},
 		{
@@ -812,69 +901,134 @@ const PromotionPage = ({promotionData}) => {
 			render: (_, record) => {
 				const gifts = record.Gifts || [];
 
-				if (gifts.length === 0) return 'Không có quà';
-
-				return gifts.map((gift, index) => (
-					<div key={index} className="text-xs mb-1 bg-gray-50 p-1 rounded">
-						<div className="font-semibold">{gift.Name || 'N/A'}</div>
-
-						<div>Loại: {getTextForEnum('TargetType', gift.TargetType) || 'N/A'}</div>
-						<div>
-							Loại Giảm Giá: {getTextForEnum('UnitType', gift.UnitType) || 'N/A'}
+				if (gifts.length === 0)
+					return (
+						<div className="text-sm text-gray-500 italic flex items-center justify-center">
+							<GiftOutlined className="mr-2 text-gray-400" />
+							Không có quà
 						</div>
+					);
 
-						{gift.UnitValue !== null && gift.UnitValue !== undefined && (
-							<div>Giá Trị Giảm Giá: {gift.UnitValue}</div>
-						)}
-						{gift.Amount !== null && gift.Amount !== undefined && (
-							<div>Số Lượng Được Giảm: {gift.Amount.toLocaleString()}</div>
-						)}
-						{gift.DiamondRequirementSpec && (
-							<div className="text-xs text-gray-600">
-								KĐ:{' '}
-								{[
-									gift.DiamondRequirementSpec.Origin &&
-										`Nguồn:${getTextForEnum(
-											'Origin',
-											gift.DiamondRequirementSpec.Origin
-										)}`,
-									gift.DiamondRequirementSpec.CaratFrom &&
-										gift.DiamondRequirementSpec.CaratTo &&
-										`Carat:${gift.DiamondRequirementSpec.CaratFrom}-${gift.DiamondRequirementSpec.CaratTo}`,
-									gift.DiamondRequirementSpec.ClarityFrom &&
-										gift.DiamondRequirementSpec.ClarityTo &&
-										`Độ Tinh:${getTextForEnum(
-											'Clarity',
-											gift.DiamondRequirementSpec.ClarityFrom
-										)}-${getTextForEnum(
-											'Clarity',
-											gift.DiamondRequirementSpec.ClarityTo
-										)}`,
-									gift.DiamondRequirementSpec.CutFrom &&
-										gift.DiamondRequirementSpec.CutTo &&
-										`Giác Cắt:${getTextForEnum(
-											'Cut',
-											gift.DiamondRequirementSpec.CutFrom
-										)}-${getTextForEnum(
-											'Cut',
-											gift.DiamondRequirementSpec.CutTo
-										)}`,
-									gift.DiamondRequirementSpec.ColorFrom &&
-										gift.DiamondRequirementSpec.ColorTo &&
-										`Màu:${getTextForEnum(
-											'Color',
-											gift.DiamondRequirementSpec.ColorFrom
-										)}-${getTextForEnum(
-											'Color',
-											gift.DiamondRequirementSpec.ColorTo
-										)}`,
-								]
-									.filter(Boolean)
-									.join(' | ')}
+				return (
+					<div className="space-y-2">
+						{gifts.map((gift, index) => (
+							<div
+								key={index}
+								className=" shadow-sm hover:shadow-md transition-all duration-300"
+							>
+								<div className="flex flex-col items-center mb-2">
+									<h4 className="font-bold text-sm text-blue-800">
+										{gift.Name || 'Quà Không Xác Định'}
+									</h4>
+									<span className="text-xs text-blue-600 bg-white rounded-full ">
+										{getTextForEnum('TargetType', gift.TargetType) || 'N/A'}
+									</span>
+								</div>
+
+								<div className="grid grid-cols-1 gap-2 text-xs text-gray-700">
+									<div className="flex items-center">
+										<TagOutlined className="mr-2 text-blue-500" />
+										<span className="font-semibold mr-1">Loại Giảm:</span>
+										{getTextForEnum('UnitType', gift.UnitType) || 'N/A'}
+									</div>
+
+									{gift.UnitValue !== null && gift.UnitValue !== undefined && (
+										<div className="flex items-center">
+											<DollarOutlined className="mr-2 text-green-500" />
+											<span className="font-semibold mr-1">Giá Trị:</span>
+											{gift.UnitValue}
+										</div>
+									)}
+
+									{gift.Amount !== null && gift.Amount !== undefined && (
+										<div className="flex items-center">
+											<NumberOutlined className="mr-2 text-purple-500" />
+											<span className="font-semibold mr-1">Số Lượng:</span>
+											{gift.Amount.toLocaleString()}
+										</div>
+									)}
+								</div>
+
+								{gift.DiamondRequirementSpec && (
+									<div className="mt-2 bg-white border border-gray-100 rounded p-2 text-xs">
+										<div className="font-semibold mb-1 text-blue-700 flex items-center">
+											<SketchOutlined className="mr-2" />
+											Chi Tiết Kim Cương
+										</div>
+										<div className="grid grid-cols-1 gap-1 text-gray-600">
+											{gift.DiamondRequirementSpec.Origin && (
+												<div>
+													<span className="font-medium">Nguồn:</span>{' '}
+													{getTextForEnum(
+														'Origin',
+														gift.DiamondRequirementSpec.Origin
+													)}
+												</div>
+											)}
+											{(gift.DiamondRequirementSpec.CaratFrom ||
+												gift.DiamondRequirementSpec.CaratTo) && (
+												<div>
+													<span className="font-medium">Carat:</span>{' '}
+													{gift.DiamondRequirementSpec.CaratFrom}-
+													{gift.DiamondRequirementSpec.CaratTo}
+												</div>
+											)}
+											{gift.DiamondRequirementSpec.ClarityFrom &&
+												gift.DiamondRequirementSpec.ClarityTo && (
+													<div>
+														<span className="font-medium">
+															Độ Tinh:
+														</span>{' '}
+														{getTextForEnum(
+															'Clarity',
+															gift.DiamondRequirementSpec.ClarityFrom
+														)}
+														-
+														{getTextForEnum(
+															'Clarity',
+															gift.DiamondRequirementSpec.ClarityTo
+														)}
+													</div>
+												)}
+											{gift.DiamondRequirementSpec.CutFrom &&
+												gift.DiamondRequirementSpec.CutTo && (
+													<div>
+														<span className="font-medium">
+															Giác Cắt:
+														</span>{' '}
+														{getTextForEnum(
+															'Cut',
+															gift.DiamondRequirementSpec.CutFrom
+														)}
+														-
+														{getTextForEnum(
+															'Cut',
+															gift.DiamondRequirementSpec.CutTo
+														)}
+													</div>
+												)}
+											{gift.DiamondRequirementSpec.ColorFrom &&
+												gift.DiamondRequirementSpec.ColorTo && (
+													<div>
+														<span className="font-medium">Màu:</span>{' '}
+														{getTextForEnum(
+															'Color',
+															gift.DiamondRequirementSpec.ColorFrom
+														)}
+														-
+														{getTextForEnum(
+															'Color',
+															gift.DiamondRequirementSpec.ColorTo
+														)}
+													</div>
+												)}
+										</div>
+									</div>
+								)}
 							</div>
-						)}
+						))}
 					</div>
-				));
+				);
 			},
 		},
 		{

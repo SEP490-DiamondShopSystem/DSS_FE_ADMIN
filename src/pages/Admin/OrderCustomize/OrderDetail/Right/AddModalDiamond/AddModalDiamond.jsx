@@ -4,7 +4,10 @@ import React, {useEffect, useState} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
 import {getAllShapeSelector, LoadingCustomizeSelector} from '../../../../../../redux/selectors';
 import {handleAddDiamondCustomize} from '../../../../../../redux/slices/customizeSlice';
-import {getDiamondShape} from '../../../../../../redux/slices/diamondSlice';
+import {
+	getDiamondShape,
+	handleEstimatePriceDiamond,
+} from '../../../../../../redux/slices/diamondSlice';
 
 const {Option} = Select;
 
@@ -26,6 +29,9 @@ export const AddModalDiamond = ({
 	const loading = useSelector(LoadingCustomizeSelector);
 	const shapes = useSelector(getAllShapeSelector);
 
+	const [estimatePrice, setEstimatePrice] = useState();
+	const [diamondParams, setDiamondParams] = useState(null);
+
 	useEffect(() => {
 		dispatch(getDiamondShape());
 	}, []);
@@ -36,6 +42,48 @@ export const AddModalDiamond = ({
 			priceOffset: 0,
 		});
 	}, [selectedRequest, form]);
+
+	useEffect(() => {
+		if (!diamondParams) return;
+
+		// Kiểm tra tất cả các tham số cần thiết
+		const isValidParams = [
+			diamondParams?.diamond_4C?.carat,
+			diamondParams?.diamond_4C?.clarity,
+			diamondParams?.diamond_4C?.color,
+			diamondParams?.diamond_4C?.cut,
+			diamondParams?.shapeId,
+		].every(Boolean); // Kiểm tra xem tất cả điều kiện đều đúng
+
+		if (isValidParams) {
+			dispatch(handleEstimatePriceDiamond(diamondParams))
+				.unwrap()
+				.then((res) => {
+					setEstimatePrice(res);
+				})
+				.catch((error) => {
+					const errorMessage = error?.data?.detail || error?.detail || 'Đã xảy ra lỗi!';
+					message.error(errorMessage);
+				});
+		} else {
+			console.warn('Thiếu thông tin cần thiết để tính giá kim cương!');
+		}
+	}, [diamondParams, dispatch]);
+
+	const handleFormChange = (changedValues, allValues) => {
+		const {cut, color, clarity, carat, priceOffset, shapeId, isLabDiamond} = allValues;
+		setDiamondParams({
+			shapeId,
+			priceOffset: priceOffset === undefined ? 0 : priceOffset,
+			diamond_4C: {
+				cut,
+				color,
+				clarity,
+				carat,
+				isLabDiamond: isLabDiamond,
+			},
+		});
+	};
 
 	const handleAddDiamondForm = (values) => {
 		Modal.confirm({
@@ -73,6 +121,8 @@ export const AddModalDiamond = ({
 			withLenghtRatio,
 			lockPrice,
 			culet,
+			sku,
+			extraFee,
 		} = values;
 
 		const diamond4c = {
@@ -103,9 +153,10 @@ export const AddModalDiamond = ({
 			details,
 			measurement: measurements,
 			shapeId,
-			sku: generateRandomSKU(16),
+			sku,
 			certificate: 1,
 			priceOffset,
+			extraFee,
 		};
 
 		if (orders?.Status === 1) {
@@ -125,7 +176,7 @@ export const AddModalDiamond = ({
 					form.resetFields();
 				})
 				.catch((error) => {
-					message.error(error?.detail);
+					message.error(error?.data?.detail);
 				});
 		} else {
 			const updatedChangeDiamond = filteredRequests?.reduce((acc, diamond) => {
@@ -180,14 +231,38 @@ export const AddModalDiamond = ({
 			visible={showModal}
 			onOk={() => form.submit()}
 			onCancel={handleCancel}
-			width={800}
+			width={1200}
+			centered
 		>
-			<Form form={form} layout="vertical" onFinish={handleAddDiamondForm} onLoad={loading}>
+			<Form
+				form={form}
+				layout="vertical"
+				onFinish={handleAddDiamondForm}
+				onValuesChange={handleFormChange}
+				onLoad={loading}
+			>
+				<label className="font-semibold">Nhập SKU</label>
+				<div className="flex flex-wrap gap-4">
+					<Form.Item
+						name="sku"
+						label="SKU"
+						className="w-1/3"
+						rules={[
+							{required: true, message: 'Vui lòng nhập SKU.'},
+							{
+								pattern: /^[a-zA-Z0-9]{1,16}$/,
+								message: 'SKU chỉ được chứa chữ và số, tối đa 16 ký tự.',
+							},
+						]}
+					>
+						<Input placeholder="Nhập SKU" className="w-full" maxLength={16} />
+					</Form.Item>
+				</div>
 				<label className="font-semibold">Thêm 4C</label>
 				<div className="flex flex-wrap gap-4">
 					<Form.Item
 						name="cut"
-						label="Cut"
+						label="Chế Tác (Cut)"
 						className="w-1/5"
 						rules={[
 							{
@@ -198,9 +273,9 @@ export const AddModalDiamond = ({
 					>
 						<Select placeholder="Chọn Cut">
 							{[
-								{value: 1, label: 'Good'},
-								{value: 2, label: 'Very Good'},
-								{value: 3, label: 'Excellent'},
+								{value: 1, label: 'Tốt'},
+								{value: 2, label: 'Rất Tốt'},
+								{value: 3, label: 'Xuất Sắc'},
 							]
 								.filter(
 									(option) =>
@@ -217,7 +292,7 @@ export const AddModalDiamond = ({
 
 					<Form.Item
 						name="color"
-						label="Color"
+						label="Màu Sắc (Color)"
 						className="w-1/5"
 						rules={[
 							{
@@ -252,7 +327,7 @@ export const AddModalDiamond = ({
 
 					<Form.Item
 						name="clarity"
-						label="Clarity"
+						label="Độ Tinh Khuyết (Clarity)"
 						className="w-1/5"
 						rules={[
 							{
@@ -287,7 +362,7 @@ export const AddModalDiamond = ({
 
 					<Form.Item
 						name="carat"
-						label="Carat"
+						label="Ly (Carat)"
 						className="w-1/5"
 						rules={[
 							{
@@ -314,7 +389,7 @@ export const AddModalDiamond = ({
 					>
 						<InputNumber
 							step={0.01}
-							placeholder="Chọn Carat Weight"
+							placeholder="Chọn Carat"
 							className="w-full"
 							min={selectedRequest?.CaratFrom}
 							max={selectedRequest?.CaratTo}
@@ -334,7 +409,7 @@ export const AddModalDiamond = ({
 				<div className="flex flex-wrap gap-4">
 					<Form.Item
 						name="polish"
-						label="Polish"
+						label="Độ Bóng (Polish)"
 						className="w-1/4"
 						rules={[
 							{
@@ -345,11 +420,11 @@ export const AddModalDiamond = ({
 					>
 						<Select placeholder="Chọn Polish">
 							{[
-								{value: 1, label: 'Poor'},
-								{value: 2, label: 'Fair'},
-								{value: 3, label: 'Good'},
-								{value: 4, label: 'Very Good'},
-								{value: 5, label: 'Excellent'},
+								{value: 1, label: 'Kém'},
+								{value: 2, label: 'Trung Bình'},
+								{value: 3, label: 'Tốt'},
+								{value: 4, label: 'Rất Tốt'},
+								{value: 5, label: 'Xuất Sắc'},
 							]
 								.filter((option) => {
 									if (Array.isArray(selectedRequest?.Polish)) {
@@ -374,7 +449,7 @@ export const AddModalDiamond = ({
 
 					<Form.Item
 						name="symmetry"
-						label="Symmetry"
+						label="Chọn Đối Xứng (Symmetry)"
 						className="w-1/4"
 						rules={[
 							{
@@ -385,11 +460,11 @@ export const AddModalDiamond = ({
 					>
 						<Select placeholder="Chọn Symmetry">
 							{[
-								{value: 1, label: 'Poor'},
-								{value: 2, label: 'Fair'},
-								{value: 3, label: 'Good'},
-								{value: 4, label: 'Very Good'},
-								{value: 5, label: 'Excellent'},
+								{value: 1, label: 'Kém'},
+								{value: 2, label: 'Trung Bình'},
+								{value: 3, label: 'Tốt'},
+								{value: 4, label: 'Rất Tốt'},
+								{value: 5, label: 'Xuất Sắc'},
 							]
 								.filter((option) => {
 									if (Array.isArray(selectedRequest?.Symmetry)) {
@@ -414,7 +489,7 @@ export const AddModalDiamond = ({
 
 					<Form.Item
 						name="measurement"
-						label="Measurement"
+						label="Kích Thước"
 						className="w-1/4"
 						rules={[
 							{
@@ -438,7 +513,7 @@ export const AddModalDiamond = ({
 				<div className="flex flex-wrap gap-4">
 					<Form.Item
 						name="girdle"
-						label="Girdle"
+						label="Viền Cạnh (Girdle)"
 						className="w-1/4"
 						rules={[
 							{
@@ -449,14 +524,14 @@ export const AddModalDiamond = ({
 					>
 						<Select placeholder="Chọn Girdle">
 							{[
-								{value: 1, label: 'Extremely Thin'},
-								{value: 2, label: 'Very Thin'},
-								{value: 3, label: 'Thin'},
-								{value: 4, label: 'Medium'},
-								{value: 5, label: 'Slightly Thick'},
-								{value: 6, label: 'Thick'},
-								{value: 7, label: 'Very Thick'},
-								{value: 8, label: 'Extremely Thick'},
+								{value: 1, label: 'Cực Mỏng'},
+								{value: 2, label: 'Rất Mỏng'},
+								{value: 3, label: 'Mỏng'},
+								{value: 4, label: 'Trung Bình'},
+								{value: 5, label: 'Hơi Dày'},
+								{value: 6, label: 'Dày'},
+								{value: 7, label: 'Rất Dày'},
+								{value: 8, label: 'Cực Dày'},
 							]
 								.filter((option) => {
 									if (Array.isArray(selectedRequest?.Girdle)) {
@@ -481,7 +556,7 @@ export const AddModalDiamond = ({
 
 					<Form.Item
 						name="fluorescence"
-						label="Fluorescence"
+						label="Huỳnh quang"
 						className="w-1/4"
 						rules={[
 							{
@@ -491,15 +566,16 @@ export const AddModalDiamond = ({
 						]}
 					>
 						<Select placeholder="Chọn Fluorescence">
-							<Option value={1}>None</Option>
-							<Option value={2}>Faint</Option>
-							<Option value={3}>Medium</Option>
+							<Option value={1}>Không Có</Option>
+							<Option value={2}>Mờ</Option>
+							<Option value={3}>Trung Bình</Option>
+							<Option value={4}>Mạnh</Option>
 						</Select>
 					</Form.Item>
 
 					<Form.Item
 						name="culet"
-						label="Culet"
+						label="Chóp Đáy (Culet)"
 						className="w-1/4"
 						rules={[
 							{
@@ -510,14 +586,14 @@ export const AddModalDiamond = ({
 					>
 						<Select placeholder="Chọn Culet">
 							{[
-								{value: 1, label: 'None'},
-								{value: 2, label: 'Very Small'},
-								{value: 3, label: 'Small'},
-								{value: 4, label: 'Medium'},
-								{value: 5, label: 'Slightly Large'},
-								{value: 6, label: 'Large'},
-								{value: 7, label: 'Very Large'},
-								{value: 8, label: 'Extremely Large'},
+								{value: 1, label: 'Không Có'},
+								{value: 2, label: 'Rất Nhỏ'},
+								{value: 3, label: 'Nhỏ'},
+								{value: 4, label: 'Trung Bình'},
+								{value: 5, label: 'Hơi Lớn'},
+								{value: 6, label: 'Lớn'},
+								{value: 7, label: 'Rất Lớn'},
+								{value: 8, label: 'Cực Lớn'},
 							]
 								.filter((option) => {
 									if (Array.isArray(selectedRequest?.Culet)) {
@@ -563,7 +639,7 @@ export const AddModalDiamond = ({
 
 					<Form.Item
 						name="depth"
-						label="Depth"
+						label="Độ Sâu (Depth)"
 						className="w-1/4"
 						rules={[{required: true, message: 'Vui lòng nhập Depth'}]}
 					>
@@ -579,7 +655,7 @@ export const AddModalDiamond = ({
 
 					<Form.Item
 						name="table"
-						label="Table"
+						label="Bề Mặt (Table)"
 						className="w-1/4"
 						rules={[{required: true, message: 'Vui lòng nhập Table'}]}
 					>
@@ -631,17 +707,24 @@ export const AddModalDiamond = ({
 									))}
 						</Select>
 					</Form.Item>
-
-					<Form.Item name="priceOffset" label="Giá Offset" className="w-1/3">
-						<InputNumber
-							min={0}
-							step={0.1}
-							placeholder="Nhập Giá Offset"
-							className="w-full"
+					<Form.Item
+						name="isLabDiamond"
+						label="Nguồn Gốc Kim Cương"
+						valuePropName="checked"
+						className="w-1/3 flex items-center"
+					>
+						<span>Tự Nhiên</span>
+						<Switch
+							className="mx-5"
+							disabled
+							checked={selectedRequest?.IsLabGrown === true}
 						/>
+						<span>Nhân Tạo</span>
 					</Form.Item>
 				</div>
-				<div>
+
+				<label className="font-semibold">Cài Đặt Giá Kim Cương</label>
+				<div className="flex flex-wrap gap-4">
 					<Form.Item
 						name="lockPrice"
 						label="Giá Kim Cương"
@@ -664,22 +747,46 @@ export const AddModalDiamond = ({
 							}
 						/>
 					</Form.Item>
+					<Form.Item name="priceOffset" label="Bù Trừ Giá" className="w-1/3">
+						<InputNumber
+							min={-0.5}
+							step={0.1}
+							placeholder="Nhập giá bù trừ"
+							className="w-full"
+							defaultValue={0.0}
+							formatter={(value) => `${value || 0.0}`}
+							parser={(value) => parseFloat(value || 0.0)}
+						/>
+					</Form.Item>
+					<Form.Item name="extraFee" label="Phí Bổ Sung">
+						<InputNumber
+							min={0}
+							defaultValue={0}
+							style={{width: '100%'}}
+							placeholder="Nhập thêm phí"
+							formatter={(value) => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
+							parser={(value) => value.replace(/,/g, '')}
+						/>
+					</Form.Item>
 				</div>
 				<div>
-					<Form.Item
-						name="isLabDiamond"
-						label="Nguồn Gốc Kim Cương"
-						valuePropName="checked"
-						className="w-1/3 flex items-center"
-					>
-						<span>Tự Nhiên</span>
-						<Switch
-							className="mx-5"
-							disabled
-							checked={selectedRequest?.IsLabGrown === true}
-						/>
-						<span>Nhân Tạo</span>
-					</Form.Item>
+					<p>
+						<strong>Thông báo:</strong> {estimatePrice?.Message}
+					</p>
+					<p>
+						<strong>Giá đúng:</strong>{' '}
+						{estimatePrice?.CorrectPrice?.toLocaleString('vi-VN')} VND
+					</p>
+					<p>
+						<strong>Giá tìm thấy:</strong>{' '}
+						{estimatePrice?.PriceFound?.Price?.toLocaleString('vi-VN')} VND
+					</p>
+					<p>
+						<strong>Gợi ý khoảng bù kim cương hình:</strong>{' '}
+						{estimatePrice?.IsFancyShape
+							? estimatePrice?.FancyShapeOffsetSuggested
+							: estimatePrice?.CutOffsetSuggested}
+					</p>
 				</div>
 			</Form>
 		</Modal>
