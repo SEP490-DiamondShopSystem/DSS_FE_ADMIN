@@ -24,14 +24,14 @@ export const PriceExtraFeeModal = ({form, isVisible, onClose, onSubmit}) => {
 			visible={isVisible}
 			onOk={handleOk}
 			onCancel={handleCancel}
-			okText="Submit"
-			cancelText="Cancel"
+			okText="Thêm"
+			cancelText="Hủy"
 		>
 			<Form form={form} layout="vertical" name="price_extra_fee_form">
 				<Form.Item
 					name="priceOffset"
 					label="Bù trừ giá"
-					rules={[{required: true, message: 'Vui lòng nhập giá bù trừ!'}]}
+					// rules={[{required: true, message: 'Vui lòng nhập giá bù trừ!'}]}
 				>
 					<InputNumber
 						min={-0.5}
@@ -44,7 +44,7 @@ export const PriceExtraFeeModal = ({form, isVisible, onClose, onSubmit}) => {
 				<Form.Item
 					name="extraFee"
 					label="Phí bổ sung"
-					rules={[{required: true, message: 'Vui lòng nhập thêm phí!'}]}
+					// rules={[{required: true, message: 'Vui lòng nhập thêm phí!'}]}
 				>
 					<InputNumber
 						min={0}

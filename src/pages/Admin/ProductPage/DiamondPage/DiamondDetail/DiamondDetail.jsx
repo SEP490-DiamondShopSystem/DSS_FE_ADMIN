@@ -3,6 +3,7 @@ import React from 'react';
 import {formatPrice} from '../../../../../utils';
 import {LockOutlined, UnlockOutlined} from '@ant-design/icons';
 import Loading from '../../../../../components/Loading';
+import {useNavigate} from 'react-router-dom';
 
 const ClarityEnum = {
 	1: 'SI2',
@@ -86,6 +87,7 @@ const statusMapping = {
 };
 
 const DiamondDetail = ({diamond, handleView, id, handleLockDiamondView, handleOpenModal}) => {
+	const navigate = useNavigate();
 	if (!diamond) {
 		return <Loading />;
 	}
@@ -240,6 +242,29 @@ const DiamondDetail = ({diamond, handleView, id, handleLockDiamondView, handleOp
 			</div>
 
 			<div className="mt-10 text-center">
+				{diamond?.DiamondRequest?.CustomizeRequestId && (
+					<Button
+						className="ml-4 bg-gray-100 text-gray-700 py-3 px-8 rounded-lg shadow-lg hover:bg-gray-200 transition-colors duration-300 transform hover:-translate-y-1"
+						onClick={() =>
+							navigate(
+								`/request-customize/${diamond?.DiamondRequest?.CustomizeRequestId}`
+							)
+						}
+						disabled={Status === 2}
+					>
+						Đơn Thiết Kế
+					</Button>
+				)}
+				{diamond?.JewelryId && (
+					<Button
+						className="ml-4 bg-gray-100 text-gray-700 py-3 px-8 rounded-lg shadow-lg hover:bg-gray-200 transition-colors duration-300 transform hover:-translate-y-1"
+						onClick={() => navigate(`/products/jewelry-list/${diamond?.JewelryId}`)}
+						disabled={Status === 2}
+					>
+						Trang Sức Đã Đính
+					</Button>
+				)}
+
 				<Button
 					className="ml-4 bg-gray-100 text-gray-700 py-3 px-8 rounded-lg shadow-lg hover:bg-gray-200 transition-colors duration-300 transform hover:-translate-y-1"
 					onClick={handleOpenModal}
