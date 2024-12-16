@@ -86,8 +86,6 @@ const DefaultLayout = () => {
 				return regex.test(currentPath);
 			});
 
-			console.log('isAllowedPath', isAllowedPath);
-
 			if (isDeliverer && !isAllowedPath && !hasRedirected) {
 				navigate('/orders');
 				setHasRedirected(true);

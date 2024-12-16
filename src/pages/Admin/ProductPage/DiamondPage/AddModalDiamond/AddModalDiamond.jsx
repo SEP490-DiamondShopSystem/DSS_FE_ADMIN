@@ -9,6 +9,7 @@ import {
 } from '../../../../../redux/slices/diamondSlice';
 import {fetchDiamondRule} from '../../../../../redux/slices/configSlice';
 import {InfoCircleOutlined} from '@ant-design/icons';
+import {formatPrice} from '../../../../../utils';
 
 const {Option} = Select;
 
@@ -24,8 +25,6 @@ export const AddModalDiamond = ({setShowModal, showModal}) => {
 	const [diamond, setDiamond] = useState(null);
 	const [rule, setRule] = useState();
 
-	console.log('rule', rule);
-
 	useEffect(() => {
 		dispatch(getDiamondShape());
 	}, []);
@@ -35,6 +34,8 @@ export const AddModalDiamond = ({setShowModal, showModal}) => {
 			.unwrap()
 			.then((res) => {
 				setRule(res);
+				setOffsetMin(res?.MinPriceOffset);
+				setOffsetMax(res?.MaxPriceOffset);
 			});
 	}, [dispatch]);
 
@@ -68,8 +69,6 @@ export const AddModalDiamond = ({setShowModal, showModal}) => {
 			},
 		});
 	};
-
-	console.log('diamondParams', diamondParams);
 
 	// Dispatch khi diamondParams thay đổi
 	useEffect(() => {
@@ -223,7 +222,17 @@ export const AddModalDiamond = ({setShowModal, showModal}) => {
 				{/* Diamond 4C Row */}
 				<label className="font-semibold">Thêm 4C</label>
 				<div className="flex flex-wrap gap-4">
-					<Form.Item name="cut" label="Chế Tác (Cut)" className="w-1/5">
+					<Form.Item
+						name="cut"
+						label="Chế Tác (Cut)"
+						className="w-1/5"
+						rules={[
+							{
+								required: true,
+								message: 'Vui lòng chọn Cut!',
+							},
+						]}
+					>
 						<Select placeholder="Chế Tác (Cut)">
 							<Option value={1}>Tốt</Option>
 							<Option value={2}>Rất Tốt</Option>
@@ -231,7 +240,17 @@ export const AddModalDiamond = ({setShowModal, showModal}) => {
 						</Select>
 					</Form.Item>
 
-					<Form.Item name="color" label="Màu Sắc (Color)" className="w-1/5">
+					<Form.Item
+						name="color"
+						label="Màu Sắc (Color)"
+						className="w-1/5"
+						rules={[
+							{
+								required: true,
+								message: 'Vui lòng chọn Color!',
+							},
+						]}
+					>
 						<Select placeholder="Chọn Color">
 							<Option value={8}>D</Option>
 							<Option value={7}>E</Option>
@@ -244,7 +263,17 @@ export const AddModalDiamond = ({setShowModal, showModal}) => {
 						</Select>
 					</Form.Item>
 
-					<Form.Item name="clarity" label="Độ Tinh Khuyết (Clarity)" className="w-1/5">
+					<Form.Item
+						name="clarity"
+						label="Độ Tinh Khuyết (Clarity)"
+						className="w-1/5"
+						rules={[
+							{
+								required: true,
+								message: 'Vui lòng chọn Clarity!',
+							},
+						]}
+					>
 						<Select placeholder="Clarity">
 							<Option value={8}>FL</Option>
 							<Option value={7}>IF</Option>
@@ -517,7 +546,8 @@ export const AddModalDiamond = ({setShowModal, showModal}) => {
 				<div className="flex flex-wrap gap-4">
 					<Form.Item name="priceOffset" label="Bù Trừ Giá" className="w-1/3">
 						<InputNumber
-							min={-0.5}
+							min={rule?.MinPriceOffset}
+							max={rule?.MaxPriceOffset}
 							step={0.1}
 							placeholder="Nhập giá bù trừ"
 							className="w-full"
@@ -537,25 +567,27 @@ export const AddModalDiamond = ({setShowModal, showModal}) => {
 						/>
 					</Form.Item>
 				</div>
-				<div>
-					<p>
-						<strong>Thông báo:</strong> {estimatePrice?.Message}
-					</p>
-					<p>
-						<strong>Giá đúng:</strong>{' '}
-						{estimatePrice?.CorrectPrice?.toLocaleString('vi-VN')} VND
-					</p>
-					<p>
-						<strong>Giá tìm thấy:</strong>{' '}
-						{estimatePrice?.PriceFound?.Price?.toLocaleString('vi-VN')} VND
-					</p>
-					<p>
-						<strong>Gợi ý khoảng bù kim cương hình:</strong>{' '}
-						{estimatePrice?.IsFancyShape
-							? estimatePrice?.FancyShapeOffsetSuggested
-							: estimatePrice?.CutOffsetSuggested}
-					</p>
-				</div>
+
+				{estimatePrice && (
+					<div>
+						<p>
+							<strong>Thông báo:</strong> {estimatePrice?.Message}
+						</p>
+						<p>
+							<strong>Giá đúng:</strong> {formatPrice(estimatePrice?.CorrectPrice)}{' '}
+						</p>
+						<p>
+							<strong>Giá tìm thấy:</strong>{' '}
+							{formatPrice(estimatePrice?.PriceFound?.Price)}
+						</p>
+						<p>
+							<strong>Gợi ý khoảng bù kim cương hình:</strong>{' '}
+							{estimatePrice?.IsFancyShape
+								? estimatePrice?.FancyShapeOffsetSuggested
+								: estimatePrice?.CutOffsetSuggested}
+						</p>
+					</div>
+				)}
 			</Form>
 		</Modal>
 	);

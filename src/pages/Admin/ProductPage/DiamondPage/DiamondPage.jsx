@@ -438,16 +438,16 @@ const DiamondPage = () => {
 						range
 						marks={{
 							0: '0',
-							1000000000: '1000M',
-							5000000000: '5000M',
-							10000000000: '10000M',
-							15000000000: '15000M',
-							20000000000: `20000M`,
+							50000000: '50M',
+							200000000: '200M',
+							500000000: '500M',
+							700000000: '700M',
+							1000000000: `10000M`,
 						}}
 						step={null}
 						value={[filters?.price?.minPrice, filters?.price?.maxPrice]}
 						min={filterLimits?.Price?.Min}
-						max={filterLimits?.Price?.Max}
+						max={1000000000}
 						onChange={handlePriceChange}
 					/>
 				</div>

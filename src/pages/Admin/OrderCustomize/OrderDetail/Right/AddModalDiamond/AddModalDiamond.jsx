@@ -8,6 +8,7 @@ import {
 	getDiamondShape,
 	handleEstimatePriceDiamond,
 } from '../../../../../../redux/slices/diamondSlice';
+import {fetchDiamondRule} from '../../../../../../redux/slices/configSlice';
 
 const {Option} = Select;
 
@@ -31,9 +32,20 @@ export const AddModalDiamond = ({
 
 	const [estimatePrice, setEstimatePrice] = useState();
 	const [diamondParams, setDiamondParams] = useState(null);
+	const [offsetMin, setOffsetMin] = useState();
+	const [offsetMax, setOffsetMax] = useState();
 
 	useEffect(() => {
 		dispatch(getDiamondShape());
+	}, []);
+
+	useEffect(() => {
+		dispatch(fetchDiamondRule())
+			.unwrap()
+			.then((res) => {
+				setOffsetMin(res?.MinPriceOffset);
+				setOffsetMax(res?.MaxPriceOffset);
+			});
 	}, []);
 
 	useEffect(() => {
@@ -749,7 +761,8 @@ export const AddModalDiamond = ({
 					</Form.Item>
 					<Form.Item name="priceOffset" label="Bù Trừ Giá" className="w-1/3">
 						<InputNumber
-							min={-0.5}
+							min={offsetMin}
+							max={offsetMax}
 							step={0.1}
 							placeholder="Nhập giá bù trừ"
 							className="w-full"
@@ -769,25 +782,26 @@ export const AddModalDiamond = ({
 						/>
 					</Form.Item>
 				</div>
-				<div>
-					<p>
-						<strong>Thông báo:</strong> {estimatePrice?.Message}
-					</p>
-					<p>
-						<strong>Giá đúng:</strong>{' '}
-						{estimatePrice?.CorrectPrice?.toLocaleString('vi-VN')} VND
-					</p>
-					<p>
-						<strong>Giá tìm thấy:</strong>{' '}
-						{estimatePrice?.PriceFound?.Price?.toLocaleString('vi-VN')} VND
-					</p>
-					<p>
-						<strong>Gợi ý khoảng bù kim cương hình:</strong>{' '}
-						{estimatePrice?.IsFancyShape
-							? estimatePrice?.FancyShapeOffsetSuggested
-							: estimatePrice?.CutOffsetSuggested}
-					</p>
-				</div>
+				{estimatePrice && (
+					<div>
+						<p>
+							<strong>Thông báo:</strong> {estimatePrice?.Message}
+						</p>
+						<p>
+							<strong>Giá đúng:</strong> {formatPrice(estimatePrice?.CorrectPrice)}
+						</p>
+						<p>
+							<strong>Giá tìm thấy:</strong>{' '}
+							{formatPrice(estimatePrice?.PriceFound?.Price)}
+						</p>
+						<p>
+							<strong>Gợi ý khoảng bù kim cương hình:</strong>{' '}
+							{estimatePrice?.IsFancyShape
+								? estimatePrice?.FancyShapeOffsetSuggested
+								: estimatePrice?.CutOffsetSuggested}
+						</p>
+					</div>
+				)}
 			</Form>
 		</Modal>
 	);
