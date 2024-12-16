@@ -6,6 +6,7 @@ import JewelryModelList from '../JewelryModelList';
 export const PromoReqForm = ({form, shapes, Option, removeRequirement}) => {
 	const [isPopupVisible, setIsPopupVisible] = useState(false);
 	const [selectedModel, setSelectedModel] = useState(null);
+	const [selectedModelName, setSelectedModelName] = useState(null);
 
 	const [moneyAmount, setMoneyAmount] = useState(null);
 	const handleAmountChange = (value) => {
@@ -30,12 +31,18 @@ export const PromoReqForm = ({form, shapes, Option, removeRequirement}) => {
 	};
 	const handleSelectModel = (model, fieldKey) => {
 		setSelectedModel(model?.Id);
+		setSelectedModelName(model?.Name);
+
 		form.setFieldsValue({
-			requirements: form
-				.getFieldValue('requirements')
-				.map((req, index) =>
-					index === fieldKey ? {...req, jewelryModelId: model?.Id} : req
-				),
+			requirements: form.getFieldValue('requirements').map((req, index) =>
+				index === fieldKey
+					? {
+							...req,
+							jewelryModelId: model?.Id,
+							jewelryModelName: model?.Name,
+					  }
+					: req
+			),
 		});
 		setIsPopupVisible(false);
 	};
@@ -581,7 +588,7 @@ export const PromoReqForm = ({form, shapes, Option, removeRequirement}) => {
 													<>
 														<Form.Item
 															{...restField}
-															label="Mẫu Trang Sức"
+															label="Mã Mẫu Trang Sức"
 															name={[name, 'jewelryModelId']}
 															fieldKey={[fieldKey, 'jewelryModelId']}
 															rules={[
@@ -592,14 +599,18 @@ export const PromoReqForm = ({form, shapes, Option, removeRequirement}) => {
 																},
 															]}
 														>
-															<Input
-																readOnly
-																value={form.getFieldValue([
-																	'requirements',
-																	name,
-																	'jewelryModelId',
-																])}
-															/>
+															<Input readOnly />
+														</Form.Item>
+														<Form.Item
+															{...restField}
+															label="Tên Mẫu Trang Sức"
+															name={[name, 'jewelryModelName']}
+															fieldKey={[
+																fieldKey,
+																'jewelryModelName',
+															]}
+														>
+															<Input readOnly />
 														</Form.Item>
 														<Button
 															onClick={() => setIsPopupVisible(true)}

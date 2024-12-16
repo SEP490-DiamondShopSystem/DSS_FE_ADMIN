@@ -49,8 +49,8 @@ export const enums = {
 	Status: {
 		Scheduled: 1,
 		Active: 2,
-		Expired: 3,
-		Paused: 4,
+		Paused: 3,
+		Expired: 4,
 		Cancelled: 5,
 	},
 	TargetType: {

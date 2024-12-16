@@ -343,7 +343,7 @@ const JewelryPage = () => {
 													<div>
 														<div className="flex justify-between items-center mb-2">
 															<span className="text-lg font-bold text-primary">
-																{jewelry.SerialCode}
+																{jewelry.Title}
 															</span>
 															{renderStatusTag(jewelry.Status)}
 														</div>

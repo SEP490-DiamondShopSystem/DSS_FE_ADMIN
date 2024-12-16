@@ -25,6 +25,7 @@ import {
 	fetchOrderRule,
 	fetchOrderRulePayment,
 	fetchShopBankAccountRule,
+	fetchJewelryModelRule,
 	updateAccountRule,
 	updateDiamondRule,
 	updateFrontendDisplayRule,
@@ -34,6 +35,7 @@ import {
 	updateOrderRulePayment,
 	updateShopBankAccountRule,
 	updateShopBankQRRule,
+	updateJewelryModelRule,
 } from '../../../redux/slices/configSlice';
 
 import {selectIsLoading, selectConfigError} from '../../../redux/selectors';
@@ -45,6 +47,7 @@ const ConfigurationPage = () => {
 	const [frontendDisplayRule, setFrontendDisplayRule] = useState(null);
 	const [promotionRule, setPromotionRule] = useState(null);
 	const [locationRule, setLocationRule] = useState(null);
+	const [modelRule, setModelRule] = useState(null);
 	const [orderRule, setOrderRule] = useState(null);
 	const [orderPaymentRule, setOrderPaymentRule] = useState(null);
 	const [shopBankAccountRule, setShopBankAccountRule] = useState(null);
@@ -57,6 +60,7 @@ const ConfigurationPage = () => {
 	const [frontendForm] = Form.useForm();
 	const [promotionForm] = Form.useForm();
 	const [locationForm] = Form.useForm();
+	const [modelForm] = Form.useForm();
 	const [orderForm] = Form.useForm();
 	const [paymentForm] = Form.useForm();
 	const [bankForm] = Form.useForm();
@@ -86,11 +90,12 @@ const ConfigurationPage = () => {
 
 	const fetchData = async () => {
 		try {
-			const [account, diamond, frontend, promotion, location, order, payment, bank] =
+			const [account, diamond, frontend, model, promotion, location, order, payment, bank] =
 				await Promise.all([
 					dispatch(fetchAccountRule()).unwrap(),
 					dispatch(fetchDiamondRule()).unwrap(),
 					dispatch(fetchFrontendDisplayRule()).unwrap(),
+					dispatch(fetchJewelryModelRule()).unwrap(),
 					dispatch(fetchPromotionRule()).unwrap(),
 					dispatch(fetchLocationRule()).unwrap(),
 					dispatch(fetchOrderRule()).unwrap(),
@@ -105,7 +110,7 @@ const ConfigurationPage = () => {
 						const method = paymentMethods.find(
 							(m) => m.value.toString() === methodValue
 						);
-						return method ? method.value : methodValue; // Use value for Select compatibility
+						return method ? method.value : methodValue;
 					}
 				),
 			};
@@ -113,18 +118,19 @@ const ConfigurationPage = () => {
 			setAccountRule(account);
 			setDiamondRule(diamond);
 			setFrontendDisplayRule(frontend);
+			setModelRule(model);
 			setPromotionRule(promotion);
 			setLocationRule(location);
 			setOrderRule(order);
 			setOrderPaymentRule(transformedPayment);
 			setShopBankAccountRule(bank);
 		} catch (error) {
-			message.error('Failed to fetch configuration data.');
+			message.error(error?.data?.detail || error?.detail);
 		}
 	};
 
 	useEffect(() => {
-		fetchData(); // Call fetchData on component mount
+		fetchData();
 	}, [dispatch]);
 
 	const handleSuccess = (messageText) => {
@@ -135,6 +141,8 @@ const ConfigurationPage = () => {
 	useEffect(() => {
 		if (error) message.error(error);
 	}, [error]);
+
+
 	const handleAccountSubmit = (values) => {
 		dispatch(updateAccountRule(values))
 			.unwrap()
@@ -161,6 +169,16 @@ const ConfigurationPage = () => {
 			.unwrap()
 			.then(() => {
 				handleSuccess('Cập Nhật Quy Định Hiển Thị Thành Công!');
+			})
+			.catch((error) => {
+				message.error(error?.data?.detail || error?.detail);
+			});
+	};
+	const handleModelSubmit = (values) => {
+		dispatch(updateJewelryModelRule(values))
+			.unwrap()
+			.then(() => {
+				handleSuccess('Cập Nhật Quy Định Mẫu Trang Sức Thành Công!');
 			})
 			.catch((error) => {
 				message.error(error?.data?.detail || error?.detail);
@@ -682,6 +700,49 @@ const ConfigurationPage = () => {
 							<Button
 								type="primary"
 								onClick={() => showConfirm(diamondForm, handleDiamondSubmit)}
+							>
+								Lưu
+							</Button>
+						</Form>
+					</Card>
+				</Tabs.TabPane>
+				<Tabs.TabPane tab="Quy Tắc Mẫu Trang Sức" key="model">
+					<Card className="shadow-lg">
+						<Form
+							form={modelForm}
+							initialValues={modelRule}
+							onFinish={handleModelSubmit}
+							layout="vertical"
+							key={JSON.stringify(modelRule)}
+						>
+							{' '}
+							<Row gutter={[16, 16]} wrap>
+								<Col xs={24} sm={12} md={6}>
+									<Form.Item
+										name="MaximumSideDiamondOption"
+										label="Số lựa chọn kim cương tấm tối đa"
+										rules={[
+											{required: true, message: 'Trường này là bắt buộc'},
+										]}
+									>
+										<InputNumber className="w-full" />
+									</Form.Item>
+								</Col>
+								<Col xs={24} sm={12} md={6}>
+									<Form.Item
+										name="MaximumMainDiamond"
+										label="Số lượng kim cương chính tối đa cho mẫu"
+										rules={[
+											{required: true, message: 'Trường này là bắt buộc'},
+										]}
+									>
+										<InputNumber className="w-full" />
+									</Form.Item>
+								</Col>
+							</Row>
+							<Button
+								type="primary"
+								onClick={() => showConfirm(modelForm, handleModelSubmit)}
 							>
 								Lưu
 							</Button>

@@ -10,8 +10,7 @@ export const fetchPromotions = createAsyncThunk(
 			const response = await api.get('/Promotion');
 			return response;
 		} catch (error) {
-			console.error('Failed to fetch promotions:', error.response?.data || error.message);
-			return rejectWithValue(error.response?.data || 'Failed to fetch promotions');
+			return rejectWithValue(error);
 		}
 	}
 );
@@ -27,8 +26,7 @@ export const fetchPromotionDetail = createAsyncThunk(
 
 			return response;
 		} catch (error) {
-			console.error('Failed to fetch promotions:', error.response?.data || error.message);
-			return rejectWithValue(error.response?.data || 'Failed to fetch promotions');
+			return rejectWithValue(error);
 		}
 	}
 );
@@ -42,7 +40,7 @@ export const createPromotion = createAsyncThunk(
 
 			return response;
 		} catch (error) {
-			return rejectWithValue(error || 'Failed to create promotion');
+			return rejectWithValue(error);
 		}
 	}
 );
@@ -56,8 +54,7 @@ export const createFullPromotion = createAsyncThunk(
 			console.log('Creating promotion with data:', fullPromotion);
 			return response;
 		} catch (error) {
-			console.log('Creating promotion with data:', JSON.stringify(fullPromotion, null, 2));
-			return rejectWithValue(error || 'Failed to create full promotion');
+			return rejectWithValue(error);
 		}
 	}
 );
@@ -68,17 +65,9 @@ export const updatePromotionRequirements = createAsyncThunk(
 	async ({promotionId, requirements}, {rejectWithValue}) => {
 		try {
 			const response = await api.put(`/Promotion/${promotionId}/Requirement`, requirements);
-			return response.data;
+			return response;
 		} catch (error) {
-			if (error.response) {
-				// Handle 400 and 500 status codes
-				if (error.response.status === 400) {
-					return rejectWithValue({status: 400, errors: error.errors});
-				} else if (error.response.status === 500) {
-					return rejectWithValue({status: 500, detail: error.detail});
-				}
-			}
-			return rejectWithValue({status: 'unknown', detail: 'An unexpected error occurred.'});
+			return rejectWithValue(error || 'Failed to update promotion');
 		}
 	}
 );
@@ -91,15 +80,7 @@ export const updatePromotionGifts = createAsyncThunk(
 			const response = await api.put(`/Promotion/${promotionId}/Gift`, gifts);
 			return response.data;
 		} catch (error) {
-			if (error.response) {
-				// Handle 400 and 500 status codes
-				if (error.response.status === 400) {
-					return rejectWithValue({status: 400, errors: error.errors});
-				} else if (error.response.status === 500) {
-					return rejectWithValue({status: 500, detail: error.detail});
-				}
-			}
-			return rejectWithValue({status: 'unknown', detail: 'An unexpected error occurred.'});
+			return rejectWithValue(error);
 		}
 	}
 );
@@ -115,17 +96,9 @@ export const updatePromotion = createAsyncThunk(
 					'Content-Type': 'application/json', // Ensure JSON content type is set
 				},
 			});
-			return response.data;
+			return response;
 		} catch (error) {
-			if (error.response) {
-				// Handle 400 and 500 status codes
-				if (error.response.status === 400) {
-					return rejectWithValue({status: 400, errors: error.errors});
-				} else if (error.response.status === 500) {
-					return rejectWithValue({status: 500, detail: error.detail});
-				}
-			}
-			return rejectWithValue({status: 'unknown', detail: 'An unexpected error occurred.'});
+			return rejectWithValue(error);
 		}
 	}
 );
@@ -140,15 +113,7 @@ export const deletePromotion = createAsyncThunk(
 
 			return promotionId;
 		} catch (error) {
-			if (error.response) {
-				// Handle 400 and 500 status codes
-				if (error.response.status === 400) {
-					return rejectWithValue({status: 400, errors: error.errors});
-				} else if (error.response.status === 500) {
-					return rejectWithValue({status: 500, detail: error.detail});
-				}
-			}
-			return rejectWithValue({status: 'unknown', detail: 'An unexpected error occurred.'});
+			return rejectWithValue(error);
 		}
 	}
 );
@@ -159,17 +124,9 @@ export const pausePromotion = createAsyncThunk(
 	async (promotionId, {rejectWithValue}) => {
 		try {
 			const response = await api.patch(`/Promotion/${promotionId}/Pause`);
-			return response.data;
+			return response;
 		} catch (error) {
-			if (error.response) {
-				// Handle 400 and 500 status codes
-				if (error.response.status === 400) {
-					return rejectWithValue({status: 400, errors: error.errors});
-				} else if (error.response.status === 500) {
-					return rejectWithValue({status: 500, detail: error.detail});
-				}
-			}
-			return rejectWithValue({status: 'unknown', detail: 'An unexpected error occurred.'});
+			return rejectWithValue(error);
 		}
 	}
 );
@@ -180,17 +137,9 @@ export const cancelPromotion = createAsyncThunk(
 	async (promotionId, {rejectWithValue}) => {
 		try {
 			const response = await api.patch(`/Promotion/${promotionId}/Cancel`);
-			return response.data;
+			return response;
 		} catch (error) {
-			if (error.response) {
-				// Handle 400 and 500 status codes
-				if (error.response.status === 400) {
-					return rejectWithValue({status: 400, errors: error.errors});
-				} else if (error.response.status === 500) {
-					return rejectWithValue({status: 500, detail: error.detail});
-				}
-			}
-			return rejectWithValue({status: 'unknown', detail: 'An unexpected error occurred.'});
+			return rejectWithValue(error);
 		}
 	}
 );
@@ -203,15 +152,7 @@ export const updatePromotionThumbnail = createAsyncThunk(
 			const response = await api.put(`/Promotion/${promotionId}/Thumbnail`, thumbnailData);
 			return response.data;
 		} catch (error) {
-			if (error.response) {
-				// Handle 400 and 500 status codes
-				if (error.response.status === 400) {
-					return rejectWithValue({status: 400, errors: error.errors});
-				} else if (error.response.status === 500) {
-					return rejectWithValue({status: 500, detail: error.detail});
-				}
-			}
-			return rejectWithValue({status: 'unknown', detail: 'An unexpected error occurred.'});
+			return rejectWithValue(error);
 		}
 	}
 );
@@ -219,25 +160,23 @@ export const updatePromotionThumbnail = createAsyncThunk(
 // Thunk to upload promotion thumbnail using multipart/form-data
 export const uploadPromotionThumbnail = createAsyncThunk(
 	'promotion/uploadThumbnail',
-	async ({ promotionId, imageFile }, { rejectWithValue }) => {
-	  try {
-		const formData = new FormData();
-		formData.append('imageFile', imageFile);
-		console.log('Uploading thumbnail with FormData:', formData);
-		const response = await api.put(`/Promotion/${promotionId}/Thumbnail`, formData, {
-		  headers: {
-			'Content-Type': 'multipart/form-data',
-		  },
-		});
-		return response.data;
-	  } catch (error) {
-		return rejectWithValue(
-		  error.response?.data || { status: 'unknown', detail: 'Failed to upload thumbnail' }
-		);
-	  }
+	async ({promotionId, imageFile}, {rejectWithValue}) => {
+		try {
+			const formData = new FormData();
+			formData.append('imageFile', imageFile);
+			console.log('Uploading thumbnail with FormData:', formData);
+			const response = await api.put(`/Promotion/${promotionId}/Thumbnail`, formData, {
+				headers: {
+					'Content-Type': 'multipart/form-data',
+				},
+			});
+			return response;
+		} catch (error) {
+			return rejectWithValue(error);
+		}
 	}
-  );
-  
+);
+
 export const promotionSlice = createSlice({
 	name: 'promotionSlice',
 	initialState: {

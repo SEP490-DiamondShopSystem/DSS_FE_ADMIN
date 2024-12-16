@@ -9,7 +9,10 @@ import {
 	DeliveredProcedureOutlined,
 	SettingOutlined,
 	EditOutlined, // New import for blogs
-	SlidersFilled, // More descriptive icon for customization requests
+	SlidersFilled,
+	MenuUnfoldOutlined,
+	LogoutOutlined,
+	MenuFoldOutlined, // More descriptive icon for customization requests
 } from '@ant-design/icons';
 import {
 	DiamondOutlined, // Kept for diamond-related items

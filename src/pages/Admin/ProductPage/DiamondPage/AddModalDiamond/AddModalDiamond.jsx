@@ -326,7 +326,7 @@ export const AddModalDiamond = ({setShowModal, showModal}) => {
 
 					<Form.Item
 						name="symmetry"
-						label="Chọn Đối Xứng (Symmetry)"
+						label="Độ Tương Xứng (Symmetry) "
 						className="w-1/4"
 						rules={[
 							{
