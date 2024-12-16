@@ -43,12 +43,6 @@ export const createDiamondPrice = createAsyncThunk(
 	'diamondPrice/createDiamondPrice',
 	async ({listPrices, shapeId, isSideDiamond, isLabDiamond}, {rejectWithValue}) => {
 		try {
-			console.log('Sending listPrices to API:', {
-				listPrices,
-				shapeId,
-				isLabDiamond,
-				isSideDiamond,
-			});
 
 			const response = await api.post('/Diamond/Price', {
 				listPrices,
@@ -56,8 +50,6 @@ export const createDiamondPrice = createAsyncThunk(
 				isLabDiamond,
 				isSideDiamond,
 			});
-
-			console.log('Response from creating diamond prices:', response);
 			return response.data || response;
 		} catch (error) {
 			console.error('Error creating diamond prices:', error);
@@ -71,12 +63,6 @@ export const updateDiamondPrices = createAsyncThunk(
 	'diamondPrice/updateDiamondPrices',
 	async ({updatedDiamondPrices, shapeId, isLabDiamond, isSideDiamond}, {rejectWithValue}) => {
 		try {
-			console.log('Sending updatedDiamondPrices to API:', {
-				updatedDiamondPrices,
-				shapeId,
-				isLabDiamond,
-				isSideDiamond,
-			});
 
 			const response = await api.put('/Diamond/Price', {
 				updatedDiamondPrices,
@@ -84,9 +70,6 @@ export const updateDiamondPrices = createAsyncThunk(
 				isLabDiamond,
 				isSideDiamond,
 			});
-
-			console.log('Response from updating diamond prices:', response);
-
 			return response.data || response;
 		} catch (error) {
 			console.error('Error updating diamond prices:', error);
@@ -112,13 +95,6 @@ export const deleteDiamondPrice = createAsyncThunk(
 	'diamondPrice/deleteDiamondPrice',
 	async ({priceIds, shapeId, isLabDiamond, isSideDiamond}, {rejectWithValue}) => {
 		try {
-			console.log('Sending delete request with:', {
-				priceIds,
-				shapeId,
-				isLabDiamond,
-				isSideDiamond,
-			});
-
 			const response = await api.delete('/Diamond/Price', {
 				data: {
 					priceIds,
@@ -127,9 +103,6 @@ export const deleteDiamondPrice = createAsyncThunk(
 					isSideDiamond,
 				},
 			});
-
-			console.log('Response from delete diamond prices:', response);
-
 			return response.data || response;
 		} catch (error) {
 			console.error('Error deleting diamond prices:', error);
@@ -266,7 +239,6 @@ export const diamondPriceSlice = createSlice({
 			.addCase(fetchPriceBoard.fulfilled, (state, action) => {
 				state.loading = false;
 				state.priceBoard = action.payload.data || action.payload;
-				console.log('Price board data fetched successfully:', action.payload); // Log the fetched data
 			})
 			.addCase(fetchPriceBoard.rejected, (state, action) => {
 				state.loading = false;
@@ -323,8 +295,6 @@ export const diamondPriceSlice = createSlice({
 				state.loading = false;
 				const updatedPrices = action.payload.data || action.payload; // Make sure this is correct
 
-				console.log('Response from updating diamond prices:', updatedPrices); // Log the response
-
 				if (Array.isArray(updatedPrices) && updatedPrices.length > 0) {
 					updatedPrices.forEach((updatedPrice) => {
 						const index = state.prices.findIndex(
@@ -342,8 +312,6 @@ export const diamondPriceSlice = createSlice({
 				} else {
 					console.warn('No updated prices returned from the API.');
 				}
-
-				console.log('Updated diamond prices:', state.prices); // Log the updated prices array
 			})
 
 			.addCase(updateDiamondPrices.rejected, (state, action) => {
@@ -384,7 +352,6 @@ export const diamondPriceSlice = createSlice({
 			})
 			.addCase(createMainDiamondCriteria.fulfilled, (state, action) => {
 				state.loading = false;
-				console.log('Main Diamond criteria created successfully:', action.payload);
 				state.prices.push(action.payload);
 			})
 			.addCase(createMainDiamondCriteria.rejected, (state, action) => {
@@ -397,7 +364,6 @@ export const diamondPriceSlice = createSlice({
 			})
 			.addCase(deleteMainDiamondCriteria.fulfilled, (state, action) => {
 				state.loading = false;
-				console.log('Main Diamond criteria deleted successfully:', action.payload);
 				state.prices = state.prices.filter(
 					(criteria) => criteria.id !== action.meta.arg.criteriaId
 				);
@@ -412,7 +378,6 @@ export const diamondPriceSlice = createSlice({
 			})
 			.addCase(createSideDiamondCriteria.fulfilled, (state, action) => {
 				state.loading = false;
-				console.log('Side Diamond criteria created successfully:', action.payload);
 				state.prices.push(action.payload);
 			})
 			.addCase(createSideDiamondCriteria.rejected, (state, action) => {
@@ -425,7 +390,6 @@ export const diamondPriceSlice = createSlice({
 			})
 			.addCase(deleteSideDiamondCriteria.fulfilled, (state, action) => {
 				state.loading = false;
-				console.log('Side Diamond criteria deleted successfully:', action.payload);
 				state.prices = state.prices.filter(
 					(criteria) => criteria.id !== action.meta.arg.criteriaId
 				);

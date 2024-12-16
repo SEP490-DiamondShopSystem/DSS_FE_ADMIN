@@ -98,13 +98,6 @@ const TimeLineOrder = ({
 	const [transactionOrderPendingPayAll, setTransactionOrderPendingPayAll] = useState();
 	const [transactionOrderOthers, setTransactionOrderOthers] = useState();
 	const [payAllFine, setPayAllFine] = useState();
-
-	console.log('transactionOrderDelivering', transactionOrderDelivering);
-	console.log('transactionOrderPending', transactionOrderPending);
-	console.log('transactionOrderPendingPayAll', transactionOrderPendingPayAll);
-	console.log('transactionOrderOthers', transactionOrderOthers);
-	console.log('payAllFine', payAllFine);
-
 	useEffect(() => {
 		if (orders?.Transactions?.length > 0) {
 			const transactionOrderDelivering = orders?.Transactions?.filter((obj) =>

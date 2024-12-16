@@ -156,7 +156,6 @@ const AccountPage = () => {
 	};
 
 	const onFinish = (value) => {
-		console.log(value);
 		const {firstName, lastName, role} = value;
 		const fullName = {
 			firstName,
@@ -218,7 +217,6 @@ const AccountPage = () => {
 
 	const handleRoleChange = (value) => {
 		setRole(value);
-		console.log('role', value);
 	};
 
 	const onSearch = (value) => {

@@ -24,7 +24,17 @@ export const fetchDiamondRule = createAsyncThunk(
 		}
 	}
 );
-
+export const fetchDiamondPriceRule = createAsyncThunk(
+	'config/fetchDiamondPriceRule',
+	async (_, {rejectWithValue}) => {
+		try {
+			const response = await api.get('/Configuration/DiamondPriceRule');
+			return response;
+		} catch (error) {
+			return rejectWithValue(error);
+		}
+	}
+);
 export const fetchFrontendDisplayRule = createAsyncThunk(
 	'config/fetchFrontendDisplayRule',
 	async (_, {rejectWithValue}) => {
@@ -126,7 +136,17 @@ export const updateDiamondRule = createAsyncThunk(
 		}
 	}
 );
-
+export const updateDiamondPriceRule = createAsyncThunk(
+	'config/updateDiamondPriceRule',
+	async (data, {rejectWithValue}) => {
+		try {
+			const response = await api.post('/Configuration/DiamondPriceRule', data);
+			return response;
+		} catch (error) {
+			return rejectWithValue(error);
+		}
+	}
+);
 export const updateFrontendDisplayRule = createAsyncThunk(
 	'config/updateFrontendDisplayRule',
 	async (data, {rejectWithValue}) => {
@@ -232,6 +252,7 @@ export const configSlice = createSlice({
 	initialState: {
 		accountRule: {},
 		diamondRule: {},
+		diamondPriceRule: {},
 		frontendDisplayRule: {},
 		promotionRule: {},
 		locationRule: {},
@@ -270,6 +291,18 @@ export const configSlice = createSlice({
 				state.isLoading = false;
 			})
 			.addCase(fetchDiamondRule.rejected, (state, action) => {
+				state.isLoading = false;
+				state.error = action.payload;
+			})
+			.addCase(fetchDiamondPriceRule.pending, (state) => {
+				state.isLoading = true;
+				state.error = null;
+			})
+			.addCase(fetchDiamondPriceRule.fulfilled, (state, action) => {
+				state.diamondPriceRule = action.payload;
+				state.isLoading = false;
+			})
+			.addCase(fetchDiamondPriceRule.rejected, (state, action) => {
 				state.isLoading = false;
 				state.error = action.payload;
 			})
@@ -365,6 +398,17 @@ export const configSlice = createSlice({
 				state.isLoading = false;
 			})
 			.addCase(updateDiamondRule.rejected, (state, action) => {
+				state.isLoading = false;
+				state.error = action.payload;
+			})
+			.addCase(updateDiamondPriceRule.pending, (state) => {
+				state.isLoading = true;
+				state.error = null;
+			})
+			.addCase(updateDiamondPriceRule.fulfilled, (state) => {
+				state.isLoading = false;
+			})
+			.addCase(updateDiamondPriceRule.rejected, (state, action) => {
 				state.isLoading = false;
 				state.error = action.payload;
 			})

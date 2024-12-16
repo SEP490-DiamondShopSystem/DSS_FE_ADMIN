@@ -463,9 +463,6 @@ const InformationOrder = ({
 			message.error(error?.detail);
 		}
 	};
-
-	console.log('orders', orders);
-
 	return (
 		<div>
 			<div className="mb-4">

@@ -54,8 +54,6 @@ const JewelryCreateForm = ({onClose, isCreateFormOpen, setIsCreateFormOpen}) => 
 		expandDiamondsByQuantity(); // Gọi hàm khi selectedModel thay đổi
 	}, [selectedModel]);
 
-	console.log('mainDiamonds', mainDiamonds);
-
 	const getDiamondForFilter = (index) => {
 		if (index >= 0 && index < mainDiamonds?.length) {
 			return mainDiamonds[index];
@@ -65,7 +63,6 @@ const JewelryCreateForm = ({onClose, isCreateFormOpen, setIsCreateFormOpen}) => 
 
 	const diamondForFilter = getDiamondForFilter(selectedIndex);
 
-	console.log('diamondForFilter', diamondForFilter);
 
 	const filterShape = diamondForFilter?.Shapes?.find((id) => id?.ShapeId === shape);
 
@@ -277,14 +274,9 @@ const JewelryCreateForm = ({onClose, isCreateFormOpen, setIsCreateFormOpen}) => 
 
 	// Handle side diamond option change
 	const handleSideDiamondChange = (value) => {
-		console.log('Side Diamond Option Changed:', value); // Log the value when it changes
 		form.setFieldsValue({
 			sideDiamondOptId: value,
 		});
-		console.log(
-			'Updated Side Diamond Option in Form State:',
-			form.getFieldValue('sideDiamondOptId')
-		);
 	};
 
 	// Handle metal change and update selectedMetal state
@@ -303,14 +295,10 @@ const JewelryCreateForm = ({onClose, isCreateFormOpen, setIsCreateFormOpen}) => 
 		});
 	
 		// Add explicit logging
-		console.log(`Changed ${name}:`, value);
-		console.log('Current Form Values:', form.getFieldsValue());
 	};
 	// Handle form submission
 	const handleSubmit = () => {
 		const formValues = form.getFieldsValue();
-
-		console.log('Form Values Before Submission:', formValues); // Log all form values before submission
 
 		// Extract JewelryRequest and sideDiamondOptId separately
 		const {JewelryRequest, attachedDiamondIds, sideDiamondOptId} = formValues;
@@ -318,7 +306,6 @@ const JewelryCreateForm = ({onClose, isCreateFormOpen, setIsCreateFormOpen}) => 
 		// Validation checks
 		const {ModelId, SizeId, ModelCode, MentalId, status} = JewelryRequest;
 
-		console.log('ModelCode:', ModelCode);
 		if (!ModelId || !SizeId || !MentalId) {
 			alert('Please fill out all required fields (Model, Size, and Metal).');
 			return;
@@ -342,7 +329,6 @@ const JewelryCreateForm = ({onClose, isCreateFormOpen, setIsCreateFormOpen}) => 
 			}),
 			...(sideDiamondOptId && {sideDiamondOptId}),
 		};
-		console.log('Final Data for Submission:', finalData);
 
 		dispatch(createJewelry(finalData))
 			.unwrap()
@@ -361,7 +347,6 @@ const JewelryCreateForm = ({onClose, isCreateFormOpen, setIsCreateFormOpen}) => 
 	const handleDiamondChange = (value) => {
 		setSelectedIndex(value);
 		setCurrentDiamondId(null);
-		console.log('Selected Diamonds:', value);
 	};
 
 	const showModal = () => {
@@ -376,8 +361,6 @@ const JewelryCreateForm = ({onClose, isCreateFormOpen, setIsCreateFormOpen}) => 
 		setIsModalVisible(false);
 		setSelectedIndex(0);
 	};
-
-	console.log('selectedDiamondList', selectedDiamondList);
 
 	return (
 		<div className="p-4">

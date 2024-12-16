@@ -5,8 +5,6 @@ import {api} from '../../services/api';
 export const fetchDiscounts = createAsyncThunk(
 	'discounts/fetchDiscounts',
 	async (_, {rejectWithValue}) => {
-		console.log('Fetching discounts...');
-
 		const response = await api.get('/Discount');
 		return response;
 	}
@@ -14,13 +12,7 @@ export const fetchDiscounts = createAsyncThunk(
 export const fetchDiscountDetail = createAsyncThunk(
 	'discounts/fetchDiscountDetail',
 	async (discountId, {rejectWithValue}) => {
-		console.log('Fetching discounts...');
-
 		const response = await api.get(`/Discount/${discountId}`);
-
-		// Log the fetched data here
-		console.log('Fetched discount details:', response);
-
 		return response;
 	}
 );
@@ -30,7 +22,6 @@ export const createDiscount = createAsyncThunk(
 	'discounts/createDiscount',
 	async (newDiscount, {rejectWithValue}) => {
 		const response = await api.post('/Discount', newDiscount);
-
 		return response;
 	}
 );
@@ -40,7 +31,6 @@ export const createFullDiscount = createAsyncThunk(
 	'discounts/createFullDiscount',
 	async (fullDiscount, {rejectWithValue}) => {
 		const response = await api.post('/Discount/Full', fullDiscount);
-		console.log('Creating discount with data:', fullDiscount);
 		return response;
 	}
 );
@@ -58,7 +48,6 @@ export const updateDiscountRequirements = createAsyncThunk(
 export const updateDiscount = createAsyncThunk(
 	'discounts/updateDiscount',
 	async ({discountId, discountData}, {rejectWithValue}) => {
-		console.log(`Updating discount with ID ${discountId} and data:`, discountData);
 		const response = await api.put(`/Discount/${discountId}`, discountData, {
 			headers: {
 				'Content-Type': 'application/json', // Ensure JSON content type is set
@@ -73,7 +62,6 @@ export const deleteDiscount = createAsyncThunk(
 	'discounts/deleteDiscount',
 	async (discountId, {rejectWithValue}) => {
 		await api.delete(`/Discount/${discountId}`);
-		console.log(`Deleting discount with ID ${discountId}`);
 
 		return response;
 	}
@@ -124,7 +112,6 @@ export const uploadDiscountThumbnail = createAsyncThunk(
 		try {
 			const formData = new FormData();
 			formData.append('imageFile', imageFile);
-			console.log('Uploading thumbnail with FormData:', formData);
 			const response = await api.put(`/Discount/${discountId}/Thumbnail`, formData, {
 				headers: {
 					'Content-Type': 'multipart/form-data',
@@ -151,12 +138,10 @@ export const discountSlice = createSlice({
 			// Fetch discounts
 			.addCase(fetchDiscounts.pending, (state) => {
 				state.loading = true;
-				console.log('Fetching discounts: pending');
 			})
 			.addCase(fetchDiscounts.fulfilled, (state, action) => {
 				state.loading = false;
 				state.discounts = action.payload;
-				console.log('Fetching discounts: fulfilled', action.payload);
 			})
 			.addCase(fetchDiscounts.rejected, (state, action) => {
 				state.loading = false;

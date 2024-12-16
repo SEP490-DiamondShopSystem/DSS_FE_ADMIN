@@ -5,10 +5,8 @@ import {api} from '../../../services/api';
 export const fetchAllEnums = createAsyncThunk('enums/fetchAll', async (_, {rejectWithValue}) => {
 	try {
 		const response = await api.get('/Enums');
-		console.log('fetchAllEnums Response:', response);
 		return response;
 	} catch (error) {
-		console.log('Error: ', JSON.stringify(error));
 		return rejectWithValue(error);
 	}
 });

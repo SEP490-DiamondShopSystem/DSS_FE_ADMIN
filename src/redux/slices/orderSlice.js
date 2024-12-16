@@ -49,8 +49,6 @@ export const getOrderDetail = createAsyncThunk(
 export const handleCheckoutCustomizeOrder = createAsyncThunk(
 	'orderSlice/handleCheckoutCustomizeOrder',
 	async (body, {rejectWithValue}) => {
-		console.log('body', body);
-
 		try {
 			const data = await api.put(`/CustomizeRequest/Checkout`, body);
 			return data;
@@ -181,7 +179,6 @@ export const getOrderLog = createAsyncThunk(
 			const response = await api.get(`/Order/Log/${orderId}`);
 			return response;
 		} catch (error) {
-			console.log('Error: ', JSON.stringify(error));
 			return rejectWithValue(error);
 		}
 	}
@@ -196,7 +193,6 @@ export const handleRedeliver = createAsyncThunk(
 			);
 			return response;
 		} catch (error) {
-			console.log('Error: ', JSON.stringify(error));
 			return rejectWithValue(error);
 		}
 	}
@@ -209,7 +205,6 @@ export const handleReturnShop = createAsyncThunk(
 			const response = await api.put(`/Order/DeliverEnd?orderId=${orderId}`);
 			return response;
 		} catch (error) {
-			console.log('Error: ', JSON.stringify(error));
 			return rejectWithValue(error);
 		}
 	}
@@ -222,7 +217,6 @@ export const handleConfirmTransferStaff = createAsyncThunk(
 			const response = await api.put(`/Order/Staff/ConfirmTransfer/Delivering`, body);
 			return response;
 		} catch (error) {
-			console.log('Error: ', JSON.stringify(error));
 			return rejectWithValue(error);
 		}
 	}
@@ -235,7 +229,6 @@ export const handleConfirmTransfer = createAsyncThunk(
 			const response = await api.put(`/Order/Staff/ConfirmTransfer/Pending`, body);
 			return response;
 		} catch (error) {
-			console.log('Error: ', JSON.stringify(error));
 			return rejectWithValue(error);
 		}
 	}
@@ -248,7 +241,6 @@ export const handleRejectTransfer = createAsyncThunk(
 			const response = await api.put(`/Order/Staff/RejectTransfer`, body);
 			return response;
 		} catch (error) {
-			console.log('Error: ', JSON.stringify(error));
 			return rejectWithValue(error);
 		}
 	}
@@ -261,7 +253,6 @@ export const handleAddMethodInShop = createAsyncThunk(
 			const response = await api.post(`/Order/Transaction/Staff/Add`, body);
 			return response;
 		} catch (error) {
-			console.log('Error: ', JSON.stringify(error));
 			return rejectWithValue(error);
 		}
 	}

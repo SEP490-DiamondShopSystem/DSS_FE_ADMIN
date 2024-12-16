@@ -134,9 +134,6 @@ const DiscountPage = ({discountData}) => {
 
 					requirements: fetchedDiscount.DiscountReq.map((req) => {
 						const diamondSpec = req.DiamondRequirementSpec || {};
-
-						console.log('Requirement Diamond Spec:', diamondSpec); // Debugging log
-
 						return {
 							id: req.Id,
 							name: req.Name,

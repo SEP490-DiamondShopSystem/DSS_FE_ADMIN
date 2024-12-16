@@ -103,7 +103,6 @@ const BlogPage = () => {
 				setTags((prevTags) => {
 					const updatedTags = [...prevTags, newTag]; // Add the new tag
 					const uniqueTags = Array.from(new Set(updatedTags)); // Ensure unique tags
-					console.log('Tags after adding new tag:', uniqueTags); // Log after adding a new tag
 					return uniqueTags;
 				});
 				setTagsInput(''); // Clear the input field
@@ -114,7 +113,6 @@ const BlogPage = () => {
 	const handleRemoveTag = (tagToRemove) => {
 		setTags((prevTags) => {
 			const updatedTags = prevTags.filter((tag) => tag !== tagToRemove);
-			console.log('Tags after removing tag:', updatedTags); // Log after removing a tag
 			return updatedTags;
 		});
 	};
@@ -127,7 +125,6 @@ const BlogPage = () => {
 			.filter((tag) => tag.length > 0); // Remove empty tags
 
 		setTags(updatedTags);
-		console.log('Tags after change:', updatedTags); // Log tags after change
 	};
 
 	const handleBlur = () => {
@@ -152,7 +149,6 @@ const BlogPage = () => {
 			blogData.append('BlogId', updatingId);
 		}
 		blogData.append('Title', values.title);
-		console.log('Tags:', tags);
 		tags.forEach((tag, index) => {
 			blogData.append(`BlogTags[${index}]`, tag);
 		});
@@ -196,7 +192,6 @@ const BlogPage = () => {
 		// Fetch blog details only if it's not already available
 		if (!blogDetail || blogDetail.Id !== blog.Id) {
 			actionResult = await dispatch(fetchBlogDetail({BlogId: blog.Id}));
-			console.log('Action Result for fetchBlogDetail:', actionResult.payload); // Log the action result
 		}
 
 		// Use the fetched blog details (from actionResult.payload) for the form and state updates
@@ -219,7 +214,6 @@ const BlogPage = () => {
 			// Correctly set the editor content and tags
 			// const htmlContent = plainTextToHTML(detail.Content || '');
 			setEditorContent(detail.Content);
-			console.log(' detail.Content :', detail.Content); // Log the action result
 
 			const blogTags = Array.isArray(detail.Tags) ? detail.Tags : [];
 			setTags(blogTags);

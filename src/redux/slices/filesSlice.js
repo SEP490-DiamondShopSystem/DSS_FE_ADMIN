@@ -18,7 +18,6 @@ export const fetchJewelryModelFiles = createAsyncThunk(
 	async (jewelryModelId, {rejectWithValue}) => {
 		try {
 			const response = await api.get(`/JewelryModelFiles/${jewelryModelId}/Files`);
-			console.log(response)
 			return response;
 		} catch (error) {
 			return rejectWithValue(error || error.message);
@@ -149,11 +148,6 @@ export const uploadMetalImages = createAsyncThunk(
 					headers: {'Content-Type': 'multipart/form-data'},
 				}
 			);
-			console.log('Uploading Metal Image:', {
-				jewelryModelId,
-				formFiles,
-				metalId,
-			});
 			return response;
 		} catch (error) {
 			return rejectWithValue(error || error.message);
@@ -175,11 +169,6 @@ export const uploadSideDiamondImage = createAsyncThunk(
 					headers: {'Content-Type': 'multipart/form-data'},
 				}
 			);
-			console.log('Uploading Side Diamond Image:', {
-				jewelryModelId,
-				image,
-				sideDiamondOptionId,
-			});
 			return response;
 		} catch (error) {
 			return rejectWithValue(error || error.message);
@@ -378,7 +367,6 @@ export const fileSlice = createSlice({
 		  })
 		  // Upload Side Diamond Image
 		  .addCase(uploadSideDiamondImage.pending, (state) => {
-			console.log('Uploading Side Diamond Image...');
 			state.loading = true;
 		  })
 		  .addCase(uploadSideDiamondImage.fulfilled, (state, action) => {
@@ -386,7 +374,6 @@ export const fileSlice = createSlice({
 			state.files = { ...state.files, sideDiamondImage: action.payload };
 		  })
 		  .addCase(uploadSideDiamondImage.rejected, (state, action) => {
-			console.log('Side Diamond Image upload failed:', action.payload);
 			state.loading = false;
 			state.error = action.payload;
 		  })

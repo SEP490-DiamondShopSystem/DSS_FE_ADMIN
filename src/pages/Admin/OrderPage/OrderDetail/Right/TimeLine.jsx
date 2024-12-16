@@ -14,7 +14,6 @@ export const TimeLine = ({status, orders, loading, id}) => {
 	const [filteredSteps, setFilteredSteps] = useState([]);
 	const [modalVisible, setModalVisible] = useState(false);
 
-	// console.log('childLogList', childLogList);
 
 	useEffect(() => {
 		if (orders) {

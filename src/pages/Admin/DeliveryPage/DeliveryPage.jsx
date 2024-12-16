@@ -54,7 +54,6 @@ const DeliveryPage = () => {
 	const [userRoleDeliverer, setUserRoleDeliverer] = useState([]);
 	const [isModalVisible, setIsModalVisible] = useState(false);
 
-	console.log('userId', userDetail?.Id);
 	const columns = [
 		{
 			title: 'ID',
@@ -153,9 +152,6 @@ const DeliveryPage = () => {
 	// 	}
 	// }, [userList]);
 
-	console.log('userDetail', userDetail);
-	console.log('deliveries', deliveries);
-
 	const filter = [
 		{name: 'All', value: 'all'},
 		{name: 'Activated', value: 'activated'},
@@ -171,7 +167,6 @@ const DeliveryPage = () => {
 		setIsModalVisible(false);
 	};
 	const onFinish = (values) => {
-		console.log('Form Values:', values);
 		dispatch(handleCreateDelivery(values))
 			.unwrap()
 			.then((es) => {
@@ -201,7 +196,6 @@ const DeliveryPage = () => {
 	const handleMetalChange = (value) => {
 		setMetal(value);
 	};
-	// console.log(filteredData);
 	return (
 		<div className="mx-20 my-10">
 			{/* <Filter filter={filter} handleStatusBtn={handleStatusBtn} active={active} /> */}

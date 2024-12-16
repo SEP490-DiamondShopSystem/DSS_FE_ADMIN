@@ -46,7 +46,6 @@ export const fetchJewelryDetail = createAsyncThunk(
 	async (jewelryId, thunkAPI) => {
 		try {
 			const response = await api.get(`/Jewelry/Staff/Detail`, {params: {jewelryId}});
-			console.log('fetchJewelryDetail response:', response);
 			return response;
 		} catch (error) {
 			console.error('fetchJewelryDetail error:', error);
@@ -68,7 +67,6 @@ export const createJewelry = createAsyncThunk(
 				sideDiamondOptId,
 				attachedDiamondIds,
 			});
-			console.log('createJewelry response:', response);
 			return response;
 		} catch (error) {
 			console.error('createJewelry error:', error);
@@ -81,7 +79,6 @@ export const deleteJewelry = createAsyncThunk(
 	async (JewelryId, {rejectWithValue}) => {
 		try {
 			const response = await api.delete(`/Jewelry/Delete?JewelryId=${JewelryId}`);
-			console.log('createJewelry response:', response);
 			return response;
 		} catch (error) {
 			console.error('createJewelry error:', error);
@@ -97,7 +94,6 @@ export const changeJewelryReviewVisibility = createAsyncThunk(
 			const response = await api.put('/JewelryReview/ChangeVisibility', null, {
 				params: {JewelryId: jewelryId},
 			});
-			console.log('changeJewelryReviewVisibility response:', response);
 			return response;
 		} catch (error) {
 			console.error('changeJewelryReviewVisibility error:', error);
@@ -128,14 +124,12 @@ export const jewelrySlice = createSlice({
 			.addCase(fetchAllJewelry.pending, (state) => {
 				state.loading = true;
 				state.error = null;
-				console.log('fetchAllJewelry pending');
 			})
 			.addCase(fetchAllJewelry.fulfilled, (state, action) => {
 				state.loading = false;
 				state.jewelryList = action.payload.Values || []; // Use 'Values' with a capital 'V'
 				state.totalPage = action.payload.TotalPage;
 				state.currentPage = action.payload.CurrentPage;
-				console.log('fetchAllJewelry fulfilled:', action.payload);
 			})
 			.addCase(fetchAllJewelry.rejected, (state, action) => {
 				state.loading = false;
@@ -147,12 +141,10 @@ export const jewelrySlice = createSlice({
 			.addCase(fetchJewelryDetail.pending, (state) => {
 				state.loading = true;
 				state.error = null;
-				console.log('fetchJewelryDetail pending');
 			})
 			.addCase(fetchJewelryDetail.fulfilled, (state, action) => {
 				state.loading = false;
 				state.jewelryDetail = action.payload;
-				console.log('fetchJewelryDetail fulfilled:', action.payload);
 			})
 			.addCase(fetchJewelryDetail.rejected, (state, action) => {
 				state.loading = false;
@@ -164,12 +156,10 @@ export const jewelrySlice = createSlice({
 			.addCase(createJewelry.pending, (state) => {
 				state.loading = true;
 				state.error = null;
-				console.log('createJewelry pending');
 			})
 			.addCase(createJewelry.fulfilled, (state, action) => {
 				state.loading = false;
 				state.jewelryList.push(action.payload);
-				console.log('createJewelry fulfilled:', action.payload);
 			})
 			.addCase(createJewelry.rejected, (state, action) => {
 				state.loading = false;

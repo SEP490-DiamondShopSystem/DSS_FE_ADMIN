@@ -7,7 +7,6 @@ export const fetchAllMetals = createAsyncThunk('metals/fetchAll', async (_, { re
     const response = await api.get('/JewelryModel/Metal/All');
     return response;
   } catch (error) {
-    console.log('Error: ', JSON.stringify(error));
     return rejectWithValue(error);
   }
 });
