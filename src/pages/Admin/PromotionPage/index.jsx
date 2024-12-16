@@ -191,9 +191,6 @@ const PromotionPage = ({promotionData}) => {
 
 					requirements: fetchedPromotion.PromoReqs.map((req) => {
 						const diamondSpec = req.DiamondRequirementSpec || {};
-
-						console.log('Requirement Diamond Spec:', diamondSpec); // Debugging log
-
 						return {
 							id: req.Id,
 							name: req.Name,
@@ -235,9 +232,6 @@ const PromotionPage = ({promotionData}) => {
 					}),
 					gifts: fetchedPromotion.Gifts.map((gift) => {
 						const diamondSpec = gift.DiamondRequirementSpec || {};
-
-						console.log('Gift Diamond Spec:', diamondSpec); // Debugging log
-
 						return {
 							id: gift.Id,
 							name: gift.Name,
@@ -502,9 +496,6 @@ const PromotionPage = ({promotionData}) => {
 		if (removedGifts.length > 0) {
 			promotionData.removedGifts = removedGifts;
 		}
-		console.log('Updating promotion with changed data:', promotionData);
-		console.log('Updating promotion with ID:', editingPromotionId); // Debugging log
-		console.log('Filtered Promotion Data:', promotionData);
 		// Dispatch the update action
 		await dispatch(updatePromotion({promotionId: editingPromotionId, promotionData}))
 			.unwrap()

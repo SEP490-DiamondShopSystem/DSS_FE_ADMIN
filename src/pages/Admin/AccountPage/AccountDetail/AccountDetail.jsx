@@ -88,7 +88,6 @@ const AccountDetail = () => {
 			} else if (roles.includes('staff')) {
 				setRoleLevel(3);
 			}
-			console.log(roles);
 		}
 	}, [userDetailCurrent]);
 
@@ -134,13 +133,11 @@ const AccountDetail = () => {
 			delete payload.changedAddress;
 		}
 
-		console.log('Prepared payload:', payload);
 		return payload;
 	};
 
 	const handleUpdate = async () => {
 		const payload = preparePayload();
-		console.log('Sending payload:', payload);
 
 		await dispatch(handleUpdateAccount({id: userInfo.Id, payload}))
 			.unwrap()

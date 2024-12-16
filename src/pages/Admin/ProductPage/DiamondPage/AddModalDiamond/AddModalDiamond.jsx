@@ -24,8 +24,6 @@ export const AddModalDiamond = ({setShowModal, showModal}) => {
 	const [diamond, setDiamond] = useState(null);
 	const [rule, setRule] = useState();
 
-	console.log('rule', rule);
-
 	useEffect(() => {
 		dispatch(getDiamondShape());
 	}, []);
@@ -68,10 +66,6 @@ export const AddModalDiamond = ({setShowModal, showModal}) => {
 			},
 		});
 	};
-
-	console.log('diamondParams', diamondParams);
-
-	// Dispatch khi diamondParams thay đổi
 	useEffect(() => {
 		if (!diamondParams) return;
 
@@ -118,7 +112,6 @@ export const AddModalDiamond = ({setShowModal, showModal}) => {
 
 	const handleSwitchChange = (checked) => {
 		setIsLabDiamond(checked);
-		console.log(checked);
 	};
 
 	const handleOk = (values) => {

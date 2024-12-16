@@ -108,7 +108,6 @@ const JewelryModelEditModal = ({isVisible, onClose, model}) => {
 				},
 			],
 		};
-		console.log('Dispatching updateSizeMetalForJewelryModel with payload:', payload);
 		dispatch(
 			updateSizeMetalForJewelryModel({modelId: model.Id, sizeMetals: payload.sizeMetals})
 		)

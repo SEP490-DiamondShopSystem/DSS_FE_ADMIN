@@ -12,8 +12,6 @@ export const handleLogin = createAsyncThunk(
 				isExternalLogin,
 				isStaffLogin,
 			});
-			console.log(data);
-
 			return data;
 		} catch (error) {
 			console.error(error);
@@ -32,8 +30,6 @@ export const handleLoginStaff = createAsyncThunk(
 				isExternalLogin,
 				isStaffLogin,
 			});
-			console.log(data);
-
 			return data;
 		} catch (error) {
 			console.error(error);
@@ -52,8 +48,6 @@ export const handleStaffRegister = createAsyncThunk(
 				fullName,
 				isManager,
 			});
-			console.log(data);
-
 			return data;
 		} catch (error) {
 			console.error(error);
@@ -66,8 +60,6 @@ export const handleAdminRegister = createAsyncThunk(
 	async ({email, password, fullName}) => {
 		try {
 			const data = await api.post(`/Account/RegisterAdmin`, {email, password, fullName});
-			console.log(data);
-
 			return data;
 		} catch (error) {
 			console.error(error);

@@ -121,7 +121,6 @@ const AddSideDiamondOptionModal = ({isVisible, onClose, model, availableShapes})
 					});
 			})
 			.catch((errorInfo) => {
-				console.log('Validation failed:', errorInfo);
 			});
 	};
 

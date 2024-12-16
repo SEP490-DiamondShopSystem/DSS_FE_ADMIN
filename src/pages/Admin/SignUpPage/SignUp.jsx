@@ -32,7 +32,6 @@ const SignUpPage = () => {
 				})
 				.catch((error) => {
 					setIsLoading(false);
-					console.log(error);
 
 					message.error(error?.data?.detail || error?.detail);
 				});

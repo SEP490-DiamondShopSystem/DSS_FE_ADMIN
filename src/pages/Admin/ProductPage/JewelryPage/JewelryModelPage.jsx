@@ -145,7 +145,6 @@ const JewelryModelPage = () => {
 			})
 		)
 			.then((response) => {
-				console.log('API response:', response);
 				if (response && response.payload.TotalPage) {
 					setTotalPage(response.payload.TotalPage);
 				}
@@ -176,7 +175,6 @@ const JewelryModelPage = () => {
 			})
 		)
 			.then((response) => {
-				console.log('API response:', response); // Log the full response to the console
 				// Assuming the response contains TotalPage data
 				if (response && response.payload.TotalPage) {
 					setTotalPage(response.payload.TotalPage);
@@ -368,7 +366,6 @@ const JewelryModelPage = () => {
 	const handleModelClick = (model) => {
 		setSelectedModel(model);
 		setShowModal(true);
-		console.log(`Model clicked: ${model.Name}`);
 	};
 
 	const handleCloseModal = () => {
@@ -434,7 +431,7 @@ const JewelryModelPage = () => {
 		dispatch(createJewelryModel(formData))
 			.unwrap()
 			.then((formData) => {
-				console.log('Jewelry model created successfully:', formData);
+				message.success('Tạo mẫu trang sức thành công');
 			})
 			.catch((error) => {
 				message.error(error?.data?.detail || error?.detail);
@@ -1431,7 +1428,6 @@ const JewelryModelPage = () => {
 				<ModelDetailsView
 					selectedModel={selectedModel}
 					onEdit={() => {
-						console.log('Edit button clicked', selectedModel);
 						setIsEditModalVisible(true);
 					}}
 					onView={() => handleView(selectedModel.Id)}
@@ -1451,7 +1447,6 @@ const JewelryModelPage = () => {
 				<JewelryModelEditModal
 					isVisible={isEditModalVisible}
 					onClose={() => {
-						console.log('Closing edit modal');
 						setIsEditModalVisible(false);
 					}}
 					model={selectedModel}

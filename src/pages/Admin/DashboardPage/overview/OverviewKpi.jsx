@@ -101,9 +101,6 @@ export const OverviewBookKpi = (props) => {
 	const {chartSeries = [], stats = [], chartOptionsOverride} = props;
 	const chartOptions = useChartOptions();
 
-	console.log(chartSeries);
-	console.log(chartOptionsOverride);
-
 	return (
 		<Card>
 			<Chart

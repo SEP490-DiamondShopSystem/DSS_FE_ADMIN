@@ -39,8 +39,6 @@ const OrderDetail = () => {
 	const [isMobileView, setIsMobileView] = useState(window.innerWidth <= 768);
 	const [completed, setCompleted] = useState(null);
 
-	console.log('completed', completed);
-	console.log('completedOrder', completedOrder);
 
 	// Handle responsive layout
 	useEffect(() => {

@@ -46,7 +46,6 @@ export const getAllOrderCustomize = createAsyncThunk(
 export const handleCustomizeOrder = createAsyncThunk(
 	'customizeSlice/handleCustomizeOrder',
 	async (body, {rejectWithValue}) => {
-		console.log('body', body);
 
 		try {
 			const data = await api.put(`/CustomizeRequest/Staff/Proceed`, body);
@@ -74,13 +73,11 @@ export const handleRejectCustomize = createAsyncThunk(
 export const handleAddDiamondCustomize = createAsyncThunk(
 	'customizeSlice/handleAddDiamondCustomize',
 	async (params, {rejectWithValue}) => {
-		console.log('params', params);
 
 		try {
 			const response = await api.post(`/Diamond/Unavailble`, params);
 			return response;
 		} catch (error) {
-			console.log('Error: ', JSON.stringify(error));
 			return rejectWithValue(error);
 		}
 	}
@@ -89,7 +86,6 @@ export const handleAddDiamondCustomize = createAsyncThunk(
 export const handleDeleteDiamondCustomize = createAsyncThunk(
 	'customizeSlice/handleDeleteDiamondCustomize',
 	async (params, {rejectWithValue}) => {
-		console.log('params', params);
 
 		try {
 			const response = await api.delete(`/Diamond/Unavailble`, {
@@ -101,7 +97,6 @@ export const handleDeleteDiamondCustomize = createAsyncThunk(
 			});
 			return response;
 		} catch (error) {
-			console.log('Error: ', JSON.stringify(error));
 			return rejectWithValue(error);
 		}
 	}
@@ -110,13 +105,11 @@ export const handleDeleteDiamondCustomize = createAsyncThunk(
 export const handleChangeDiamondCustomize = createAsyncThunk(
 	'customizeSlice/handleChangeDiamondCustomize',
 	async (params, {rejectWithValue}) => {
-		console.log('params', params);
 
 		try {
 			const response = await api.put(`/CustomizeRequest/Staff/ChangeDiamond`, params);
 			return response;
 		} catch (error) {
-			console.log('Error: ', JSON.stringify(error));
 			return rejectWithValue(error);
 		}
 	}

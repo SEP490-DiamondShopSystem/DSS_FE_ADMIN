@@ -8,7 +8,6 @@ export const getProcessingDetail = createAsyncThunk(
 			const response = await api.get(`/Order/Log/${orderId}/${logId}/Detail`);
 			return response;
 		} catch (error) {
-			console.log('Error: ', JSON.stringify(error));
 			return rejectWithValue(error);
 		}
 	}
@@ -21,7 +20,6 @@ export const getDeliveringDetail = createAsyncThunk(
 			const response = await api.get(`/Order/Log/${orderId}/${logId}/Detail`);
 			return response;
 		} catch (error) {
-			console.log('Error: ', JSON.stringify(error));
 			return rejectWithValue(error);
 		}
 	}

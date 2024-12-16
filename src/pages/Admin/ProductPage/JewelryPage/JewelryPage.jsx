@@ -74,8 +74,6 @@ const JewelryPage = () => {
 		Status: 1,
 	});
 
-	console.log('jewelryList', jewelryList);
-
 	const metals = useSelector(getAllMetalsSelector);
 	const sizes = useSelector(getAllSizesSelector);
 

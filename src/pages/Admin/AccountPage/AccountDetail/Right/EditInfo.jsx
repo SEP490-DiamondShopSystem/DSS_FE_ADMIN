@@ -11,8 +11,6 @@ export const EditInfo = ({
 	setAddressChanges,
 }) => {
 	const handleAddressChange = (index, field, value) => {
-		console.log(`Changing address at index ${index}:`, {field, value});
-
 		const updatedAddresses = [...userInfo.Addresses];
 		const address = updatedAddresses[index];
 
@@ -102,8 +100,6 @@ export const EditInfo = ({
 
 	const handleRemoveAddress = (index) => {
 		const removedAddress = userInfo.Addresses[index];
-		console.log('Removed Address:', removedAddress);
-		console.log('Removed Address ID:', removedAddress?.Id);
 		if (userInfo.Addresses.length === 1 || removedAddress.IsDefault) {
 			message.warning('Không thể xóa địa chỉ mặc định');
 			return;
@@ -111,7 +107,6 @@ export const EditInfo = ({
 		if (removedAddress?.Id) {
 			setAddressChanges((prev) => {
 				const newRemovedAddressId = [...prev.removedAddressId, removedAddress.Id];
-				console.log('Updated Removed Address IDs:', newRemovedAddressId);
 				return {
 					...prev,
 					removedAddressId: newRemovedAddressId,
@@ -123,18 +118,12 @@ export const EditInfo = ({
 		onChange({target: {name: 'Addresses', value: updatedAddresses}});
 	};
 	const handleSetDefaultAddress = (index) => {
-		console.log('Setting default address for index:', index);
-
 		const updatedAddresses = userInfo.Addresses.map((addr, i) => ({
 			...addr,
 			IsDefault: i === index, // Only the selected address becomes default
 		}));
 
-		console.log('Updated Addresses after setting default:', updatedAddresses);
-
 		const newDefaultAddressId = updatedAddresses[index]?.Id || '';
-		console.log('New Default Address ID:', newDefaultAddressId);
-
 		// Update addressChanges
 		setAddressChanges((prev) => ({
 			...prev,
@@ -159,8 +148,6 @@ export const EditInfo = ({
 				},
 			},
 		});
-
-		console.log('handleSetDefaultAddress completed.');
 	};
 
 	return (

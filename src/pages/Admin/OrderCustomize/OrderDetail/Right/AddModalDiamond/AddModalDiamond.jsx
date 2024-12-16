@@ -101,7 +101,6 @@ export const AddModalDiamond = ({
 	};
 
 	const handleOk = (values) => {
-		console.log('Form Values:', values);
 
 		const {
 			cut,

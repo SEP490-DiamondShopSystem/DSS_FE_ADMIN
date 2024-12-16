@@ -44,7 +44,6 @@ export const handleAddTransfer = createAsyncThunk(
 
 			return response;
 		} catch (error) {
-			console.log('Error: ', JSON.stringify(error));
 			return rejectWithValue(error);
 		}
 	}
@@ -80,7 +79,6 @@ export const handleChangeEvidence = createAsyncThunk(
 
 			return response;
 		} catch (error) {
-			console.log('Error: ', JSON.stringify(error));
 			return rejectWithValue(error);
 		}
 	}

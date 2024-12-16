@@ -406,7 +406,6 @@ const SideDiamondPricePage = () => {
 	};
 	const handleEditCell = (rowIndex, cellIndex, diamondPriceId, newValue) => {
 		const numericValue = parseFloat(newValue.replace(/\./g, '').replace(',', '.')) || 0;
-		console.log(`Received diamondPriceId: ${diamondPriceId}`);
 
 		setEditedCells((prev) => {
 			const existingCell = prev.find(
@@ -415,14 +414,8 @@ const SideDiamondPricePage = () => {
 
 			if (existingCell) {
 				if (newValue.trim() === '') {
-					console.log(
-						`Removing entry for price Id: ${diamondPriceId} due to empty value`
-					);
 					return prev.filter((cell) => cell !== existingCell);
 				} else {
-					console.log(
-						`Updating existing entry with diamondPriceId: ${diamondPriceId}, Price: ${numericValue}`
-					);
 					return prev.map((cell) =>
 						cell === existingCell ? {...existingCell, price: numericValue} : cell
 					);
@@ -434,16 +427,12 @@ const SideDiamondPricePage = () => {
 					rowIndex,
 					cellIndex,
 				};
-				console.log(
-					`Adding new entry with Price Id: ${diamondPriceId}, Price: ${numericValue}`
-				);
 				return [...prev, newEntry];
 			}
 		});
 	};
 
 	const handleAddPriceCell = (rowIndex, cellIndex, diamondPriceId, newValue) => {
-		console.log(`Received DiamondPriceId: ${diamondPriceId}, New Value: ${newValue}`);
 		const numericValue = parseFloat(newValue.replace(/\./g, '').replace(',', '.')) || 0;
 
 		setEditedCells((prev) => {
@@ -453,16 +442,8 @@ const SideDiamondPricePage = () => {
 
 			if (existingCell) {
 				if (newValue.trim() === '' || numericValue === 0) {
-					// Remove the existing cell entry if the new value is empty
-					console.log(
-						`Removing entry for DiamondPriceId: ${diamondPriceId} due to empty value`
-					);
 					return prev.filter((cell) => cell !== existingCell);
 				} else {
-					// Update the existing entry
-					console.log(
-						`Updating existing entry with DiamondPriceId: ${diamondPriceId}, New Price: ${numericValue}`
-					);
 					return prev.map((cell) =>
 						cell === existingCell ? {...existingCell, price: numericValue} : cell
 					);
@@ -476,9 +457,6 @@ const SideDiamondPricePage = () => {
 						rowIndex,
 						cellIndex,
 					};
-					console.log(
-						`Adding new entry with DiamondPriceId: ${diamondPriceId}, Price: ${numericValue}`
-					);
 					return [...prev, newCell];
 				}
 				// If the numeric value is zero or the new value is empty, do not add a new entry
@@ -522,10 +500,6 @@ const SideDiamondPricePage = () => {
 								<input
 									type="number"
 									onChange={(e) => {
-										console.log(
-											'Creating price for cell with CriteriaId:',
-											cell.DiamondPriceId
-										);
 										handleAddPriceCell(
 											rowIndex,
 											cellIndex,
