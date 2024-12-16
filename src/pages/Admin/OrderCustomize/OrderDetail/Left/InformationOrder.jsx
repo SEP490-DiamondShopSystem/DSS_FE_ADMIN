@@ -317,6 +317,11 @@ const InformationOrder = ({
 
 	const sub2Columns = [
 		{
+			title: 'SKU',
+			dataIndex: 'SerialCode',
+			key: 'carat',
+		},
+		{
 			title: 'Ly (Carat)',
 			dataIndex: 'Carat',
 			key: 'carat',
@@ -425,38 +430,6 @@ const InformationOrder = ({
 			)}
 		/>
 	);
-
-	// const handleChange = (request) => {
-	// 	Modal.confirm({
-	// 		title: 'Xác nhận xóa',
-	// 		content: 'Bạn có chắc chắn muốn xóa kim cương đã thêm trong yêu cầu này?',
-	// 		okText: 'Xóa',
-	// 		okType: 'danger',
-	// 		cancelText: 'Hủy',
-	// 		onOk: () => handleChangeConfirm(request),
-	// 		onCancel: () => {
-	// 			console.log('Cancel deletion');
-	// 		},
-	// 	});
-	// };
-
-	// const handleChangeConfirm = (request) => {
-	// 	console.log('request', request);
-	// 	dispatch(
-	// 		handleChangeDiamondCustomize({
-	// 			diamondId: request?.DiamondId,
-	// 			customizeRequestId: request?.CustomizeRequestId,
-	// 			diamondRequestId: request?.DiamondRequestId,
-	// 		})
-	// 	)
-	// 		.unwrap()
-	// 		.then(() => {
-	// 			message.success(`Đã xác nhận yêu cầu!.`);
-	// 		})
-	// 		.catch((error) => {
-	// 			message.error( error?.detail);
-	// 		});
-	// };
 
 	const handleDelete = (request) => {
 		Modal.confirm({

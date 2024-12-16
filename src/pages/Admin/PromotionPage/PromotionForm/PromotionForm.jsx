@@ -120,7 +120,7 @@ const PromotionForm = ({
 						<Col span={8}>
 							<Form.Item
 								name="isExcludeQualifierProduct"
-								label="Exclude Qualifier Product"
+								label="Loại trừ sản phẩm đủ điều kiện"
 								valuePropName="checked"
 								initialValue={true}
 								className="mb-0"
