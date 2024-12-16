@@ -27,7 +27,6 @@ const DiamondDetailPage = () => {
 	const [fetch, setFetch] = useState();
 	const [isModalVisible, setIsModalVisible] = useState(false);
 
-	console.log('diamond', diamond);
 
 	useEffect(() => {
 		dispatch(getDiamondDetail(id))
@@ -80,7 +79,6 @@ const DiamondDetailPage = () => {
 	};
 
 	const handleSubmit = (values) => {
-		console.log('priceOffset:', values);
 		dispatch(handleAddPrice({id, priceOffset: values?.priceOffset, extraFee: values?.extraFee}))
 			.unwrap()
 			.then((res) => {

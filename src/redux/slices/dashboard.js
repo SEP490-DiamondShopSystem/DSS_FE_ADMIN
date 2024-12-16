@@ -46,7 +46,6 @@ export const getOrderCompleted = createAsyncThunk(
 			const data = await api.get(
 				`/Dashboard/OrderCompleted/Count?startDate=${startDate}&endDate=${endDate}&isCustomOrder=${isCustomOrder}`
 			);
-			console.log('data', data);
 
 			return data;
 		} catch (error) {

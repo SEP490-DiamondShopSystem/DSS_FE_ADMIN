@@ -157,8 +157,6 @@ const OrderCustomizePage = () => {
 			dataIndex: 'status',
 			align: 'center',
 			render: (status) => {
-				console.log('status', status);
-
 				const {label, color} = statusMapping[status] || {label: 'Unknown', color: 'gray'};
 				return <Tag color={color}>{label?.toUpperCase()}</Tag>;
 			},
@@ -201,7 +199,6 @@ const OrderCustomizePage = () => {
 
 	const onSearch = (value) => {
 		setSearchText(value);
-		console.log(value);
 	};
 
 	return (

@@ -19,6 +19,7 @@ import {
 import {
 	fetchAccountRule,
 	fetchDiamondRule,
+	fetchDiamondPriceRule,
 	fetchFrontendDisplayRule,
 	fetchPromotionRule,
 	fetchLocationRule,
@@ -28,6 +29,7 @@ import {
 	fetchJewelryModelRule,
 	updateAccountRule,
 	updateDiamondRule,
+	updateDiamondPriceRule,
 	updateFrontendDisplayRule,
 	updatePromotionRule,
 	updateLocationRules,
@@ -44,6 +46,7 @@ const ConfigurationPage = () => {
 	const dispatch = useDispatch();
 	const [accountRule, setAccountRule] = useState(null);
 	const [diamondRule, setDiamondRule] = useState(null);
+	const [diamondPriceRule, setDiamondPriceRule] = useState(null);
 	const [frontendDisplayRule, setFrontendDisplayRule] = useState(null);
 	const [promotionRule, setPromotionRule] = useState(null);
 	const [locationRule, setLocationRule] = useState(null);
@@ -57,6 +60,7 @@ const ConfigurationPage = () => {
 
 	const [accountForm] = Form.useForm();
 	const [diamondForm] = Form.useForm();
+	const [diamondPriceForm] = Form.useForm();
 	const [frontendForm] = Form.useForm();
 	const [promotionForm] = Form.useForm();
 	const [locationForm] = Form.useForm();
@@ -90,18 +94,29 @@ const ConfigurationPage = () => {
 
 	const fetchData = async () => {
 		try {
-			const [account, diamond, frontend, model, promotion, location, order, payment, bank] =
-				await Promise.all([
-					dispatch(fetchAccountRule()).unwrap(),
-					dispatch(fetchDiamondRule()).unwrap(),
-					dispatch(fetchFrontendDisplayRule()).unwrap(),
-					dispatch(fetchJewelryModelRule()).unwrap(),
-					dispatch(fetchPromotionRule()).unwrap(),
-					dispatch(fetchLocationRule()).unwrap(),
-					dispatch(fetchOrderRule()).unwrap(),
-					dispatch(fetchOrderRulePayment()).unwrap(),
-					dispatch(fetchShopBankAccountRule()).unwrap(),
-				]);
+			const [
+				account,
+				diamond,
+				diamondPrice,
+				frontend,
+				model,
+				promotion,
+				location,
+				order,
+				payment,
+				bank,
+			] = await Promise.all([
+				dispatch(fetchAccountRule()).unwrap(),
+				dispatch(fetchDiamondRule()).unwrap(),
+				dispatch(fetchDiamondPriceRule()).unwrap(),
+				dispatch(fetchFrontendDisplayRule()).unwrap(),
+				dispatch(fetchJewelryModelRule()).unwrap(),
+				dispatch(fetchPromotionRule()).unwrap(),
+				dispatch(fetchLocationRule()).unwrap(),
+				dispatch(fetchOrderRule()).unwrap(),
+				dispatch(fetchOrderRulePayment()).unwrap(),
+				dispatch(fetchShopBankAccountRule()).unwrap(),
+			]);
 
 			const transformedPayment = {
 				...payment,
@@ -117,6 +132,7 @@ const ConfigurationPage = () => {
 
 			setAccountRule(account);
 			setDiamondRule(diamond);
+			setDiamondPriceRule(diamondPrice);
 			setFrontendDisplayRule(frontend);
 			setModelRule(model);
 			setPromotionRule(promotion);
@@ -142,7 +158,6 @@ const ConfigurationPage = () => {
 		if (error) message.error(error);
 	}, [error]);
 
-
 	const handleAccountSubmit = (values) => {
 		dispatch(updateAccountRule(values))
 			.unwrap()
@@ -163,7 +178,16 @@ const ConfigurationPage = () => {
 				message.error(error?.data?.detail || error?.detail);
 			});
 	};
-
+	const handleDiamondPriceSubmit = (values) => {
+		dispatch(updateDiamondPriceRule(values))
+			.unwrap()
+			.then(() => {
+				handleSuccess('Cập Nhật Quy Định Bảng Giá Kim Cương Thành Công!');
+			})
+			.catch((error) => {
+				message.error(error?.data?.detail || error?.detail);
+			});
+	};
 	const handleFrontendSubmit = (values) => {
 		dispatch(updateFrontendDisplayRule(values))
 			.unwrap()
@@ -457,6 +481,62 @@ const ConfigurationPage = () => {
 					</Card>
 				</Tabs.TabPane>
 				<Tabs.TabPane tab="Quy Tắc Kim Cương" key="diamond">
+					<Tabs.TabPane tab="Quy Tắc Khuyến Mãi" key="promotion">
+						<Card className="shadow-lg">
+							<Form
+								form={promotionForm}
+								initialValues={promotionRule}
+								onFinish={handlePromotionSubmit}
+								layout="vertical"
+								key={JSON.stringify(promotionRule)}
+							>
+								{' '}
+								<Row gutter={[16, 16]} wrap>
+									<Col xs={24} sm={12} md={6}>
+										<Form.Item
+											name="MaxDiscountPercent"
+											label="Phần trăm giảm giá tối đa"
+											rules={[
+												{required: true, message: 'Trường này là bắt buộc'},
+											]}
+										>
+											<InputNumber className="w-full" />
+										</Form.Item>
+									</Col>
+									<Col xs={24} sm={12} md={6}>
+										<Form.Item
+											name="MinCode"
+											label="Mã giảm giá tối thiểu có thể dùng"
+											rules={[
+												{required: true, message: 'Trường này là bắt buộc'},
+											]}
+										>
+											<InputNumber className="w-full" />
+										</Form.Item>
+									</Col>
+									<Col xs={24} sm={12} md={6}>
+										<Form.Item
+											name="MaxCode"
+											label="Mã giảm giá tối đa có thể dùng"
+											rules={[
+												{required: true, message: 'Trường này là bắt buộc'},
+											]}
+										>
+											<InputNumber className="w-full" />
+										</Form.Item>
+									</Col>
+								</Row>
+								<Button
+									type="primary"
+									onClick={() =>
+										showConfirm(promotionForm, handlePromotionSubmit)
+									}
+								>
+									Lưu
+								</Button>
+							</Form>
+						</Card>
+					</Tabs.TabPane>
 					<Card className="shadow-lg">
 						<Form
 							form={diamondForm}
@@ -706,21 +786,44 @@ const ConfigurationPage = () => {
 						</Form>
 					</Card>
 				</Tabs.TabPane>
-				<Tabs.TabPane tab="Quy Tắc Mẫu Trang Sức" key="model">
+				<Tabs.TabPane tab="Quy Tắc Giá Kim Cương" key="diamondPrice">
 					<Card className="shadow-lg">
 						<Form
-							form={modelForm}
-							initialValues={modelRule}
-							onFinish={handleModelSubmit}
+							form={diamondPriceForm}
+							initialValues={diamondPriceRule}
+							onFinish={handleDiamondPriceSubmit}
 							layout="vertical"
-							key={JSON.stringify(modelRule)}
+							key={JSON.stringify(diamondPriceRule)}
 						>
 							{' '}
 							<Row gutter={[16, 16]} wrap>
 								<Col xs={24} sm={12} md={6}>
 									<Form.Item
-										name="MaximumSideDiamondOption"
-										label="Số lựa chọn kim cương tấm tối đa"
+										name="MinPriceOffsetPercent"
+										label="Phần trăm giảm giá nhỏ nhất"
+										rules={[
+											{required: true, message: 'Trường này là bắt buộc'},
+										]}
+									>
+										<InputNumber className="w-full" addonAfter="%" />
+									</Form.Item>
+								</Col>
+								<Col xs={24} sm={12} md={6}>
+									<Form.Item
+										name="MaxPriceOffsetPercent"
+										label="Phần trăm giảm giá cao nhất"
+										rules={[
+											{required: true, message: 'Trường này là bắt buộc'},
+										]}
+									>
+										<InputNumber className="w-full" addonAfter="%" />
+									</Form.Item>
+								</Col>
+
+								<Col xs={24} sm={12} md={12}>
+									<Form.Item
+										name="DefaultRoundCriteriaPriceBoard"
+										label=" Bảng giá tiêu chí mặc định cho kim cương tròn"
 										rules={[
 											{required: true, message: 'Trường này là bắt buộc'},
 										]}
@@ -728,10 +831,21 @@ const ConfigurationPage = () => {
 										<InputNumber className="w-full" />
 									</Form.Item>
 								</Col>
-								<Col xs={24} sm={12} md={6}>
+								<Col xs={24} sm={12} md={12}>
 									<Form.Item
-										name="MaximumMainDiamond"
-										label="Số lượng kim cương chính tối đa cho mẫu"
+										name="DefaultFancyCriteriaPriceBoard"
+										label="Bảng giá tiêu chí mặc định cho kim cương kiểu dáng đặc biệt"
+										rules={[
+											{required: true, message: 'Trường này là bắt buộc'},
+										]}
+									>
+										<InputNumber className="w-full" />
+									</Form.Item>
+								</Col>
+								<Col xs={24} sm={12} md={12}>
+									<Form.Item
+										name="DefaultSideDiamondCriteriaPriceBoard"
+										label="Bảng giá tiêu chí mặc định cho kim cương phụ"
 										rules={[
 											{required: true, message: 'Trường này là bắt buộc'},
 										]}
@@ -1231,7 +1345,6 @@ const ConfigurationPage = () => {
 						</Form>
 					</Card>
 				</Tabs.TabPane>
-				{/* Confirmation Modal */}
 			</Tabs>
 			<Modal
 				title="Xác nhận"

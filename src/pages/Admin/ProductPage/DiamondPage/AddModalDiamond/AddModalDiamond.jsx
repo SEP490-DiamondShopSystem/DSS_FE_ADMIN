@@ -69,8 +69,6 @@ export const AddModalDiamond = ({setShowModal, showModal}) => {
 			},
 		});
 	};
-
-	// Dispatch khi diamondParams thay đổi
 	useEffect(() => {
 		if (!diamondParams) return;
 
@@ -117,7 +115,6 @@ export const AddModalDiamond = ({setShowModal, showModal}) => {
 
 	const handleSwitchChange = (checked) => {
 		setIsLabDiamond(checked);
-		console.log(checked);
 	};
 
 	const handleOk = (values) => {

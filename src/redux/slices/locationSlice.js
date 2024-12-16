@@ -9,7 +9,6 @@ export const fetchAllLocations = createAsyncThunk(
 			const response = await api.get('/Location/Province');
 			return response;
 		} catch (error) {
-			console.log('Error: ', JSON.stringify(error));
 			return rejectWithValue(error);
 		}
 	}

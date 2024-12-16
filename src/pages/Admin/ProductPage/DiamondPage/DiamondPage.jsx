@@ -187,7 +187,6 @@ const DiamondPage = () => {
 			dataIndex: 'Status',
 			align: 'center',
 			render: (status) => {
-				console.log('status', status);
 
 				const {label, color} = statusMapping[status] || {
 					label: 'Không Biết',
@@ -354,7 +353,6 @@ const DiamondPage = () => {
 	};
 
 	const handleDelete = () => {
-		console.log('Deleted successfully');
 		dispatch(handleDeleteDiamond(diamondId))
 			.unwrap()
 			.then(() => {
@@ -381,7 +379,6 @@ const DiamondPage = () => {
 	};
 
 	const handleLockDiamondSubmit = (values) => {
-		console.log('Form values:', values);
 		dispatch(handleLockDiamond(values))
 			.unwrap()
 			.then((res) => {

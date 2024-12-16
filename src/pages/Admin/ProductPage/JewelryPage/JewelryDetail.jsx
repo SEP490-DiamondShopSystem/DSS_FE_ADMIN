@@ -183,7 +183,6 @@ const JewelryDetail = ({jewelry, onClose}) => {
 					});
 			},
 			onCancel() {
-				console.log('Đã hủy việc xóa');
 			},
 		});
 	};

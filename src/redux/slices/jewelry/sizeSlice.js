@@ -7,7 +7,6 @@ export const fetchAllSizes = createAsyncThunk('sizes/fetchAll', async (_, {rejec
 		const response = await api.get('/Size/All');
 		return response;
 	} catch (error) {
-		console.log('Error: ', JSON.stringify(error));
 		return rejectWithValue(error);
 	}
 });

@@ -5,7 +5,6 @@ import {api} from '../../services/api';
 export const fetchPromotions = createAsyncThunk(
 	'promotions/fetchPromotions',
 	async (_, {rejectWithValue}) => {
-		console.log('Fetching promotions...');
 		try {
 			const response = await api.get('/Promotion');
 			return response;
@@ -17,13 +16,8 @@ export const fetchPromotions = createAsyncThunk(
 export const fetchPromotionDetail = createAsyncThunk(
 	'promotions/fetchPromotionDetail',
 	async (promotionId, {rejectWithValue}) => {
-		console.log('Fetching promotions...');
 		try {
 			const response = await api.get(`/Promotion/${promotionId}`);
-
-			// Log the fetched data here
-			console.log('Fetched promotion details:', response);
-
 			return response;
 		} catch (error) {
 			return rejectWithValue(error);
@@ -51,7 +45,6 @@ export const createFullPromotion = createAsyncThunk(
 	async (fullPromotion, {rejectWithValue}) => {
 		try {
 			const response = await api.post('/Promotion/Full', fullPromotion);
-			console.log('Creating promotion with data:', fullPromotion);
 			return response;
 		} catch (error) {
 			return rejectWithValue(error);
@@ -90,7 +83,6 @@ export const updatePromotion = createAsyncThunk(
 	'promotions/updatePromotion',
 	async ({promotionId, promotionData}, {rejectWithValue}) => {
 		try {
-			console.log(`Updating promotion with ID ${promotionId} and data:`, promotionData);
 			const response = await api.put(`/Promotion/${promotionId}`, promotionData, {
 				headers: {
 					'Content-Type': 'application/json', // Ensure JSON content type is set
@@ -109,8 +101,6 @@ export const deletePromotion = createAsyncThunk(
 	async (promotionId, {rejectWithValue}) => {
 		try {
 			await api.delete(`/Promotion/${promotionId}`);
-			console.log(`Deleting promotion with ID ${promotionId}`);
-
 			return promotionId;
 		} catch (error) {
 			return rejectWithValue(error);
@@ -164,7 +154,6 @@ export const uploadPromotionThumbnail = createAsyncThunk(
 		try {
 			const formData = new FormData();
 			formData.append('imageFile', imageFile);
-			console.log('Uploading thumbnail with FormData:', formData);
 			const response = await api.put(`/Promotion/${promotionId}/Thumbnail`, formData, {
 				headers: {
 					'Content-Type': 'multipart/form-data',
@@ -192,7 +181,6 @@ export const promotionSlice = createSlice({
 			// Fetch promotions
 			.addCase(fetchPromotions.pending, (state) => {
 				state.loading = true;
-				console.log('Fetching promotions: pending');
 			})
 			.addCase(fetchPromotions.fulfilled, (state, action) => {
 				state.loading = false;

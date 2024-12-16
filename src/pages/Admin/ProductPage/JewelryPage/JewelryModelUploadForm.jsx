@@ -296,7 +296,6 @@ export const JewelryModelUploadForm = ({jewelryModelId, visible, onClose}) => {
 	// Handle the deletion of images by calling the API
 	const handleDeleteImages = () => {
 		if (removedImagePaths.length > 0) {
-			console.log('Deleting images:', removedImagePaths);
 
 			dispatch(deleteJewelryModelImages({jewelryModelId, imagePaths: removedImagePaths}))
 				.unwrap()
@@ -314,7 +313,6 @@ export const JewelryModelUploadForm = ({jewelryModelId, visible, onClose}) => {
 			return;
 		}
 
-		console.log('Uploading Thumbnail for Diamond ID:', jewelryModelId);
 
 		await dispatch(uploadJewelryModelThumbnail({jewelryModelId, formFile: thumbnailFile}))
 			.unwrap()
@@ -360,7 +358,6 @@ export const JewelryModelUploadForm = ({jewelryModelId, visible, onClose}) => {
 			return;
 		}
 
-		console.log('Uploading Diamond Images for Diamond ID:', jewelryModelId);
 
 		await dispatch(uploadBaseImages({jewelryModelId, formFiles: imageFiles}))
 			.unwrap()

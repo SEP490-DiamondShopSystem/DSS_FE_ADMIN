@@ -8,7 +8,6 @@ export const getTransactionByOrderId = createAsyncThunk(
 			const response = await api.get(`/Order/${id}/TransactionDetail`);
 			return response;
 		} catch (error) {
-			console.log('Error: ', JSON.stringify(error));
 			return rejectWithValue(error);
 		}
 	}

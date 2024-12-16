@@ -64,8 +64,6 @@ const InformationOrder = ({orders, statusOrder, paymentStatusOrder, userDetail})
 	const [delivererRole, setDelivererRole] = useState();
 	const [orderFiles, setOrderFiles] = useState(null);
 	const [transaction, setTransaction] = useState(null);
-	console.log('order', orders);
-	console.log('transaction', transaction);
 
 	useEffect(() => {
 		if (userDetail) {

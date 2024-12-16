@@ -33,8 +33,6 @@ export const handleAddRole = createAsyncThunk(
 				accId,
 				roleId,
 			});
-			console.log(data);
-
 			return data;
 		} catch (error) {
 			console.error(error);
@@ -50,8 +48,6 @@ export const handleRemoveRole = createAsyncThunk(
 				accId,
 				roleId,
 			});
-			console.log(data);
-
 			return data;
 		} catch (error) {
 			console.error(error);
@@ -62,8 +58,6 @@ export const handleRemoveRole = createAsyncThunk(
 export const handleBanAccount = createAsyncThunk('userSlice/handleBanAccount', async (id) => {
 	try {
 		const data = await api.put(`/Account/Ban?identityId=${id}`);
-		console.log(data);
-
 		return data;
 	} catch (error) {
 		console.error(error);
@@ -75,7 +69,6 @@ export const handleUpdateAccount = createAsyncThunk(
 	async ({id, payload}, {rejectWithValue}) => {
 		try {
 			const data = await api.put(`/Account/${id}/Profile`, payload);
-			console.log(data);
 			return data; // Return the API response
 		} catch (error) {
 			console.error(error);
