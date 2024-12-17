@@ -17,7 +17,7 @@ import {
 	handleRejectCustomize,
 } from '../../../../../redux/slices/customizeSlice';
 import {AddModalDiamond} from './AddModalDiamond/AddModalDiamond';
-import {Clarity, Color, Cut, ShapeName} from '../../../../../utils/constant';
+import {Clarity, Color, Cut, enumMappings, ShapeName} from '../../../../../utils/constant';
 
 const {Title, Text} = Typography;
 const {Option} = Select;
@@ -275,6 +275,7 @@ const TimeLineOrder = ({
 
 				const updatedSelection = {
 					DiamondRequestId: selectedRequest.DiamondRequestId,
+					Position: selectedRequest?.Position,
 					...currentDiamondId,
 				};
 
@@ -417,6 +418,7 @@ const TimeLineOrder = ({
 	const handleCancel = () => {
 		setIsModalVisible(false);
 		setSelectedRequest(null);
+		setChangeDiamond(null);
 	};
 
 	const handleAcceptedConfirm = () => {
@@ -645,6 +647,7 @@ const TimeLineOrder = ({
 				onOk={handleAddDiamond}
 				onCancel={handleCancel}
 				style={{minWidth: 1200}}
+				centered
 			>
 				<div>
 					<label>Chọn Yêu Cầu</label>
@@ -676,8 +679,92 @@ const TimeLineOrder = ({
 							Tạo Kim Cương Theo Yêu Cầu
 						</Button>
 					</div>
+					{selectedRequest && (
+						<div className="shadow-lg py-2 px-5 border my-5">
+							<Title level={5} className="">
+								Thông Tin Yêu Cầu
+							</Title>
+							<div className="grid grid-cols-3 gap-4 ">
+								<div>
+									<span className="font-semibold">Ly (Carat): </span>
+									<span>
+										{selectedRequest?.CaratFrom} - {selectedRequest?.CaratTo}
+									</span>
+								</div>
+								<div>
+									<span className="font-semibold">
+										Độ Tinh Khuyết (Clarity):{' '}
+									</span>
+									<span>
+										{enumMappings.Clarity[selectedRequest?.ClarityFrom]} -{' '}
+										{enumMappings.Clarity[selectedRequest?.ClarityTo]}
+									</span>
+								</div>
+								<div>
+									<span className="font-semibold">Màu Sắc (Color): </span>
+									<span>
+										{enumMappings.Color[selectedRequest?.ColorFrom]} -{' '}
+										{enumMappings.Color[selectedRequest?.ColorTo]}
+									</span>
+								</div>
+								<div>
+									<span className="font-semibold">Chế Tác (Cut): </span>
+									<span>
+										{enumMappings.Cut[selectedRequest?.CutFrom]} -{' '}
+										{enumMappings.Cut[selectedRequest?.CutTo]}
+									</span>
+								</div>
+								<div>
+									<span className="font-semibold">Hình Dạng: </span>
+									<span>
+										{enumMappings.Shape[selectedRequest?.DiamondShapeId]}
+									</span>
+								</div>
+								<div>
+									<span className="font-semibold">Độ Bóng (Polish): </span>
+									<span>
+										{selectedRequest?.Polish
+											? enumMappings.Polish[selectedRequest?.Polish]
+											: 'Không'}
+									</span>
+								</div>
+								<div>
+									<span className="font-semibold">
+										Chọn Đối Xứng (Symmetry):{' '}
+									</span>
+									<span>
+										{selectedRequest?.Symmetry
+											? enumMappings.Symmetry[selectedRequest?.Symmetry]
+											: 'Không'}
+									</span>
+								</div>
+								<div>
+									<span className="font-semibold">Viền Cạnh (Girdle): </span>
+									<span>
+										{selectedRequest?.Girdle
+											? enumMappings.Girdle[selectedRequest?.Girdle]
+											: 'Không'}
+									</span>
+								</div>
+								<div>
+									<span className="font-semibold">Chóp Đáy (Culet): </span>
+									<span>
+										{selectedRequest?.Culet
+											? enumMappings.Culet[selectedRequest?.Culet]
+											: 'Không'}
+									</span>
+								</div>
+								<div>
+									<span className="font-semibold">Nguồn Gốc: </span>
+									<span>
+										{selectedRequest?.IsLabGrown ? 'Tự Nhiên' : 'Nhân Tạo'}
+									</span>
+								</div>
+							</div>
+						</div>
+					)}
 					<div style={{marginTop: 16}}>
-						<label>Chọn Kim Cương Đang Có</label>
+						<Title level={5}>Chọn Kim Cương Đang Có Sẵn</Title>
 						<DiamondList
 							diamond={diamonds}
 							filters={filters}
@@ -685,12 +772,13 @@ const TimeLineOrder = ({
 							currentDiamondId={currentDiamondId}
 						/>
 					</div>
-
-					<div style={{marginTop: 16}}>
-						<Button type="primary" onClick={handleSaveDiamond}>
-							Chọn Kim Cương Này
-						</Button>
-					</div>
+					{Array.isArray(diamonds) && diamonds.length > 0 && (
+						<div style={{marginTop: 16}}>
+							<Button type="primary" onClick={handleSaveDiamond}>
+								Chọn Kim Cương
+							</Button>
+						</div>
+					)}
 
 					{filteredDiamondRequests?.length > 0 && (
 						<>

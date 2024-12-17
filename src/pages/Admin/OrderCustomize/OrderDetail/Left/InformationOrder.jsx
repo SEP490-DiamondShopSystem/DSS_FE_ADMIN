@@ -109,22 +109,7 @@ const InformationOrder = ({
 				return text?.Name;
 			},
 		},
-		{
-			title: 'Kim Cương Tấm (Carat)',
-			dataIndex: 'SideDiamond',
-			key: 'sideDiamond',
-			render: (text) => {
-				return text?.CaratWeight;
-			},
-		},
-		{
-			title: 'Kim Cương Tấm (Số Lượng)',
-			dataIndex: 'SideDiamond',
-			key: 'sideDiamond',
-			render: (text) => {
-				return text?.Quantity;
-			},
-		},
+
 		{
 			title: 'Chữ Khắc',
 			dataIndex: 'EngravedText',
@@ -153,7 +138,33 @@ const InformationOrder = ({
 				return <Tag color={color}>{statusLabel.toUpperCase()}</Tag>;
 			},
 		},
-		...(orders?.JewelryModel
+
+		...(orders?.SideDiamond
+			? [
+					{
+						title: 'Kim Cương Tấm (Carat)',
+						dataIndex: 'SideDiamond',
+						key: 'sideDiamond',
+						render: (text) => {
+							return text?.CaratWeight;
+						},
+					},
+			  ]
+			: []),
+		...(orders?.SideDiamond
+			? [
+					{
+						title: 'Kim Cương Tấm (Số Lượng)',
+						dataIndex: 'SideDiamond',
+						key: 'sideDiamond',
+						render: (text) => {
+							return text?.Quantity;
+						},
+					},
+			  ]
+			: []),
+
+		...(orders?.JewelryModel?.SD_Price
 			? [
 					{
 						title: 'Giá Kim Cương Tấm',
