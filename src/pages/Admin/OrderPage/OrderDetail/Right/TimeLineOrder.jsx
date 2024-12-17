@@ -569,6 +569,10 @@ const TimeLineOrder = ({
 	};
 
 	const handleRefundStatus = async () => {
+		if (fileList?.length === 0) {
+			message.warning('Vui lòng gửi ít nhất 1 ảnh!');
+			return;
+		}
 		dispatch(
 			handleRefundOrder({
 				OrderId: orders.Id,
@@ -849,9 +853,8 @@ const TimeLineOrder = ({
 											  )
 											: transactionOrderOthers[0]?.Status === 2 &&
 											  orders?.Transactions?.length === 1
-											? formatPriceCeilFloor(
-													transactionOrderOthers[0]?.TransactionAmount *
-														((100 - payAllFine) / 100)
+											? formatPrice(
+													transactionOrderOthers[0]?.TransactionAmount
 											  )
 											: 'Không'}
 									</label>
@@ -904,7 +907,8 @@ const TimeLineOrder = ({
 									type="text"
 									className="bg-primary font-semibold rounded-full"
 									onClick={handleRefund}
-									disabled={loading}
+									loading={loading}
+									// disabled={fileList.length}
 								>
 									Xác nhận hoàn tiền
 								</Button>
@@ -1014,7 +1018,8 @@ const TimeLineOrder = ({
 									type="text"
 									className="bg-primary font-semibold rounded-full"
 									onClick={handleRefund}
-									disabled={loading}
+									loading={loading}
+									// disabled={fileList === null}
 								>
 									Xác nhận hoàn tiền
 								</Button>
