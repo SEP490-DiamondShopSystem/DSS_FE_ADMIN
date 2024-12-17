@@ -217,15 +217,19 @@ const JewelryDetail = ({jewelry, onClose}) => {
 						</div>
 						<div className="">
 							<div className="bg-white p-4 rounded-lg shadow-sm">
-								<div className="flex items-center mb-2">
+								<div className="w-full flex justify-around mb-2">
 									<Camera className="mr-2 text-primary" size={20} />
 									<span className="font-semibold text-gray-700">
 										Mã Trang Sức:
 									</span>
-									<span className="ml-2">
+									<span className="pl-2">
 										{' '}
 										{fetchedJewelry?.SerialCode || 'Chưa Có'}
-									</span>{' '}
+									</span>
+									<span className="pl-2">
+										{' '}
+										{renderStatusTag(fetchedJewelry?.Status)}
+									</span>
 								</div>
 								<div className="flex items-center mb-2">
 									<Cannabis className="mr-2 text-primary" size={20} />
@@ -305,20 +309,22 @@ const JewelryDetail = ({jewelry, onClose}) => {
 											</h2>
 											<div className="flex flex-col items-center">
 												{renderStatusTag(diamond.Status)}
-												{diamond.IsLockForCustomizeRequest && diamond.Status === 3 &&(
-													<div className="flex justify-between items-center">
-														<span className="font-light text-gray">
-															Khóa cho đơn thiết kế
-														</span>
-													</div>
-												)}
-												{diamond.IsLockForJewelry && diamond.Status === 3 && (
-													<div className="flex justify-between items-center">
-														<span className="font-light text-gray">
-															Gắn cho trang sức
-														</span>
-													</div>
-												)}
+												{diamond.IsLockForCustomizeRequest &&
+													diamond.Status === 3 && (
+														<div className="flex justify-between items-center">
+															<span className="font-light text-gray">
+																Khóa cho đơn thiết kế
+															</span>
+														</div>
+													)}
+												{diamond.IsLockForJewelry &&
+													diamond.Status === 3 && (
+														<div className="flex justify-between items-center">
+															<span className="font-light text-gray">
+																Gắn cho trang sức
+															</span>
+														</div>
+													)}
 											</div>
 										</div>
 
@@ -667,13 +673,7 @@ const JewelryDetail = ({jewelry, onClose}) => {
 										<span className="font-medium text-gray-700">
 											Trạng Thái:
 										</span>
-										<span>
-											{fetchedJewelry.Status === 1
-												? 'Còn Hàng'
-												: fetchedJewelry.Status === 2
-												? 'Hết Hàng'
-												: 'Chưa Có'}
-										</span>
+										<span>{renderStatusTag(fetchedJewelry.Status)}</span>
 									</div>
 									<div className="flex justify-between items-center">
 										<span className="font-medium text-gray-700">
