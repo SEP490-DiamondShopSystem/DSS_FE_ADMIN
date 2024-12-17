@@ -34,8 +34,6 @@ export const AddModalDiamond = ({setShowModal, showModal}) => {
 			.unwrap()
 			.then((res) => {
 				setRule(res);
-				setOffsetMin(res?.MinPriceOffset);
-				setOffsetMax(res?.MaxPriceOffset);
 			});
 	}, [dispatch]);
 

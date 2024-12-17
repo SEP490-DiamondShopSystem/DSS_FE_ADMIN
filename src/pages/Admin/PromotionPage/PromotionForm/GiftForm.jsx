@@ -183,7 +183,7 @@ export const GiftForm = ({form, shapes, Option, removeGift, isEditing = false}) 
 														fieldKey={[fieldKey, 'maxAmount']}
 														rules={[
 															{
-																required: true,
+																required: false,
 																type: 'number',
 																min: 1000,
 																message:
