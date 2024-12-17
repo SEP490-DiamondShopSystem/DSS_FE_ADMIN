@@ -55,7 +55,7 @@ const DeliveryFeePage = () => {
 	};
 
 	const handleDeleteDeliveryFee = async (id) => {
-		dispatch(deleteDeliveryFee(id))
+		await dispatch(deleteDeliveryFee(id))
 			.unwrap()
 			.then(() => {
 				message.success('Xóa giá vận chuyển thành công!');
@@ -67,7 +67,7 @@ const DeliveryFeePage = () => {
 		await dispatch(fetchDeliveryFees({isLocation: true}));
 	};
 	const HandleActiveDeliveryFee = async (id, updatePayload) => {
-		dispatch(setActiveDeliveryFee(id))
+		await dispatch(setActiveDeliveryFee(id))
 			.unwrap()
 			.then(() => {
 				message.success('Trạng thái giá vận chuyển được cập nhật thành công!');
