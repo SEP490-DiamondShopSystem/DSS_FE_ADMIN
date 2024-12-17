@@ -51,6 +51,27 @@ const DefaultLayout = () => {
 	const [hasRedirected, setHasRedirected] = useState(false);
 	const [showSignOutPopup, setShowSignOutPopup] = useState(false);
 
+	const routeTranslations = {
+		'/dashboard': 'Bảng Điều Khiển',
+		'/accounts': 'Quản Lý Tài Khoản',
+		'/products': 'Sản Phẩm',
+		'/products/diamond-list': 'Danh Sách Kim Cương',
+		'/products/jewelry-list': 'Danh Sách Trang Sức',
+		'/products/jewelry-model-list': 'Danh Sách Mẫu Trang Sức',
+		'/products/metal-list': 'Danh Sách Vật Liệu',
+		'/orders': 'Quản Lý Đặt Hàng',
+		'/request-customize': 'Các Yêu Cầu Thiết Kế',
+		'/promotion': 'Khuyến Mãi',
+		'/discount': 'Giảm Giá',
+		'/delivery-fee': 'Phí Vận Chuyển',
+		'/diamond-price': 'Giá Kim Cương',
+		'/blogs': 'Quản Lí Bài Viết',
+		'/config': 'Cài Đặt Hệ Thống',
+		'/diamond-price/main-diamond-price': 'Bảng Giá Kim Cương Chính',
+		'/diamond-price/side-diamond-price': 'Bảng Giá Kim Cương Tấm',
+		'/jewelry-model-category-list': 'Danh Sách Loại Trang Sức',
+	};
+
 	// Responsive handling
 	useEffect(() => {
 		const handleResize = () => {
@@ -183,9 +204,14 @@ const DefaultLayout = () => {
 				.split('/')
 				.slice(1, index + 2)
 				.join('/')}`;
+
+			// Lấy bản dịch tiếng Việt cho route nếu có
+			const breadcrumbLabel =
+				routeTranslations[fullPath] || path.charAt(0).toUpperCase() + path.slice(1);
+
 			return (
 				<Breadcrumb.Item key={index}>
-					<Link to={fullPath}>{path.charAt(0).toUpperCase() + path.slice(1)}</Link>
+					<Link to={fullPath}>{breadcrumbLabel}</Link>
 				</Breadcrumb.Item>
 			);
 		});
@@ -193,7 +219,7 @@ const DefaultLayout = () => {
 	// Thêm mục "Home" không nhấn được
 	breadcrumbItems.unshift(
 		<Breadcrumb.Item key="home">
-			<span>Home</span> {/* Home là văn bản tĩnh, không phải liên kết */}
+			<span>Trang Chủ</span>
 		</Breadcrumb.Item>
 	);
 	// Logout logic
