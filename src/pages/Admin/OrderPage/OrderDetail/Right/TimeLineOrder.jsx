@@ -722,6 +722,10 @@ const TimeLineOrder = ({
 		return false;
 	};
 
+	const handleRemove = (file) => {
+		setFileList((prev) => prev.filter((item) => item.uid !== file.uid));
+	};
+
 	return (
 		<div>
 			{loading ? (
@@ -1267,6 +1271,7 @@ const TimeLineOrder = ({
 											multiple
 											beforeUpload={() => false} // Không tự động upload
 											onChange={handleImageChange}
+											onRemove={handleRemove}
 											accept="image/*"
 											capture="environment"
 											className="flex flex-col items-center justify-center h-full"
@@ -1514,6 +1519,7 @@ const TimeLineOrder = ({
 												multiple
 												beforeUpload={() => false} // Không tự động upload
 												onChange={handleImageChange}
+												onRemove={handleRemove}
 												accept="image/*"
 												className="flex flex-col items-center justify-center h-full"
 											>
@@ -1776,6 +1782,7 @@ const TimeLineOrder = ({
 														multiple
 														beforeUpload={() => false} // Không tự động upload
 														onChange={handleImageChange}
+														onRemove={handleRemove}
 														accept="image/*"
 														className="flex flex-col items-center justify-center h-full"
 													>
