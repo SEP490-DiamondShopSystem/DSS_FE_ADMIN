@@ -32,7 +32,7 @@ const PromotionForm = ({
 	addGift,
 	shapes,
 	removeRequirement,
-	removeGift, // Receive removeRequirement as a prop
+	removeGift,
 }) => {
 	return (
 		<div>
@@ -161,6 +161,7 @@ const PromotionForm = ({
 					shapes={shapes}
 					Option={Option}
 					removeRequirement={removeRequirement}
+					isEditing={isEditing} // Pass isEditing to PromoReqForm
 				/>
 
 				{/* Gift Section */}
@@ -172,7 +173,14 @@ const PromotionForm = ({
 				</div>
 
 				{/* Dynamic Gift List */}
-				<GiftForm form={form} shapes={shapes} Option={Option} removeGift={removeGift} />
+				<GiftForm 
+					form={form} 
+					shapes={shapes} 
+					Option={Option} 
+					removeGift={removeGift}
+					isEditing={isEditing} // Pass isEditing to GiftForm
+				/>
+
 				{/* Submit Button */}
 				<Form.Item>
 					<div className="flex justify-end space-x-4">

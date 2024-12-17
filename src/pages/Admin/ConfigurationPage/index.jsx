@@ -39,6 +39,7 @@ import {
 	updateShopBankQRRule,
 	updateJewelryModelRule,
 } from '../../../redux/slices/configSlice';
+import {formatPrice} from '../../../utils';
 
 import {selectIsLoading, selectConfigError} from '../../../redux/selectors';
 
@@ -338,6 +339,7 @@ const ConfigurationPage = () => {
 										<InputNumber
 											placeholder={accountRule?.VndPerPoint}
 											className="w-full"
+											formatter={(value) => formatPrice(value)}
 										/>
 									</Form.Item>
 								</Col>
@@ -439,6 +441,7 @@ const ConfigurationPage = () => {
 														accountRule?.[`${rank}RankBenefit`]
 															?.MaxAmountDiscountOnOrder
 													}
+													formatter={(value) => formatPrice(value)}
 													className="w-full"
 												/>
 											</Form.Item>
@@ -555,9 +558,10 @@ const ConfigurationPage = () => {
 										]}
 									>
 										<InputNumber
-											placeholder={
+											placeholder={formatPrice(
 												diamondRule?.MinimalSideDiamondAveragePrice
-											}
+											)}
+											formatter={(value) => formatPrice(value)}
 											className="w-full"
 										/>
 									</Form.Item>
@@ -572,7 +576,10 @@ const ConfigurationPage = () => {
 									>
 										<InputNumber
 											className="w-full"
-											placeholder={diamondRule?.MinimalMainDiamondPrice}
+											placeholder={formatPrice(
+												diamondRule?.MinimalMainDiamondPrice
+											)}
+											formatter={(value) => formatPrice(value)}
 										/>
 									</Form.Item>
 								</Col>
@@ -856,7 +863,9 @@ const ConfigurationPage = () => {
 							</Row>
 							<Button
 								type="primary"
-								onClick={() => showConfirm(diamondPriceForm, handleDiamondPriceSubmit)}
+								onClick={() =>
+									showConfirm(diamondPriceForm, handleDiamondPriceSubmit)
+								}
 							>
 								Lưu
 							</Button>
@@ -1107,7 +1116,7 @@ const ConfigurationPage = () => {
 											{required: true, message: 'Trường này là bắt buộc'},
 										]}
 									>
-										<InputNumber className="w-full" />
+										<InputNumber className="w-full" readOnly />
 									</Form.Item>
 								</Col>
 								<Col xs={24} sm={12} md={6}>
@@ -1118,7 +1127,7 @@ const ConfigurationPage = () => {
 											{required: true, message: 'Trường này là bắt buộc'},
 										]}
 									>
-										<InputNumber className="w-full" />
+										<InputNumber className="w-full" readOnly />
 									</Form.Item>
 								</Col>
 								<Col xs={24} sm={12} md={6}>
@@ -1129,7 +1138,11 @@ const ConfigurationPage = () => {
 											{required: true, message: 'Trường này là bắt buộc'},
 										]}
 									>
-										<InputNumber className="w-full" />
+										<InputNumber
+											className="w-full"
+											readOnly
+											formatter={(value) => formatPrice(value)}
+										/>
 									</Form.Item>
 								</Col>
 								<Col xs={24} sm={12} md={6}>
@@ -1140,7 +1153,11 @@ const ConfigurationPage = () => {
 											{required: true, message: 'Trường này là bắt buộc'},
 										]}
 									>
-										<InputNumber className="w-full" />
+										<InputNumber
+											className="w-full"
+											readOnly
+											formatter={(value) => formatPrice(value)}
+										/>
 									</Form.Item>
 								</Col>
 								<Col xs={24} sm={12} md={6}>
@@ -1151,7 +1168,7 @@ const ConfigurationPage = () => {
 											{required: true, message: 'Trường này là bắt buộc'},
 										]}
 									>
-										<InputNumber className="w-full" />
+										<InputNumber className="w-full" readOnly />
 									</Form.Item>
 								</Col>
 								<Col xs={24} sm={12} md={6}>
@@ -1162,7 +1179,7 @@ const ConfigurationPage = () => {
 											{required: true, message: 'Trường này là bắt buộc'},
 										]}
 									>
-										<InputNumber className="w-full" />
+										<InputNumber className="w-full" readOnly />
 									</Form.Item>
 								</Col>
 								<Col xs={24} sm={12} md={6}>
@@ -1173,16 +1190,16 @@ const ConfigurationPage = () => {
 											{required: true, message: 'Trường này là bắt buộc'},
 										]}
 									>
-										<InputNumber className="w-full" />
+										<InputNumber className="w-full" readOnly />
 									</Form.Item>
 								</Col>
 							</Row>
-							<Button
+							{/* <Button
 								type="primary"
 								onClick={() => showConfirm(orderForm, handleOrderSubmit)}
 							>
 								Lưu
-							</Button>
+							</Button> */}
 						</Form>
 					</Card>
 				</Tabs.TabPane>
@@ -1227,7 +1244,10 @@ const ConfigurationPage = () => {
 											{required: true, message: 'Trường này là bắt buộc'},
 										]}
 									>
-										<InputNumber className="w-full" />
+										<InputNumber
+											className="w-full"
+											formatter={(value) => formatPrice(value)}
+										/>
 									</Form.Item>
 								</Col>
 								<Col xs={24} sm={12} md={6}>
@@ -1238,7 +1258,10 @@ const ConfigurationPage = () => {
 											{required: true, message: 'Trường này là bắt buộc'},
 										]}
 									>
-										<InputNumber className="w-full" />
+										<InputNumber
+											className="w-full"
+											formatter={(value) => formatPrice(value)}
+										/>
 									</Form.Item>
 								</Col>
 								<Col xs={24} sm={12} md={6}>
@@ -1249,7 +1272,10 @@ const ConfigurationPage = () => {
 											{required: true, message: 'Trường này là bắt buộc'},
 										]}
 									>
-										<InputNumber className="w-full" />
+										<InputNumber
+											className="w-full"
+											formatter={(value) => formatPrice(value)}
+										/>
 									</Form.Item>
 								</Col>
 								<Col xs={24} sm={12} md={6}>
@@ -1291,7 +1317,7 @@ const ConfigurationPage = () => {
 						</Form>
 					</Card>
 				</Tabs.TabPane>
-				<Tabs.TabPane tab="Quy Tắc Khuyến Mãi" key="promotion">
+				{/* <Tabs.TabPane tab="Quy Tắc Khuyến Mãi" key="promotion">
 					<Card className="shadow-lg">
 						<Form
 							form={promotionForm}
@@ -1344,7 +1370,7 @@ const ConfigurationPage = () => {
 							</Button>
 						</Form>
 					</Card>
-				</Tabs.TabPane>
+				</Tabs.TabPane> */}
 			</Tabs>
 			<Modal
 				title="Xác nhận"

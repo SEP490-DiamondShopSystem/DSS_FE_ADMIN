@@ -2,7 +2,7 @@ import {MinusCircleOutlined} from '@ant-design/icons';
 import {Button, Col, Form, Input, InputNumber, Row, Select, Space, Modal} from 'antd';
 import React, {useState} from 'react';
 import JewelryModelList from '../../PromotionPage/JewelryModelList';
-export const DiscountReqForm = ({form, shapes, Option, removeRequirement}) => {
+export const DiscountReqForm = ({form, shapes, Option, removeRequirement, isEditing = false}) => {
 	const [isPopupVisible, setIsPopupVisible] = useState(false);
 	const [selectedModel, setSelectedModel] = useState(null);
 	const [selectedModelName, setSelectedModelName] = useState(null);
@@ -40,6 +40,7 @@ export const DiscountReqForm = ({form, shapes, Option, removeRequirement}) => {
 					<>
 						{fields.map(({key, name, fieldKey, ...restField}) => {
 							const requirement = form.getFieldValue(['requirements', name]);
+							const hasExistingId = requirement?.id && isEditing;
 
 							return (
 								<Space key={key} className="flex mb-4 space-x-4" align="baseline">
@@ -60,7 +61,11 @@ export const DiscountReqForm = ({form, shapes, Option, removeRequirement}) => {
 													labelCol={{span: 24}}
 													wrapperCol={{span: 24}}
 												>
-													<Input className="w-full" placeholder="Tên" />
+													<Input
+														className="w-full"
+														placeholder="Tên"
+														disabled={hasExistingId}
+													/>
 												</Form.Item>
 												<Form.Item
 													label="Operator"
@@ -88,6 +93,7 @@ export const DiscountReqForm = ({form, shapes, Option, removeRequirement}) => {
 												>
 													<Select
 														className="w-full"
+														disabled={hasExistingId}
 														onChange={(value) =>
 															handleTargetTypeChange(
 																value,
@@ -137,7 +143,10 @@ export const DiscountReqForm = ({form, shapes, Option, removeRequirement}) => {
 																labelCol={{span: 24}}
 																wrapperCol={{span: 24}}
 															>
-																<Select className="w-full">
+																<Select
+																	className="w-full"
+																	disabled={hasExistingId}
+																>
 																	{Option ? (
 																		<>
 																			<Option value={1}>
@@ -175,7 +184,10 @@ export const DiscountReqForm = ({form, shapes, Option, removeRequirement}) => {
 																	},
 																]}
 															>
-																<Select mode="multiple">
+																<Select
+																	mode="multiple"
+																	disabled={hasExistingId}
+																>
 																	{shapes?.map((shape) => (
 																		<Option
 																			key={shape.Id}
@@ -213,6 +225,7 @@ export const DiscountReqForm = ({form, shapes, Option, removeRequirement}) => {
 																	<InputNumber
 																		className="w-full"
 																		min={0}
+																		disabled={hasExistingId}
 																	/>
 																</Form.Item>
 																<Form.Item
@@ -239,6 +252,7 @@ export const DiscountReqForm = ({form, shapes, Option, removeRequirement}) => {
 																	<InputNumber
 																		className="w-full"
 																		min={0}
+																		disabled={hasExistingId}
 																	/>
 																</Form.Item>
 															</div>
@@ -264,7 +278,10 @@ export const DiscountReqForm = ({form, shapes, Option, removeRequirement}) => {
 																		},
 																	]}
 																>
-																	<Select className="w-full">
+																	<Select
+																		className="w-full"
+																		disabled={hasExistingId}
+																	>
 																		{Option ? (
 																			<>
 																				<Option value={1}>
@@ -316,7 +333,10 @@ export const DiscountReqForm = ({form, shapes, Option, removeRequirement}) => {
 																		},
 																	]}
 																>
-																	<Select className="w-full">
+																	<Select
+																		className="w-full"
+																		disabled={hasExistingId}
+																	>
 																		{Option ? (
 																			<>
 																				<Option value={1}>
@@ -363,7 +383,9 @@ export const DiscountReqForm = ({form, shapes, Option, removeRequirement}) => {
 																		'colorFrom',
 																	]}
 																>
-																	<Select>
+																	<Select
+																		disabled={hasExistingId}
+																	>
 																		{Option ? (
 																			<>
 																				<Option value={1}>
@@ -408,7 +430,9 @@ export const DiscountReqForm = ({form, shapes, Option, removeRequirement}) => {
 																		'colorTo',
 																	]}
 																>
-																	<Select>
+																	<Select
+																		disabled={hasExistingId}
+																	>
 																		{Option ? (
 																			<>
 																				<Option value={1}>
@@ -462,7 +486,10 @@ export const DiscountReqForm = ({form, shapes, Option, removeRequirement}) => {
 																		},
 																	]}
 																>
-																	<Select className="w-full">
+																	<Select
+																		className="w-full"
+																		disabled={hasExistingId}
+																	>
 																		{Option ? (
 																			<>
 																				<Option value={1}>
@@ -499,7 +526,10 @@ export const DiscountReqForm = ({form, shapes, Option, removeRequirement}) => {
 																		},
 																	]}
 																>
-																	<Select className="w-full">
+																	<Select
+																		className="w-full"
+																		disabled={hasExistingId}
+																	>
 																		{Option ? (
 																			<>
 																				<Option value={1}>
@@ -540,6 +570,7 @@ export const DiscountReqForm = ({form, shapes, Option, removeRequirement}) => {
 														>
 															<Input
 																readOnly
+																disabled={hasExistingId}
 																value={form.getFieldValue([
 																	'requirements',
 																	name,
@@ -556,10 +587,14 @@ export const DiscountReqForm = ({form, shapes, Option, removeRequirement}) => {
 																'jewelryModelName',
 															]}
 														>
-															<Input readOnly />
+															<Input
+																readOnly
+																disabled={hasExistingId}
+															/>
 														</Form.Item>
 														<Button
 															onClick={() => setIsPopupVisible(true)}
+															disabled={hasExistingId}
 														>
 															Chọn Mẫu Trang Sức
 														</Button>
