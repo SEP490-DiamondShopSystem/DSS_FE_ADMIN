@@ -321,7 +321,7 @@ const WarrantyPage = () => {
 		<div className="mx-20 my-10">
 			<Filter filter={filter} handleStatusBtn={handleStatusBtn} active={active} />
 			<div className="flex items-center ">
-				<p>Tìm theo SKU:</p>
+				<p>Tìm theo sê-ri:</p>
 				<Search
 					className="w-60 my-10 ml-5"
 					placeholder="Tìm kiếm"

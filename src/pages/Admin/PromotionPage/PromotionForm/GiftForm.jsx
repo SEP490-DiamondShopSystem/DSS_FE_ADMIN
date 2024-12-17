@@ -40,7 +40,7 @@ export const GiftForm = ({form, shapes, Option, removeGift}) => {
 													rules={[
 														{
 															required: true,
-															message: 'Name is required',
+															message: 'Vui lòng nhập tên',
 														},
 													]}
 													labelCol={{span: 24}}
@@ -58,7 +58,7 @@ export const GiftForm = ({form, shapes, Option, removeGift}) => {
 														rules={[
 															{
 																required: targetType !== 3,
-																message: 'Amount is required',
+																message: 'Vui lòng nhập số lượng',
 															},
 														]}
 														initialValue={1} // Always set to 1
@@ -67,7 +67,7 @@ export const GiftForm = ({form, shapes, Option, removeGift}) => {
 													>
 														<InputNumber
 															className="w-full"
-															placeholder="Enter amount"
+															placeholder="Số lượng"
 															disabled
 															/>
 													</Form.Item>
@@ -325,7 +325,7 @@ export const GiftForm = ({form, shapes, Option, removeGift}) => {
 													<div className="flex gap-5">
 														<div className="p-4 border rounded-md bg-gray-50">
 															<Form.Item
-																label="Carat From"
+																label="Carat thấp nhất"
 																{...restField}
 																name={[
 																	name,
@@ -351,7 +351,7 @@ export const GiftForm = ({form, shapes, Option, removeGift}) => {
 																/>
 															</Form.Item>
 															<Form.Item
-																label="Carat To"
+																label="Carat cao nhất"
 																{...restField}
 																name={[
 																	name,
@@ -379,7 +379,7 @@ export const GiftForm = ({form, shapes, Option, removeGift}) => {
 														</div>
 														<div className="p-4 border rounded-md bg-gray-50">
 															<Form.Item
-																label="Clarity From"
+																label="Độ tinh khiết từ"
 																{...restField}
 																name={[
 																	name,
@@ -431,7 +431,7 @@ export const GiftForm = ({form, shapes, Option, removeGift}) => {
 																</Select>
 															</Form.Item>
 															<Form.Item
-																label="Clarity To"
+																label="Đến"
 																{...restField}
 																name={[
 																	name,
@@ -485,7 +485,7 @@ export const GiftForm = ({form, shapes, Option, removeGift}) => {
 														</div>
 														<div className="p-4 border rounded-md bg-gray-50">
 															<Form.Item
-																label="Color From"
+																label="Màu từ"
 																{...restField}
 																name={[
 																	name,
@@ -530,7 +530,7 @@ export const GiftForm = ({form, shapes, Option, removeGift}) => {
 																</Select>
 															</Form.Item>
 															<Form.Item
-																label="Color To"
+																label="đến"
 																{...restField}
 																name={[
 																	name,
@@ -577,7 +577,7 @@ export const GiftForm = ({form, shapes, Option, removeGift}) => {
 														</div>
 														<div className="p-4 border rounded-md bg-gray-50">
 															<Form.Item
-																label="Cut From"
+																label="Giác cắt từ"
 																{...restField}
 																name={[
 																	name,
@@ -614,7 +614,7 @@ export const GiftForm = ({form, shapes, Option, removeGift}) => {
 																</Select>
 															</Form.Item>
 															<Form.Item
-																label="Cut To"
+																label="đến"
 																{...restField}
 																name={[
 																	name,

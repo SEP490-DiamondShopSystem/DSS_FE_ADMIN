@@ -317,7 +317,7 @@ const InformationOrder = ({
 
 	const sub2Columns = [
 		{
-			title: 'SKU',
+			title: 'Mã sê-ri',
 			dataIndex: 'SerialCode',
 			key: 'carat',
 		},

@@ -146,7 +146,7 @@ const DiamondDetail = ({diamond, handleView, id, handleLockDiamondView, handleOp
 				<div className="md:ml-8 flex-1 mt-6 md:mt-0">
 					<h1 className="text-4xl font-bold text-gray-800 mb-4">{Title}</h1>
 					<p className="text-gray-500 text-base mb-6 font-semibold ">
-						Mã SKU: {SerialCode}
+						Mã Sê-ri: {SerialCode}
 					</p>
 					<p className="text-gray-500 text-base mb-6 font-semibold">
 						Trạng Thái:

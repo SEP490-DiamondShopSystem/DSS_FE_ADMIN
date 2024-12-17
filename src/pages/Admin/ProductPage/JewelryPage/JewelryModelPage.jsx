@@ -1,11 +1,12 @@
 import React, {useEffect, useState} from 'react';
+import {Search, Filter, X} from 'lucide-react';
 import {useDispatch, useSelector} from 'react-redux';
 import {
 	fetchAllJewelryModels,
 	createJewelryModel,
 	deleteJewelryModel,
 } from '../../../../redux/slices/jewelry/jewelryModelSlice';
-import {message, Collapse, Input, Select} from 'antd';
+import {message, Collapse, Input, Select, InputNumber} from 'antd';
 import {fetchAllMetals} from '../../../../redux/slices/jewelry/metalSlice';
 import {fetchAllSizes} from '../../../../redux/slices/jewelry/sizeSlice';
 import {fetchAllShapes} from '../../../../redux/slices/shapeSlice';
@@ -39,13 +40,17 @@ const JewelryModelPage = () => {
 	const [isEditModalVisible, setIsEditModalVisible] = useState(false);
 	// State for search parameters
 	const [searchName, setSearchName] = useState('');
+	const [searchCode, setSearchCode] = useState('');
 	const [searchCategory, setSearchCategory] = useState('');
 	const [searchIsEngravable, setSearchIsEngravable] = useState('');
+	const [searchMainDiamondQuantity, setSearchMainDiamondQuantity] = useState('');
 
 	// Actual state used for fetching
 	const [name, setName] = useState('');
+	const [code, setCode] = useState('');
 	const [category, setCategory] = useState('');
 	const [isEngravable, setIsEngravable] = useState('');
+	const [mainDiamondQuantity, setMainDiamondQuantity] = useState('');
 	const [currentPage, setCurrentPage] = React.useState(1);
 	const [pageSize, setPageSize] = React.useState(5);
 	const [totalPage, setTotalPage] = useState(0);
@@ -75,6 +80,18 @@ const JewelryModelPage = () => {
 		sizeId: '',
 		sideDiamond: false,
 	});
+	const vietnameseFieldNames = {
+		name: 'Tên Mẫu',
+		code: 'Mã Mẫu',
+		categoryId: 'Loại Trang Sức',
+		craftManFee: 'Phí Thợ (VND)',
+		isEngravable: 'Khắc Chữ',
+		width: 'Chiều Rộng (mm)',
+		length: 'Chiều Dài',
+		backType: 'Loại Gài',
+		claspType: 'Loại Khóa',
+		chainType: 'Loại Dây Chuyền',
+	};
 	const [modelSpec, setModelSpec] = useState({
 		name: '',
 		code: '',
@@ -140,8 +157,10 @@ const JewelryModelPage = () => {
 				Currentpage: 1,
 				PageSize: pageSize,
 				Name: searchName,
+				Code: searchCode,
 				Category: searchCategory,
 				IsEngravable: searchIsEngravable,
+				MainDiamondQuantity: searchMainDiamondQuantity,
 			})
 		)
 			.then((response) => {
@@ -170,8 +189,10 @@ const JewelryModelPage = () => {
 				Currentpage: currentPage,
 				PageSize: pageSize,
 				Name: name,
+				Code: code,
 				Category: category,
 				IsEngravable: isEngravable,
+				MainDiamondQuantity: mainDiamondQuantity,
 			})
 		)
 			.then((response) => {
@@ -183,7 +204,7 @@ const JewelryModelPage = () => {
 			.catch((error) => {
 				message.error(error?.data?.detail || error?.detail);
 			});
-	}, [dispatch, name, category, isEngravable, currentPage, pageSize]);
+	}, [dispatch, name, code, category, isEngravable, currentPage, pageSize]);
 	const metals = useSelector(getAllMetalsSelector); // Selector for getting metals from the store
 	useEffect(() => {
 		dispatch(fetchAllMetals());
@@ -441,8 +462,10 @@ const JewelryModelPage = () => {
 				Currentpage: currentPage,
 				PageSize: pageSize,
 				Name: name,
+				Code: code,
 				Category: category,
 				IsEngravable: isEngravable,
+				MainDiamondQuantity: mainDiamondQuantity,
 			})
 		);
 	};
@@ -459,8 +482,10 @@ const JewelryModelPage = () => {
 							Currentpage: currentPage,
 							PageSize: pageSize,
 							Name: name,
+							Code: code,
 							Category: category,
 							IsEngravable: isEngravable,
+							MainDiamondQuantity: mainDiamondQuantity,
 						})
 					);
 				})
@@ -491,36 +516,52 @@ const JewelryModelPage = () => {
 			) : (
 				<div>
 					<div className=" p-4 mb-6 bg-offWhite">
-						<div className="mb-4 flex flex-wrap gap-4">
-							<Input
+						<div className="mb-4 grid grid-cols-4 sm:grid-cols-2 md:grid-cols-3 gap-4">
+							<input
 								type="text"
 								value={searchName}
 								onChange={(e) => setSearchName(e.target.value)}
-								placeholder="Nhập mã mẫu"
+								placeholder="Tên mẫu"
+								className="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
 							/>
-							<Select
+							<input
+								type="text"
+								value={searchCode}
+								onChange={(e) => setSearchCode(e.target.value)}
+								placeholder="Mã mẫu"
+								className="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+							/>
+							<select
 								value={searchCategory}
 								onChange={(e) => setSearchCategory(e.target.value)}
-								placeholder="Nhập theo loại mẫu"
+								className="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
 							>
-								<option value="">Loại Trang Sức</option>
+								<option value="">Loại trang sức</option>
 								{categories.map((category) => (
-									<option key={category.id} value={category.Name}>
+									<option key={category.id} value={category.Id}>
 										{category.Name}
 									</option>
 								))}
-							</Select>
-							<Select
+							</select>
+							<select
 								value={searchIsEngravable}
 								onChange={(e) => setSearchIsEngravable(e.target.value)}
+								className="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
 							>
-								<option value="">Có thể khác chữ?</option>
+								<option value="">Khắc chữ?</option>
 								<option value="true">Có</option>
 								<option value="false">Không</option>
-							</Select>
+							</select>
+							<input
+								type="text"
+								value={searchMainDiamondQuantity}
+								onChange={(e) => setSearchMainDiamondQuantity(e.target.value)}
+								placeholder="Số lượng kim cương chính"
+								className="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+							/>
 							<button
 								onClick={handleSearch}
-								className="bg-primary text-white px-4 py-2 rounded-md hover:bg-primary-dark transition-colors"
+								className="bg-primary text-white px-4 py-2 rounded-lg hover:bg-primary-dark transition-all shadow-md"
 							>
 								Tìm kiếm
 							</button>
@@ -770,16 +811,20 @@ const JewelryModelPage = () => {
 																htmlFor={field}
 																className="m-3 text-gray"
 															>
-																{field.replace(/([A-Z])/g, ' $1')}
+																{vietnameseFieldNames[field] ||
+																	field.replace(
+																		/([A-Z])/g,
+																		' $1'
+																	)}
 															</label>
 														</div>
 													) : (
 														// Render a text input for other fields
 														<input
-															placeholder={field.replace(
-																/([A-Z])/g,
-																' $1'
-															)}
+															placeholder={
+																vietnameseFieldNames[field] ||
+																field.replace(/([A-Z])/g, ' $1')
+															}
 															type="text"
 															name={field}
 															value={modelSpec[field]}

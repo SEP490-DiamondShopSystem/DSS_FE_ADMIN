@@ -794,6 +794,7 @@ const InformationOrder = ({orders, statusOrder, paymentStatusOrder, userDetail})
 									key={transaction?.Id}
 									className="bg-white rounded-lg shadow-md p-4 my-4"
 								>
+									<Divider />
 									<Row>
 										<Col span={24}>
 											<h5 className="text-lg font-semibold text-gray-600">
@@ -879,7 +880,7 @@ const InformationOrder = ({orders, statusOrder, paymentStatusOrder, userDetail})
 											</Tag>
 										</Col>
 									</Row>
-									<Divider className="my-4" />
+
 									<Row>
 										<Col span={24}>
 											<h5 className="text-lg font-semibold text-gray-600">
