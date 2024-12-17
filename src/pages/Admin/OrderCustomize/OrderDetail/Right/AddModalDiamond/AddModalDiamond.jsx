@@ -110,6 +110,7 @@ export const AddModalDiamond = ({
 
 	const handleCancel = () => {
 		setShowModal(false);
+		setEstimatePrice(null);
 		form.resetFields();
 	};
 
@@ -184,6 +185,7 @@ export const AddModalDiamond = ({
 					message.success('Thêm Cương Kim Thành Công!');
 					setShowModal(false);
 					setSelectedRequest(null);
+					setEstimatePrice(null);
 					form.resetFields();
 				})
 				.catch((error) => {

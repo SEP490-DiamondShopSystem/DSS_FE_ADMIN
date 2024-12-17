@@ -489,7 +489,7 @@ const TimeLineOrder = ({
 						onChange={handleSelectFault}
 					>
 						<Option value="false">Khách hàng yêu cầu/Vấn đề của khách hàng</Option>
-						<Option value="true">Vấn đề của cửa hàng</Option>
+						<Option value="true">Vấn đề của đơn hàng</Option>
 					</Select>
 				</div>
 			),

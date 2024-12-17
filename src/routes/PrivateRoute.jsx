@@ -36,14 +36,12 @@ const PrivateRoute = ({children, roles}) => {
 		!userDetail.Roles ||
 		userDetail.Roles.length === 0
 	) {
-		console.log('Private route redirect: User not logged in');
 		message.error('Vui Lòng Đăng Nhập!');
 		return <Navigate to="/login" />;
 	}
 
 	// Kiểm tra xem userDetail có tồn tại không
 	if (!userDetail || !userDetail.Roles || userDetail.Roles.length === 0) {
-		console.log('Private route redirect: User roles not available');
 		message.error('Vai trò người dùng không có sẵn!');
 		return <Navigate to="/login" />;
 	}
@@ -53,7 +51,6 @@ const PrivateRoute = ({children, roles}) => {
 
 	console.log(hasAccess);
 	if (!hasAccess) {
-		console.log('Private route redirect: Access denied');
 		message.error('Bạn không có quyền truy cập vào trang này!');
 		return <Navigate to="/login" />;
 	}

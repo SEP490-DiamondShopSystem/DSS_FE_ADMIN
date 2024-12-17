@@ -20,7 +20,7 @@ export const AddModalDiamond = ({setShowModal, showModal}) => {
 	const shapes = useSelector(getAllShapeSelector);
 
 	const [isLabDiamond, setIsLabDiamond] = useState(false);
-	const [estimatePrice, setEstimatePrice] = useState();
+	const [estimatePrice, setEstimatePrice] = useState(null);
 	const [diamondParams, setDiamondParams] = useState(null);
 	const [diamond, setDiamond] = useState(null);
 	const [rule, setRule] = useState();
@@ -98,6 +98,7 @@ export const AddModalDiamond = ({setShowModal, showModal}) => {
 
 	const handleCancel = () => {
 		setShowModal(false);
+		setEstimatePrice(null);
 		// form.resetFields();
 	};
 
@@ -176,6 +177,7 @@ export const AddModalDiamond = ({setShowModal, showModal}) => {
 			.then((res) => {
 				message.success('Thêm Cương Kim Thành Công!');
 				setShowModal(false);
+				setEstimatePrice(null);
 				form.resetFields();
 			})
 			.catch((error) => {
