@@ -3,7 +3,7 @@ import {Button, Col, Form, Input, InputNumber, Row, Select, Space, Modal} from '
 import React, {useState} from 'react';
 import JewelryModelList from '../JewelryModelList';
 
-export const GiftForm = ({form, shapes, Option, removeGift}) => {
+export const GiftForm = ({form, shapes, Option, removeGift, isEditing = false}) => {
 	const [isPopupVisible, setIsPopupVisible] = useState(false);
 	const [selectedModel, setSelectedModel] = useState(null);
 
@@ -12,7 +12,9 @@ export const GiftForm = ({form, shapes, Option, removeGift}) => {
 		form.setFieldsValue({
 			gifts: form
 				.getFieldValue('gifts')
-				.map((gift, index) => (index === fieldKey ? {...gift, itemCode: model?.ModelCode} : gift)),
+				.map((gift, index) =>
+					index === fieldKey ? {...gift, itemCode: model?.ModelCode} : gift
+				),
 		});
 		setIsPopupVisible(false);
 	};
@@ -26,6 +28,7 @@ export const GiftForm = ({form, shapes, Option, removeGift}) => {
 							const gift = form.getFieldValue(['gifts', name]);
 							const unitType = form.getFieldValue(['gifts', name, 'unitType']);
 							const targetType = form.getFieldValue(['gifts', name, 'targetType']);
+							const hasExistingId = gift?.id && isEditing;
 
 							return (
 								<Space key={key} className="flex mb-4 space-x-4" align="baseline">
@@ -46,7 +49,11 @@ export const GiftForm = ({form, shapes, Option, removeGift}) => {
 													labelCol={{span: 24}}
 													wrapperCol={{span: 24}}
 												>
-													<Input className="w-full" placeholder="Tên" />
+													<Input
+														className="w-full"
+														placeholder="Tên"
+														disabled={hasExistingId}
+													/>
 												</Form.Item>
 												{targetType !== 3 && (
 													<Form.Item
@@ -68,8 +75,8 @@ export const GiftForm = ({form, shapes, Option, removeGift}) => {
 														<InputNumber
 															className="w-full"
 															placeholder="Số lượng"
-															disabled
-															/>
+															disabled={hasExistingId}
+														/>
 													</Form.Item>
 												)}
 												<Form.Item
@@ -83,6 +90,7 @@ export const GiftForm = ({form, shapes, Option, removeGift}) => {
 												>
 													<Select
 														className="w-full"
+														disabled={hasExistingId}
 														onChange={(value) => {
 															form.setFieldsValue({
 																[`gifts[${name}].amount`]:
@@ -111,6 +119,7 @@ export const GiftForm = ({form, shapes, Option, removeGift}) => {
 												>
 													<Select
 														className="w-full"
+														disabled={hasExistingId}
 														onChange={(value) => {
 															form.setFieldsValue({
 																[`gifts[${name}].unitValueAddon`]:
@@ -123,7 +132,7 @@ export const GiftForm = ({form, shapes, Option, removeGift}) => {
 														}}
 													>
 														<Option value={1}>Phần Trăm</Option>
-														<Option value={2}>Giá Trị</Option>
+														{/* <Option value={2}>Giá Trị</Option> */}
 													</Select>
 												</Form.Item>
 												<Form.Item
@@ -140,7 +149,7 @@ export const GiftForm = ({form, shapes, Option, removeGift}) => {
 															max: unitType === 1 ? 100 : undefined,
 															message:
 																unitType === 1
-																	? 'Percentage must be between 1 and 100'
+																	? 'Phần trăm phải nằm trong khoảng từ 1 đến 100'
 																	: 'Value must be at least 1000',
 														},
 														{
@@ -148,7 +157,7 @@ export const GiftForm = ({form, shapes, Option, removeGift}) => {
 																unitType === 2 && value % 1000 !== 0
 																	? Promise.reject(
 																			new Error(
-																				'Value should be in multiples of 1000'
+																				'Giá trị phải là bội số của 1000'
 																			)
 																	  )
 																	: Promise.resolve(),
@@ -159,6 +168,7 @@ export const GiftForm = ({form, shapes, Option, removeGift}) => {
 												>
 													<InputNumber
 														className="w-full"
+														disabled={hasExistingId}
 														addonAfter={form.getFieldValue([
 															`gifts[${name}].unitValueAddon`,
 														])}
@@ -176,7 +186,8 @@ export const GiftForm = ({form, shapes, Option, removeGift}) => {
 																required: true,
 																type: 'number',
 																min: 1000,
-																message:'Giá trị tối thiểu 1000 VND',
+																message:
+																	'Giá trị tối thiểu 1000 VND',
 															},
 															{
 																validator: (_, value) =>
@@ -193,6 +204,7 @@ export const GiftForm = ({form, shapes, Option, removeGift}) => {
 														wrapperCol={{span: 24}}
 													>
 														<InputNumber
+															disabled={hasExistingId}
 															className="w-full"
 															addonAfter="VND"
 														/>
@@ -216,6 +228,7 @@ export const GiftForm = ({form, shapes, Option, removeGift}) => {
 															]}
 														>
 															<Input
+																disabled={hasExistingId}
 																readOnly
 																value={form.getFieldValue([
 																	'gifts',
@@ -226,6 +239,7 @@ export const GiftForm = ({form, shapes, Option, removeGift}) => {
 														</Form.Item>
 														<Button
 															onClick={() => setIsPopupVisible(true)}
+															disabled={hasExistingId}
 														>
 															Chọn Mẫu Trang Sức
 														</Button>
@@ -272,7 +286,10 @@ export const GiftForm = ({form, shapes, Option, removeGift}) => {
 															labelCol={{span: 24}}
 															wrapperCol={{span: 24}}
 														>
-															<Select className="w-full">
+															<Select
+																className="w-full"
+																disabled={hasExistingId}
+															>
 																{Option ? (
 																	<>
 																		<Option value={1}>
@@ -310,7 +327,10 @@ export const GiftForm = ({form, shapes, Option, removeGift}) => {
 																},
 															]}
 														>
-															<Select mode="multiple">
+															<Select
+																mode="multiple"
+																disabled={hasExistingId}
+															>
 																{shapes?.map((shape) => (
 																	<Option
 																		key={shape.Id}
@@ -348,6 +368,7 @@ export const GiftForm = ({form, shapes, Option, removeGift}) => {
 																<InputNumber
 																	className="w-full"
 																	min={0}
+																	disabled={hasExistingId}
 																/>
 															</Form.Item>
 															<Form.Item
@@ -374,6 +395,7 @@ export const GiftForm = ({form, shapes, Option, removeGift}) => {
 																<InputNumber
 																	className="w-full"
 																	min={0}
+																	disabled={hasExistingId}
 																/>
 															</Form.Item>
 														</div>
@@ -399,7 +421,10 @@ export const GiftForm = ({form, shapes, Option, removeGift}) => {
 																	},
 																]}
 															>
-																<Select className="w-full">
+																<Select
+																	className="w-full"
+																	disabled={hasExistingId}
+																>
 																	{Option ? (
 																		<>
 																			<Option value={1}>
@@ -451,7 +476,10 @@ export const GiftForm = ({form, shapes, Option, removeGift}) => {
 																	},
 																]}
 															>
-																<Select className="w-full">
+																<Select
+																	className="w-full"
+																	disabled={hasExistingId}
+																>
 																	{Option ? (
 																		<>
 																			<Option value={1}>
@@ -498,7 +526,7 @@ export const GiftForm = ({form, shapes, Option, removeGift}) => {
 																	'colorFrom',
 																]}
 															>
-																<Select>
+																<Select disabled={hasExistingId}>
 																	{Option ? (
 																		<>
 																			<Option value={1}>
@@ -543,7 +571,7 @@ export const GiftForm = ({form, shapes, Option, removeGift}) => {
 																	'colorTo',
 																]}
 															>
-																<Select>
+																<Select disabled={hasExistingId}>
 																	{Option ? (
 																		<>
 																			<Option value={1}>
@@ -597,7 +625,10 @@ export const GiftForm = ({form, shapes, Option, removeGift}) => {
 																	},
 																]}
 															>
-																<Select className="w-full">
+																<Select
+																	className="w-full"
+																	disabled={hasExistingId}
+																>
 																	{Option ? (
 																		<>
 																			<Option value={1}>
@@ -634,7 +665,10 @@ export const GiftForm = ({form, shapes, Option, removeGift}) => {
 																	},
 																]}
 															>
-																<Select className="w-full">
+																<Select
+																	className="w-full"
+																	disabled={hasExistingId}
+																>
 																	{Option ? (
 																		<>
 																			<Option value={1}>
@@ -668,16 +702,6 @@ export const GiftForm = ({form, shapes, Option, removeGift}) => {
 								</Space>
 							);
 						})}
-						{/* <Form.Item>
-								<Button
-									type="dashed"
-									onClick={() => add()}
-									block
-									icon={<PlusOutlined />}
-								>
-									Add Gift
-								</Button>
-							</Form.Item> */}
 					</>
 				)}
 			</Form.List>

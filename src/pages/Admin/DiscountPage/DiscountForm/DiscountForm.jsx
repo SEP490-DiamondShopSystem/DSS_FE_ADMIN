@@ -99,6 +99,8 @@ const DiscountForm = ({
 					shapes={shapes}
 					Option={Option}
 					removeRequirement={removeRequirement} // Passing the function as a prop
+					isEditing={isEditing} // Pass isEditing to PromoReqForm
+
 				/>
 
 				{/* Submit Button */}

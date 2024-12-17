@@ -4,8 +4,6 @@ const API_URL = import.meta.env.VITE_API_URL;
 const API_DEV = import.meta.env.VITE_API_DEV;
 const API_DEVTUNNEL = import.meta.env.VITE_DEVTUNNEL_API;
 
-console.log(API_DEV);
-
 // Khởi tạo axios instance
 export const api = axios.create({
 	baseURL: API_DEV,
@@ -43,10 +41,8 @@ api.interceptors.response.use(
 			res.status = error.response.status;
 		} else if (error.request) {
 			// Yêu cầu đã được gửi nhưng không có phản hồi nào
-			console.log(error.request);
 		} else {
 			// Một điều gì đó đã xảy ra khi thiết lập yêu cầu
-			console.log('Error', error.message);
 		}
 		return Promise.reject(res);
 	}
