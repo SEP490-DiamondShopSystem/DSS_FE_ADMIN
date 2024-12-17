@@ -538,7 +538,7 @@ const JewelryModelPage = () => {
 							>
 								<option value="">Loại trang sức</option>
 								{categories.map((category) => (
-									<option key={category.id} value={category.Id}>
+									<option key={category.id} value={category.Name}>
 										{category.Name}
 									</option>
 								))}
@@ -569,107 +569,110 @@ const JewelryModelPage = () => {
 						{loading ? (
 							<p>Đang tải...</p>
 						) : (
-							<ul>
-								{models.map((model) => (
-									<li
-										key={model.Id}
-										className="py-3 flex px-4 bg-white rounded-lg shadow-md mb-4 border border-lightGray cursor-pointer"
-										onClick={() => handleModelClick(model)}
-									>
-										<div className="mt-2">
-											{model.Thumbnail?.MediaPath ? (
-												<img
-													src={model.Thumbnail.MediaPath} // Fixed the property name here
-													alt={model.Thumbnail.MediaName} // Fixed the property name here
-													className="w-32 h-32 object-cover rounded-md" // You can adjust these values to fit your layout
-												/>
-											) : (
-												<div className="w-32 h-32 bg-gray-300 flex items-center justify-center rounded-md">
-													<span className="text-gray-600">
-														Chưa có hình ảnh
-													</span>{' '}
-													{/* Fallback when no thumbnail */}
-												</div>
-											)}
-										</div>
-
-										<div className="ml-4">
-											<strong className="text-xl text-black">
-												{model.Name}
-											</strong>{' '}
-											<div className="text-xl text-black">
-												Mã Mẫu: {model.ModelCode}
-											</div>
-											{model.MainDiamondCount > 0 && (
-												<div className="text-sm text-gray-500">
-													Số lượng kim cương chính:{' '}
-													{model.MainDiamondCount} viên
-												</div>
-											)}
-											<div className="text-sm text-gray-500">
-												Số lượng lựa chọn kim cương tấm:{' '}
-												{model.SideDiamondOptionCount}
-											</div>
-											{/* Displaying more model details conditionally */}
-											{model.IsEngravable && (
-												<div className="text-sm text-gray-500">
-													Có khắc chữ
-												</div>
-											)}
-											{model.MetalSupported &&
-												model.MetalSupported.length > 0 && (
-													<div className="text-sm text-gray-500">
-														Kim loại: {model.MetalSupported.join(', ')}
+							<div>
+								<ul>
+									{models.map((model) => (
+										<li
+											key={model.Id}
+											className="py-3 flex px-4 bg-white rounded-lg shadow-md mb-4 border border-lightGray cursor-pointer"
+											onClick={() => handleModelClick(model)}
+										>
+											<div className="mt-2">
+												{model.Thumbnail?.MediaPath ? (
+													<img
+														src={model.Thumbnail.MediaPath} // Fixed the property name here
+														alt={model.Thumbnail.MediaName} // Fixed the property name here
+														className="w-32 h-32 object-cover rounded-md" // You can adjust these values to fit your layout
+													/>
+												) : (
+													<div className="w-32 h-32 bg-gray-300 flex items-center justify-center rounded-md">
+														<span className="text-gray-600">
+															Chưa có hình ảnh
+														</span>{' '}
+														{/* Fallback when no thumbnail */}
 													</div>
 												)}
-											{model.CraftmanFee > 0 && (
-												<div className="text-sm text-gray-500">
-													Giá gia công: ${model.CraftmanFee}
-												</div>
-											)}
-											{/* Optionally, display a preview or more images */}
-											<div className="mt-2">
-												{model.ThumbnailPath && (
-													<img
-														src={model.ThumbnailPath}
-														alt={model.Name}
-														className="w-32 h-32 object-cover"
-													/>
-												)}
 											</div>
-										</div>
-									</li>
-								))}
-							</ul>
+
+											<div className="ml-4">
+												<strong className="text-xl text-black">
+													{model.Name}
+												</strong>{' '}
+												<div className="text-xl text-black">
+													Mã Mẫu: {model.ModelCode}
+												</div>
+												{model.MainDiamondCount > 0 && (
+													<div className="text-sm text-gray-500">
+														Số lượng kim cương chính:{' '}
+														{model.MainDiamondCount} viên
+													</div>
+												)}
+												<div className="text-sm text-gray-500">
+													Số lượng lựa chọn kim cương tấm:{' '}
+													{model.SideDiamondOptionCount}
+												</div>
+												{/* Displaying more model details conditionally */}
+												{model.IsEngravable && (
+													<div className="text-sm text-gray-500">
+														Có khắc chữ
+													</div>
+												)}
+												{model.MetalSupported &&
+													model.MetalSupported.length > 0 && (
+														<div className="text-sm text-gray-500">
+															Kim loại:{' '}
+															{model.MetalSupported.join(', ')}
+														</div>
+													)}
+												{model.CraftmanFee > 0 && (
+													<div className="text-sm text-gray-500">
+														Giá gia công: ${model.CraftmanFee}
+													</div>
+												)}
+												{/* Optionally, display a preview or more images */}
+												<div className="mt-2">
+													{model.ThumbnailPath && (
+														<img
+															src={model.ThumbnailPath}
+															alt={model.Name}
+															className="w-32 h-32 object-cover"
+														/>
+													)}
+												</div>
+											</div>
+										</li>
+									))}
+								</ul>
+								<div className="pagination-controls flex justify-center space-x-4 mt-4">
+									<button
+										onClick={handlePreviousPage}
+										disabled={currentPage === 1}
+										className="px-4 py-2 bg-primary text-black rounded-lg hover:bg-primaryDark disabled:opacity-50"
+									>
+										Trước
+									</button>
+									<span className="text-lg">{`Trang ${currentPage} / ${totalPage}`}</span>
+									<button
+										onClick={handleNextPage}
+										disabled={currentPage === totalPage}
+										className="px-4 py-2 bg-primary text-black rounded-lg hover:bg-primaryDark disabled:opacity-50"
+									>
+										Sau
+									</button>
+									<select
+										value={pageSize}
+										onChange={(e) =>
+											setPageSize(Number(e.target.value), setCurrentPage(1))
+										}
+										className="form-select p-2 border border-gray rounded-md"
+									>
+										<option value="5">5 mỗi trang</option>
+										<option value="10">10 mỗi trang</option>
+										<option value="20">20 mỗi trang</option>
+									</select>
+								</div>
+							</div>
 						)}{' '}
-						<div className="pagination-controls flex justify-center space-x-4 mt-4">
-							<button
-								onClick={handlePreviousPage}
-								disabled={currentPage === 1}
-								className="px-4 py-2 bg-primary text-black rounded-lg hover:bg-primaryDark disabled:opacity-50"
-							>
-								Trước
-							</button>
-							<span className="text-lg">{`Trang ${currentPage} / ${totalPage}`}</span>
-							<button
-								onClick={handleNextPage}
-								disabled={currentPage === totalPage}
-								className="px-4 py-2 bg-primary text-black rounded-lg hover:bg-primaryDark disabled:opacity-50"
-							>
-								Sau
-							</button>
-							<select
-								value={pageSize}
-								onChange={(e) =>
-									setPageSize(Number(e.target.value), setCurrentPage(1))
-								}
-								className="form-select p-2 border border-gray rounded-md"
-							>
-								<option value="5">5 mỗi trang</option>
-								<option value="10">10 mỗi trang</option>
-								<option value="20">20 mỗi trang</option>
-							</select>
-						</div>
 						<JewelryModelUploadForm
 							jewelryModelId={selectedJewelryModelId}
 							visible={isFormVisible}

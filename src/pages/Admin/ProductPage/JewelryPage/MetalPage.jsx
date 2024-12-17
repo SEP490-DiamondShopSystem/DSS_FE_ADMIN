@@ -58,7 +58,7 @@ const MetalPage = () => {
 						<tr key={metal.Id} className="border-b">
 							<td className="border p-3 text-sm text-gray-700">{metal.Name}</td>
 							<td className="border p-3 text-sm text-gray-700">
-								{metal.Price.toLocaleString()} VND
+								{metal.Price.toLocaleString()} VND / gram
 							</td>
 							<td className="border p-3">
 								<input
