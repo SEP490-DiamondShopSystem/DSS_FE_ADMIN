@@ -9,6 +9,7 @@ import {
 	handleEstimatePriceDiamond,
 } from '../../../../../../redux/slices/diamondSlice';
 import {fetchDiamondRule} from '../../../../../../redux/slices/configSlice';
+import {formatPrice} from '../../../../../../utils';
 
 const {Option} = Select;
 
