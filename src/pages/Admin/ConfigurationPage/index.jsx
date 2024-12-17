@@ -856,7 +856,7 @@ const ConfigurationPage = () => {
 							</Row>
 							<Button
 								type="primary"
-								onClick={() => showConfirm(modelForm, handleModelSubmit)}
+								onClick={() => showConfirm(diamondPriceForm, handleDiamondPriceSubmit)}
 							>
 								Lưu
 							</Button>
