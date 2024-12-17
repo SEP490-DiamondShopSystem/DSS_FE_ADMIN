@@ -119,7 +119,7 @@ const AccountPage = () => {
 						<Button
 							type="text"
 							className="bg-primary"
-							onClick={() => navigate(`/Accounts/${record.Id}`)}
+							onClick={() => navigate(`/accounts/${record.Id}`)}
 						>
 							<EditFilled />
 						</Button>

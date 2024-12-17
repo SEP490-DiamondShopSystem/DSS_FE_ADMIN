@@ -255,7 +255,7 @@ const JewelryPage = () => {
 									</Select>
 								</Col>
 								<Col xs={24} md={12} lg={6}>
-									<div>Mã số sê-ri</div>
+									<div>Mã sê-ri</div>
 									<Input
 										onChange={(e) => {
 											const updatedFilters = {

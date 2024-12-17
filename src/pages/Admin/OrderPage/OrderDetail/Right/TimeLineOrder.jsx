@@ -1118,10 +1118,18 @@ const TimeLineOrder = ({
 									<div className="flex justify-around">
 										<Button
 											type="text"
-											className="bg-primary font-semibold rounded-full w-full"
+											className="bg-primary font-semibold rounded-full"
 											onClick={handleMethod}
 										>
 											Chọn Phương Thức Thanh Toán
+										</Button>
+										<Button
+											type="text"
+											className="bg-red font-semibold w-32 rounded-full"
+											onClick={handleCancelOrder}
+											disabled={loading}
+										>
+											Hủy đơn
 										</Button>
 									</div>
 								</>
@@ -1293,7 +1301,7 @@ const TimeLineOrder = ({
 											</div>
 										</Upload.Dragger>
 									</div>
-									<Space className="mt-5 flex items-center justify-center">
+									<Space className="mt-5 flex items-center justify-around">
 										<Button
 											type="text"
 											className="font-semibold w-32 rounded-full bg-primary"
@@ -1301,6 +1309,14 @@ const TimeLineOrder = ({
 											loading={loadingPayment}
 										>
 											Xác Nhận
+										</Button>
+										<Button
+											type="text"
+											className="bg-red font-semibold w-32 rounded-full"
+											onClick={handleCancelOrder}
+											disabled={loading}
+										>
+											Hủy đơn
 										</Button>
 									</Space>
 								</div>
