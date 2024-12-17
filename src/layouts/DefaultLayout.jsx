@@ -174,15 +174,28 @@ const DefaultLayout = () => {
 	const isSignUpPage = location.pathname === '/signup';
 	const showHeaderFooter = !(isLoginPage || isSignUpPage);
 
-	// Breadcrumb logic
 	const breadcrumbItems = location.pathname
 		.split('/')
 		.filter((path) => path)
-		.map((path, index) => (
-			<Breadcrumb.Item key={index}>
-				<p to={`/${path}`}>{path.charAt(0).toUpperCase() + path.slice(1)}</p>
-			</Breadcrumb.Item>
-		));
+		.map((path, index) => {
+			// Xây dựng đường dẫn đầy đủ cho từng cấp
+			const fullPath = `/${location.pathname
+				.split('/')
+				.slice(1, index + 2)
+				.join('/')}`;
+			return (
+				<Breadcrumb.Item key={index}>
+					<Link to={fullPath}>{path.charAt(0).toUpperCase() + path.slice(1)}</Link>
+				</Breadcrumb.Item>
+			);
+		});
+
+	// Thêm mục "Home" không nhấn được
+	breadcrumbItems.unshift(
+		<Breadcrumb.Item key="home">
+			<span>Home</span> {/* Home là văn bản tĩnh, không phải liên kết */}
+		</Breadcrumb.Item>
+	);
 	// Logout logic
 	const handleLogout = () => {
 		dispatch(logout());
@@ -346,9 +359,7 @@ const DefaultLayout = () => {
 				{!isMobile && showHeaderFooter && <TopNavbar />}
 				<Content className={`p-4 flex-1 ${isMobile ? 'mt-16' : ''}`}>
 					<Breadcrumb className="mb-4">
-						<Breadcrumb.Item>
-							<div>Home</div>
-						</Breadcrumb.Item>
+						<Breadcrumb.Item></Breadcrumb.Item>
 						{breadcrumbItems}
 					</Breadcrumb>
 					<div

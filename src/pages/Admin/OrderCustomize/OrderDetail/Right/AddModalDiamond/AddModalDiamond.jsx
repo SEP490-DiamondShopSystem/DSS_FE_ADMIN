@@ -113,7 +113,6 @@ export const AddModalDiamond = ({
 	};
 
 	const handleOk = (values) => {
-
 		const {
 			cut,
 			color,
@@ -252,21 +251,21 @@ export const AddModalDiamond = ({
 				onValuesChange={handleFormChange}
 				onLoad={loading}
 			>
-				<label className="font-semibold">Nhập SKU</label>
+				<label className="font-semibold">Nhập Sê-ri</label>
 				<div className="flex flex-wrap gap-4">
 					<Form.Item
 						name="sku"
-						label="SKU"
+						label="Mã sê-ri"
 						className="w-1/3"
 						rules={[
-							{required: true, message: 'Vui lòng nhập SKU.'},
+							{required: true, message: 'Vui lòng nhập sê-ri.'},
 							{
 								pattern: /^[a-zA-Z0-9]{1,16}$/,
-								message: 'SKU chỉ được chứa chữ và số, tối đa 16 ký tự.',
+								message: 'Sê-ri chỉ được chứa chữ và số, tối đa 16 ký tự.',
 							},
 						]}
 					>
-						<Input placeholder="Nhập SKU" className="w-full" maxLength={16} />
+						<Input placeholder="Nhập sê-ri" className="w-full" maxLength={16} />
 					</Form.Item>
 				</div>
 				<label className="font-semibold">Thêm 4C</label>

@@ -63,7 +63,6 @@ const JewelryCreateForm = ({onClose, isCreateFormOpen, setIsCreateFormOpen}) => 
 
 	const diamondForFilter = getDiamondForFilter(selectedIndex);
 
-
 	const filterShape = diamondForFilter?.Shapes?.find((id) => id?.ShapeId === shape);
 
 	const filterLimits = useSelector(GetDiamondFilterSelector);
@@ -262,7 +261,7 @@ const JewelryCreateForm = ({onClose, isCreateFormOpen, setIsCreateFormOpen}) => 
 				JewelryRequest: {
 					...form.getFieldsValue().JewelryRequest,
 					ModelId: model.Id,
-					ModelCode:'',
+					ModelCode: '',
 					MentalId: '', // Reset metal
 					SizeId: '', // Reset size
 				},
@@ -293,7 +292,7 @@ const JewelryCreateForm = ({onClose, isCreateFormOpen, setIsCreateFormOpen}) => 
 				[name]: value,
 			},
 		});
-	
+
 		// Add explicit logging
 	};
 	// Handle form submission
@@ -387,7 +386,7 @@ const JewelryCreateForm = ({onClose, isCreateFormOpen, setIsCreateFormOpen}) => 
 				visible={isModalVisible}
 				onOk={handleOk}
 				onCancel={handleCancel}
-				okText="Gửi Yêu Cầu"
+				okText="Thêm Kim Cương"
 				cancelText="Hủy"
 				style={{minWidth: 1000}}
 			>
