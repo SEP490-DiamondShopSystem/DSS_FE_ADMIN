@@ -164,6 +164,7 @@ const ConfigurationPage = () => {
 			.unwrap()
 			.then(() => {
 				handleSuccess('Cập Nhật Quy Định Tài Khoản Thành Công!');
+				fetchData;
 			})
 			.catch((error) => {
 				message.error(error?.data?.detail || error?.detail);
@@ -174,6 +175,7 @@ const ConfigurationPage = () => {
 			.unwrap()
 			.then(() => {
 				handleSuccess('Cập Nhật Quy Định Kim Cương Thành Công!');
+				fetchData;
 			})
 			.catch((error) => {
 				message.error(error?.data?.detail || error?.detail);
@@ -184,6 +186,7 @@ const ConfigurationPage = () => {
 			.unwrap()
 			.then(() => {
 				handleSuccess('Cập Nhật Quy Định Bảng Giá Kim Cương Thành Công!');
+				fetchData;
 			})
 			.catch((error) => {
 				message.error(error?.data?.detail || error?.detail);
@@ -194,6 +197,7 @@ const ConfigurationPage = () => {
 			.unwrap()
 			.then(() => {
 				handleSuccess('Cập Nhật Quy Định Hiển Thị Thành Công!');
+				fetchData;
 			})
 			.catch((error) => {
 				message.error(error?.data?.detail || error?.detail);
@@ -204,6 +208,7 @@ const ConfigurationPage = () => {
 			.unwrap()
 			.then(() => {
 				handleSuccess('Cập Nhật Quy Định Mẫu Trang Sức Thành Công!');
+				fetchData;
 			})
 			.catch((error) => {
 				message.error(error?.data?.detail || error?.detail);
@@ -214,6 +219,7 @@ const ConfigurationPage = () => {
 			.unwrap()
 			.then(() => {
 				handleSuccess('Cập Nhật Địa Chỉ Cửa Hàng Thành Công!');
+				fetchData;
 			})
 			.catch((error) => {
 				message.error(error?.data?.detail || error?.detail);
@@ -224,6 +230,7 @@ const ConfigurationPage = () => {
 			.unwrap()
 			.then(() => {
 				handleSuccess('Cập Nhật Quy Định Đặt Hàng Thành Công!');
+				fetchData;
 			})
 			.catch((error) => {
 				message.error(error?.data?.detail || error?.detail);
@@ -244,6 +251,7 @@ const ConfigurationPage = () => {
 			.unwrap()
 			.then(() => {
 				handleSuccess('Cập Nhật Quy Định Thanh Toán Thành Công!');
+				fetchData;
 			})
 			.catch((error) => {
 				message.error(error?.data?.detail || error?.detail);
@@ -260,6 +268,7 @@ const ConfigurationPage = () => {
 				.unwrap()
 				.then(() => {
 					handleSuccess('Tải lên thành công!');
+					fetchData;
 				})
 				.catch((error) => {
 					message.error(error?.data?.detail || error?.detail);
@@ -267,6 +276,7 @@ const ConfigurationPage = () => {
 		}
 
 		const updatePayload = {
+			bankName: values.BankName,
 			accountNumber: values.AccountNumber,
 			accountName: values.AccountName,
 			bankBin: values.BankBin,
@@ -276,6 +286,7 @@ const ConfigurationPage = () => {
 			.unwrap()
 			.then(() => {
 				handleSuccess('Cập nhật tài khoản ngân hàng thành công!');
+				fetchData;
 			})
 			.catch((error) => {
 				message.error(error?.data?.detail || error?.detail);
@@ -1000,7 +1011,7 @@ const ConfigurationPage = () => {
 											Array.isArray(e) ? e : e?.fileList
 										}
 										rules={[
-											{required: true, message: 'Trường này là bắt buộc'},
+											{required: false, message: 'Trường này là bắt buộc'},
 										]}
 									>
 										<Upload
