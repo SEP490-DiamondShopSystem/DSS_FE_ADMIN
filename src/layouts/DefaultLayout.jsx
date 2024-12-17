@@ -51,6 +51,27 @@ const DefaultLayout = () => {
 	const [hasRedirected, setHasRedirected] = useState(false);
 	const [showSignOutPopup, setShowSignOutPopup] = useState(false);
 
+	const routeTranslations = {
+		'/dashboard': 'Bảng Điều Khiển',
+		'/accounts': 'Quản Lý Tài Khoản',
+		'/products': 'Sản Phẩm',
+		'/products/diamond-list': 'Danh Sách Kim Cương',
+		'/products/jewelry-list': 'Danh Sách Trang Sức',
+		'/products/jewelry-model-list': 'Danh Sách Mẫu Trang Sức',
+		'/products/metal-list': 'Danh Sách Vật Liệu',
+		'/orders': 'Quản Lý Đặt Hàng',
+		'/request-customize': 'Các Yêu Cầu Thiết Kế',
+		'/promotion': 'Khuyến Mãi',
+		'/discount': 'Giảm Giá',
+		'/delivery-fee': 'Phí Vận Chuyển',
+		'/diamond-price': 'Giá Kim Cương',
+		'/blogs': 'Quản Lí Bài Viết',
+		'/config': 'Cài Đặt Hệ Thống',
+		'/diamond-price/main-diamond-price': 'Bảng Giá Kim Cương Chính',
+		'/diamond-price/side-diamond-price': 'Bảng Giá Kim Cương Tấm',
+		'/jewelry-model-category-list': 'Danh Sách Loại Trang Sức',
+	};
+
 	// Responsive handling
 	useEffect(() => {
 		const handleResize = () => {
@@ -174,15 +195,33 @@ const DefaultLayout = () => {
 	const isSignUpPage = location.pathname === '/signup';
 	const showHeaderFooter = !(isLoginPage || isSignUpPage);
 
-	// Breadcrumb logic
 	const breadcrumbItems = location.pathname
 		.split('/')
 		.filter((path) => path)
-		.map((path, index) => (
-			<Breadcrumb.Item key={index}>
-				<p to={`/${path}`}>{path.charAt(0).toUpperCase() + path.slice(1)}</p>
-			</Breadcrumb.Item>
-		));
+		.map((path, index) => {
+			// Xây dựng đường dẫn đầy đủ cho từng cấp
+			const fullPath = `/${location.pathname
+				.split('/')
+				.slice(1, index + 2)
+				.join('/')}`;
+
+			// Lấy bản dịch tiếng Việt cho route nếu có
+			const breadcrumbLabel =
+				routeTranslations[fullPath] || path.charAt(0).toUpperCase() + path.slice(1);
+
+			return (
+				<Breadcrumb.Item key={index}>
+					<Link to={fullPath}>{breadcrumbLabel}</Link>
+				</Breadcrumb.Item>
+			);
+		});
+
+	// Thêm mục "Home" không nhấn được
+	breadcrumbItems.unshift(
+		<Breadcrumb.Item key="home">
+			<span>Trang Chủ</span>
+		</Breadcrumb.Item>
+	);
 	// Logout logic
 	const handleLogout = () => {
 		dispatch(logout());
@@ -346,9 +385,7 @@ const DefaultLayout = () => {
 				{!isMobile && showHeaderFooter && <TopNavbar />}
 				<Content className={`p-4 flex-1 ${isMobile ? 'mt-16' : ''}`}>
 					<Breadcrumb className="mb-4">
-						<Breadcrumb.Item>
-							<div>Home</div>
-						</Breadcrumb.Item>
+						<Breadcrumb.Item></Breadcrumb.Item>
 						{breadcrumbItems}
 					</Breadcrumb>
 					<div

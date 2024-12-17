@@ -169,7 +169,7 @@ const DiamondPage = () => {
 			},
 		},
 		{
-			title: 'SKU',
+			title: 'Mã Sê-ri',
 			key: 'SerialCode',
 			dataIndex: 'SerialCode',
 			align: 'center',
@@ -187,7 +187,6 @@ const DiamondPage = () => {
 			dataIndex: 'Status',
 			align: 'center',
 			render: (status) => {
-
 				const {label, color} = statusMapping[status] || {
 					label: 'Không Biết',
 					color: 'gray',
@@ -542,11 +541,11 @@ const DiamondPage = () => {
 							</Popover>
 						</div>
 						<div className="flex items-center">
-							<span className="ml-3 mr-2">Tìm Kiếm SKU:</span>
+							<span className="ml-3 mr-2">Tìm Kiếm Sê-ri:</span>
 							<div>
 								<Search
 									className="w-full sm:w-60"
-									placeholder="Tìm theo SKU"
+									placeholder="Tìm theo sê-ri"
 									allowClear
 									onSearch={onSearch}
 								/>
