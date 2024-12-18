@@ -86,7 +86,14 @@ const statusMapping = {
 	6: {label: 'Đặt trước', color: 'geekblue'},
 };
 
-const DiamondDetail = ({diamond, handleView, id, handleLockDiamondView, handleOpenModal}) => {
+const DiamondDetail = ({
+	diamond,
+	handleView,
+	id,
+	handleLockDiamondView,
+	handleOpenModal,
+	handleActive,
+}) => {
 	const navigate = useNavigate();
 	if (!diamond) {
 		return <Loading />;
@@ -294,6 +301,23 @@ const DiamondDetail = ({diamond, handleView, id, handleLockDiamondView, handleOp
 				>
 					Tải lên hình ảnh
 				</Button>
+				{Status === 4 ? (
+					<Button
+						type="text"
+						className="mx-5 bg-primary bg-gray-100 text-gray-700 py-3 px-8 rounded-lg shadow-lg hover:bg-gray-200 transition-colors duration-300 transform hover:-translate-y-1"
+						onClick={handleActive}
+					>
+						Mở Bán Lại
+					</Button>
+				) : Status === 1 ? (
+					<Button
+						danger
+						className="mx-5 bg-red-100 text-red-700 py-3 px-8 rounded-lg shadow-lg hover:bg-red-200 transition-colors duration-300 transform hover:-translate-y-1"
+						onClick={handleActive}
+					>
+						Hết Hàng
+					</Button>
+				) : null}
 			</div>
 		</div>
 	);
