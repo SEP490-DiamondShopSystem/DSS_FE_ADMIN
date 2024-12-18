@@ -4,6 +4,7 @@ import React, {useEffect, useState} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
 import {getOrderChildLogListSelector, getOrderLogsSelector} from '../../../../../redux/selectors';
 import {getProcessingDetail} from '../../../../../redux/slices/logSlice';
+import {getOrderLog} from '../../../../../redux/slices/orderSlice';
 
 export const TimeLine = ({status, orders, loading, id}) => {
 	const dispatch = useDispatch();
@@ -13,7 +14,7 @@ export const TimeLine = ({status, orders, loading, id}) => {
 	const [log, setLog] = useState(null);
 	const [filteredSteps, setFilteredSteps] = useState([]);
 	const [modalVisible, setModalVisible] = useState(false);
-
+	// const [orderLogList, setOrderLogList] = useState();
 
 	useEffect(() => {
 		if (orders) {
