@@ -494,63 +494,61 @@ const ConfigurationPage = () => {
 						</Form>
 					</Card>
 				</Tabs.TabPane>
-				<Tabs.TabPane tab="Quy Tắc Kim Cương" key="diamond">
-					<Tabs.TabPane tab="Quy Tắc Khuyến Mãi" key="promotion">
-						<Card className="shadow-lg">
-							<Form
-								form={promotionForm}
-								initialValues={promotionRule}
-								onFinish={handlePromotionSubmit}
-								layout="vertical"
-								key={JSON.stringify(promotionRule)}
+				{/* <Tabs.TabPane tab="Quy Tắc Khuyến Mãi" key="promotion">
+					<Card className="shadow-lg">
+						<Form
+							form={promotionForm}
+							initialValues={promotionRule}
+							onFinish={handlePromotionSubmit}
+							layout="vertical"
+							key={JSON.stringify(promotionRule)}
+						>
+							{' '}
+							<Row gutter={[16, 16]} wrap>
+								<Col xs={24} sm={12} md={6}>
+									<Form.Item
+										name="MaxDiscountPercent"
+										label="Phần trăm giảm giá tối đa"
+										rules={[
+											{required: true, message: 'Trường này là bắt buộc'},
+										]}
+									>
+										<InputNumber className="w-full" />
+									</Form.Item>
+								</Col>
+								<Col xs={24} sm={12} md={6}>
+									<Form.Item
+										name="MinCode"
+										label="Mã giảm giá tối thiểu có thể dùng"
+										rules={[
+											{required: true, message: 'Trường này là bắt buộc'},
+										]}
+									>
+										<InputNumber className="w-full" />
+									</Form.Item>
+								</Col>
+								<Col xs={24} sm={12} md={6}>
+									<Form.Item
+										name="MaxCode"
+										label="Mã giảm giá tối đa có thể dùng"
+										rules={[
+											{required: true, message: 'Trường này là bắt buộc'},
+										]}
+									>
+										<InputNumber className="w-full" />
+									</Form.Item>
+								</Col>
+							</Row>
+							<Button
+								type="primary"
+								onClick={() => showConfirm(promotionForm, handlePromotionSubmit)}
 							>
-								{' '}
-								<Row gutter={[16, 16]} wrap>
-									<Col xs={24} sm={12} md={6}>
-										<Form.Item
-											name="MaxDiscountPercent"
-											label="Phần trăm giảm giá tối đa"
-											rules={[
-												{required: true, message: 'Trường này là bắt buộc'},
-											]}
-										>
-											<InputNumber className="w-full" />
-										</Form.Item>
-									</Col>
-									<Col xs={24} sm={12} md={6}>
-										<Form.Item
-											name="MinCode"
-											label="Mã giảm giá tối thiểu có thể dùng"
-											rules={[
-												{required: true, message: 'Trường này là bắt buộc'},
-											]}
-										>
-											<InputNumber className="w-full" />
-										</Form.Item>
-									</Col>
-									<Col xs={24} sm={12} md={6}>
-										<Form.Item
-											name="MaxCode"
-											label="Mã giảm giá tối đa có thể dùng"
-											rules={[
-												{required: true, message: 'Trường này là bắt buộc'},
-											]}
-										>
-											<InputNumber className="w-full" />
-										</Form.Item>
-									</Col>
-								</Row>
-								<Button
-									type="primary"
-									onClick={() =>
-										showConfirm(promotionForm, handlePromotionSubmit)
-									}
-								>
-									Lưu
-								</Button>
-							</Form>
-						</Card>
-					</Tabs.TabPane>
+								Lưu
+							</Button>
+						</Form>
+					</Card>
+				</Tabs.TabPane> */}
+				<Tabs.TabPane tab="Quy Tắc Kim Cương" key="diamond">
 					<Card className="shadow-lg">
 						<Form
 							form={diamondForm}
@@ -846,7 +844,7 @@ const ConfigurationPage = () => {
 											{required: true, message: 'Trường này là bắt buộc'},
 										]}
 									>
-										<InputNumber className="w-full" />
+										<Input className="w-full" />
 									</Form.Item>
 								</Col>
 								<Col xs={24} sm={12} md={12}>
@@ -857,7 +855,7 @@ const ConfigurationPage = () => {
 											{required: true, message: 'Trường này là bắt buộc'},
 										]}
 									>
-										<InputNumber className="w-full" />
+										<Input className="w-full" />
 									</Form.Item>
 								</Col>
 								<Col xs={24} sm={12} md={12}>
@@ -868,7 +866,7 @@ const ConfigurationPage = () => {
 											{required: true, message: 'Trường này là bắt buộc'},
 										]}
 									>
-										<InputNumber className="w-full" />
+										<Input className="w-full" />
 									</Form.Item>
 								</Col>
 							</Row>
@@ -883,7 +881,7 @@ const ConfigurationPage = () => {
 						</Form>
 					</Card>
 				</Tabs.TabPane>
-				<Tabs.TabPane tab="Quy Tắc Hiển thị Giao diện" key="frontend">
+				{/* <Tabs.TabPane tab="Quy Tắc Hiển thị Giao diện" key="frontend">
 					<Card className="shadow-lg">
 						<Form
 							form={frontendForm}
@@ -935,7 +933,7 @@ const ConfigurationPage = () => {
 							</Button>
 						</Form>
 					</Card>
-				</Tabs.TabPane>
+				</Tabs.TabPane> */}
 				<Tabs.TabPane tab="Tài Khoản Ngân Hàng Của Shop" key="bank">
 					<Card className="shadow-lg">
 						<Form
@@ -987,7 +985,7 @@ const ConfigurationPage = () => {
 											{required: true, message: 'Trường này là bắt buộc'},
 										]}
 									>
-										<InputNumber className="w-full" />
+										<Input className="w-full" />
 									</Form.Item>
 								</Col>
 							</Row>
@@ -1123,9 +1121,6 @@ const ConfigurationPage = () => {
 									<Form.Item
 										name="ExpectedDeliveryDate"
 										label="Thời gian giao hàng dự kiến sau đặt hàng ( ngày )"
-										rules={[
-											{required: true, message: 'Trường này là bắt buộc'},
-										]}
 									>
 										<InputNumber className="w-full" readOnly />
 									</Form.Item>
@@ -1134,9 +1129,6 @@ const ConfigurationPage = () => {
 									<Form.Item
 										name="ExpiredOrderHour"
 										label="Thời gian hết hạn thanh toán sau đặt hàng ( giờ )"
-										rules={[
-											{required: true, message: 'Trường này là bắt buộc'},
-										]}
 									>
 										<InputNumber className="w-full" readOnly />
 									</Form.Item>
@@ -1145,9 +1137,6 @@ const ConfigurationPage = () => {
 									<Form.Item
 										name="MaxOrderAmountForDelivery"
 										label="Tổng giá trị đơn hàng tối đa cho vận chuyển"
-										rules={[
-											{required: true, message: 'Trường này là bắt buộc'},
-										]}
 									>
 										<InputNumber
 											className="w-full"
@@ -1160,9 +1149,6 @@ const ConfigurationPage = () => {
 									<Form.Item
 										name="MaxOrderAmountForFullPayment"
 										label="Giá trị đơn hàng tối đa cho một lần thanh toán đủ"
-										rules={[
-											{required: true, message: 'Trường này là bắt buộc'},
-										]}
 									>
 										<InputNumber
 											className="w-full"
@@ -1175,9 +1161,6 @@ const ConfigurationPage = () => {
 									<Form.Item
 										name="DaysWaitForCustomerToPay"
 										label="Thời gian cho phép khách hàng đến lấy ( ngày )"
-										rules={[
-											{required: true, message: 'Trường này là bắt buộc'},
-										]}
 									>
 										<InputNumber className="w-full" readOnly />
 									</Form.Item>
@@ -1190,7 +1173,7 @@ const ConfigurationPage = () => {
 											{required: true, message: 'Trường này là bắt buộc'},
 										]}
 									>
-										<InputNumber className="w-full" readOnly />
+										<InputNumber className="w-full" />
 									</Form.Item>
 								</Col>
 								<Col xs={24} sm={12} md={6}>
@@ -1201,16 +1184,16 @@ const ConfigurationPage = () => {
 											{required: true, message: 'Trường này là bắt buộc'},
 										]}
 									>
-										<InputNumber className="w-full" readOnly />
+										<InputNumber className="w-full" />
 									</Form.Item>
 								</Col>
 							</Row>
-							{/* <Button
+							<Button
 								type="primary"
 								onClick={() => showConfirm(orderForm, handleOrderSubmit)}
 							>
 								Lưu
-							</Button> */}
+							</Button>
 						</Form>
 					</Card>
 				</Tabs.TabPane>
@@ -1233,7 +1216,7 @@ const ConfigurationPage = () => {
 											{required: true, message: 'Trường này là bắt buộc'},
 										]}
 									>
-										<InputNumber className="w-full" />
+										<InputNumber className="w-full" readOnly />
 									</Form.Item>
 								</Col>
 								<Col xs={24} sm={12} md={6}>
@@ -1244,7 +1227,7 @@ const ConfigurationPage = () => {
 											{required: true, message: 'Trường này là bắt buộc'},
 										]}
 									>
-										<InputNumber className="w-full" />
+										<InputNumber className="w-full" readOnly />
 									</Form.Item>
 								</Col>
 								<Col xs={24} sm={12} md={6}>
@@ -1257,6 +1240,7 @@ const ConfigurationPage = () => {
 									>
 										<InputNumber
 											className="w-full"
+											readOnly
 											formatter={(value) => formatPrice(value)}
 										/>
 									</Form.Item>
@@ -1270,6 +1254,7 @@ const ConfigurationPage = () => {
 										]}
 									>
 										<InputNumber
+											readOnly
 											className="w-full"
 											formatter={(value) => formatPrice(value)}
 										/>
@@ -1285,6 +1270,7 @@ const ConfigurationPage = () => {
 									>
 										<InputNumber
 											className="w-full"
+											readOnly
 											formatter={(value) => formatPrice(value)}
 										/>
 									</Form.Item>
@@ -1293,11 +1279,12 @@ const ConfigurationPage = () => {
 									<Form.Item
 										name="CODHourTimeLimit"
 										label="Giới hạn thời gian để thanh toán đơn COD ( giờ )"
+										readOnly
 										rules={[
 											{required: true, message: 'Trường này là bắt buộc'},
 										]}
 									>
-										<InputNumber className="w-full" />
+										<InputNumber className="w-full" readOnly />
 									</Form.Item>
 								</Col>
 								<Col xs={24} sm={12} md={6}>
