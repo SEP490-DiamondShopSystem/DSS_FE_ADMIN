@@ -79,7 +79,7 @@ const JewelryPage = () => {
 	const sizes = useSelector(getAllSizesSelector);
 
 	const sizesByUnit = useMemo(() => {
-		return sizes.reduce((acc, sizeGroup) => {
+		return sizes?.reduce((acc, sizeGroup) => {
 			if (!sizeGroup.Unit) return acc;
 
 			if (!acc[sizeGroup.Unit]) {
