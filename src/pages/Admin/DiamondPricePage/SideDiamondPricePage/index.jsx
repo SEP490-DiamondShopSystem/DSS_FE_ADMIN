@@ -13,6 +13,7 @@ import {
 } from '../../../../redux/slices/criteriaRangeSlice';
 import {message, Alert, Modal, Form, InputNumber} from 'antd';
 import {getPriceBoardSelector, LoadingDiamondPriceSelector} from '../../../../redux/selectors';
+import {Helmet} from 'react-helmet';
 
 const formatPrice = (price) => {
 	if (price === null || price === undefined) return 'N/A';
@@ -596,6 +597,9 @@ const SideDiamondPricePage = () => {
 
 	return (
 		<div className="container gap-4 mx-auto p-6 bg-white rounded-lg shadow-lg">
+			<Helmet>
+				<title>Bảng Giá Kim Cương Tấm</title>
+			</Helmet>
 			<h1 className="text-5xl font-bold text-center text-blue-600">
 				Bảng Giá Kim Cương Tấm{' '}
 			</h1>

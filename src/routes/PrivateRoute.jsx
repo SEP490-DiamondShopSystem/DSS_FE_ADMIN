@@ -49,7 +49,6 @@ const PrivateRoute = ({children, roles}) => {
 	// Kiểm tra xem người dùng có ít nhất một vai trò phù hợp không
 	const hasAccess = userDetail.Roles.some((role) => roles.includes(role.RoleName));
 
-	console.log(hasAccess);
 	if (!hasAccess) {
 		message.error('Bạn không có quyền truy cập vào trang này!');
 		return <Navigate to="/login" />;

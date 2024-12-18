@@ -28,6 +28,7 @@ import {
 } from '../../../redux/slices/promotionSlice';
 import {enumMappings} from '../../../utils/constant';
 import PromotionForm from './PromotionForm/PromotionForm';
+import {Helmet} from 'react-helmet';
 
 const PromotionPage = ({promotionData}) => {
 	const shapes = useSelector(getAllShapeSelector);
@@ -1122,6 +1123,9 @@ const PromotionPage = ({promotionData}) => {
 
 	return (
 		<div className="p-8 bg-white shadow-md rounded-lg">
+			<Helmet>
+				<title>Quản Lí Khuyến Mãi</title>
+			</Helmet>
 			<h2 className="text-2xl font-bold mb-6">
 				{isEditing ? 'Cập Nhật Khuyến Mãi' : 'Tạo Khuyến Mãi Mới'}
 			</h2>{' '}

@@ -261,9 +261,23 @@ const JewelryDetail = ({jewelry, onClose}) => {
 								</div>
 								<div className="flex items-center mb-2">
 									<span className="mr-2 text-primary font-bold">₫</span>
-									<span className="font-semibold mr-3 text-gray-700">Giá:</span>
-									{fetchedJewelry?.TotalPrice > fetchedJewelry?.SalePrice ? (
+
+									{fetchedJewelry?.SoldPrice ? (
+										<div className="flex justify-between items-center">
+											<span className="font-medium text-gray-700">
+												Giá Đã Bán:
+											</span>
+											<span className="text-darkGreen text-lg font-bold">
+												{fetchedJewelry.SoldPrice.toLocaleString() ||
+													'Chưa Có'}{' '}
+												VND
+											</span>
+										</div>
+									) : fetchedJewelry?.TotalPrice > fetchedJewelry?.SalePrice ? (
 										<div className="flex items-center">
+											<span className="font-semibold mr-3 text-gray-700">
+												Giá:
+											</span>
 											<span className="line-through mr-2 text-gray-400">
 												{fetchedJewelry?.TotalPrice.toLocaleString()} VND
 											</span>
@@ -272,7 +286,9 @@ const JewelryDetail = ({jewelry, onClose}) => {
 											</span>
 										</div>
 									) : (
-										fetchedJewelry?.SalePrice.toLocaleString()
+										<span className="text-darkGreen text-xl">
+											{fetchedJewelry?.SalePrice.toLocaleString()} VND
+										</span>
 									)}
 								</div>
 							</div>
@@ -613,7 +629,9 @@ const JewelryDetail = ({jewelry, onClose}) => {
 												</span>
 											</div>
 										) : (
-											fetchedJewelry?.SalePrice.toLocaleString()
+											<span className="text-black">
+												{fetchedJewelry?.SalePrice.toLocaleString()} {'VND'}
+											</span>
 										)}
 									</div>
 									{fetchedJewelry?.SoldPrice && (

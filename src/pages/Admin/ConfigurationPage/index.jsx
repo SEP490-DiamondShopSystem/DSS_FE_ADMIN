@@ -42,6 +42,7 @@ import {
 import {formatPrice} from '../../../utils';
 
 import {selectIsLoading, selectConfigError} from '../../../redux/selectors';
+import {Helmet} from 'react-helmet';
 
 const ConfigurationPage = () => {
 	const dispatch = useDispatch();
@@ -313,6 +314,9 @@ const ConfigurationPage = () => {
 
 	return (
 		<div className="p-8 bg-gray-100 min-h-screen">
+			<Helmet>
+				<title>Cài Đặt Hệ Thống</title>
+			</Helmet>
 			<h1 className="text-2xl font-bold mb-6">Trang cài đặt cấu hình</h1>
 			<Tabs defaultActiveKey="account">
 				<Tabs.TabPane tab="Quy Tắc Tài Khoản" key="account">

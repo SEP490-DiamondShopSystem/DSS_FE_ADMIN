@@ -45,6 +45,7 @@ import {fetchAllMetals} from '../../../../redux/slices/jewelry/metalSlice';
 import {fetchAllSizes} from '../../../../redux/slices/jewelry/sizeSlice';
 import {formatPrice} from '../../../../utils';
 import Loading from '../../../../components/Loading';
+import {Helmet} from 'react-helmet';
 
 const JewelryPage = () => {
 	const dispatch = useDispatch();
@@ -144,6 +145,9 @@ const JewelryPage = () => {
 
 	return (
 		<div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8 bg-gradient-to-br from-gray-50 to-gray-100 min-h-screen">
+			<Helmet>
+				<title>Quản Lý Trang Sức</title>
+			</Helmet>
 			<div className="bg-white shadow-2xl rounded-2xl overflow-hidden">
 				{/* Header */}
 				<div className="bg-primary/10 px-6 py-6 border-b border-primary/20 flex justify-between items-center">
@@ -383,8 +387,9 @@ const JewelryPage = () => {
 															<div className="flex items-center">
 																<DollarOutlined className="mr-2 text-primary" />
 																<span className="font-semibold">
-																	{jewelry.TotalPrice >
-																	jewelry.SalePrice ? (
+																	{!jewelry.SoldPrice &&
+																	jewelry.TotalPrice >
+																		jewelry.SalePrice ? (
 																		<div className="flex items-center">
 																			<span className="line-through mr-2 text-gray-400">
 																				{formatPrice(
@@ -398,9 +403,11 @@ const JewelryPage = () => {
 																			</span>
 																		</div>
 																	) : (
-																		formatPrice(
-																			jewelry.SalePrice
-																		)
+																		<Tooltip title="Giá đã bán">
+																			{formatPrice(
+																				jewelry.SoldPrice
+																			)}
+																		</Tooltip>
 																	)}
 																</span>
 															</div>
