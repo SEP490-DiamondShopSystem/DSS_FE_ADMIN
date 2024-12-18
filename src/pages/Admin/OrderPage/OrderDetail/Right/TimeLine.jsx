@@ -83,7 +83,7 @@ export const TimeLine = ({status, orders, loading, id}) => {
 
 	return (
 		<div className="w-full my-10">
-			<Timeline reverse={true} items={filteredSteps} mode="left" />
+			<Timeline items={filteredSteps} mode="left" />
 
 			<Modal
 				title="Chi tiết trạng thái"
