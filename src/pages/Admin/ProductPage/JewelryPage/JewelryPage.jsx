@@ -383,8 +383,9 @@ const JewelryPage = () => {
 															<div className="flex items-center">
 																<DollarOutlined className="mr-2 text-primary" />
 																<span className="font-semibold">
-																	{jewelry.TotalPrice >
-																	jewelry.SalePrice ? (
+																	{!jewelry.SoldPrice &&
+																	jewelry.TotalPrice >
+																		jewelry.SalePrice ? (
 																		<div className="flex items-center">
 																			<span className="line-through mr-2 text-gray-400">
 																				{formatPrice(
@@ -398,9 +399,11 @@ const JewelryPage = () => {
 																			</span>
 																		</div>
 																	) : (
-																		formatPrice(
-																			jewelry.SalePrice
-																		)
+																		<Tooltip title="Giá đã bán">
+																			{formatPrice(
+																				jewelry.SoldPrice
+																			)}
+																		</Tooltip>
 																	)}
 																</span>
 															</div>
