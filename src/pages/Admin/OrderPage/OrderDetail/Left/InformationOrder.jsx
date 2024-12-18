@@ -461,7 +461,7 @@ const InformationOrder = ({orders, statusOrder, paymentStatusOrder, userDetail})
 						)}
 					</Col>
 				</Row>
-				{orders?.ExpiredDate && (
+				{orders?.ExpiredDate && orders?.Status === 1 && (
 					<Row gutter={[16, 16]} justify="center" align="middle" className="my-3">
 						<Col xs={24} lg={12}>
 							<>
@@ -495,7 +495,7 @@ const InformationOrder = ({orders, statusOrder, paymentStatusOrder, userDetail})
 												className="mt-5 w-full md:w-[600px]"
 											/>
 										) : (
-											<>Chưa có chứng từ nào</>
+											<></>
 										)
 									)}
 								</Space>
