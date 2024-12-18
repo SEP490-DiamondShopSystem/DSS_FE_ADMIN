@@ -60,7 +60,8 @@ const JewelryModelPage = () => {
 		MaximumMainDiamond: 3,
 		MaximumSideDiamondOption: 5,
 	});
-
+	const [selectedUnit, setSelectedUnit] = useState('milimeter'); // Initial unit
+	const [filteredSizes, setFilteredSizes] = useState([]);
 	useEffect(() => {
 		// Fetch jewelry model rules
 		dispatch(fetchJewelryModelRule())
@@ -87,7 +88,7 @@ const JewelryModelPage = () => {
 		craftManFee: 'Phí Thợ (VND)',
 		isEngravable: 'Khắc Chữ',
 		width: 'Chiều Rộng (mm)',
-		length: 'Chiều Dài',
+		// length: 'Chiều Dài',
 		backType: 'Loại Gài',
 		claspType: 'Loại Khóa',
 		chainType: 'Loại Dây Chuyền',
@@ -99,7 +100,7 @@ const JewelryModelPage = () => {
 		craftManFee: '',
 		isEngravable: false,
 		width: '',
-		length: '',
+		// length: '',
 		backType: '',
 		claspType: '',
 		chainType: '',
@@ -211,8 +212,17 @@ const JewelryModelPage = () => {
 	}, [dispatch]);
 	const sizes = useSelector(getAllSizesSelector); // Selector for getting metals from the store
 	useEffect(() => {
-		dispatch(fetchAllSizes());
+		dispatch(fetchAllSizes(sizes));
 	}, [dispatch]);
+
+	useEffect(() => {
+		if (sizes && Array.isArray(sizes)) {
+			const initialUnitData = sizes.find((unit) => unit.Unit === selectedUnit);
+			if (initialUnitData) {
+				setFilteredSizes(initialUnitData.Sizes);
+			}
+		}
+	}, [sizes, selectedUnit]);
 	const enums = useSelector(getAllEnumsSelector); // Selector for getting metals from the store
 	useEffect(() => {
 		dispatch(fetchAllEnums());
@@ -238,6 +248,16 @@ const JewelryModelPage = () => {
 				...prevState,
 				[name]: value,
 			}));
+		}
+	};
+	const handleUnitChange = (e) => {
+		const newUnit = e.target.value;
+		setSelectedUnit(newUnit);
+		const unitData = sizes.find((unit) => unit.Unit === newUnit);
+		if (unitData) {
+			setFilteredSizes(unitData.Sizes);
+			// Set the initial size value for the new unit
+			handleMetalSizeChange(index, 'sizeId', unitData.Sizes[0]?.Id || '');
 		}
 	};
 	const handleMainDiamondChange = (index, field, value) => {
@@ -756,7 +776,7 @@ const JewelryModelPage = () => {
 															</option>
 															<option value="2">Hạt</option>
 															<option value="3">Byzantine</option>
-															<option value="0">Dây Cáp"</option>
+															<option value="0">Dây Cáp</option>
 															<option value="5">
 																Dây Xích Phẳng
 															</option>
@@ -1396,6 +1416,23 @@ const JewelryModelPage = () => {
 																))}
 														</select>
 
+														{/* Unit Selector */}
+														<select
+															value={selectedUnit}
+															onChange={handleUnitChange}
+															className="form-input w-full p-2 border border-gray text-black rounded-md"
+														>
+															{sizes.map((unitData) => (
+																<option
+																	key={unitData.Unit}
+																	value={unitData.Unit}
+																>
+																	{unitData.Unit}
+																</option>
+															))}
+														</select>
+
+														{/* Size Selector */}
 														<select
 															value={spec.sizeId}
 															onChange={(e) =>
@@ -1405,23 +1442,16 @@ const JewelryModelPage = () => {
 																	e.target.value
 																)
 															}
-															required
-															placeholder="Size ID"
 															className="form-input w-full p-2 border border-gray text-black rounded-md"
 														>
-															{' '}
-															<option value="">Chọn size( mm)</option>
-															{Array.isArray(sizes) &&
-																sizes.map((size) => (
-																	<option
-																		className="text-black"
-																		key={size.id}
-																		value={size.id}
-																	>
-																		{size.Value}{' '}
-																		{/* Display the metal name */}
-																	</option>
-																))}
+															{filteredSizes.map((size) => (
+																<option
+																	key={size.Id}
+																	value={size.Id}
+																>
+																	{size.Value} {selectedUnit}
+																</option>
+															))}
 														</select>
 
 														<input
@@ -1480,12 +1510,7 @@ const JewelryModelPage = () => {
 					}}
 					onView={() => handleView(selectedModel.Id)}
 					onDelete={() => {
-						const isConfirmed = window.confirm(
-							'Bạn có chắc chắn muốn xóa món trang sức này không?'
-						);
-						if (isConfirmed) {
-							handleDeleteModel();
-						}
+						handleDeleteModel();
 					}}
 					onClose={handleCloseModal}
 				/>
