@@ -373,7 +373,8 @@ const JewelryPage = () => {
 													<div>
 														<div className="flex justify-between items-center mb-2">
 															<span className="text-lg font-bold text-primary">
-																{jewelry.Title}
+																{jewelry.Title} -{' '}
+																{jewelry.ModelCode}
 															</span>
 															{renderStatusTag(jewelry.Status)}
 														</div>
@@ -382,11 +383,25 @@ const JewelryPage = () => {
 															<div className="flex items-center">
 																<DollarOutlined className="mr-2 text-primary" />
 																<span className="font-semibold">
-																	{jewelry.TotalPrice > 0
-																		? formatPrice(
-																				jewelry.TotalPrice
-																		  )
-																		: 'Liên Hệ Báo Giá'}
+																	{jewelry.TotalPrice >
+																	jewelry.SalePrice ? (
+																		<div className="flex items-center">
+																			<span className="line-through mr-2 text-gray-400">
+																				{formatPrice(
+																					jewelry.TotalPrice
+																				)}
+																			</span>
+																			<span className="text-darkGreen text-xl">
+																				{formatPrice(
+																					jewelry.SalePrice
+																				)}
+																			</span>
+																		</div>
+																	) : (
+																		formatPrice(
+																			jewelry.SalePrice
+																		)
+																	)}
 																</span>
 															</div>
 															<div className="flex justify-between text-sm">
