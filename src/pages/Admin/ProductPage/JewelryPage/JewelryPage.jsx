@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useState, useMemo} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
 import {useNavigate} from 'react-router-dom';
 
@@ -76,6 +76,18 @@ const JewelryPage = () => {
 
 	const metals = useSelector(getAllMetalsSelector);
 	const sizes = useSelector(getAllSizesSelector);
+
+	const sizesByUnit = useMemo(() => {
+		return sizes.reduce((acc, sizeGroup) => {
+			if (!sizeGroup.Unit) return acc;
+
+			if (!acc[sizeGroup.Unit]) {
+				acc[sizeGroup.Unit] = [];
+			}
+			acc[sizeGroup.Unit].push(...sizeGroup.Sizes);
+			return acc;
+		}, {});
+	}, [sizes]);
 
 	useEffect(() => {
 		dispatch(fetchAllMetals());
@@ -215,22 +227,28 @@ const JewelryPage = () => {
 										))}
 									</Select>
 								</Col>
-								<Col xs={24} md={12} lg={6}>
+								<Col xs={24} md={12} lg={6} className="w-full">
 									<div>Kích Thước</div>
 									<Select
 										value={filters.SizeId}
 										onChange={(value) => {
-											const updatedFilters = {...filters, SizeId: value};
-											setFilters(updatedFilters); // Update the state
+											setFilters((prevFilters) => ({
+												...prevFilters,
+												SizeId: value,
+											}));
 										}}
 										placeholder="Chọn kích thước"
 										allowClear
 										className="w-full"
 									>
-										{sizes.map((size) => (
-											<Select.Option key={size.Id} value={size.Id}>
-												{size.Value} {size.Unit}
-											</Select.Option>
+										{Object.entries(sizesByUnit).map(([unit, unitSizes]) => (
+											<Select.OptGroup key={unit} label={unit.toUpperCase()}>
+												{unitSizes.map((size) => (
+													<Select.Option key={size.Id} value={size.Id}>
+														{`${size.Value} ${unit}`}
+													</Select.Option>
+												))}
+											</Select.OptGroup>
 										))}
 									</Select>
 								</Col>
@@ -287,9 +305,23 @@ const JewelryPage = () => {
 													SizeId: filters.SizeId,
 													Status: filters.Status,
 												})
-											).then((res) => {
-												setJewelryList(res?.Values);
-											});
+											)
+												.unwrap()
+												.then((res) => {
+													console.log('Fetch Result:', res);
+													console.log('Values:', res?.Values);
+													setJewelryList(res?.Values);
+												})
+												.catch((error) => {
+													console.error('Fetch Error:', error);
+													notification.error({
+														message: 'Lỗi',
+														description:
+															error?.data?.detail ||
+															error?.detail ||
+															'Không thể tải danh sách trang sức',
+													});
+												});
 										}}
 										className="w-full"
 									>
