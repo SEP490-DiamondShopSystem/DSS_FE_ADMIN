@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useState, useMemo} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
 import {useNavigate} from 'react-router-dom';
 
@@ -45,6 +45,7 @@ import {fetchAllMetals} from '../../../../redux/slices/jewelry/metalSlice';
 import {fetchAllSizes} from '../../../../redux/slices/jewelry/sizeSlice';
 import {formatPrice} from '../../../../utils';
 import Loading from '../../../../components/Loading';
+import {Helmet} from 'react-helmet';
 
 const JewelryPage = () => {
 	const dispatch = useDispatch();
@@ -76,6 +77,18 @@ const JewelryPage = () => {
 
 	const metals = useSelector(getAllMetalsSelector);
 	const sizes = useSelector(getAllSizesSelector);
+
+	const sizesByUnit = useMemo(() => {
+		return sizes.reduce((acc, sizeGroup) => {
+			if (!sizeGroup.Unit) return acc;
+
+			if (!acc[sizeGroup.Unit]) {
+				acc[sizeGroup.Unit] = [];
+			}
+			acc[sizeGroup.Unit].push(...sizeGroup.Sizes);
+			return acc;
+		}, {});
+	}, [sizes]);
 
 	useEffect(() => {
 		dispatch(fetchAllMetals());
@@ -132,6 +145,9 @@ const JewelryPage = () => {
 
 	return (
 		<div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8 bg-gradient-to-br from-gray-50 to-gray-100 min-h-screen">
+			<Helmet>
+				<title>Quản Lý Trang Sức</title>
+			</Helmet>
 			<div className="bg-white shadow-2xl rounded-2xl overflow-hidden">
 				{/* Header */}
 				<div className="bg-primary/10 px-6 py-6 border-b border-primary/20 flex justify-between items-center">
@@ -215,22 +231,28 @@ const JewelryPage = () => {
 										))}
 									</Select>
 								</Col>
-								<Col xs={24} md={12} lg={6}>
+								<Col xs={24} md={12} lg={6} className="w-full">
 									<div>Kích Thước</div>
 									<Select
 										value={filters.SizeId}
 										onChange={(value) => {
-											const updatedFilters = {...filters, SizeId: value};
-											setFilters(updatedFilters); // Update the state
+											setFilters((prevFilters) => ({
+												...prevFilters,
+												SizeId: value,
+											}));
 										}}
 										placeholder="Chọn kích thước"
 										allowClear
 										className="w-full"
 									>
-										{sizes.map((size) => (
-											<Select.Option key={size.Id} value={size.Id}>
-												{size.Value} {size.Unit}
-											</Select.Option>
+										{Object.entries(sizesByUnit).map(([unit, unitSizes]) => (
+											<Select.OptGroup key={unit} label={unit.toUpperCase()}>
+												{unitSizes.map((size) => (
+													<Select.Option key={size.Id} value={size.Id}>
+														{`${size.Value} ${unit}`}
+													</Select.Option>
+												))}
+											</Select.OptGroup>
 										))}
 									</Select>
 								</Col>
@@ -287,9 +309,23 @@ const JewelryPage = () => {
 													SizeId: filters.SizeId,
 													Status: filters.Status,
 												})
-											).then((res) => {
-												setJewelryList(res?.Values);
-											});
+											)
+												.unwrap()
+												.then((res) => {
+													console.log('Fetch Result:', res);
+													console.log('Values:', res?.Values);
+													setJewelryList(res?.Values);
+												})
+												.catch((error) => {
+													console.error('Fetch Error:', error);
+													notification.error({
+														message: 'Lỗi',
+														description:
+															error?.data?.detail ||
+															error?.detail ||
+															'Không thể tải danh sách trang sức',
+													});
+												});
 										}}
 										className="w-full"
 									>
@@ -341,7 +377,8 @@ const JewelryPage = () => {
 													<div>
 														<div className="flex justify-between items-center mb-2">
 															<span className="text-lg font-bold text-primary">
-																{jewelry.Title}
+																{jewelry.Title} -{' '}
+																{jewelry.ModelCode}
 															</span>
 															{renderStatusTag(jewelry.Status)}
 														</div>
@@ -350,11 +387,28 @@ const JewelryPage = () => {
 															<div className="flex items-center">
 																<DollarOutlined className="mr-2 text-primary" />
 																<span className="font-semibold">
-																	{jewelry.TotalPrice > 0
-																		? formatPrice(
-																				jewelry.TotalPrice
-																		  )
-																		: 'Liên Hệ Báo Giá'}
+																	{!jewelry.SoldPrice &&
+																	jewelry.TotalPrice >
+																		jewelry.SalePrice ? (
+																		<div className="flex items-center">
+																			<span className="line-through mr-2 text-gray-400">
+																				{formatPrice(
+																					jewelry.TotalPrice
+																				)}
+																			</span>
+																			<span className="text-darkGreen text-xl">
+																				{formatPrice(
+																					jewelry.SalePrice
+																				)}
+																			</span>
+																		</div>
+																	) : (
+																		<Tooltip title="Giá đã bán">
+																			{formatPrice(
+																				jewelry.SoldPrice
+																			)}
+																		</Tooltip>
+																	)}
 																</span>
 															</div>
 															<div className="flex justify-between text-sm">

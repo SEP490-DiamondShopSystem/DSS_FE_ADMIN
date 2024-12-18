@@ -6,6 +6,7 @@ import {
 	LoadingMetalSelector,
 	MetalErrorSelector,
 } from '../../../../redux/selectors';
+import {Helmet} from 'react-helmet';
 
 const MetalPage = () => {
 	const dispatch = useDispatch();
@@ -41,6 +42,9 @@ const MetalPage = () => {
 
 	return (
 		<div className="p-6 bg-offWhite min-h-screen">
+			<Helmet>
+				<title>Quản Lý Giá Kim Loại</title>
+			</Helmet>
 			<h1 className="text-3xl font-semibold text-primary mb-6">Quản Lý Giá Kim Loại</h1>
 
 			{/* Metal Prices Table */}

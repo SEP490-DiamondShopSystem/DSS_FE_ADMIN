@@ -13,6 +13,8 @@ import {
 } from '../../../../redux/slices/criteriaRangeSlice';
 import {message, Alert, Modal, Form, InputNumber} from 'antd';
 import {getPriceBoardSelector, LoadingDiamondPriceSelector} from '../../../../redux/selectors';
+import Loading from '../../../../components/Loading';
+import {Helmet} from 'react-helmet';
 
 const formatPrice = (price) => {
 	if (price === null || price === undefined) return 'N/A';
@@ -489,7 +491,7 @@ const MainDiamondPricePage = () => {
 	};
 
 	if (loading) {
-		return <div className="text-center text-lg font-semibold">Đang Tải...</div>;
+		return <Loading />;
 	}
 
 	const renderPriceRows = (cellMatrix, colorRange, isCreating) => {
@@ -632,6 +634,9 @@ const MainDiamondPricePage = () => {
 
 	return (
 		<div className="container gap-4 mx-auto p-6 bg-white rounded-lg shadow-lg">
+			<Helmet>
+				<title>Bảng Giá Kim Cương Chính</title>
+			</Helmet>
 			<h1 className="text-5xl font-bold text-center text-blue-600">
 				Bảng Giá Kim Cương Chính{' '}
 			</h1>

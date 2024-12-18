@@ -189,16 +189,6 @@ export const GiftForm = ({form, shapes, Option, removeGift, isEditing = false}) 
 																message:
 																	'Giá trị tối thiểu 1000 VND',
 															},
-															{
-																validator: (_, value) =>
-																	value % 1000 !== 0
-																		? Promise.reject(
-																				new Error(
-																					'Giá trị phải là bội của 1000'
-																				)
-																		  )
-																		: Promise.resolve(),
-															},
 														]}
 														labelCol={{span: 24}}
 														wrapperCol={{span: 24}}
