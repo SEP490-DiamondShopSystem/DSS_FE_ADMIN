@@ -965,7 +965,7 @@ const ConfigurationPage = () => {
 											{required: true, message: 'Trường này là bắt buộc'},
 										]}
 									>
-										<InputNumber className="w-full" />
+										<Input className="w-full" />
 									</Form.Item>
 								</Col>
 								<Col xs={24} sm={12} md={6}>
