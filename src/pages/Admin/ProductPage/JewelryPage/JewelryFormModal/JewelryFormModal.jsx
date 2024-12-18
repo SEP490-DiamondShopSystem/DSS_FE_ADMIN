@@ -112,7 +112,7 @@ const JewelryFormModal = ({
 						>
 							{filteredSizes.map((size) => (
 								<Option key={size.SizeId} value={size.SizeId}>
-									{size.Size.Id} {size.Size.Unit}
+									{size.Size.Value} {size.Size.Unit}
 								</Option>
 							))}
 						</Select>
