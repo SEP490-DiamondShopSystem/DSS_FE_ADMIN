@@ -111,9 +111,7 @@ const SideDiamondPricePage = () => {
 
 		if (listPrices.length === 0) return;
 
-		await dispatch(
-			createDiamondPrice({listPrices, shapeId, isLabDiamond, isSideDiamond: true})
-		)
+		await dispatch(createDiamondPrice({listPrices, shapeId, isLabDiamond, isSideDiamond: true}))
 			.unwrap()
 			.then(() => {
 				message.success('Thêm giá kim cương thành công!');
@@ -482,7 +480,10 @@ const SideDiamondPricePage = () => {
 
 				{row.map((cell, cellIndex) => {
 					const editedCell = editedCells.find(
-						(edited) => edited.rowIndex === rowIndex && edited.cellIndex === cellIndex
+						(edited) =>
+							edited.diamondPriceId === cell.DiamondPriceId &&
+							edited.rowIndex === rowIndex &&
+							edited.cellIndex === cellIndex
 					);
 					const cellValue = editedCell ? editedCell.price : cell.Price;
 

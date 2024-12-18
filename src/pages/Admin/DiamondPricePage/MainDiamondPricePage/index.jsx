@@ -408,30 +408,47 @@ const MainDiamondPricePage = () => {
 		const numericValue = parseFloat(newValue.replace(/\./g, '').replace(',', '.')) || 0;
 
 		setEditedCells((prev) => {
-			const existingCell = prev.find(
-				(cell) => cell.rowIndex === rowIndex && cell.cellIndex === cellIndex
+			// Find the exact matching cell based on diamondPriceId, rowIndex, and cellIndex
+			const existingCellIndex = prev.findIndex(
+				(cell) =>
+					cell.diamondPriceId === diamondPriceId &&
+					cell.rowIndex === rowIndex &&
+					cell.cellIndex === cellIndex
 			);
 
-			if (existingCell) {
+			// If cell exists
+			if (existingCellIndex !== -1) {
+				// If new value is empty, remove the cell from edited cells
 				if (newValue.trim() === '') {
-					return prev.filter((cell) => cell !== existingCell);
-				} else {
-					return prev.map((cell) =>
-						cell === existingCell ? {...existingCell, price: numericValue} : cell
-					);
+					return prev.filter((_, index) => index !== existingCellIndex);
 				}
-			} else {
-				const newEntry = {
-					diamondPriceId: diamondPriceId,
+
+				// Create a new array with updated cell
+				const updatedCells = [...prev];
+				updatedCells[existingCellIndex] = {
+					...updatedCells[existingCellIndex],
 					price: numericValue,
-					rowIndex,
-					cellIndex,
 				};
-				return [...prev, newEntry];
+				return updatedCells;
 			}
+
+			// If cell doesn't exist and value is not empty, add new cell
+			if (newValue.trim() !== '') {
+				return [
+					...prev,
+					{
+						diamondPriceId: diamondPriceId,
+						price: numericValue,
+						rowIndex,
+						cellIndex,
+					},
+				];
+			}
+
+			// If no changes needed, return original state
+			return prev;
 		});
 	};
-
 	const handleAddPriceCell = (rowIndex, cellIndex, diamondPriceId, newValue) => {
 		const numericValue = parseFloat(newValue.replace(/\./g, '').replace(',', '.')) || 0;
 
@@ -482,7 +499,10 @@ const MainDiamondPricePage = () => {
 
 				{row.map((cell, cellIndex) => {
 					const editedCell = editedCells.find(
-						(edited) => edited.rowIndex === rowIndex && edited.cellIndex === cellIndex
+						(edited) =>
+							edited.diamondPriceId === cell.DiamondPriceId &&
+							edited.rowIndex === rowIndex &&
+							edited.cellIndex === cellIndex
 					);
 					const cellValue = editedCell ? editedCell.price : cell.Price;
 
