@@ -27,7 +27,6 @@ const DiamondDetailPage = () => {
 	const [fetch, setFetch] = useState();
 	const [isModalVisible, setIsModalVisible] = useState(false);
 
-
 	useEffect(() => {
 		dispatch(getDiamondDetail(id))
 			.unwrap()

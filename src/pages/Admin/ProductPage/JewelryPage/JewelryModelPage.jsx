@@ -29,6 +29,7 @@ import {
 import {JewelryModelUploadForm} from './JewelryModelUploadForm';
 import Loading from '../../../../components/Loading';
 import ModelDetailsView from './ModelDetailView';
+import {Helmet} from 'react-helmet';
 
 const JewelryModelPage = () => {
 	const dispatch = useDispatch();
@@ -530,6 +531,9 @@ const JewelryModelPage = () => {
 
 	return (
 		<div className="p-6 bg-white min-h-screen">
+			<Helmet>
+				<title>Quản Lí Mẫu Trang Sức</title>
+			</Helmet>
 			<h1 className="text-3xl font-semibold text-primary mb-6">Mẫu Trang Sức</h1>
 			{loading ? (
 				<Loading />

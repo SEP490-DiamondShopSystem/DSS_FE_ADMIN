@@ -47,6 +47,7 @@ import {AddModalDiamond} from './AddModalDiamond/AddModalDiamond';
 import {DiamondUploadForm} from './DiamondUploadForm';
 import {LockDiamondModal} from './LockDiamondModal/LockDiamondModal';
 import {Filter} from '../../../../components/Filter';
+import {Helmet} from 'react-helmet';
 
 const {Search} = Input;
 const {Title} = Typography;
@@ -521,6 +522,9 @@ const DiamondPage = () => {
 	// if (diamondList === null || diamondList === undefined) <Loading />;
 	return (
 		<div className="mx-20 my-10">
+			<Helmet>
+				<title>Danh Sách Kim Cương</title>
+			</Helmet>
 			<Title level={3}>Danh Sách Kim Cương</Title>
 			<Filter
 				filter={statusList}

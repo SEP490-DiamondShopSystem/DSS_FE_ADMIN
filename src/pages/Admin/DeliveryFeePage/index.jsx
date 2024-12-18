@@ -16,6 +16,7 @@ import {
 	getAllLocationsSelector,
 } from '../../../redux/selectors';
 import {CheckOutlined, CloseOutlined, EditOutlined} from '@ant-design/icons';
+import {Helmet} from 'react-helmet';
 
 const {Option} = Select;
 
@@ -180,6 +181,9 @@ const DeliveryFeePage = () => {
 
 	return (
 		<div className="p-6 bg-offWhite min-h-screen">
+			<Helmet>
+				<title>Quản Lí Phí Vận Chuyển</title>
+			</Helmet>
 			<h1 className="text-2xl font-semibold mb-4 text-primary">Quản Lí Phí Vận Chuyển</h1>
 			<Button
 				type="primary"

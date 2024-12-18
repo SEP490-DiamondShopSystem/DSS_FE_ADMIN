@@ -743,8 +743,8 @@ const TimeLineOrder = ({
 							{orders?.Transactions?.length > 0 && orders?.PaymentStatus === 1 ? (
 								<>
 									<div className="my-5">
-										<Title level={5}>
-											Xác Nhận Thông Tin Giao Dịch Từ Ngân Hàng
+										<Title level={5} className="text-center">
+											Xác Thực Thông Tin Giao Dịch Từ Ngân Hàng
 										</Title>
 
 										<div className="my-2">
@@ -803,7 +803,7 @@ const TimeLineOrder = ({
 							) : (
 								<div className="text-center">
 									<div className="font-semibold text-base text-darkBlue mb-5">
-										Chờ Khách Hàng Gửi Chứng Từ
+										Vui Lòng Chờ Khách Hàng Thanh Toán
 									</div>
 									<div className="flex justify-around">
 										<Button
@@ -951,7 +951,9 @@ const TimeLineOrder = ({
 								</p>
 							</div>
 							<div className="my-5">
-								<Title level={5}>Xác Thực Thông Tin Giao Dịch Từ Ngân Hàng</Title>
+								<Title level={5} className="text-center">
+									Xác Thực Thông Tin Giao Dịch Từ Ngân Hàng
+								</Title>
 
 								<div className="my-2">
 									<label className="font-semibold text-base">
@@ -1038,8 +1040,8 @@ const TimeLineOrder = ({
 									<CloseCircleOutlined /> {ORDER_STATUS_TEXTS.Cancelled}
 								</p>
 							</div>
-							<p className="mt-3 text-center font-semibold text-primary text-lg">
-								Chờ Quản Lý Xác Nhận Hoàn Tiền
+							<p className="mt-3 text-center font-semibold text-darkBlue text-lg">
+								Vui Lòng Chờ Quản Lý Xác Nhận Hoàn Tiền
 							</p>
 						</div>
 					)}
@@ -1161,7 +1163,7 @@ const TimeLineOrder = ({
 
 								<>
 									<div className="my-5">
-										<Title level={5}>
+										<Title level={5} className="text-center">
 											Xác Thực Thông Tin Giao Dịch Từ Ngân Hàng
 										</Title>
 
@@ -1720,8 +1722,8 @@ const TimeLineOrder = ({
 										  orders?.Transactions?.length === 2 &&
 										  !transactionStatusInvalid ? (
 											<>
-												<div className="font-semibold text-base text-primary text-center">
-													Chờ Nhân Viên Xác Nhận
+												<div className="font-semibold text-base text-darkBlue text-center">
+													Vui Lòng Chờ Nhân Viên Xác Nhận
 												</div>
 												<div className="mt-6">
 													<h4 className="text-lg font-medium mb-2">
@@ -2010,7 +2012,7 @@ const TimeLineOrder = ({
 											</>
 										) : (
 											<div className="font-semibold text-base text-darkBlue text-center">
-												Chờ Nhân Viên Giao Hàng Xác Nhận
+												Vui Lòng Chờ Nhân Viên Giao Hàng Xác Nhận
 											</div>
 										)}
 									</div>

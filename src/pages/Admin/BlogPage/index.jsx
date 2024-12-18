@@ -42,6 +42,7 @@ import 'react-quill/dist/quill.snow.css';
 import QuillTable from 'quill-table';
 import DOMPurify from 'dompurify';
 import ReactHtmlParser from 'html-react-parser';
+import {Helmet} from 'react-helmet';
 
 const {Title, Text} = Typography;
 
@@ -312,6 +313,9 @@ const BlogPage = () => {
 
 	return (
 		<div className="container mx-auto px-4 py-6 bg-gray-50 min-h-screen">
+			<Helmet>
+				<title>Quản Lí Bài Viết</title>
+			</Helmet>
 			<Card
 				className="shadow-lg rounded-xl"
 				title={
