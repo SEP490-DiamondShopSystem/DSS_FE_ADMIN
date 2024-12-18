@@ -535,15 +535,24 @@ const PromotionPage = ({promotionData}) => {
 	// Add a new requirement row based on the selected type
 	const addRequirement = (type) => {
 		const currentRequirements = form.getFieldValue('requirements') || [];
-		form.setFieldsValue({
-			requirements: [...currentRequirements, {type}],
-		});
+		if (currentRequirements.length < 4) {
+			form.setFieldsValue({
+				requirements: [...currentRequirements, {type}],
+			});
+		} else {
+			message.warning('Chỉ được thêm tối đa 4 yêu cầu');
+		}
 	};
 	const addGift = (type) => {
-		const currentGifts = form.getFieldValue('gifts') || []; // Use 'gifts' instead of 'gift'
-		form.setFieldsValue({
-			gifts: [...currentGifts, {type}], // Update to 'gifts'
-		});
+		// Only allow adding if no gifts exist
+		const currentGifts = form.getFieldValue('gifts') || [];
+		if (currentGifts.length === 0) {
+			form.setFieldsValue({
+				gifts: [{type}],
+			});
+		} else {
+			message.warning('Chỉ được thêm tối đa 1 quà');
+		}
 	};
 
 	// Table columns definition for displaying promotions
