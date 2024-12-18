@@ -32,7 +32,7 @@ const PromotionForm = ({
 	addGift,
 	shapes,
 	removeRequirement,
-	removeGift, // Receive removeRequirement as a prop
+	removeGift,
 }) => {
 	return (
 		<div>
@@ -50,23 +50,23 @@ const PromotionForm = ({
 							<Form.Item
 								name="name"
 								label="Tên Khuyến Mãi"
-								rules={[{required: true, message: 'Please enter a promotion name'}]}
+								rules={[{required: true, message: 'Vui lòng nhập tên khuyến mãi'}]}
 								className="mb-0"
 							>
 								<Input
 									className="border border-gray-300 rounded-md p-2 focus:border-blue-500"
-									placeholder="Enter promotion name"
+									placeholder="Nhập tên khuyến mãi"
 								/>
 							</Form.Item>
 							<Form.Item
 								name="promoCode"
 								label="Mã Khuyến Mãi"
-								rules={[{required: true, message: 'Please enter a promotion code'}]}
+								rules={[{required: true, message: 'Vui lòng nhập mã khuyến mãi'}]}
 								className="mb-0"
 							>
 								<Input
 									className="border border-gray-300 rounded-md p-2 focus:border-blue-500"
-									placeholder="Enter promotion code"
+									placeholder="Nhập mã khuyến mãi"
 								/>
 							</Form.Item>
 						</Col>
@@ -75,7 +75,7 @@ const PromotionForm = ({
 								label="Ngày hoạt động"
 								name="validDate"
 								rules={[
-									{required: true, message: 'Please select a valid date range'},
+									{required: true, message: 'Vui lòng nhập ngày hoạt động'},
 								]}
 							>
 								<RangePicker
@@ -87,11 +87,11 @@ const PromotionForm = ({
 							<Form.Item
 								name="description"
 								label="Miêu Tả"
-								rules={[{required: true, message: 'Please enter a description'}]}
+								rules={[{required: true, message: 'Vui lòng nhập mô tả'}]}
 							>
 								<Input
 									className="border border-gray-300 rounded-md p-2 focus:border-blue-500"
-									placeholder="Enter description"
+									placeholder="Nhập mô tả khuyến mãi"
 								/>
 							</Form.Item>
 						</Col>
@@ -161,6 +161,7 @@ const PromotionForm = ({
 					shapes={shapes}
 					Option={Option}
 					removeRequirement={removeRequirement}
+					isEditing={isEditing} // Pass isEditing to PromoReqForm
 				/>
 
 				{/* Gift Section */}
@@ -172,7 +173,14 @@ const PromotionForm = ({
 				</div>
 
 				{/* Dynamic Gift List */}
-				<GiftForm form={form} shapes={shapes} Option={Option} removeGift={removeGift} />
+				<GiftForm 
+					form={form} 
+					shapes={shapes} 
+					Option={Option} 
+					removeGift={removeGift}
+					isEditing={isEditing} // Pass isEditing to GiftForm
+				/>
+
 				{/* Submit Button */}
 				<Form.Item>
 					<div className="flex justify-end space-x-4">

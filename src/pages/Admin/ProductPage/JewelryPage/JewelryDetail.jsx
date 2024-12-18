@@ -5,11 +5,11 @@ import {
 	changeJewelryReviewVisibility,
 	deleteJewelry,
 } from '../../../../redux/slices/jewelry/jewelrySlice';
-import {Camera, Ruler, Star, Info, Diamond, Tag, Eye, EyeOff, X, Cannabis} from 'lucide-react';
+import {Camera, Ruler, Star, Info, Diamond, Eye, EyeOff, X, Cannabis} from 'lucide-react';
 import {useNavigate, useParams} from 'react-router-dom';
 import Loading from '../../../../components/Loading';
 import {DeleteFilled, LeftCircleFilled, LeftOutlined} from '@ant-design/icons';
-import {Button, message, Modal, Tooltip} from 'antd';
+import {Button, message, Modal, Tooltip, Tag} from 'antd';
 const ClarityEnum = {
 	1: 'SI2',
 	2: 'SI1',
@@ -182,13 +182,24 @@ const JewelryDetail = ({jewelry, onClose}) => {
 						message.error(error.data.detail || error.detail);
 					});
 			},
-			onCancel() {
-			},
+			onCancel() {},
 		});
 	};
 
 	const mapEnum = (value, enumObj) => enumObj[value] || 'Chưa Có';
 
+	const renderStatusTag = (status) => {
+		const statusMap = {
+			1: {color: 'blue', label: 'Hoạt động'},
+			2: {color: 'gold', label: 'Đã bán'},
+			3: {color: 'volcano', label: 'Bị khóa'},
+			4: {color: 'gray', label: 'Không hoạt động'},
+			5: {color: 'cyan', label: 'Khóa người dùng'},
+			6: {color: 'purple', label: 'Đặt trước'},
+		};
+		const statusInfo = statusMap[status] || {color: 'default', label: 'Không xác định'};
+		return <Tag color={statusInfo.color}>{statusInfo.label}</Tag>;
+	};
 	const renderTabContent = () => {
 		switch (activeTab) {
 			case 'main':
@@ -206,15 +217,19 @@ const JewelryDetail = ({jewelry, onClose}) => {
 						</div>
 						<div className="">
 							<div className="bg-white p-4 rounded-lg shadow-sm">
-								<div className="flex items-center mb-2">
+								<div className="w-full flex justify-around mb-2">
 									<Camera className="mr-2 text-primary" size={20} />
 									<span className="font-semibold text-gray-700">
 										Mã Trang Sức:
 									</span>
-									<span className="ml-2">
+									<span className="pl-2">
 										{' '}
 										{fetchedJewelry?.SerialCode || 'Chưa Có'}
-									</span>{' '}
+									</span>
+									<span className="pl-2">
+										{' '}
+										{renderStatusTag(fetchedJewelry?.Status)}
+									</span>
 								</div>
 								<div className="flex items-center mb-2">
 									<Cannabis className="mr-2 text-primary" size={20} />
@@ -288,9 +303,31 @@ const JewelryDetail = ({jewelry, onClose}) => {
 										key={index}
 										className="bg-white p-4 rounded-lg shadow-md hover:shadow-lg transition-shadow  border"
 									>
-										<h2 className="text-xl font-bold text-primary mb-4 flex items-center">
-											{diamond?.Title}
-										</h2>
+										<div className="flex justify-between items-center mb-4">
+											<h2 className="text-xl font-bold text-primary flex items-center">
+												{diamond?.Title}
+											</h2>
+											<div className="flex flex-col items-center">
+												{renderStatusTag(diamond.Status)}
+												{diamond.IsLockForCustomizeRequest &&
+													diamond.Status === 3 && (
+														<div className="flex justify-between items-center">
+															<span className="font-light text-gray">
+																Khóa cho đơn thiết kế
+															</span>
+														</div>
+													)}
+												{diamond.IsLockForJewelry &&
+													diamond.Status === 3 && (
+														<div className="flex justify-between items-center">
+															<span className="font-light text-gray">
+																Gắn cho trang sức
+															</span>
+														</div>
+													)}
+											</div>
+										</div>
+
 										<div className="grid grid-cols-2 gap-3">
 											{/* Basic Details */}
 											<div className="space-y-3 mx-2">
@@ -411,7 +448,7 @@ const JewelryDetail = ({jewelry, onClose}) => {
 														Giá Gốc:
 													</span>
 													<span className="text-black font-bold">
-														{diamond.DiamondPrice?.Price?.toLocaleString() ||
+														{diamond.TruePrice.toLocaleString() ||
 															'Chưa Có'}{' '}
 														VND
 													</span>
@@ -636,13 +673,7 @@ const JewelryDetail = ({jewelry, onClose}) => {
 										<span className="font-medium text-gray-700">
 											Trạng Thái:
 										</span>
-										<span>
-											{fetchedJewelry.Status === 1
-												? 'Còn Hàng'
-												: fetchedJewelry.Status === 2
-												? 'Hết Hàng'
-												: 'Chưa Có'}
-										</span>
+										<span>{renderStatusTag(fetchedJewelry.Status)}</span>
 									</div>
 									<div className="flex justify-between items-center">
 										<span className="font-medium text-gray-700">

@@ -65,7 +65,7 @@ const ModelDetailsView = ({
       title: 'Xác nhận xóa mẫu',
       content: 'Bạn có chắc chắn muốn xóa mẫu này? Hành động này không thể hoàn tác.',
       okText: 'Xóa',
-      okType: 'danger',
+      okType: 'default',
       cancelText: 'Hủy',
       onOk: onDelete, // This will execute the onDelete function if the user confirms
       onCancel: () => {}, // This will execute if the user cancels

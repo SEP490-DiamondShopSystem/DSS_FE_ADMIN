@@ -39,6 +39,7 @@ import {
 	updateShopBankQRRule,
 	updateJewelryModelRule,
 } from '../../../redux/slices/configSlice';
+import {formatPrice} from '../../../utils';
 
 import {selectIsLoading, selectConfigError} from '../../../redux/selectors';
 
@@ -163,6 +164,7 @@ const ConfigurationPage = () => {
 			.unwrap()
 			.then(() => {
 				handleSuccess('Cập Nhật Quy Định Tài Khoản Thành Công!');
+				fetchData;
 			})
 			.catch((error) => {
 				message.error(error?.data?.detail || error?.detail);
@@ -173,6 +175,7 @@ const ConfigurationPage = () => {
 			.unwrap()
 			.then(() => {
 				handleSuccess('Cập Nhật Quy Định Kim Cương Thành Công!');
+				fetchData;
 			})
 			.catch((error) => {
 				message.error(error?.data?.detail || error?.detail);
@@ -183,6 +186,7 @@ const ConfigurationPage = () => {
 			.unwrap()
 			.then(() => {
 				handleSuccess('Cập Nhật Quy Định Bảng Giá Kim Cương Thành Công!');
+				fetchData;
 			})
 			.catch((error) => {
 				message.error(error?.data?.detail || error?.detail);
@@ -193,6 +197,7 @@ const ConfigurationPage = () => {
 			.unwrap()
 			.then(() => {
 				handleSuccess('Cập Nhật Quy Định Hiển Thị Thành Công!');
+				fetchData;
 			})
 			.catch((error) => {
 				message.error(error?.data?.detail || error?.detail);
@@ -203,6 +208,7 @@ const ConfigurationPage = () => {
 			.unwrap()
 			.then(() => {
 				handleSuccess('Cập Nhật Quy Định Mẫu Trang Sức Thành Công!');
+				fetchData;
 			})
 			.catch((error) => {
 				message.error(error?.data?.detail || error?.detail);
@@ -213,6 +219,7 @@ const ConfigurationPage = () => {
 			.unwrap()
 			.then(() => {
 				handleSuccess('Cập Nhật Địa Chỉ Cửa Hàng Thành Công!');
+				fetchData;
 			})
 			.catch((error) => {
 				message.error(error?.data?.detail || error?.detail);
@@ -223,6 +230,7 @@ const ConfigurationPage = () => {
 			.unwrap()
 			.then(() => {
 				handleSuccess('Cập Nhật Quy Định Đặt Hàng Thành Công!');
+				fetchData;
 			})
 			.catch((error) => {
 				message.error(error?.data?.detail || error?.detail);
@@ -243,6 +251,7 @@ const ConfigurationPage = () => {
 			.unwrap()
 			.then(() => {
 				handleSuccess('Cập Nhật Quy Định Thanh Toán Thành Công!');
+				fetchData;
 			})
 			.catch((error) => {
 				message.error(error?.data?.detail || error?.detail);
@@ -259,6 +268,7 @@ const ConfigurationPage = () => {
 				.unwrap()
 				.then(() => {
 					handleSuccess('Tải lên thành công!');
+					fetchData;
 				})
 				.catch((error) => {
 					message.error(error?.data?.detail || error?.detail);
@@ -266,6 +276,7 @@ const ConfigurationPage = () => {
 		}
 
 		const updatePayload = {
+			bankName: values.BankName,
 			accountNumber: values.AccountNumber,
 			accountName: values.AccountName,
 			bankBin: values.BankBin,
@@ -275,6 +286,7 @@ const ConfigurationPage = () => {
 			.unwrap()
 			.then(() => {
 				handleSuccess('Cập nhật tài khoản ngân hàng thành công!');
+				fetchData;
 			})
 			.catch((error) => {
 				message.error(error?.data?.detail || error?.detail);
@@ -338,6 +350,7 @@ const ConfigurationPage = () => {
 										<InputNumber
 											placeholder={accountRule?.VndPerPoint}
 											className="w-full"
+											formatter={(value) => formatPrice(value)}
 										/>
 									</Form.Item>
 								</Col>
@@ -439,6 +452,7 @@ const ConfigurationPage = () => {
 														accountRule?.[`${rank}RankBenefit`]
 															?.MaxAmountDiscountOnOrder
 													}
+													formatter={(value) => formatPrice(value)}
 													className="w-full"
 												/>
 											</Form.Item>
@@ -555,9 +569,10 @@ const ConfigurationPage = () => {
 										]}
 									>
 										<InputNumber
-											placeholder={
+											placeholder={formatPrice(
 												diamondRule?.MinimalSideDiamondAveragePrice
-											}
+											)}
+											formatter={(value) => formatPrice(value)}
 											className="w-full"
 										/>
 									</Form.Item>
@@ -572,7 +587,10 @@ const ConfigurationPage = () => {
 									>
 										<InputNumber
 											className="w-full"
-											placeholder={diamondRule?.MinimalMainDiamondPrice}
+											placeholder={formatPrice(
+												diamondRule?.MinimalMainDiamondPrice
+											)}
+											formatter={(value) => formatPrice(value)}
 										/>
 									</Form.Item>
 								</Col>
@@ -856,7 +874,9 @@ const ConfigurationPage = () => {
 							</Row>
 							<Button
 								type="primary"
-								onClick={() => showConfirm(modelForm, handleModelSubmit)}
+								onClick={() =>
+									showConfirm(diamondPriceForm, handleDiamondPriceSubmit)
+								}
 							>
 								Lưu
 							</Button>
@@ -991,7 +1011,7 @@ const ConfigurationPage = () => {
 											Array.isArray(e) ? e : e?.fileList
 										}
 										rules={[
-											{required: true, message: 'Trường này là bắt buộc'},
+											{required: false, message: 'Trường này là bắt buộc'},
 										]}
 									>
 										<Upload
@@ -1107,7 +1127,7 @@ const ConfigurationPage = () => {
 											{required: true, message: 'Trường này là bắt buộc'},
 										]}
 									>
-										<InputNumber className="w-full" />
+										<InputNumber className="w-full" readOnly />
 									</Form.Item>
 								</Col>
 								<Col xs={24} sm={12} md={6}>
@@ -1118,7 +1138,7 @@ const ConfigurationPage = () => {
 											{required: true, message: 'Trường này là bắt buộc'},
 										]}
 									>
-										<InputNumber className="w-full" />
+										<InputNumber className="w-full" readOnly />
 									</Form.Item>
 								</Col>
 								<Col xs={24} sm={12} md={6}>
@@ -1129,7 +1149,11 @@ const ConfigurationPage = () => {
 											{required: true, message: 'Trường này là bắt buộc'},
 										]}
 									>
-										<InputNumber className="w-full" />
+										<InputNumber
+											className="w-full"
+											readOnly
+											formatter={(value) => formatPrice(value)}
+										/>
 									</Form.Item>
 								</Col>
 								<Col xs={24} sm={12} md={6}>
@@ -1140,7 +1164,11 @@ const ConfigurationPage = () => {
 											{required: true, message: 'Trường này là bắt buộc'},
 										]}
 									>
-										<InputNumber className="w-full" />
+										<InputNumber
+											className="w-full"
+											readOnly
+											formatter={(value) => formatPrice(value)}
+										/>
 									</Form.Item>
 								</Col>
 								<Col xs={24} sm={12} md={6}>
@@ -1151,7 +1179,7 @@ const ConfigurationPage = () => {
 											{required: true, message: 'Trường này là bắt buộc'},
 										]}
 									>
-										<InputNumber className="w-full" />
+										<InputNumber className="w-full" readOnly />
 									</Form.Item>
 								</Col>
 								<Col xs={24} sm={12} md={6}>
@@ -1162,7 +1190,7 @@ const ConfigurationPage = () => {
 											{required: true, message: 'Trường này là bắt buộc'},
 										]}
 									>
-										<InputNumber className="w-full" />
+										<InputNumber className="w-full" readOnly />
 									</Form.Item>
 								</Col>
 								<Col xs={24} sm={12} md={6}>
@@ -1173,16 +1201,16 @@ const ConfigurationPage = () => {
 											{required: true, message: 'Trường này là bắt buộc'},
 										]}
 									>
-										<InputNumber className="w-full" />
+										<InputNumber className="w-full" readOnly />
 									</Form.Item>
 								</Col>
 							</Row>
-							<Button
+							{/* <Button
 								type="primary"
 								onClick={() => showConfirm(orderForm, handleOrderSubmit)}
 							>
 								Lưu
-							</Button>
+							</Button> */}
 						</Form>
 					</Card>
 				</Tabs.TabPane>
@@ -1227,7 +1255,10 @@ const ConfigurationPage = () => {
 											{required: true, message: 'Trường này là bắt buộc'},
 										]}
 									>
-										<InputNumber className="w-full" />
+										<InputNumber
+											className="w-full"
+											formatter={(value) => formatPrice(value)}
+										/>
 									</Form.Item>
 								</Col>
 								<Col xs={24} sm={12} md={6}>
@@ -1238,7 +1269,10 @@ const ConfigurationPage = () => {
 											{required: true, message: 'Trường này là bắt buộc'},
 										]}
 									>
-										<InputNumber className="w-full" />
+										<InputNumber
+											className="w-full"
+											formatter={(value) => formatPrice(value)}
+										/>
 									</Form.Item>
 								</Col>
 								<Col xs={24} sm={12} md={6}>
@@ -1249,7 +1283,10 @@ const ConfigurationPage = () => {
 											{required: true, message: 'Trường này là bắt buộc'},
 										]}
 									>
-										<InputNumber className="w-full" />
+										<InputNumber
+											className="w-full"
+											formatter={(value) => formatPrice(value)}
+										/>
 									</Form.Item>
 								</Col>
 								<Col xs={24} sm={12} md={6}>
@@ -1291,7 +1328,7 @@ const ConfigurationPage = () => {
 						</Form>
 					</Card>
 				</Tabs.TabPane>
-				<Tabs.TabPane tab="Quy Tắc Khuyến Mãi" key="promotion">
+				{/* <Tabs.TabPane tab="Quy Tắc Khuyến Mãi" key="promotion">
 					<Card className="shadow-lg">
 						<Form
 							form={promotionForm}
@@ -1344,7 +1381,7 @@ const ConfigurationPage = () => {
 							</Button>
 						</Form>
 					</Card>
-				</Tabs.TabPane>
+				</Tabs.TabPane> */}
 			</Tabs>
 			<Modal
 				title="Xác nhận"

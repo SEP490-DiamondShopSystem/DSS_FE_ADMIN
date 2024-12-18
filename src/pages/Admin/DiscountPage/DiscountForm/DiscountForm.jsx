@@ -35,32 +35,32 @@ const DiscountForm = ({
 						<Col span={12}>
 							<Form.Item
 								name="name"
-								label="Discount Name"
-								rules={[{required: true, message: 'Please enter a discount name'}]}
+								label="Tên giảm giá"
+								rules={[{required: true, message: 'Vui lòng nhập tên giảm giá'}]}
 								className="mb-0"
 							>
 								<Input
 									className="border border-gray-300 rounded-md p-2 focus:border-blue-500"
-									placeholder="Enter discount name"
+									placeholder="Nhập tên giảm giá"
 								/>
 							</Form.Item>
 							<Form.Item
 								name="discountCode"
-								label="DiscountCode"
-								rules={[{required: true, message: 'Please enter a discountCode'}]}
+								label="Mã giảm giá"
+								rules={[{required: true, message: 'Vui lòng nhập mã giảm giá'}]}
 							>
 								<Input
 									className="border border-gray-300 rounded-md p-2 focus:border-blue-500"
-									placeholder="Enter discountCode"
+									placeholder="Nhập mã giảm giá"
 								/>
 							</Form.Item>
 						</Col>
 						<Col span={12}>
 							<Form.Item
-								label="Valid Date"
+								label="Ngày áp dụng"
 								name="validDate"
 								rules={[
-									{required: true, message: 'Please select a valid date range'},
+									{required: true, message: 'Vui lòng chọn ngày áp dụng'},
 								]}
 							>
 								<RangePicker
@@ -71,14 +71,14 @@ const DiscountForm = ({
 							</Form.Item>
 							<Form.Item
 								name="discountPercent"
-								label="DiscountPercent"
+								label="Phần trăm giảm giá"
 								rules={[
-									{required: true, message: 'Please enter a DiscountPercent'},
+									{required: true, message: 'Vui lòng nhập phần trăm giảm giá'},
 								]}
 							>
 								<Input
 									className="border border-gray-300 rounded-md p-2 focus:border-blue-500"
-									placeholder="Enter discountCode"
+									placeholder="Nhập phần trăm giảm giá"
 								/>
 							</Form.Item>
 						</Col>
@@ -99,6 +99,8 @@ const DiscountForm = ({
 					shapes={shapes}
 					Option={Option}
 					removeRequirement={removeRequirement} // Passing the function as a prop
+					isEditing={isEditing} // Pass isEditing to PromoReqForm
+
 				/>
 
 				{/* Submit Button */}

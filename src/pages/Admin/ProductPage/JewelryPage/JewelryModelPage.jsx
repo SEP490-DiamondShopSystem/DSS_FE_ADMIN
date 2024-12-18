@@ -1,11 +1,12 @@
 import React, {useEffect, useState} from 'react';
+import {Search, Filter, X} from 'lucide-react';
 import {useDispatch, useSelector} from 'react-redux';
 import {
 	fetchAllJewelryModels,
 	createJewelryModel,
 	deleteJewelryModel,
 } from '../../../../redux/slices/jewelry/jewelryModelSlice';
-import {message, Collapse, Input, Select} from 'antd';
+import {message, Collapse, Input, Select, InputNumber} from 'antd';
 import {fetchAllMetals} from '../../../../redux/slices/jewelry/metalSlice';
 import {fetchAllSizes} from '../../../../redux/slices/jewelry/sizeSlice';
 import {fetchAllShapes} from '../../../../redux/slices/shapeSlice';
@@ -39,13 +40,17 @@ const JewelryModelPage = () => {
 	const [isEditModalVisible, setIsEditModalVisible] = useState(false);
 	// State for search parameters
 	const [searchName, setSearchName] = useState('');
+	const [searchCode, setSearchCode] = useState('');
 	const [searchCategory, setSearchCategory] = useState('');
 	const [searchIsEngravable, setSearchIsEngravable] = useState('');
+	const [searchMainDiamondQuantity, setSearchMainDiamondQuantity] = useState('');
 
 	// Actual state used for fetching
 	const [name, setName] = useState('');
+	const [code, setCode] = useState('');
 	const [category, setCategory] = useState('');
 	const [isEngravable, setIsEngravable] = useState('');
+	const [mainDiamondQuantity, setMainDiamondQuantity] = useState('');
 	const [currentPage, setCurrentPage] = React.useState(1);
 	const [pageSize, setPageSize] = React.useState(5);
 	const [totalPage, setTotalPage] = useState(0);
@@ -55,7 +60,8 @@ const JewelryModelPage = () => {
 		MaximumMainDiamond: 3,
 		MaximumSideDiamondOption: 5,
 	});
-
+	const [selectedUnit, setSelectedUnit] = useState('milimeter'); // Initial unit
+	const [filteredSizes, setFilteredSizes] = useState([]);
 	useEffect(() => {
 		// Fetch jewelry model rules
 		dispatch(fetchJewelryModelRule())
@@ -75,6 +81,18 @@ const JewelryModelPage = () => {
 		sizeId: '',
 		sideDiamond: false,
 	});
+	const vietnameseFieldNames = {
+		name: 'Tên Mẫu',
+		code: 'Mã Mẫu',
+		categoryId: 'Loại Trang Sức',
+		craftManFee: 'Phí Thợ (VND)',
+		isEngravable: 'Khắc Chữ',
+		width: 'Chiều Rộng (mm)',
+		// length: 'Chiều Dài',
+		backType: 'Loại Gài',
+		claspType: 'Loại Khóa',
+		chainType: 'Loại Dây Chuyền',
+	};
 	const [modelSpec, setModelSpec] = useState({
 		name: '',
 		code: '',
@@ -82,7 +100,7 @@ const JewelryModelPage = () => {
 		craftManFee: '',
 		isEngravable: false,
 		width: '',
-		length: '',
+		// length: '',
 		backType: '',
 		claspType: '',
 		chainType: '',
@@ -140,8 +158,10 @@ const JewelryModelPage = () => {
 				Currentpage: 1,
 				PageSize: pageSize,
 				Name: searchName,
+				Code: searchCode,
 				Category: searchCategory,
 				IsEngravable: searchIsEngravable,
+				MainDiamondQuantity: searchMainDiamondQuantity,
 			})
 		)
 			.then((response) => {
@@ -170,8 +190,10 @@ const JewelryModelPage = () => {
 				Currentpage: currentPage,
 				PageSize: pageSize,
 				Name: name,
+				Code: code,
 				Category: category,
 				IsEngravable: isEngravable,
+				MainDiamondQuantity: mainDiamondQuantity,
 			})
 		)
 			.then((response) => {
@@ -183,15 +205,24 @@ const JewelryModelPage = () => {
 			.catch((error) => {
 				message.error(error?.data?.detail || error?.detail);
 			});
-	}, [dispatch, name, category, isEngravable, currentPage, pageSize]);
+	}, [dispatch, name, code, category, isEngravable, currentPage, pageSize]);
 	const metals = useSelector(getAllMetalsSelector); // Selector for getting metals from the store
 	useEffect(() => {
 		dispatch(fetchAllMetals());
 	}, [dispatch]);
 	const sizes = useSelector(getAllSizesSelector); // Selector for getting metals from the store
 	useEffect(() => {
-		dispatch(fetchAllSizes());
+		dispatch(fetchAllSizes(sizes));
 	}, [dispatch]);
+
+	useEffect(() => {
+		if (sizes && Array.isArray(sizes)) {
+			const initialUnitData = sizes.find((unit) => unit.Unit === selectedUnit);
+			if (initialUnitData) {
+				setFilteredSizes(initialUnitData.Sizes);
+			}
+		}
+	}, [sizes, selectedUnit]);
 	const enums = useSelector(getAllEnumsSelector); // Selector for getting metals from the store
 	useEffect(() => {
 		dispatch(fetchAllEnums());
@@ -217,6 +248,16 @@ const JewelryModelPage = () => {
 				...prevState,
 				[name]: value,
 			}));
+		}
+	};
+	const handleUnitChange = (e) => {
+		const newUnit = e.target.value;
+		setSelectedUnit(newUnit);
+		const unitData = sizes.find((unit) => unit.Unit === newUnit);
+		if (unitData) {
+			setFilteredSizes(unitData.Sizes);
+			// Set the initial size value for the new unit
+			handleMetalSizeChange(index, 'sizeId', unitData.Sizes[0]?.Id || '');
 		}
 	};
 	const handleMainDiamondChange = (index, field, value) => {
@@ -441,8 +482,10 @@ const JewelryModelPage = () => {
 				Currentpage: currentPage,
 				PageSize: pageSize,
 				Name: name,
+				Code: code,
 				Category: category,
 				IsEngravable: isEngravable,
+				MainDiamondQuantity: mainDiamondQuantity,
 			})
 		);
 	};
@@ -459,8 +502,10 @@ const JewelryModelPage = () => {
 							Currentpage: currentPage,
 							PageSize: pageSize,
 							Name: name,
+							Code: code,
 							Category: category,
 							IsEngravable: isEngravable,
+							MainDiamondQuantity: mainDiamondQuantity,
 						})
 					);
 				})
@@ -491,36 +536,52 @@ const JewelryModelPage = () => {
 			) : (
 				<div>
 					<div className=" p-4 mb-6 bg-offWhite">
-						<div className="mb-4 flex flex-wrap gap-4">
-							<Input
+						<div className="mb-4 grid grid-cols-4 sm:grid-cols-2 md:grid-cols-3 gap-4">
+							<input
 								type="text"
 								value={searchName}
 								onChange={(e) => setSearchName(e.target.value)}
-								placeholder="Nhập mã mẫu"
+								placeholder="Tên mẫu"
+								className="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
 							/>
-							<Select
+							<input
+								type="text"
+								value={searchCode}
+								onChange={(e) => setSearchCode(e.target.value)}
+								placeholder="Mã mẫu"
+								className="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+							/>
+							<select
 								value={searchCategory}
 								onChange={(e) => setSearchCategory(e.target.value)}
-								placeholder="Nhập theo loại mẫu"
+								className="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
 							>
-								<option value="">Loại Trang Sức</option>
+								<option value="">Loại trang sức</option>
 								{categories.map((category) => (
 									<option key={category.id} value={category.Name}>
 										{category.Name}
 									</option>
 								))}
-							</Select>
-							<Select
+							</select>
+							<select
 								value={searchIsEngravable}
 								onChange={(e) => setSearchIsEngravable(e.target.value)}
+								className="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
 							>
-								<option value="">Có thể khác chữ?</option>
+								<option value="">Khắc chữ?</option>
 								<option value="true">Có</option>
 								<option value="false">Không</option>
-							</Select>
+							</select>
+							<input
+								type="text"
+								value={searchMainDiamondQuantity}
+								onChange={(e) => setSearchMainDiamondQuantity(e.target.value)}
+								placeholder="Số lượng kim cương chính"
+								className="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+							/>
 							<button
 								onClick={handleSearch}
-								className="bg-primary text-white px-4 py-2 rounded-md hover:bg-primary-dark transition-colors"
+								className="bg-primary text-white px-4 py-2 rounded-lg hover:bg-primary-dark transition-all shadow-md"
 							>
 								Tìm kiếm
 							</button>
@@ -528,107 +589,110 @@ const JewelryModelPage = () => {
 						{loading ? (
 							<p>Đang tải...</p>
 						) : (
-							<ul>
-								{models.map((model) => (
-									<li
-										key={model.Id}
-										className="py-3 flex px-4 bg-white rounded-lg shadow-md mb-4 border border-lightGray cursor-pointer"
-										onClick={() => handleModelClick(model)}
-									>
-										<div className="mt-2">
-											{model.Thumbnail?.MediaPath ? (
-												<img
-													src={model.Thumbnail.MediaPath} // Fixed the property name here
-													alt={model.Thumbnail.MediaName} // Fixed the property name here
-													className="w-32 h-32 object-cover rounded-md" // You can adjust these values to fit your layout
-												/>
-											) : (
-												<div className="w-32 h-32 bg-gray-300 flex items-center justify-center rounded-md">
-													<span className="text-gray-600">
-														Chưa có hình ảnh
-													</span>{' '}
-													{/* Fallback when no thumbnail */}
-												</div>
-											)}
-										</div>
-
-										<div className="ml-4">
-											<strong className="text-xl text-black">
-												{model.Name}
-											</strong>{' '}
-											<div className="text-xl text-black">
-												Mã Mẫu: {model.ModelCode}
-											</div>
-											{model.MainDiamondCount > 0 && (
-												<div className="text-sm text-gray-500">
-													Số lượng kim cương chính:{' '}
-													{model.MainDiamondCount} viên
-												</div>
-											)}
-											<div className="text-sm text-gray-500">
-												Số lượng lựa chọn kim cương tấm:{' '}
-												{model.SideDiamondOptionCount}
-											</div>
-											{/* Displaying more model details conditionally */}
-											{model.IsEngravable && (
-												<div className="text-sm text-gray-500">
-													Có khắc chữ
-												</div>
-											)}
-											{model.MetalSupported &&
-												model.MetalSupported.length > 0 && (
-													<div className="text-sm text-gray-500">
-														Kim loại: {model.MetalSupported.join(', ')}
+							<div>
+								<ul>
+									{models.map((model) => (
+										<li
+											key={model.Id}
+											className="py-3 flex px-4 bg-white rounded-lg shadow-md mb-4 border border-lightGray cursor-pointer"
+											onClick={() => handleModelClick(model)}
+										>
+											<div className="mt-2">
+												{model.Thumbnail?.MediaPath ? (
+													<img
+														src={model.Thumbnail.MediaPath} // Fixed the property name here
+														alt={model.Thumbnail.MediaName} // Fixed the property name here
+														className="w-32 h-32 object-cover rounded-md" // You can adjust these values to fit your layout
+													/>
+												) : (
+													<div className="w-32 h-32 bg-gray-300 flex items-center justify-center rounded-md">
+														<span className="text-gray-600">
+															Chưa có hình ảnh
+														</span>{' '}
+														{/* Fallback when no thumbnail */}
 													</div>
 												)}
-											{model.CraftmanFee > 0 && (
-												<div className="text-sm text-gray-500">
-													Giá gia công: ${model.CraftmanFee}
-												</div>
-											)}
-											{/* Optionally, display a preview or more images */}
-											<div className="mt-2">
-												{model.ThumbnailPath && (
-													<img
-														src={model.ThumbnailPath}
-														alt={model.Name}
-														className="w-32 h-32 object-cover"
-													/>
-												)}
 											</div>
-										</div>
-									</li>
-								))}
-							</ul>
+
+											<div className="ml-4">
+												<strong className="text-xl text-black">
+													{model.Name}
+												</strong>{' '}
+												<div className="text-xl text-black">
+													Mã Mẫu: {model.ModelCode}
+												</div>
+												{model.MainDiamondCount > 0 && (
+													<div className="text-sm text-gray-500">
+														Số lượng kim cương chính:{' '}
+														{model.MainDiamondCount} viên
+													</div>
+												)}
+												<div className="text-sm text-gray-500">
+													Số lượng lựa chọn kim cương tấm:{' '}
+													{model.SideDiamondOptionCount}
+												</div>
+												{/* Displaying more model details conditionally */}
+												{model.IsEngravable && (
+													<div className="text-sm text-gray-500">
+														Có khắc chữ
+													</div>
+												)}
+												{model.MetalSupported &&
+													model.MetalSupported.length > 0 && (
+														<div className="text-sm text-gray-500">
+															Kim loại:{' '}
+															{model.MetalSupported.join(', ')}
+														</div>
+													)}
+												{model.CraftmanFee > 0 && (
+													<div className="text-sm text-gray-500">
+														Giá gia công: ${model.CraftmanFee}
+													</div>
+												)}
+												{/* Optionally, display a preview or more images */}
+												<div className="mt-2">
+													{model.ThumbnailPath && (
+														<img
+															src={model.ThumbnailPath}
+															alt={model.Name}
+															className="w-32 h-32 object-cover"
+														/>
+													)}
+												</div>
+											</div>
+										</li>
+									))}
+								</ul>
+								<div className="pagination-controls flex justify-center space-x-4 mt-4">
+									<button
+										onClick={handlePreviousPage}
+										disabled={currentPage === 1}
+										className="px-4 py-2 bg-primary text-black rounded-lg hover:bg-primaryDark disabled:opacity-50"
+									>
+										Trước
+									</button>
+									<span className="text-lg">{`Trang ${currentPage} / ${totalPage}`}</span>
+									<button
+										onClick={handleNextPage}
+										disabled={currentPage === totalPage}
+										className="px-4 py-2 bg-primary text-black rounded-lg hover:bg-primaryDark disabled:opacity-50"
+									>
+										Sau
+									</button>
+									<select
+										value={pageSize}
+										onChange={(e) =>
+											setPageSize(Number(e.target.value), setCurrentPage(1))
+										}
+										className="form-select p-2 border border-gray rounded-md"
+									>
+										<option value="5">5 mỗi trang</option>
+										<option value="10">10 mỗi trang</option>
+										<option value="20">20 mỗi trang</option>
+									</select>
+								</div>
+							</div>
 						)}{' '}
-						<div className="pagination-controls flex justify-center space-x-4 mt-4">
-							<button
-								onClick={handlePreviousPage}
-								disabled={currentPage === 1}
-								className="px-4 py-2 bg-primary text-black rounded-lg hover:bg-primaryDark disabled:opacity-50"
-							>
-								Trước
-							</button>
-							<span className="text-lg">{`Trang ${currentPage} / ${totalPage}`}</span>
-							<button
-								onClick={handleNextPage}
-								disabled={currentPage === totalPage}
-								className="px-4 py-2 bg-primary text-black rounded-lg hover:bg-primaryDark disabled:opacity-50"
-							>
-								Sau
-							</button>
-							<select
-								value={pageSize}
-								onChange={(e) =>
-									setPageSize(Number(e.target.value), setCurrentPage(1))
-								}
-								className="form-select p-2 border border-gray rounded-md"
-							>
-								<option value="5">5 mỗi trang</option>
-								<option value="10">10 mỗi trang</option>
-								<option value="20">20 mỗi trang</option>
-							</select>
-						</div>
 						<JewelryModelUploadForm
 							jewelryModelId={selectedJewelryModelId}
 							visible={isFormVisible}
@@ -712,7 +776,7 @@ const JewelryModelPage = () => {
 															</option>
 															<option value="2">Hạt</option>
 															<option value="3">Byzantine</option>
-															<option value="0">Dây Cáp"</option>
+															<option value="0">Dây Cáp</option>
 															<option value="5">
 																Dây Xích Phẳng
 															</option>
@@ -770,16 +834,20 @@ const JewelryModelPage = () => {
 																htmlFor={field}
 																className="m-3 text-gray"
 															>
-																{field.replace(/([A-Z])/g, ' $1')}
+																{vietnameseFieldNames[field] ||
+																	field.replace(
+																		/([A-Z])/g,
+																		' $1'
+																	)}
 															</label>
 														</div>
 													) : (
 														// Render a text input for other fields
 														<input
-															placeholder={field.replace(
-																/([A-Z])/g,
-																' $1'
-															)}
+															placeholder={
+																vietnameseFieldNames[field] ||
+																field.replace(/([A-Z])/g, ' $1')
+															}
 															type="text"
 															name={field}
 															value={modelSpec[field]}
@@ -1348,6 +1416,23 @@ const JewelryModelPage = () => {
 																))}
 														</select>
 
+														{/* Unit Selector */}
+														<select
+															value={selectedUnit}
+															onChange={handleUnitChange}
+															className="form-input w-full p-2 border border-gray text-black rounded-md"
+														>
+															{sizes.map((unitData) => (
+																<option
+																	key={unitData.Unit}
+																	value={unitData.Unit}
+																>
+																	{unitData.Unit}
+																</option>
+															))}
+														</select>
+
+														{/* Size Selector */}
 														<select
 															value={spec.sizeId}
 															onChange={(e) =>
@@ -1357,23 +1442,16 @@ const JewelryModelPage = () => {
 																	e.target.value
 																)
 															}
-															required
-															placeholder="Size ID"
 															className="form-input w-full p-2 border border-gray text-black rounded-md"
 														>
-															{' '}
-															<option value="">Chọn size( mm)</option>
-															{Array.isArray(sizes) &&
-																sizes.map((size) => (
-																	<option
-																		className="text-black"
-																		key={size.id}
-																		value={size.id}
-																	>
-																		{size.Value}{' '}
-																		{/* Display the metal name */}
-																	</option>
-																))}
+															{filteredSizes.map((size) => (
+																<option
+																	key={size.Id}
+																	value={size.Id}
+																>
+																	{size.Value} {selectedUnit}
+																</option>
+															))}
 														</select>
 
 														<input
@@ -1432,12 +1510,7 @@ const JewelryModelPage = () => {
 					}}
 					onView={() => handleView(selectedModel.Id)}
 					onDelete={() => {
-						const isConfirmed = window.confirm(
-							'Bạn có chắc chắn muốn xóa món trang sức này không?'
-						);
-						if (isConfirmed) {
-							handleDeleteModel();
-						}
+						handleDeleteModel();
 					}}
 					onClose={handleCloseModal}
 				/>

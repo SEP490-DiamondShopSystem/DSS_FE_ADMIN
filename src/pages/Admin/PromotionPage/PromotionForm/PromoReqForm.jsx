@@ -3,7 +3,7 @@ import {Button, Col, Form, Input, InputNumber, Row, Select, Space, Modal} from '
 import React, {useState} from 'react';
 import JewelryModelList from '../JewelryModelList';
 
-export const PromoReqForm = ({form, shapes, Option, removeRequirement}) => {
+export const PromoReqForm = ({form, shapes, Option, removeRequirement, isEditing = false}) => {
 	const [isPopupVisible, setIsPopupVisible] = useState(false);
 	const [selectedModel, setSelectedModel] = useState(null);
 	const [selectedModelName, setSelectedModelName] = useState(null);
@@ -20,8 +20,6 @@ export const PromoReqForm = ({form, shapes, Option, removeRequirement}) => {
 		const isOrder = targetType === 3;
 		const isDiamond = targetType === 2;
 		const isJewelryModel = targetType === 1;
-
-		// Set default values or clear fields based on target type
 		setFieldsValue({
 			[`requirements[${name}].quantity`]: isOrder ? undefined : '',
 			[`requirements[${name}].moneyAmount`]: '',
@@ -54,6 +52,7 @@ export const PromoReqForm = ({form, shapes, Option, removeRequirement}) => {
 					<>
 						{fields.map(({key, name, fieldKey, ...restField}) => {
 							const requirement = form.getFieldValue(['requirements', name]);
+							const hasExistingId = requirement?.id && isEditing;
 
 							return (
 								<Space key={key} className="flex mb-4 space-x-4" align="baseline">
@@ -74,7 +73,11 @@ export const PromoReqForm = ({form, shapes, Option, removeRequirement}) => {
 													labelCol={{span: 24}}
 													wrapperCol={{span: 24}}
 												>
-													<Input className="w-full" placeholder="Tên" />
+													<Input
+														className="w-full"
+														placeholder="Tên"
+														disabled={hasExistingId}
+													/>
 												</Form.Item>
 												<Form.Item
 													label="Operator"
@@ -112,7 +115,9 @@ export const PromoReqForm = ({form, shapes, Option, removeRequirement}) => {
 														onChange={(value) =>
 															handleAmountChange(value)
 														}
-														disabled={quantity !== null} // Disable if quantity is filled
+														disabled={
+															quantity !== null || hasExistingId
+														}
 													/>
 												</Form.Item>
 												<Form.Item
@@ -132,6 +137,7 @@ export const PromoReqForm = ({form, shapes, Option, removeRequirement}) => {
 																form.setFieldsValue
 															)
 														}
+														disabled={hasExistingId}
 													>
 														{Option && (
 															<>
@@ -162,7 +168,9 @@ export const PromoReqForm = ({form, shapes, Option, removeRequirement}) => {
 														onChange={(value) =>
 															handleQuantityChange(value)
 														}
-														disabled={moneyAmount !== null} // Disable if moneyAmount is filled
+														disabled={
+															moneyAmount !== null || hasExistingId
+														} // Disable if moneyAmount is filled
 													/>
 												</Form.Item>
 											</Col>
@@ -198,7 +206,10 @@ export const PromoReqForm = ({form, shapes, Option, removeRequirement}) => {
 																labelCol={{span: 24}}
 																wrapperCol={{span: 24}}
 															>
-																<Select className="w-full">
+																<Select
+																	className="w-full"
+																	disabled={hasExistingId}
+																>
 																	{Option ? (
 																		<>
 																			<Option value={1}>
@@ -236,7 +247,10 @@ export const PromoReqForm = ({form, shapes, Option, removeRequirement}) => {
 																	},
 																]}
 															>
-																<Select mode="multiple">
+																<Select
+																	mode="multiple"
+																	disabled={hasExistingId}
+																>
 																	{shapes?.map((shape) => (
 																		<Option
 																			key={shape.Id}
@@ -274,6 +288,7 @@ export const PromoReqForm = ({form, shapes, Option, removeRequirement}) => {
 																	<InputNumber
 																		className="w-full"
 																		min={0}
+																		disabled={hasExistingId}
 																	/>
 																</Form.Item>
 																<Form.Item
@@ -300,6 +315,7 @@ export const PromoReqForm = ({form, shapes, Option, removeRequirement}) => {
 																	<InputNumber
 																		className="w-full"
 																		min={0}
+																		disabled={hasExistingId}
 																	/>
 																</Form.Item>
 															</div>
@@ -325,7 +341,10 @@ export const PromoReqForm = ({form, shapes, Option, removeRequirement}) => {
 																		},
 																	]}
 																>
-																	<Select className="w-full">
+																	<Select
+																		className="w-full"
+																		disabled={hasExistingId}
+																	>
 																		{Option ? (
 																			<>
 																				<Option value={1}>
@@ -377,7 +396,10 @@ export const PromoReqForm = ({form, shapes, Option, removeRequirement}) => {
 																		},
 																	]}
 																>
-																	<Select className="w-full">
+																	<Select
+																		className="w-full"
+																		disabled={hasExistingId}
+																	>
 																		{Option ? (
 																			<>
 																				<Option value={1}>
@@ -424,7 +446,9 @@ export const PromoReqForm = ({form, shapes, Option, removeRequirement}) => {
 																		'colorFrom',
 																	]}
 																>
-																	<Select>
+																	<Select
+																		disabled={hasExistingId}
+																	>
 																		{Option ? (
 																			<>
 																				<Option value={1}>
@@ -469,7 +493,9 @@ export const PromoReqForm = ({form, shapes, Option, removeRequirement}) => {
 																		'colorTo',
 																	]}
 																>
-																	<Select>
+																	<Select
+																		disabled={hasExistingId}
+																	>
 																		{Option ? (
 																			<>
 																				<Option value={1}>
@@ -523,7 +549,10 @@ export const PromoReqForm = ({form, shapes, Option, removeRequirement}) => {
 																		},
 																	]}
 																>
-																	<Select className="w-full">
+																	<Select
+																		className="w-full"
+																		disabled={hasExistingId}
+																	>
 																		{Option ? (
 																			<>
 																				<Option value={1}>
@@ -560,7 +589,10 @@ export const PromoReqForm = ({form, shapes, Option, removeRequirement}) => {
 																		},
 																	]}
 																>
-																	<Select className="w-full">
+																	<Select
+																		className="w-full"
+																		disabled={hasExistingId}
+																	>
 																		{Option ? (
 																			<>
 																				<Option value={1}>
@@ -599,7 +631,10 @@ export const PromoReqForm = ({form, shapes, Option, removeRequirement}) => {
 																},
 															]}
 														>
-															<Input readOnly />
+															<Input
+																readOnly
+																disabled={hasExistingId}
+															/>
 														</Form.Item>
 														<Form.Item
 															{...restField}
@@ -610,10 +645,14 @@ export const PromoReqForm = ({form, shapes, Option, removeRequirement}) => {
 																'jewelryModelName',
 															]}
 														>
-															<Input readOnly />
+															<Input
+																readOnly
+																disabled={hasExistingId}
+															/>
 														</Form.Item>
 														<Button
 															onClick={() => setIsPopupVisible(true)}
+															disabled={hasExistingId}
 														>
 															Chọn Mẫu Trang Sức
 														</Button>
