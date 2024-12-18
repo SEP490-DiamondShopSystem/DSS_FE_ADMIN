@@ -238,7 +238,7 @@ const PromotionPage = ({promotionData}) => {
 							targetType: gift.TargetType,
 							unitType: gift.UnitType,
 							unitValue: gift.UnitValue || 0,
-							maxAmount: gift.MaxAmout || 0,
+							maxAmount: gift.MaxAmount || 0,
 							amount: gift.Amount || 0,
 							itemCode: gift.ItemCode || '',
 							promotionId: gift.PromotionId,
