@@ -1874,7 +1874,9 @@ const TimeLineOrder = ({
 										<CloseCircleOutlined /> {ORDER_STATUS_TEXTS.Delivery_Failed}
 									</p>
 								</div>
-
+								<div className="text-base font-semibold">
+									Số lần giao hàng thất bại: {orders?.ShipFailedCount}
+								</div>
 								<>
 									<div className="flex mt-2">
 										<p className="text-red mr-1">*</p>
