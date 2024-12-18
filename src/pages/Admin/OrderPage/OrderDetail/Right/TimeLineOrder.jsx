@@ -1875,7 +1875,8 @@ const TimeLineOrder = ({
 									</p>
 								</div>
 								<div className="text-base font-semibold">
-									Số lần giao hàng thất bại: {orders?.ShipFailedCount}
+									Số lần giao hàng thất bại do lỗi khách hàng:{' '}
+									{orders?.ShipFailedCount}
 								</div>
 								<>
 									<div className="flex mt-2">
