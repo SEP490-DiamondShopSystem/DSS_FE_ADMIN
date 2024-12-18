@@ -172,6 +172,19 @@ export const handleAddPrice = createAsyncThunk(
 	}
 );
 
+export const handleSetActive = createAsyncThunk(
+	'diamondSlice/handleSetActive',
+	async (updateDiamondStates, {rejectWithValue}) => {
+		try {
+			const response = await api.put(`/Diamond/SetActive`, {updateDiamondStates});
+
+			return response;
+		} catch (error) {
+			return rejectWithValue(error.data);
+		}
+	}
+);
+
 export const diamondSlice = createSlice({
 	name: 'diamondSlice',
 	initialState: {
@@ -183,6 +196,7 @@ export const diamondSlice = createSlice({
 		loading: false,
 		error: null,
 		filterLimits: null,
+		active: null,
 	},
 	reducers: {
 		setUser: (state, action) => {
@@ -275,6 +289,17 @@ export const diamondSlice = createSlice({
 				state.price = action.payload;
 			})
 			.addCase(handleAddPrice.rejected, (state, action) => {
+				state.loading = false;
+				state.error = action.payload;
+			})
+			.addCase(handleSetActive.pending, (state) => {
+				state.loading = true;
+			})
+			.addCase(handleSetActive.fulfilled, (state, action) => {
+				state.loading = false;
+				state.active = action.payload;
+			})
+			.addCase(handleSetActive.rejected, (state, action) => {
 				state.loading = false;
 				state.error = action.payload;
 			});
