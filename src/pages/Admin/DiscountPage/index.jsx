@@ -24,6 +24,7 @@ import {
 } from '../../../redux/slices/discountSlice';
 import {enumMappings} from '../../../utils/constant';
 import DiscountForm from './DiscountForm/DiscountForm';
+import {Helmet} from 'react-helmet';
 
 const DiscountPage = ({discountData}) => {
 	const shapes = useSelector(getAllShapeSelector);
@@ -655,105 +656,108 @@ const DiscountPage = ({discountData}) => {
 		},
 
 		{
-				title: '',
-				key: 'action',
-				render: (_, record) => {
-					const status = record.Status;
-					const canEdit = status === 1 || status === 2; // Scheduled or Active
-					const canPause = status === 2; // Only Active can be paused
-					const canStart = status === 1; // Only Scheduled can be started
-					const canContinue = status === 3; // Only Paused can be continued
-					const canCancel = status === 1 || status === 3; // Scheduled and Paused can be cancelled
-					const canDelete = status === 4 || status === 5; // Expired or Cancelled can be deleted
-	
-					return (
-						<Space size="middle">
-							{/* Edit Button (only for Scheduled or Active) */}
-							{canEdit && (
-								<Tooltip title="Sửa">
-									<Button type="link" onClick={() => handleEdit(record)}>
-										<EditFilled />
+			title: '',
+			key: 'action',
+			render: (_, record) => {
+				const status = record.Status;
+				const canEdit = status === 1 || status === 2; // Scheduled or Active
+				const canPause = status === 2; // Only Active can be paused
+				const canStart = status === 1; // Only Scheduled can be started
+				const canContinue = status === 3; // Only Paused can be continued
+				const canCancel = status === 1 || status === 3; // Scheduled and Paused can be cancelled
+				const canDelete = status === 4 || status === 5; // Expired or Cancelled can be deleted
+
+				return (
+					<Space size="middle">
+						{/* Edit Button (only for Scheduled or Active) */}
+						{canEdit && (
+							<Tooltip title="Sửa">
+								<Button type="link" onClick={() => handleEdit(record)}>
+									<EditFilled />
+								</Button>
+							</Tooltip>
+						)}
+
+						{/* Start Button (for Scheduled promotions) */}
+						{canStart && (
+							<Popconfirm
+								title="Bạn có chắc bắt đầu giảm giá này không?"
+								onConfirm={() => handleStart(record.Id)}
+							>
+								<Tooltip title="Bắt Đầu Giảm Giá">
+									<Button type="link">
+										<PlayCircleOutlined />
 									</Button>
 								</Tooltip>
-							)}
-	
-							{/* Start Button (for Scheduled promotions) */}
-							{canStart && (
-								<Popconfirm
-									title="Bạn có chắc bắt đầu giảm giá này không?"
-									onConfirm={() => handleStart(record.Id)}
-								>
-									<Tooltip title="Bắt Đầu Giảm Giá">
-										<Button type="link">
-											<PlayCircleOutlined />
-										</Button>
-									</Tooltip>
-								</Popconfirm>
-							)}
-	
-							{/* Pause Button (for Active promotions) */}
-							{canPause && (
-								<Popconfirm
-									title="Bạn có chắc tạm ngưng giảm giá này không?"
-									onConfirm={() => handlePause(record.Id)}
-								>
-									<Tooltip title="Tạm Ngưng Giảm Giá">
-										<Button type="link" danger>
-											<PauseOutlined />
-										</Button>
-									</Tooltip>
-								</Popconfirm>
-							)}
-	
-							{/* Continue Button (for Paused promotions) */}
-							{canContinue && (
-								<Popconfirm
-									title="Bạn có chắc tiếp tục giảm giá này không?"
-									onConfirm={() => handleContinue(record.Id)}
-								>
-									<Tooltip title="Tiếp Tục Giảm Giá">
-										<Button type="link">
-											<PlayCircleOutlined />
-										</Button>
-									</Tooltip>
-								</Popconfirm>
-							)}
-	
-							{/* Cancel Button (for Scheduled or Active promotions) */}
-							{canCancel && (
-								<Popconfirm
-									title="Bạn có chắc hủy giảm giá này không?"
-									onConfirm={() => handleCancel(record.Id)}
-								>
-									<Tooltip title="Hủy Giảm Giá">
-										<Button type="link" danger>
-											<CloseOutlined />
-										</Button>
-									</Tooltip>
-								</Popconfirm>
-							)}
-	
-							{/* Delete Button (for Expired or Cancelled promotions) */}
-							{canDelete && (
-								<Popconfirm
-									title="Xác Nhận Xóa?"
-									onConfirm={() => handleDelete(record.Id)}
-								>
-									<Tooltip title="Xóa">
-										<Button type="link" danger>
-											<DeleteFilled />
-										</Button>
-									</Tooltip>
-								</Popconfirm>
-							)}
-						</Space>
-					);
-				},
+							</Popconfirm>
+						)}
+
+						{/* Pause Button (for Active promotions) */}
+						{canPause && (
+							<Popconfirm
+								title="Bạn có chắc tạm ngưng giảm giá này không?"
+								onConfirm={() => handlePause(record.Id)}
+							>
+								<Tooltip title="Tạm Ngưng Giảm Giá">
+									<Button type="link" danger>
+										<PauseOutlined />
+									</Button>
+								</Tooltip>
+							</Popconfirm>
+						)}
+
+						{/* Continue Button (for Paused promotions) */}
+						{canContinue && (
+							<Popconfirm
+								title="Bạn có chắc tiếp tục giảm giá này không?"
+								onConfirm={() => handleContinue(record.Id)}
+							>
+								<Tooltip title="Tiếp Tục Giảm Giá">
+									<Button type="link">
+										<PlayCircleOutlined />
+									</Button>
+								</Tooltip>
+							</Popconfirm>
+						)}
+
+						{/* Cancel Button (for Scheduled or Active promotions) */}
+						{canCancel && (
+							<Popconfirm
+								title="Bạn có chắc hủy giảm giá này không?"
+								onConfirm={() => handleCancel(record.Id)}
+							>
+								<Tooltip title="Hủy Giảm Giá">
+									<Button type="link" danger>
+										<CloseOutlined />
+									</Button>
+								</Tooltip>
+							</Popconfirm>
+						)}
+
+						{/* Delete Button (for Expired or Cancelled promotions) */}
+						{canDelete && (
+							<Popconfirm
+								title="Xác Nhận Xóa?"
+								onConfirm={() => handleDelete(record.Id)}
+							>
+								<Tooltip title="Xóa">
+									<Button type="link" danger>
+										<DeleteFilled />
+									</Button>
+								</Tooltip>
+							</Popconfirm>
+						)}
+					</Space>
+				);
 			},
+		},
 	];
 
 	return (
 		<div className="p-8 bg-white shadow-md rounded-lg">
+			<Helmet>
+				<title>Quản Lí Giảm Giá</title>
+			</Helmet>
 			<h2 className="text-2xl font-bold mb-6">
 				{isEditing ? 'Cập Nhật Giảm Giá' : 'Tạo Giảm Giá Mới'}
 			</h2>

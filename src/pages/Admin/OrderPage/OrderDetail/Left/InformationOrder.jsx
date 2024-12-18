@@ -38,6 +38,7 @@ import {
 	getOrderStatusTag,
 } from '../../../../../utils';
 import {getTransactionByOrderId} from '../../../../../redux/slices/transactionSlice';
+import CountdownTimer from '../Countdown';
 
 const {Title, Text} = Typography;
 
@@ -460,6 +461,22 @@ const InformationOrder = ({orders, statusOrder, paymentStatusOrder, userDetail})
 						)}
 					</Col>
 				</Row>
+				{orders?.ExpiredDate && (
+					<Row gutter={[16, 16]} justify="center" align="middle" className="my-3">
+						<Col xs={24} lg={12}>
+							<>
+								<Text strong style={{fontSize: 18}}>
+									Thời gian hết hạn thanh toán
+								</Text>
+								<br />
+								<Text className="text-lg">
+									<CountdownTimer expiredDate={orders?.ExpiredDate} />
+								</Text>
+							</>
+						</Col>
+						<Col xs={0} lg={12}></Col>
+					</Row>
+				)}
 				<Row gutter={[16, 16]} justify="center" align="middle" className="my-3">
 					<Col xs={24} lg={12}>
 						<Text strong style={{fontSize: 18}}>
@@ -477,7 +494,9 @@ const InformationOrder = ({orders, statusOrder, paymentStatusOrder, userDetail})
 												alt={`evidence-${index}`}
 												className="mt-5 w-full md:w-[600px]"
 											/>
-										) : null
+										) : (
+											<>Chưa có chứng từ nào</>
+										)
 									)}
 								</Space>
 							</>
