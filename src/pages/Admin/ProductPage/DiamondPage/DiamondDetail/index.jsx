@@ -6,6 +6,7 @@ import {
 	getDiamondDetail,
 	handleAddPrice,
 	handleLockDiamond,
+	handleSetActive,
 } from '../../../../../redux/slices/diamondSlice';
 import {DiamondUploadForm} from '../DiamondUploadForm';
 import {LockDiamondModal} from '../LockDiamondModal/LockDiamondModal';
@@ -85,6 +86,20 @@ const DiamondDetailPage = () => {
 				setFetch(res);
 			});
 	};
+	const handleActive = () => {
+		const updateDiamondStates = [
+			{
+				diamondId: id,
+				setActive: diamond?.Status === 4 ? true : false,
+			},
+		];
+		dispatch(handleSetActive(updateDiamondStates))
+			.unwrap()
+			.then((res) => {
+				message.success(`Thay Đổi Trạng Thái Thành Công!`);
+				setFetch(res);
+			});
+	};
 
 	return (
 		<div className="bg-gray-100 min-h-screen py-10">
@@ -95,6 +110,7 @@ const DiamondDetailPage = () => {
 					id={id}
 					handleLockDiamondView={handleLockDiamondView}
 					handleOpenModal={handleOpenModal}
+					handleActive={handleActive}
 				/>
 			</div>
 			<DiamondUploadForm
