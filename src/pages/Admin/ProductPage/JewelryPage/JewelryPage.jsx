@@ -403,7 +403,7 @@ const JewelryPage = () => {
 																				</span>
 																			</div>
 																		) : (
-																			<span className="text-xl">
+																			<span className="">
 																				{formatPrice(
 																					jewelry.TotalPrice
 																				)}
@@ -427,8 +427,8 @@ const JewelryPage = () => {
 																</Tooltip>
 																<Tooltip title="Kích Thước">
 																	<span>
-																		{jewelry.Size?.Value}{' '}
-																		{jewelry.Size?.Unit}
+																		{jewelry?.Size?.Value}{' '}
+																		{jewelry?.Size?.Unit}
 																	</span>
 																</Tooltip>
 															</div>
