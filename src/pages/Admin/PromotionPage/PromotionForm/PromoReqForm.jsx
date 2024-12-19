@@ -8,6 +8,8 @@ export const PromoReqForm = ({form, shapes, Option, removeRequirement, isEditing
 	const [selectedModel, setSelectedModel] = useState(null);
 	const [selectedModelName, setSelectedModelName] = useState(null);
 
+	const [requirementValues, setRequirementValues] = useState({});
+
 	const [moneyAmount, setMoneyAmount] = useState(null);
 	const handleAmountChange = (value) => {
 		setMoneyAmount(value);
@@ -28,6 +30,7 @@ export const PromoReqForm = ({form, shapes, Option, removeRequirement, isEditing
 		});
 	};
 	const handleSelectModel = (model, fieldKey) => {
+		
 		setSelectedModel(model?.Id);
 		setSelectedModelName(model?.Name);
 
@@ -44,7 +47,37 @@ export const PromoReqForm = ({form, shapes, Option, removeRequirement, isEditing
 		});
 		setIsPopupVisible(false);
 	};
+	const updateRequirementValues = (name, field, value) => {
+		const updatedValues = {
+			...requirementValues,
+			[name]: {
+				...requirementValues[name],
+				[field]: value,
+			},
+		};
+		setRequirementValues(updatedValues);
+	};
+	const isFieldDisabled = (name, field) => {
+		const currentRequirementValues = requirementValues[name] || {};
+		if (field === 'moneyAmount' && currentRequirementValues.quantity) {
+			return true;
+		}
+		if (field === 'quantity' && currentRequirementValues.moneyAmount) {
+			return true;
+		}
+		return false;
+	};
+	const hasExclusiveValue = (name) => {
+		const currentValues = requirementValues[name] || {};
+		return currentValues.moneyAmount || currentValues.quantity;
+	};
 
+	// Check if any other requirement has a value
+	const hasAnyOtherValue = (currentName) => {
+		return Object.entries(requirementValues).some(
+			([name, values]) => name !== currentName && (values.moneyAmount || values.quantity)
+		);
+	};
 	return (
 		<div>
 			<Form.List name="requirements">
@@ -100,23 +133,20 @@ export const PromoReqForm = ({form, shapes, Option, removeRequirement, isEditing
 													{...restField}
 													name={[name, 'moneyAmount']}
 													fieldKey={[fieldKey, 'moneyAmount']}
-													rules={[
-														{
-															required: false,
-															message: 'Money Amount is required',
-														},
-													]}
-													labelCol={{span: 24}}
-													wrapperCol={{span: 24}}
 												>
 													<InputNumber
 														className="w-full"
-														placeholder="Enter Money moneyAmount"
-														onChange={(value) =>
-															handleAmountChange(value)
-														}
+														placeholder="Enter Money Amount"
+														onChange={(value) => {
+															updateRequirementValues(
+																name,
+																'moneyAmount',
+																value
+															);
+														}}
 														disabled={
-															quantity !== null || hasExistingId
+															isFieldDisabled(name, 'moneyAmount') ||
+															hasExistingId
 														}
 													/>
 												</Form.Item>
@@ -153,24 +183,21 @@ export const PromoReqForm = ({form, shapes, Option, removeRequirement, isEditing
 													{...restField}
 													name={[name, 'quantity']}
 													fieldKey={[fieldKey, 'quantity']}
-													rules={[
-														{
-															required: false,
-															message: 'Quantity is required',
-														},
-													]}
-													labelCol={{span: 24}}
-													wrapperCol={{span: 24}}
 												>
 													<InputNumber
 														min={1}
 														className="w-full"
-														onChange={(value) =>
-															handleQuantityChange(value)
-														}
+														onChange={(value) => {
+															updateRequirementValues(
+																name,
+																'quantity',
+																value
+															);
+														}}
 														disabled={
-															moneyAmount !== null || hasExistingId
-														} // Disable if moneyAmount is filled
+															isFieldDisabled(name, 'quantity') ||
+															hasExistingId
+														}
 													/>
 												</Form.Item>
 											</Col>
